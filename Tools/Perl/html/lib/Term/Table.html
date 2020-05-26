@@ -1,0 +1,227 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#INTERFACE">INTERFACE</a>
+    <ul>
+      <li><a href="#OPTIONS">OPTIONS</a></li>
+    </ul>
+  </li>
+  <li><a href="#NOTE-ON-UNICODE-WIDE-CHARACTERS">NOTE ON UNICODE/WIDE CHARACTERS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Term::Table - Format a header and rows into a table</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is used by some failing tests to provide diagnostics about what has gone wrong. This module is able to generic format rows of data into tables.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Term::Table</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$table</span> <span class="operator">=</span> <span class="variable">Term::Table</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">max_width</span>    <span class="operator">=&gt;</span> <span class="number">80</span><span class="operator">,</span> <span class="comment"># defaults to terminal size </span>
+        <span class="string">collapse</span>     <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="comment"># do not show empty columns</span>
+        <span class="string">header</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'name'</span><span class="operator">,</span> <span class="string">'age'</span><span class="operator">,</span> <span class="string">'hair color'</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">rows</span>         <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="operator">[</span> <span class="string">'Fred Flinstone'</span><span class="operator">,</span>  <span class="number">2000000</span><span class="operator">,</span> <span class="string">'black'</span> <span class="operator">]</span><span class="operator">,</span>
+            <span class="operator">[</span> <span class="string">'Wilma Flinstone'</span><span class="operator">,</span> <span class="number">1999995</span><span class="operator">,</span> <span class="string">'red'</span> <span class="operator">]</span><span class="operator">,</span>
+            <span class="operator">...</span>
+        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">say</span> <span class="variable">$_</span> <span class="keyword">for</span> <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">render</span><span class="operator">;</span>
+</code></pre>
+
+<p>This prints a table like this:</p>
+
+<pre><code>    +-----------------+---------+------------+
+    | name            | age     | hair color |
+    +-----------------+---------+------------+
+    | Fred Flinstone  | 2000000 | black      |
+    | Wilma Flinstone | 1999995 | red        |
+    | ...             | ...     | ...        |
+    +-----------------+---------+------------+</code></pre>
+
+<h1 id="INTERFACE">INTERFACE</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Term::Table</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$table</span> <span class="operator">=</span> <span class="variable">Term::Table</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(...);</span>
+</code></pre>
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+
+<dt id="header">header =&gt; [ ... ]</dt>
+<dd>
+
+<p>If you want a header specify it here. This takes an arrayref with each columns heading.</p>
+
+</dd>
+<dt id="rows">rows =&gt; [ [...], [...], ... ]</dt>
+<dd>
+
+<p>This should be an arrayref containing an arrayref per row.</p>
+
+</dd>
+<dt id="collapse-bool">collapse =&gt; $bool</dt>
+<dd>
+
+<p>Use this if you want to hide empty columns, that is any column that has no data in any row. Having a header for the column will not effect collapse.</p>
+
+</dd>
+<dt id="max_width-num">max_width =&gt; $num</dt>
+<dd>
+
+<p>Set the maximum width of the table, the table may not be this big, but it will be no bigger. If none is specified it will attempt to find the width of your terminal and use that, otherwise it falls back to the terminal width or <code>80</code>.</p>
+
+</dd>
+<dt id="sanitize-bool">sanitize =&gt; $bool</dt>
+<dd>
+
+<p>This will sanitize all the data in the table such that newlines, control characters, and all whitespace except for ASCII 20 <code>&#39; &#39;</code> are replaced with escape sequences. This prevents newlines, tabs, and similar whitespace from disrupting the table.</p>
+
+<p><b>Note:</b> newlines are marked as &#39;\n&#39;, but a newline is also inserted into the data so that it typically displays in a way that is useful to humans.</p>
+
+<p>Example:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$field</span> <span class="operator">=</span> <span class="string">"foo\nbar\nbaz\n"</span><span class="operator">;</span>
+    
+    <span class="keyword">print</span> <span class="keyword">join</span> <span class="string">"\n"</span> <span class="operator">=&gt;</span> <span class="variable">table</span><span class="operator">(</span>
+        <span class="string">sanitize</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="string">rows</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="operator">[</span><span class="variable">$field</span><span class="operator">,</span>      <span class="string">'col2'</span>     <span class="operator">]</span><span class="operator">,</span>
+            <span class="operator">[</span><span class="string">'row2 col1'</span><span class="operator">,</span> <span class="string">'row2 col2'</span><span class="operator">]</span>
+        <span class="operator">]</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>Prints:</p>
+
+<pre><code>    +-----------------+-----------+
+    | foo\n           | col2      |
+    | bar\n           |           |
+    | baz\n           |           |
+    |                 |           |
+    | row2 col1       | row2 col2 |
+    +-----------------+-----------+</code></pre>
+
+<p>So it marks the newlines by inserting the escape sequence, but it also shows the data across as many lines as it would normally display.</p>
+
+</dd>
+<dt id="mark_tail-bool">mark_tail =&gt; $bool</dt>
+<dd>
+
+<p>This will replace the last whitespace character of any trailing whitespace with its escape sequence. This makes it easier to notice trailing whitespace when comparing values.</p>
+
+</dd>
+<dt id="show_header-bool">show_header =&gt; $bool</dt>
+<dd>
+
+<p>Set this to false to hide the header. This defaults to true if the header is set, false if no header is provided.</p>
+
+</dd>
+<dt id="auto_columns-bool">auto_columns =&gt; $bool</dt>
+<dd>
+
+<p>Set this to true to automatically add columns that are not named in the header. This defaults to false if a header is provided, and defaults to true when there is no header.</p>
+
+</dd>
+<dt id="no_collapse-col_num_a-col_num_b">no_collapse =&gt; [ $col_num_a, $col_num_b, ... ]</dt>
+<dd>
+
+</dd>
+<dt id="no_collapse-col_name_a-col_name_b">no_collapse =&gt; [ $col_name_a, $col_name_b, ... ]</dt>
+<dd>
+
+</dd>
+<dt id="no_collapse-col_num_a-1-col_num_b-1">no_collapse =&gt; { $col_num_a =&gt; 1, $col_num_b =&gt; 1, ... }</dt>
+<dd>
+
+</dd>
+<dt id="no_collapse-col_name_a-1-col_name_b-1">no_collapse =&gt; { $col_name_a =&gt; 1, $col_name_b =&gt; 1, ... }</dt>
+<dd>
+
+<p>Specify (by number and/or name) columns that should not be removed when empty. The &#39;name&#39; form only works when a header is specified. There is currently no protection to insure that names you specify are actually in the header, invalid names are ignored, patches to fix this will be happily accepted.</p>
+
+</dd>
+</dl>
+
+<h1 id="NOTE-ON-UNICODE-WIDE-CHARACTERS">NOTE ON UNICODE/WIDE CHARACTERS</h1>
+
+<p>Some unicode characters, such as <code>&#x5A67;</code> (<code>U+5A67</code>) are wider than others. These will render just fine if you <code><span class="keyword">use</span> <span class="variable">utf8</span><span class="operator">;</span>
+</code> as necessary, and <a>Unicode::GCString</a> is installed, however if the module is not installed there will be anomalies in the table:</p>
+
+<pre><code>    +-----+-----+---+
+    | a   | b   | c |
+    +-----+-----+---+
+    | &#x5A67; | x   | y |
+    | x   | y   | z |
+    | x   | &#x5A67; | z |
+    +-----+-----+---+</code></pre>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Term-Table can be found at <i>http://github.com/exodist/Term-Table/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2016 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

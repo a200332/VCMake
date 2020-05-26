@@ -1,0 +1,310 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a>
+    <ul>
+      <li><a href="#TIME-ZONES">TIME ZONES</a></li>
+      <li><a href="#INTERVAL-ELEMENTS">INTERVAL ELEMENTS</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#COPYRIGHT-LICENSE">COPYRIGHT &amp; LICENSE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Oracle - Parse and format Oracle dates and timestamps</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">DateTime::Format::Oracle</span><span class="operator">;</span>
+  
+  <span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_DATE_FORMAT'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">'YYYY-MM-DD HH24:MI:SS'</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Oracle</span><span class="operator">-&gt;</span><span class="variable">parse_datetime</span><span class="operator">(</span><span class="string">'2003-01-16 23:12:01'</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$string</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Oracle</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span><span class="variable">$dt</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module may be used to convert Oracle date and timestamp values into <code>DateTime</code> objects. It also can take a <code>DateTime</code> object and produce a date string matching the <code>NLS_DATE_FORMAT</code>.</p>
+
+<p>Oracle has flexible date formatting via its <code>NLS_DATE_FORMAT</code> session variable. Date values will be returned from Oracle according to the current value of that variable. Date values going into Oracle must also match the current setting of <code>NLS_DATE_FORMAT</code>.</p>
+
+<p>Timestamp values will match either the <code>NLS_TIMESTAMP_FORMAT</code> or <code>NLS_TIMESTAMP_TZ_FORMAT</code> session variables.</p>
+
+<p>This module keeps track of these Oracle session variable values by examining environment variables of the same name. Each time one of Oracle&#39;s formatting session variables is updated, the <code>%ENV</code> hash must also be updated.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class offers the following methods.</p>
+
+<ul>
+
+<li><p>nls_date_format</p>
+
+<p>This method is used to determine the current value of Oracle&#39;s <code>NLS_DATE_FORMAT</code>. It currently just reads the value from</p>
+
+<pre><code>  <span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_DATE_FORMAT'</span><span class="operator">}</span>
+</code></pre>
+
+<p>or if that is not set, from the package variable <code>$nls_date_format</code>, which has a default value of <code>YYYY-MM-DD HH24:MI:SS</code>. This is a good default to have, but is not Oracle&#39;s default. Dates will fail to parse if Oracle&#39;s NLS_DATE_FORMAT and the value from this method are not the same.</p>
+
+<p>If you want to use the default from this module, you can do something like this after you connect to Oracle:</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(</span>
+      <span class="string">"alter session set nls_date_format = '"</span> <span class="operator">.</span>
+      <span class="variable">DateTime::Format::Oracle</span><span class="operator">-&gt;</span><span class="variable">nls_date_format</span> <span class="operator">.</span>
+      <span class="string">"'"</span>
+  <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>nls_timestamp_format</p>
+
+<p>This method is used to determine the current value of Oracle&#39;s <code>NLS_TIMESTAMP_FORMAT</code>. It currently just reads the value from</p>
+
+<pre><code>  <span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_TIMESTAMP_FORMAT'</span><span class="operator">}</span>
+</code></pre>
+
+<p>or if that is not set, from the package variable <code>$nls_timestamp_format</code>, which has a default value of <code>YYYY-MM-DD HH24:MI:SS</code>. This is a good default to have, but is not Oracle&#39;s default. Dates will fail to parse if Oracle&#39;s NLS_TIMESTAMP_FORMAT and the value from this method are not the same.</p>
+
+<p>If you want to use the default from this module, you can do something like this after you connect to Oracle:</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(</span>
+      <span class="string">"alter session set nls_timestamp_format = '"</span> <span class="operator">.</span>
+      <span class="variable">DateTime::Format::Oracle</span><span class="operator">-&gt;</span><span class="variable">nls_timestamp_format</span> <span class="operator">.</span>
+      <span class="string">"'"</span>
+  <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>nls_timestamp_tz_format</p>
+
+<p>This method is used to determine the current value of Oracle&#39;s <code>NLS_TIMESTAMP_TZ_FORMAT</code>. It currently just reads the value from</p>
+
+<pre><code>  <span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_TIMESTAMP_TZ_FORMAT'</span><span class="operator">}</span>
+</code></pre>
+
+<p>or if that is not set, from the package variable <code>$nls_timestamp_tz_format</code>, which has a default value of <code>YYYY-MM-DD HH24:MI:SS TZHTZM</code>. This is a good default to have, but is not Oracle&#39;s default. Dates will fail to parse if Oracle&#39;s NLS_TIMESTAMP_TZ_FORMAT and the value from this method are not the same.</p>
+
+<p>If you want to use the default from this module, you can do something like this after you connect to Oracle:</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(</span>
+      <span class="string">"alter session set nls_timestamp_tz_format = '"</span> <span class="operator">.</span>
+      <span class="variable">DateTime::Format::Oracle</span><span class="operator">-&gt;</span><span class="variable">nls_timestamp_tz_format</span> <span class="operator">.</span>
+      <span class="string">"'"</span>
+  <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>parse_datetime</p>
+
+<p>Given a string containing a date and/or time representation matching <code>NLS_DATE_FORMAT</code>, this method will return a new <code>DateTime</code> object.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_date</p>
+
+<p>Alias to <code>parse_datetime</code>. Oracle&#39;s date datatype also holds time information.</p>
+
+</li>
+<li><p>parse_timestamp</p>
+
+<p>Given a string containing a date and/or time representation matching <code>NLS_TIMESTAMP_FORMAT</code>, this method will return a new <code>DateTime</code> object.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_timestamptz =item * parse_timestamp_with_time_zone</p>
+
+<p>Given a string containing a date and/or time representation matching <code>NLS_TIMESTAMP_TZ_FORMAT</code>, this method will return a new <code>DateTime</code> object.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>current_date_parser</p>
+
+<p>The current <code>DateTime::Format::Builder</code> generated parsing method used by <code>parse_datetime</code> and <code>parse_date</code>.</p>
+
+</li>
+<li><p>current_timestamp_parser</p>
+
+<p>The current <code>DateTime::Format::Builder</code> generated parsing method used by <code>parse_timestamp</code>.</p>
+
+</li>
+<li><p>current_timestamptz_parser</p>
+
+<p>The current <code>DateTime::Format::Builder</code> generated parsing method used by <code>parse_timestamptz</code>.</p>
+
+</li>
+<li><p>format_datetime</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string matching the current value of <code>NLS_DATE_FORMAT</code>.</p>
+
+<p>It is important to keep the value of <code><span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_DATE_FORMAT'</span><span class="operator">}</span>
+</code> the same as the value of the Oracle session variable <code>NLS_DATE_FORMAT</code>.</p>
+
+<p>To determine the current value of Oracle&#39;s <code>NLS_DATE_FORMAT</code>:</p>
+
+<pre><code>  select NLS_DATE_FORMAT from NLS_SESSION_PARAMETERS</code></pre>
+
+<p>To reset Oracle&#39;s <code>NLS_DATE_FORMAT</code>:</p>
+
+<pre><code>  alter session set NLS_DATE_FORMAT=&#39;YYYY-MM-DD HH24:MI:SS&#39;</code></pre>
+
+<p>It is generally a good idea to set <code>NLS_DATE_FORMAT</code> to an unambiguos value, with four-digit year, and hour, minute, and second.</p>
+
+</li>
+<li><p>format_date</p>
+
+<p>Alias to <code>format_datetime</code>.</p>
+
+</li>
+<li><p>format_timestamp</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string matching the current value of <code>NLS_TIMESTAMP_FORMAT</code>.</p>
+
+<p>It is important to keep the value of <code><span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_TIMESTAMP_FORMAT'</span><span class="operator">}</span>
+</code> the same as the value of the Oracle session variable <code>NLS_TIMESTAMP_FORMAT</code>.</p>
+
+<p>To determine the current value of Oracle&#39;s <code>NLS_TIMESTAMP_FORMAT</code>:</p>
+
+<pre><code>  select NLS_TIMESTAMP_FORMAT from NLS_SESSION_PARAMETERS</code></pre>
+
+<p>To reset Oracle&#39;s <code>NLS_TIMESTAMP_FORMAT</code>:</p>
+
+<pre><code>  alter session set NLS_TIMESTAMP_FORMAT=&#39;YYYY-MM-DD HH24:MI:SS&#39;</code></pre>
+
+<p>It is generally a good idea to set <code>NLS_TIMESTAMP_FORMAT</code> to an unambiguos value, with four-digit year, and hour, minute, and second.</p>
+
+</li>
+<li><p>format_timestamptz =item * format_timestamp_with_time_zone</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string matching the current value of <code>NLS_TIMESTAMP_TZ_FORMAT</code>.</p>
+
+<p>It is important to keep the value of <code><span class="variable">$ENV</span><span class="operator">{</span><span class="string">'NLS_TIMESTAMP_TZ_FORMAT'</span><span class="operator">}</span>
+</code> the same as the value of the Oracle session variable <code>NLS_TIMESTAMP_TZ_FORMAT</code>.</p>
+
+<p>To determine the current value of Oracle&#39;s <code>NLS_TIMESTAMP_TZ_FORMAT</code>:</p>
+
+<pre><code>  select NLS_TIMESTAMP_TZ_FORMAT from NLS_SESSION_PARAMETERS</code></pre>
+
+<p>To reset Oracle&#39;s <code>NLS_TIMESTAMP_TZ_FORMAT</code>:</p>
+
+<pre><code>  alter session set NLS_TIMESTAMP_TZ_FORMAT=&#39;YYYY-MM-DD HH24:MI:SS TZHTZM&#39;</code></pre>
+
+<p>It is generally a good idea to set <code>NLS_TIMESTAMP_TZ_FORMAT</code> to an unambiguos value, with four-digit year, and hour, minute, and second.</p>
+
+</li>
+<li><p>current_date_format</p>
+
+<p>The current generated method used by <code>format_datetime</code>, <code>format_date</code>, and <code>current_date_parser</code> to keep track of the <code>strptime</code> translation of <code>NLS_DATE_FORMAT</code>.</p>
+
+</li>
+<li><p>current_timestamp_format</p>
+
+<p>The current generated method used by <code>format_timestamp</code>, <code>format_timestamp_with_time_zone</code>, and <code>current_timestamp_parser</code> to keep track of the <code>strptime</code> translation of <code>NLS_TIMESTAMP_FORMAT</code>.</p>
+
+</li>
+<li><p>current_timestamptz_format</p>
+
+<p>The current generated method used by <code>format_timestamptz</code>, <code>format_timestamp_with_time_zone</code>, and <code>current_timestamp_parser</code> to keep track of the <code>strptime</code> translation of <code>NLS_TIMESTAMP_FORMAT</code>.</p>
+
+</li>
+<li><p>oracle_to_posix</p>
+
+<p>Given an <code>NLS_DATE_FORMAT</code>, <code>NLS_TIMESTAMP_FORMAT</code>, or <code>NLS_TIMESTAMP_TZ_FORMAT</code> value, this method returns a <code>DateTime</code>-compatible <code>strptime</code> format value.</p>
+
+<p>Translation is currently handled by <code>Convert::NLS_DATE_FORMAT</code>.</p>
+
+</li>
+</ul>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>Oracle is more flexible with the case of names, such as the month, whereas <code>DateTime</code> generally returns names in <code>ucfirst</code> format.</p>
+
+<pre><code>  MONTH -&gt; FEBRUARY
+  Month -&gt; February
+  month -&gt; february</code></pre>
+
+<p>All translate to:</p>
+
+<pre><code>  %B    -&gt; February</code></pre>
+
+<h2 id="TIME-ZONES">TIME ZONES</h2>
+
+<p>Oracle returns all dates and timestamps in a time zone similar to the <code>DateTime</code> floating time zone, except for &#39;timestamp with time zone&#39; columns.</p>
+
+<h2 id="INTERVAL-ELEMENTS">INTERVAL ELEMENTS</h2>
+
+<p>I have not implemented <code>parse_duration</code>, <code>format_duration</code>, <code>parse_interval</code>, nor <code>format_interval</code>, and have no plans to do so.</p>
+
+<p>If you need these features, unit tests, method implementations, and pointers to documentation are all welcome.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support for this module is provided via the datetime@perl.org email list. See http://lists.perl.org/ for more details.</p>
+
+<h1 id="TODO">TODO</h1>
+
+<p>Possibly read an environment variable to determine a time zone to use instead of &#39;floating&#39;.</p>
+
+<p>Test and document creating an instance via <code>new</code>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Nathan Gray, &lt;kolibrie@cpan.org&gt;</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>I might have put this module off for another couple years without the lure of Jifty, Catalyst, and DBIx::Class pulling at me.</p>
+
+<p>Thanks to Dan Horne for his RFC draft of this module.</p>
+
+<h1 id="COPYRIGHT-LICENSE">COPYRIGHT &amp; LICENSE</h1>
+
+<p>Copyright (C) 2006, 2008, 2011 Nathan Gray.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.4 or, at your option, any later version of Perl 5 you may have available.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Convert::NLS_DATE_FORMAT</p>
+
+<p>datetime@perl.org mailing list</p>
+
+<p>http://datetime.perl.org/</p>
+
+
+</body>
+
+</html>
+
+

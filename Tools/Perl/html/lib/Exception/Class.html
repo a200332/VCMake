@@ -1,0 +1,326 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#DECLARING-EXCEPTION-CLASSES">DECLARING EXCEPTION CLASSES</a></li>
+  <li><a href="#Try::Tiny">Try::Tiny</a></li>
+  <li><a href="#Catching-Exceptions-Without-Try::Tiny">Catching Exceptions Without Try::Tiny</a>
+    <ul>
+      <li><a href="#Uncatchable-Exceptions">Uncatchable Exceptions</a></li>
+    </ul>
+  </li>
+  <li><a href="#USAGE-RECOMMENDATION">USAGE RECOMMENDATION</a>
+    <ul>
+      <li><a href="#Subclassing-Exception::Class::Base">Subclassing Exception::Class::Base</a></li>
+    </ul>
+  </li>
+  <li><a href="#Exception::Class-FUNCTIONS">Exception::Class FUNCTIONS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Exception::Class - A module that allows you to declare real exception classes in Perl</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.43</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Exception::Class</span> <span class="operator">(</span>
+      <span class="string">'MyException'</span><span class="operator">,</span>
+  
+      <span class="string">'AnotherException'</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'MyException'</span> <span class="operator">}</span><span class="operator">,</span>
+  
+      <span class="string">'YetAnotherException'</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">isa</span>         <span class="operator">=&gt;</span> <span class="string">'AnotherException'</span><span class="operator">,</span>
+          <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">'These exceptions are related to IPC'</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  
+      <span class="string">'ExceptionWithFields'</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">isa</span>    <span class="operator">=&gt;</span> <span class="string">'YetAnotherException'</span><span class="operator">,</span>
+          <span class="string">fields</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'grandiosity'</span><span class="operator">,</span> <span class="string">'quixotic'</span> <span class="operator">]</span><span class="operator">,</span>
+          <span class="string">alias</span>  <span class="operator">=&gt;</span> <span class="string">'throw_fields'</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  <span class="keyword">use</span> <span class="variable">Scalar::Util</span> <span class="string">qw( blessed )</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Try::Tiny</span><span class="operator">;</span>
+  
+  <span class="variable">try</span> <span class="operator">{</span>
+      <span class="variable">MyException</span><span class="operator">-&gt;</span><span class="variable">throw</span><span class="operator">(</span> <span class="string">error</span> <span class="operator">=&gt;</span> <span class="string">'I feel funny.'</span> <span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="variable">catch</span> <span class="operator">{</span>
+      <span class="keyword">die</span> <span class="variable">$_</span> <span class="keyword">unless</span> <span class="variable">blessed</span> <span class="variable">$_</span> <span class="operator">&amp;&amp;</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'rethrow'</span><span class="operator">);</span>
+  
+      <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'Exception::Class'</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+          <span class="keyword">warn</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">trace</span><span class="operator">-&gt;</span><span class="variable">as_string</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+          <span class="keyword">warn</span> <span class="keyword">join</span> <span class="string">' '</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">euid</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">egid</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">uid</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">gid</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">pid</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">time</span><span class="operator">;</span>
+  
+          <span class="keyword">exit</span><span class="operator">;</span>
+      <span class="operator">}</span>
+      <span class="keyword">elsif</span> <span class="operator">(</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'ExceptionWithFields'</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+          <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">quixotic</span> <span class="operator">)</span> <span class="operator">{</span>
+              <span class="variable">handle_quixotic_exception</span><span class="operator">();</span>
+          <span class="operator">}</span>
+          <span class="keyword">else</span> <span class="operator">{</span>
+              <span class="variable">handle_non_quixotic_exception</span><span class="operator">();</span>
+          <span class="operator">}</span>
+      <span class="operator">}</span>
+      <span class="keyword">else</span> <span class="operator">{</span>
+          <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">rethrow</span><span class="operator">;</span>
+      <span class="operator">}</span>
+  <span class="operator">};</span>
+  
+  <span class="comment"># without Try::Tiny</span>
+  <span class="keyword">eval</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+  <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">Exception::Class</span><span class="operator">-&gt;</span><span class="variable">caught</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+  
+  <span class="comment"># use an alias - without parens subroutine name is checked at</span>
+  <span class="comment"># compile time</span>
+  <span class="variable">throw_fields</span> <span class="string">error</span> <span class="operator">=&gt;</span> <span class="string">"No strawberry"</span><span class="operator">,</span> <span class="string">grandiosity</span> <span class="operator">=&gt;</span> <span class="string">"quite a bit"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>RECOMMENDATION 1</b>: If you are writing modern Perl code with <a href="../../lib/Moose.html">Moose</a> or <a>Moo</a> I highly recommend using <a>Throwable</a> instead of this module.</p>
+
+<p><b>RECOMMENDATION 2</b>: Whether or not you use <a>Throwable</a>, you should use <a href="../../lib/Try/Tiny.html">Try::Tiny</a>.</p>
+
+<p>Exception::Class allows you to declare exception hierarchies in your modules in a &quot;Java-esque&quot; manner.</p>
+
+<p>It features a simple interface allowing programmers to &#39;declare&#39; exception classes at compile time. It also has a base exception class, <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a>, that can be easily extended.</p>
+
+<p>It is designed to make structured exception handling simpler and better by encouraging people to use hierarchies of exceptions in their applications, as opposed to a single catch-all exception class.</p>
+
+<p>This module does not implement any try/catch syntax. Please see the &quot;OTHER EXCEPTION MODULES (try/catch syntax)&quot; section for more information on how to get this syntax.</p>
+
+<p>You will also want to look at the documentation for <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a>, which is the default base class for all exception objects created by this module.</p>
+
+<h1 id="DECLARING-EXCEPTION-CLASSES">DECLARING EXCEPTION CLASSES</h1>
+
+<p>Importing <code>Exception::Class</code> allows you to automagically create <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a> subclasses. You can also create subclasses via the traditional means of defining your own subclass with <code>@ISA</code>. These two methods may be easily combined, so that you could subclass an exception class defined via the automagic import, if you desired this.</p>
+
+<p>The syntax for the magic declarations is as follows:</p>
+
+<pre><code>  &#39;MANDATORY CLASS NAME&#39; =&gt; \%optional_hashref</code></pre>
+
+<p>The hashref may contain the following options:</p>
+
+<ul>
+
+<li><p>isa</p>
+
+<p>This is the class&#39;s parent class. If this isn&#39;t provided then the class name in <code>$Exception::Class::BASE_EXC_CLASS</code> is assumed to be the parent (see below).</p>
+
+<p>This parameter lets you create arbitrarily deep class hierarchies. This can be any other <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a> subclass in your declaration <i>or</i> a subclass loaded from a module.</p>
+
+<p>To change the default exception class you will need to change the value of <code>$Exception::Class::BASE_EXC_CLASS</code> <i>before</i> calling <code>import</code>. To do this simply do something like this:</p>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">$Exception::Class::BASE_EXC_CLASS</span> <span class="operator">=</span> <span class="string">'SomeExceptionClass'</span><span class="operator">;</span> <span class="operator">}</span>
+</code></pre>
+
+<p>If anyone can come up with a more elegant way to do this please let me know.</p>
+
+<p>CAVEAT: If you want to automagically subclass an <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a> subclass loaded from a file, then you <i>must</i> compile the class (via use or require or some other magic) <i>before</i> you import <code>Exception::Class</code> or you&#39;ll get a compile time error.</p>
+
+</li>
+<li><p>fields</p>
+
+<p>This allows you to define additional attributes for your exception class. Any field you define can be passed to the <code>throw</code> or <code>new</code> methods as additional parameters for the constructor. In addition, your exception object will have an accessor method for the fields you define.</p>
+
+<p>This parameter can be either a scalar (for a single field) or an array reference if you need to define multiple fields.</p>
+
+<p>Fields will be inherited by subclasses.</p>
+
+</li>
+<li><p>alias</p>
+
+<p>Specifying an alias causes this class to create a subroutine of the specified name in the <i>caller&#39;s</i> namespace. Calling this subroutine is equivalent to calling <code>&lt;class&gt;-&gt;throw(@_)</code> for the given exception class.</p>
+
+<p>Besides convenience, using aliases also allows for additional compile time checking. If the alias is called <i>without parentheses</i>, as in <code>throw_fields &quot;an error occurred&quot;</code>, then Perl checks for the existence of the <code>throw_fields</code> subroutine at compile time. If instead you do <code>ExceptionWithFields-&gt;throw(...)</code>, then Perl checks the class name at runtime, meaning that typos may sneak through.</p>
+
+</li>
+<li><p>description</p>
+
+<p>Each exception class has a description method that returns a fixed string. This should describe the exception <i>class</i> (as opposed to any particular exception object). This may be useful for debugging if you start catching exceptions you weren&#39;t expecting (particularly if someone forgot to document them) and you don&#39;t understand the error messages.</p>
+
+</li>
+</ul>
+
+<p>The <code>Exception::Class</code> magic attempts to detect circular class hierarchies and will die if it finds one. It also detects missing links in a chain, for example if you declare Bar to be a subclass of Foo and never declare Foo.</p>
+
+<h1 id="Try::Tiny"><a href="../../lib/Try/Tiny.html">Try::Tiny</a></h1>
+
+<p>If you are interested in adding try/catch/finally syntactic sugar to your code then I recommend you check out <a href="../../lib/Try/Tiny.html">Try::Tiny</a>. This is a great module that helps you ignore some of the weirdness with <code>eval</code> and <code>$@</code>. Here&#39;s an example of how the two modules work together:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Exception::Class</span> <span class="operator">(</span> <span class="string">'My::Exception'</span> <span class="operator">);</span>
+  <span class="keyword">use</span> <span class="variable">Scalar::Util</span> <span class="string">qw( blessed )</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Try::Tiny</span><span class="operator">;</span>
+  
+  <span class="variable">try</span> <span class="operator">{</span>
+      <span class="variable">might_throw</span><span class="operator">();</span>
+  <span class="operator">}</span>
+  <span class="variable">catch</span> <span class="operator">{</span>
+      <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">blessed</span> <span class="variable">$_</span> <span class="operator">&amp;&amp;</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'My::Exception'</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+          <span class="variable">handle_it</span><span class="operator">();</span>
+      <span class="operator">}</span>
+      <span class="keyword">else</span> <span class="operator">{</span>
+          <span class="keyword">die</span> <span class="variable">$_</span><span class="operator">;</span>
+      <span class="operator">}</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Note that you <b>cannot</b> use <code>Exception::Class-&gt;caught</code> with <a href="../../lib/Try/Tiny.html">Try::Tiny</a>.</p>
+
+<h1 id="Catching-Exceptions-Without-Try::Tiny">Catching Exceptions Without <a href="../../lib/Try/Tiny.html">Try::Tiny</a></h1>
+
+<p><code>Exception::Class</code> provides some syntactic sugar for catching exceptions in a safe manner:</p>
+
+<pre><code>  <span class="keyword">eval</span> <span class="operator">{...};</span>
+  
+  <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">Exception::Class</span><span class="operator">-&gt;</span><span class="variable">caught</span><span class="operator">(</span><span class="string">'My::Error'</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="variable">cleanup</span><span class="operator">();</span>
+      <span class="variable">do_something_with_exception</span><span class="operator">(</span><span class="variable">$e</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>caught</code> method takes a class name and returns an exception object if the last thrown exception is of the given class, or a subclass of that class. If it is not given any arguments, it simply returns <code>$@</code>.</p>
+
+<p>You should <b>always</b> make a copy of the exception object, rather than using <code>$@</code> directly. This is necessary because if your <code>cleanup</code> function uses <code>eval</code>, or calls something which uses it, then <code>$@</code> is overwritten. Copying the exception preserves it for the call to <code>do_something_with_exception</code>.</p>
+
+<p>Exception objects also provide a caught method so you can write:</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">My::Error</span><span class="operator">-&gt;</span><span class="variable">caught</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="variable">cleanup</span><span class="operator">();</span>
+      <span class="variable">do_something_with_exception</span><span class="operator">(</span><span class="variable">$e</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Uncatchable-Exceptions">Uncatchable Exceptions</h2>
+
+<p>Internally, the <code>caught</code> method will call <code>isa</code> on the exception object. You could make an exception &quot;uncatchable&quot; by overriding <code>isa</code> in that class like this:</p>
+
+<pre><code> <span class="keyword">package</span> <span class="variable">Exception::Uncatchable</span><span class="operator">;</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> isa </span><span class="operator">{</span> <span class="keyword">shift</span><span class="operator">-&gt;</span><span class="variable">rethrow</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Of course, this only works if you always call <code>Exception::Class-&gt;caught</code> after an <code>eval</code>.</p>
+
+<h1 id="USAGE-RECOMMENDATION">USAGE RECOMMENDATION</h1>
+
+<p>If you&#39;re creating a complex system that throws lots of different types of exceptions, consider putting all the exception declarations in one place. For an app called Foo you might make a <code>Foo::Exceptions</code> module and use that in all your code. This module could just contain the code to make <code>Exception::Class</code> do its automagic class creation. Doing this allows you to more easily see what exceptions you have, and makes it easier to keep track of them.</p>
+
+<p>This might look something like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo::Bar::Exceptions</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Exception::Class</span> <span class="operator">(</span>
+      <span class="variable">Foo::Bar::Exception::Senses</span> <span class="operator">=&gt;</span>
+          <span class="operator">{</span> <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">'sense-related exception'</span> <span class="operator">}</span><span class="operator">,</span>
+  
+      <span class="variable">Foo::Bar::Exception::Smell</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">isa</span>         <span class="operator">=&gt;</span> <span class="string">'Foo::Bar::Exception::Senses'</span><span class="operator">,</span>
+          <span class="string">fields</span>      <span class="operator">=&gt;</span> <span class="string">'odor'</span><span class="operator">,</span>
+          <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">'stinky!'</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  
+      <span class="variable">Foo::Bar::Exception::Taste</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">isa</span>         <span class="operator">=&gt;</span> <span class="string">'Foo::Bar::Exception::Senses'</span><span class="operator">,</span>
+          <span class="string">fields</span>      <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'taste'</span><span class="operator">,</span> <span class="string">'bitterness'</span> <span class="operator">]</span><span class="operator">,</span>
+          <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">'like, gag me with a spoon!'</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  
+      <span class="operator">...</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>You may want to create a real module to subclass <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a> as well, particularly if you want your exceptions to have more methods.</p>
+
+<h2 id="Subclassing-Exception::Class::Base">Subclassing Exception::Class::Base</h2>
+
+<p>As part of your usage of <code>Exception::Class</code>, you may want to create your own base exception class which subclasses <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a>. You should feel free to subclass any of the methods documented above. For example, you may want to subclass <code>new</code> to add additional information to your exception objects.</p>
+
+<h1 id="Exception::Class-FUNCTIONS">Exception::Class FUNCTIONS</h1>
+
+<p>The <code>Exception::Class</code> method offers one function, <code>Classes</code>, which is not exported. This method returns a list of the classes that have been created by calling the <code>Exception::Class</code> <code>import</code> method. Note that this is <i>all</i> the subclasses that have been created, so it may include subclasses created by things like CPAN modules, etc. Also note that if you simply define a subclass via the normal Perl method of setting <code>@ISA</code> or <code>use base</code>, then your subclass will not be included.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Exception-Class/issues">https://github.com/houseabsolute/Exception-Class/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Exception-Class can be found at <a href="https://github.com/houseabsolute/Exception-Class">https://github.com/houseabsolute/Exception-Class</a>.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Alexander Batyrshin &lt;0x62ash@gmail.com&gt;</p>
+
+</li>
+<li><p>Leon Timmermans &lt;fawaka@gmail.com&gt;</p>
+
+</li>
+<li><p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2017 by Dave Rolsky.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

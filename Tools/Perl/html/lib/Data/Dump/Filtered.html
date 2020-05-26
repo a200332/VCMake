@@ -1,0 +1,232 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Filter-callback">Filter callback</a></li>
+      <li><a href="#Filter-context">Filter context</a></li>
+      <li><a href="#Filter-return-hash">Filter return hash</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Data::Dump::Filtered - Pretty printing with filtering</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The following functions are provided:</p>
+
+<dl>
+
+<dt id="add_dump_filter-filter">add_dump_filter( \&amp;filter )</dt>
+<dd>
+
+<p>This registers a filter function to be used by the regular Data::Dump::dump() function. By default no filters are active.</p>
+
+<p>Since registering filters has a global effect is might be more appropriate to use the dump_filtered() function instead.</p>
+
+</dd>
+<dt id="remove_dump_filter-filter">remove_dump_filter( \&amp;filter )</dt>
+<dd>
+
+<p>Unregister the given callback function as filter callback. This undoes the effect of <a>add_filter</a>.</p>
+
+</dd>
+<dt id="dump_filtered-...-filter">dump_filtered(..., \&amp;filter )</dt>
+<dd>
+
+<p>Works like Data::Dump::dump(), but the last argument should be a filter callback function. As objects are visited the filter callback is invoked at it might influence how objects are dumped.</p>
+
+<p>Any filters registered with <a>add_filter()</a> are ignored when this interface is invoked. Actually, passing <code>undef</code> as \&amp;filter is allowed and <code>dump_filtered(..., undef)</code> is the official way to force unfiltered dumps.</p>
+
+</dd>
+</dl>
+
+<h2 id="Filter-callback">Filter callback</h2>
+
+<p>A filter callback is a function that will be invoked with 2 arguments; a context object and reference to the object currently visited. The return value should either be a hash reference or <code>undef</code>.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> filter_callback </span><span class="operator">{</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$ctx</span><span class="operator">,</span> <span class="variable">$object_ref</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="operator">...</span>
+        <span class="keyword">return</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>If the filter callback returns <code>undef</code> (or nothing) then normal processing and formatting of the visited object happens. If the filter callback returns a hash it might replace or annotate the representation of the current object.</p>
+
+<h2 id="Filter-context">Filter context</h2>
+
+<p>The context object provide methods that can be used to determine what kind of object is currently visited and where it&#39;s located. The context object has the following interface:</p>
+
+<dl>
+
+<dt id="ctx-object_ref">$ctx-&gt;object_ref</dt>
+<dd>
+
+<p>Alternative way to obtain a reference to the current object</p>
+
+</dd>
+<dt id="ctx-class">$ctx-&gt;class</dt>
+<dd>
+
+<p>If the object is blessed this return the class. Returns &quot;&quot; for objects not blessed.</p>
+
+</dd>
+<dt id="ctx-reftype">$ctx-&gt;reftype</dt>
+<dd>
+
+<p>Returns what kind of object this is. It&#39;s a string like &quot;SCALAR&quot;, &quot;ARRAY&quot;, &quot;HASH&quot;, &quot;CODE&quot;,...</p>
+
+</dd>
+<dt id="ctx-is_ref">$ctx-&gt;is_ref</dt>
+<dd>
+
+<p>Returns true if a reference was provided.</p>
+
+</dd>
+<dt id="ctx-is_blessed">$ctx-&gt;is_blessed</dt>
+<dd>
+
+<p>Returns true if the object is blessed. Actually, this is just an alias for <code>$ctx-&gt;class</code>.</p>
+
+</dd>
+<dt id="ctx-is_array">$ctx-&gt;is_array</dt>
+<dd>
+
+<p>Returns true if the object is an array</p>
+
+</dd>
+<dt id="ctx-is_hash">$ctx-&gt;is_hash</dt>
+<dd>
+
+<p>Returns true if the object is a hash</p>
+
+</dd>
+<dt id="ctx-is_scalar">$ctx-&gt;is_scalar</dt>
+<dd>
+
+<p>Returns true if the object is a scalar (a string or a number)</p>
+
+</dd>
+<dt id="ctx-is_code">$ctx-&gt;is_code</dt>
+<dd>
+
+<p>Returns true if the object is a function (aka subroutine)</p>
+
+</dd>
+<dt id="ctx-container_class">$ctx-&gt;container_class</dt>
+<dd>
+
+<p>Returns the class of the innermost container that contains this object. Returns &quot;&quot; if there is no blessed container.</p>
+
+</dd>
+<dt id="ctx-container_self">$ctx-&gt;container_self</dt>
+<dd>
+
+<p>Returns an textual expression relative to the container object that names this object. The variable <code>$self</code> in this expression is the container itself.</p>
+
+</dd>
+<dt id="ctx-object_isa-class">$ctx-&gt;object_isa( $class )</dt>
+<dd>
+
+<p>Returns TRUE if the current object is of the given class or is of a subclass.</p>
+
+</dd>
+<dt id="ctx-container_isa-class">$ctx-&gt;container_isa( $class )</dt>
+<dd>
+
+<p>Returns TRUE if the innermost container is of the given class or is of a subclass.</p>
+
+</dd>
+<dt id="ctx-depth">$ctx-&gt;depth</dt>
+<dd>
+
+<p>Returns how many levels deep have we recursed into the structure (from the original dump_filtered() arguments).</p>
+
+</dd>
+<dt id="ctx-expr">$ctx-&gt;expr</dt>
+<dd>
+
+</dd>
+<dt id="ctx-expr-top_level_name">$ctx-&gt;expr( $top_level_name )</dt>
+<dd>
+
+<p>Returns an textual expression that denotes the current object. In the expression <code>$var</code> is used as the name of the top level object dumped. This can be overridden by providing a different name as argument.</p>
+
+</dd>
+</dl>
+
+<h2 id="Filter-return-hash">Filter return hash</h2>
+
+<p>The following elements has significance in the returned hash:</p>
+
+<dl>
+
+<dt id="dump-string">dump =&gt; $string</dt>
+<dd>
+
+<p>incorporate the given string as the representation for the current value</p>
+
+</dd>
+<dt id="object-value">object =&gt; $value</dt>
+<dd>
+
+<p>dump the given value instead of the one visited and passed in as $object. Basically the same as specifying <code>dump =&gt; Data::Dump::dump($value)</code>.</p>
+
+</dd>
+<dt id="comment-comment">comment =&gt; $comment</dt>
+<dd>
+
+<p>prefix the value with the given comment string</p>
+
+</dd>
+<dt id="bless-class">bless =&gt; $class</dt>
+<dd>
+
+<p>make it look as if the current object is of the given $class instead of the class it really has (if any). The internals of the object is dumped in the regular way. The $class can be the empty string to make Data::Dump pretend the object wasn&#39;t blessed at all.</p>
+
+</dd>
+<dt id="hide_keys-key1-key2">hide_keys =&gt; [&#39;key1&#39;, &#39;key2&#39;,...]</dt>
+<dd>
+
+</dd>
+<dt id="hide_keys-code">hide_keys =&gt; \&amp;code</dt>
+<dd>
+
+<p>If the $object is a hash dump is as normal but pretend that the listed keys did not exist. If the argument is a function then the function is called to determine if the given key should be hidden.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/Data/Dump.html">Data::Dump</a></p>
+
+
+</body>
+
+</html>
+
+

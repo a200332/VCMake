@@ -1,0 +1,364 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SKIPPING-TEST::EXCEPTION-TESTS">SKIPPING TEST::EXCEPTION TESTS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#COMMUNITY">COMMUNITY</a></li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#LICENCE">LICENCE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test::Exception - Test exception-based code</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Test::More</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Test::Exception</span><span class="operator">;</span>
+  
+  <span class="comment"># or if you don't need Test::More</span>
+  
+  <span class="keyword">use</span> <span class="variable">Test::Exception</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">;</span>
+  
+  <span class="comment"># then...</span>
+  
+  <span class="comment"># Check that the stringified exception matches given regex</span>
+  <span class="variable">throws_ok</span> <span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">}</span> <span class="string">qr/division by zero/</span><span class="operator">,</span> <span class="string">'zero caught okay'</span><span class="operator">;</span>
+  
+  <span class="comment"># Check an exception of the given class (or subclass) is thrown</span>
+  <span class="variable">throws_ok</span> <span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">}</span> <span class="string">'Error::Simple'</span><span class="operator">,</span> <span class="string">'simple error thrown'</span><span class="operator">;</span>
+  
+  <span class="comment"># all Test::Exceptions subroutines are guaranteed to preserve the state </span>
+  <span class="comment"># of $@ so you can do things like this after throws_ok and dies_ok</span>
+  <span class="variable">like</span> <span class="variable">$@</span><span class="operator">,</span> <span class="string">'what the stringified exception should look like'</span><span class="operator">;</span>
+  
+  <span class="comment"># Check that something died - we do not care why</span>
+  <span class="variable">dies_ok</span> <span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">}</span> <span class="string">'expecting to die'</span><span class="operator">;</span>
+  
+  <span class="comment"># Check that something did not die</span>
+  <span class="variable">lives_ok</span> <span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">}</span> <span class="string">'expecting to live'</span><span class="operator">;</span>
+  
+  <span class="comment"># Check that a test runs without an exception</span>
+  <span class="variable">lives_and</span> <span class="operator">{</span> <span class="variable">is</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span><span class="operator">,</span> <span class="number">42</span> <span class="operator">}</span> <span class="string">'method is 42'</span><span class="operator">;</span>
+  
+  <span class="comment"># or if you don't like prototyped functions</span>
+  
+  <span class="variable">throws_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">},</span> <span class="string">qr/division by zero/</span><span class="operator">,</span>
+      <span class="string">'zero caught okay'</span> <span class="operator">);</span>
+  <span class="variable">throws_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">},</span> <span class="string">'Error::Simple'</span><span class="operator">,</span> 
+      <span class="string">'simple error thrown'</span> <span class="operator">);</span>
+  <span class="variable">dies_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">},</span> <span class="string">'expecting to die'</span> <span class="operator">);</span>
+  <span class="variable">lives_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span> <span class="operator">},</span> <span class="string">'expecting to live'</span> <span class="operator">);</span>
+  <span class="variable">lives_and</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">is</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">method</span><span class="operator">,</span> <span class="number">42</span> <span class="operator">},</span> <span class="string">'method is 42'</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a few convenience methods for testing exception based code. It is built with <a href="../../lib/Test/Builder.html">Test::Builder</a> and plays happily with <a href="../../lib/Test/More.html">Test::More</a> and friends.</p>
+
+<p>If you are not already familiar with <a href="../../lib/Test/More.html">Test::More</a> now would be the time to go take a look.</p>
+
+<p>You can specify the test plan when you <code>use Test::Exception</code> in the same way as <code>use Test::More</code>. See <a href="../../lib/Test/More.html">Test::More</a> for details.</p>
+
+<p>NOTE: Test::Exception only checks for exceptions. It will ignore other methods of stopping program execution - including exit(). If you have an exit() in evalled code Test::Exception will not catch this with any of its testing functions.</p>
+
+<p>NOTE: This module uses <a href="../../lib/Sub/Uplevel.html">Sub::Uplevel</a> and relies on overriding <code>CORE::GLOBAL::caller</code> to hide your test blocks from the call stack. If this use of global overrides concerns you, the <a href="../../lib/Test/Fatal.html">Test::Fatal</a> module offers a more minimalist alternative.</p>
+
+<dl>
+
+<dt id="throws_ok"><b>throws_ok</b></dt>
+<dd>
+
+<p>Tests to see that a specific exception is thrown. throws_ok() has two forms:</p>
+
+<pre><code>  throws_ok BLOCK REGEX, TEST_DESCRIPTION
+  throws_ok BLOCK CLASS, TEST_DESCRIPTION</code></pre>
+
+<p>In the first form the test passes if the stringified exception matches the give regular expression. For example:</p>
+
+<pre><code>    <span class="variable">throws_ok</span> <span class="operator">{</span> <span class="variable">read_file</span><span class="operator">(</span> <span class="string">'unreadable'</span> <span class="operator">)</span> <span class="operator">}</span> <span class="string">qr/No file/</span><span class="operator">,</span> <span class="string">'no file'</span><span class="operator">;</span>
+</code></pre>
+
+<p>If your perl does not support <code>qr//</code> you can also pass a regex-like string, for example:</p>
+
+<pre><code>    <span class="variable">throws_ok</span> <span class="operator">{</span> <span class="variable">read_file</span><span class="operator">(</span> <span class="string">'unreadable'</span> <span class="operator">)</span> <span class="operator">}</span> <span class="string">'/No file/'</span><span class="operator">,</span> <span class="string">'no file'</span><span class="operator">;</span>
+</code></pre>
+
+<p>The second form of throws_ok() test passes if the exception is of the same class as the one supplied, or a subclass of that class. For example:</p>
+
+<pre><code>    <span class="variable">throws_ok</span> <span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">bar</span> <span class="operator">}</span> <span class="string">"Error::Simple"</span><span class="operator">,</span> <span class="string">'simple error'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Will only pass if the <code>bar</code> method throws an Error::Simple exception, or a subclass of an Error::Simple exception.</p>
+
+<p>You can get the same effect by passing an instance of the exception you want to look for. The following is equivalent to the previous example:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$SIMPLE</span> <span class="operator">=</span> <span class="variable">Error::Simple</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">throws_ok</span> <span class="operator">{</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">bar</span> <span class="operator">}</span> <span class="variable">$SIMPLE</span><span class="operator">,</span> <span class="string">'simple error'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Should a throws_ok() test fail it produces appropriate diagnostic messages. For example:</p>
+
+<pre><code>    not ok 3 - simple error
+    #     Failed test (test.t at line 48)
+    # expecting: Error::Simple exception
+    # found: normal exit</code></pre>
+
+<p>Like all other Test::Exception functions you can avoid prototypes by passing a subroutine explicitly:</p>
+
+<pre><code>    <span class="variable">throws_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">},</span> <span class="string">"Error::Simple"</span><span class="operator">,</span> <span class="string">'simple error'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>A true value is returned if the test succeeds, false otherwise. On exit $@ is guaranteed to be the cause of death (if any).</p>
+
+<p>A description of the exception being checked is used if no optional test description is passed.</p>
+
+<p>NOTE: Remember when you <code>die $string_without_a_trailing_newline</code> perl will automatically add the current script line number, input line number and a newline. This will form part of the string that throws_ok regular expressions match against.</p>
+
+</dd>
+<dt id="dies_ok"><b>dies_ok</b></dt>
+<dd>
+
+<p>Checks that a piece of code dies, rather than returning normally. For example:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> div </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$a</span><span class="operator">,</span> <span class="variable">$b</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$a</span> <span class="operator">/</span> <span class="variable">$b</span><span class="operator">;</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">dies_ok</span> <span class="operator">{</span> <span class="variable">div</span><span class="operator">(</span> <span class="number">1</span><span class="operator">,</span> <span class="number">0</span> <span class="operator">)</span> <span class="operator">}</span> <span class="string">'divide by zero detected'</span><span class="operator">;</span>
+    
+    <span class="comment"># or if you don't like prototypes</span>
+    <span class="variable">dies_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">div</span><span class="operator">(</span> <span class="number">1</span><span class="operator">,</span> <span class="number">0</span> <span class="operator">)</span> <span class="operator">},</span> <span class="string">'divide by zero detected'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>A true value is returned if the test succeeds, false otherwise. On exit $@ is guaranteed to be the cause of death (if any).</p>
+
+<p>Remember: This test will pass if the code dies for any reason. If you care about the reason it might be more sensible to write a more specific test using throws_ok().</p>
+
+<p>The test description is optional, but recommended.</p>
+
+</dd>
+<dt id="lives_ok"><b>lives_ok</b></dt>
+<dd>
+
+<p>Checks that a piece of code doesn&#39;t die. This allows your test script to continue, rather than aborting if you get an unexpected exception. For example:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> read_file </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">local</span> <span class="variable">$/</span><span class="operator">;</span>
+        <span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="variable">$file</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"open failed ($!)\n"</span><span class="operator">;</span>
+        <span class="variable">$file</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">FILE</span><span class="operator">&gt;;</span>
+        <span class="keyword">return</span> <span class="variable">$file</span><span class="operator">;</span>
+    <span class="operator">};</span>
+    
+    <span class="keyword">my</span> <span class="variable">$file</span><span class="operator">;</span>
+    <span class="variable">lives_ok</span> <span class="operator">{</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">read_file</span><span class="operator">(</span><span class="string">'test.txt'</span><span class="operator">)</span> <span class="operator">}</span> <span class="string">'file read'</span><span class="operator">;</span>
+    
+    <span class="comment"># or if you don't like prototypes</span>
+    <span class="variable">lives_ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">read_file</span><span class="operator">(</span><span class="string">'test.txt'</span><span class="operator">)</span> <span class="operator">},</span> <span class="string">'file read'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Should a lives_ok() test fail it produces appropriate diagnostic messages. For example:</p>
+
+<pre><code>    not ok 1 - file read
+    #     Failed test (test.t at line 15)
+    # died: open failed (No such file or directory)</code></pre>
+
+<p>A true value is returned if the test succeeds, false otherwise. On exit $@ is guaranteed to be the cause of death (if any).</p>
+
+<p>The test description is optional, but recommended.</p>
+
+</dd>
+<dt id="lives_and"><b>lives_and</b></dt>
+<dd>
+
+<p>Run a test that may throw an exception. For example, instead of doing:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$file</span><span class="operator">;</span>
+  <span class="variable">lives_ok</span> <span class="operator">{</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">read_file</span><span class="operator">(</span><span class="string">'answer.txt'</span><span class="operator">)</span> <span class="operator">}</span> <span class="string">'read_file worked'</span><span class="operator">;</span>
+  <span class="variable">is</span> <span class="variable">$file</span><span class="operator">,</span> <span class="string">"42"</span><span class="operator">,</span> <span class="string">'answer was 42'</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can use lives_and() like this:</p>
+
+<pre><code>  <span class="variable">lives_and</span> <span class="operator">{</span> <span class="variable">is</span> <span class="variable">read_file</span><span class="operator">(</span><span class="string">'answer.txt'</span><span class="operator">),</span> <span class="string">"42"</span> <span class="operator">}</span> <span class="string">'answer is 42'</span><span class="operator">;</span>
+  <span class="comment"># or if you don't like prototypes</span>
+  <span class="variable">lives_and</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="variable">is</span> <span class="variable">read_file</span><span class="operator">(</span><span class="string">'answer.txt'</span><span class="operator">),</span> <span class="string">"42"</span><span class="operator">},</span> <span class="string">'answer is 42'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Which is the same as doing</p>
+
+<pre><code>  <span class="variable">is</span> <span class="variable">read_file</span><span class="operator">(</span><span class="string">'answer.txt'</span><span class="operator">),</span> <span class="string">"42\n"</span><span class="operator">,</span> <span class="string">'answer is 42'</span><span class="operator">;</span>
+</code></pre>
+
+<p>unless <code>read_file(&#39;answer.txt&#39;)</code> dies, in which case you get the same kind of error as lives_ok()</p>
+
+<pre><code>  not ok 1 - answer is 42
+  #     Failed test (test.t at line 15)
+  # died: open failed (No such file or directory)</code></pre>
+
+<p>A true value is returned if the test succeeds, false otherwise. On exit $@ is guaranteed to be the cause of death (if any).</p>
+
+<p>The test description is optional, but recommended.</p>
+
+</dd>
+</dl>
+
+<h1 id="SKIPPING-TEST::EXCEPTION-TESTS">SKIPPING TEST::EXCEPTION TESTS</h1>
+
+<p>Sometimes we want to use Test::Exception tests in a test suite, but don&#39;t want to force the user to have Test::Exception installed. One way to do this is to skip the tests if Test::Exception is absent. You can do this with code something like this:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Test::More</span><span class="operator">;</span>
+  
+  <span class="keyword">BEGIN</span> <span class="operator">{</span>
+      <span class="keyword">eval</span> <span class="string">"use Test::Exception"</span><span class="operator">;</span>
+      <span class="variable">plan</span> <span class="string">skip_all</span> <span class="operator">=&gt;</span> <span class="string">"Test::Exception needed"</span> <span class="keyword">if</span> <span class="variable">$@</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="variable">plan</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">;</span>
+  <span class="comment"># ... tests that need Test::Exception ...</span>
+</code></pre>
+
+<p>Note that we load Test::Exception in a <code>BEGIN</code> block ensuring that the subroutine prototypes are in place before the rest of the test script is compiled.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>There are some edge cases in Perl&#39;s exception handling where Test::Exception will miss exceptions thrown in DESTROY blocks. See the RT bug <a href="http://rt.cpan.org/Ticket/Display.html?id=24678">http://rt.cpan.org/Ticket/Display.html?id=24678</a> for details, along with the t/edge-cases.t in the distribution test suite. These will be addressed in a future Test::Exception release.</p>
+
+<p>If you find any more bugs please let me know by e-mail, or report the problem with <a href="http://rt.cpan.org/">http://rt.cpan.org/</a>.</p>
+
+<h1 id="COMMUNITY">COMMUNITY</h1>
+
+<dl>
+
+<dt id="perl-qa">perl-qa</dt>
+<dd>
+
+<p>If you are interested in testing using Perl I recommend you visit <a href="http://qa.perl.org/">http://qa.perl.org/</a> and join the excellent perl-qa mailing list. See <a href="http://lists.perl.org/showlist.cgi?name=perl-qa">http://lists.perl.org/showlist.cgi?name=perl-qa</a> for details on how to subscribe.</p>
+
+</dd>
+<dt id="perlmonks">perlmonks</dt>
+<dd>
+
+<p>You can find users of Test::Exception, including the module author, on <a href="http://www.perlmonks.org/">http://www.perlmonks.org/</a>. Feel free to ask questions on Test::Exception there.</p>
+
+</dd>
+<dt id="CPAN::Forum">CPAN::Forum</dt>
+<dd>
+
+<p>The CPAN Forum is a web forum for discussing Perl&#39;s CPAN modules. The Test::Exception forum can be found at <a href="http://www.cpanforum.com/dist/Test-Exception">http://www.cpanforum.com/dist/Test-Exception</a>.</p>
+
+</dd>
+<dt id="AnnoCPAN">AnnoCPAN</dt>
+<dd>
+
+<p>AnnoCPAN is a web site that allows community annotations of Perl module documentation. The Test::Exception annotations can be found at <a href="http://annocpan.org/~ADIE/Test-Exception/">http://annocpan.org/~ADIE/Test-Exception/</a>.</p>
+
+</dd>
+</dl>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>If you think this module should do something that it doesn&#39;t (or does something that it shouldn&#39;t) please let me know.</p>
+
+<p>You can see my current to do list at <a href="http://adrianh.tadalist.com/lists/public/15421">http://adrianh.tadalist.com/lists/public/15421</a>, with an RSS feed of changes at <a href="http://adrianh.tadalist.com/lists/feed_public/15421">http://adrianh.tadalist.com/lists/feed_public/15421</a>.</p>
+
+<h1 id="ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</h1>
+
+<p>Thanks to chromatic and Michael G Schwern for the excellent Test::Builder, without which this module wouldn&#39;t be possible.</p>
+
+<p>Thanks to Adam Kennedy, Andy Lester, Aristotle Pagaltzis, Ben Prew, Cees Hek, Chris Dolan, chromatic, Curt Sampson, David Cantrell, David Golden, David Tulloh, David Wheeler, J. K. O&#39;Brien, Janek Schleicher, Jim Keenan, Jos I. Boumans, Joshua ben Jore, Jost Krieger, Mark Fowler, Michael G Schwern, Nadim Khemir, Paul McCann, Perrin Harkins, Peter Rabbitson, Peter Scott, Ricardo Signes, Rob Muhlestein, Scott R. Godin, Steve Purkis, Steve, Tim Bunce, and various anonymous folk for comments, suggestions, bug reports and patches.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adrian Howard &lt;adrianh@quietstars.com&gt;</p>
+
+<p>If you can spare the time, please drop me a line if you find this module useful.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="http:-del.icio.us-tag-Test::Exception"><a href="http://del.icio.us/tag/Test::Exception">http://del.icio.us/tag/Test::Exception</a></dt>
+<dd>
+
+<p>Delicious links on Test::Exception.</p>
+
+</dd>
+<dt id="Test::Fatal"><a href="../../lib/Test/Fatal.html">Test::Fatal</a></dt>
+<dd>
+
+<p>A slightly different interface to testing exceptions, without overriding <code>CORE::caller</code>.</p>
+
+</dd>
+<dt id="Test::Warnings-Test::Warn-Test::NoWarnings"><a>Test::Warnings</a> &amp; <a>Test::Warn</a> &amp; <a>Test::NoWarnings</a></dt>
+<dd>
+
+<p>Modules to help test warnings.</p>
+
+</dd>
+<dt id="Test::Builder"><a href="../../lib/Test/Builder.html">Test::Builder</a></dt>
+<dd>
+
+<p>Support module for building test libraries.</p>
+
+</dd>
+<dt id="Test::Simple-Test::More"><a href="../../lib/Test/Simple.html">Test::Simple</a> &amp; <a href="../../lib/Test/More.html">Test::More</a></dt>
+<dd>
+
+<p>Basic utilities for writing tests.</p>
+
+</dd>
+<dt id="http:-qa.perl.org-test-modules.html"><a href="http://qa.perl.org/test-modules.html">http://qa.perl.org/test-modules.html</a></dt>
+<dd>
+
+<p>Overview of some of the many testing modules available on CPAN.</p>
+
+</dd>
+<dt id="http:-del.icio.us-tag-perl-testing"><a href="http://del.icio.us/tag/perl+testing">http://del.icio.us/tag/perl+testing</a></dt>
+<dd>
+
+<p>Delicious links on perl testing.</p>
+
+</dd>
+</dl>
+
+<h1 id="LICENCE">LICENCE</h1>
+
+<p>Copyright 2002-2007 Adrian Howard, All Rights Reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

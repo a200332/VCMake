@@ -1,0 +1,348 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Package-Variables">Package Variables</a></li>
+      <li><a href="#Class-Methods">Class Methods</a></li>
+      <li><a href="#Instance-Methods">Instance Methods</a></li>
+      <li><a href="#Overloaded-Operators">Overloaded Operators</a></li>
+      <li><a href="#Did-I-Mention-Fast">Did I Mention Fast?</a></li>
+    </ul>
+  </li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Email::Address - RFC 2822 Address Parsing and Creation</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.908</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Email::Address</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">@addresses</span> <span class="operator">=</span> <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="variable">$line</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$address</span>   <span class="operator">=</span> <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">Casey</span> <span class="operator">=&gt;</span> <span class="string">'casey@localhost'</span><span class="operator">);</span>
+  
+  <span class="keyword">print</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">format</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class implements a regex-based RFC 2822 parser that locates email addresses in strings and returns a list of <code>Email::Address</code> objects found. Alternatively you may construct objects manually. The goal of this software is to be correct, and very very fast.</p>
+
+<h2 id="Package-Variables">Package Variables</h2>
+
+<p><b>ACHTUNG!</b> Email isn&#39;t easy (if even possible) to parse with a regex, <i>at least</i> if you&#39;re on a <code>perl</code> prior to 5.10.0. Providing regular expressions for use by other programs isn&#39;t a great idea, because it makes it hard to improve the parser without breaking the &quot;it&#39;s a regex&quot; feature. Using these regular expressions is not encouraged, and methods like <code>Email::Address-&gt;is_addr_spec</code> should be provided in the future.</p>
+
+<p>Several regular expressions used in this package are useful to others. For convenience, these variables are declared as package variables that you may access from your program.</p>
+
+<p>These regular expressions conform to the rules specified in RFC 2822.</p>
+
+<p>You can access these variables using the full namespace. If you want short names, define them yourself.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$addr_spec</span> <span class="operator">=</span> <span class="variable">$Email::Address::addr_spec</span><span class="operator">;</span>
+</code></pre>
+
+<dl>
+
+<dt id="Email::Address::addr_spec">$Email::Address::addr_spec</dt>
+<dd>
+
+<p>This regular expression defined what an email address is allowed to look like.</p>
+
+</dd>
+<dt id="Email::Address::angle_addr">$Email::Address::angle_addr</dt>
+<dd>
+
+<p>This regular expression defines an <code>$addr_spec</code> wrapped in angle brackets.</p>
+
+</dd>
+<dt id="Email::Address::name_addr">$Email::Address::name_addr</dt>
+<dd>
+
+<p>This regular expression defines what an email address can look like with an optional preceding display name, also known as the <code>phrase</code>.</p>
+
+</dd>
+<dt id="Email::Address::mailbox">$Email::Address::mailbox</dt>
+<dd>
+
+<p>This is the complete regular expression defining an RFC 2822 email address with an optional preceding display name and optional following comment.</p>
+
+</dd>
+</dl>
+
+<h2 id="Class-Methods">Class Methods</h2>
+
+<dl>
+
+<dt id="parse">parse</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@addrs</span> <span class="operator">=</span> <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span>
+    <span class="string">q[me@local, Casey &lt;me@local&gt;, "Casey" &lt;me@local&gt; (West)]</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>This method returns a list of <code>Email::Address</code> objects it finds in the input string. <b>Please note</b> that it returns a list, and expects that it may find multiple addresses. The behavior in scalar context is undefined.</p>
+
+<p>The specification for an email address allows for infinitely nestable comments. That&#39;s nice in theory, but a little over done. By default this module allows for one (<code>1</code>) level of nested comments. If you think you need more, modify the <code>$Email::Address::COMMENT_NEST_LEVEL</code> package variable to allow more.</p>
+
+<pre><code>  <span class="variable">$Email::Address::COMMENT_NEST_LEVEL</span> <span class="operator">=</span> <span class="number">10</span><span class="operator">;</span> <span class="comment"># I'm deep</span>
+</code></pre>
+
+<p>The reason for this hardly-limiting limitation is simple: efficiency.</p>
+
+<p>Long strings of whitespace can be problematic for this module to parse, a bug which has not yet been adequately addressed. The default behavior is now to collapse multiple spaces into a single space, which avoids this problem. To prevent this behavior, set <code>$Email::Address::COLLAPSE_SPACES</code> to zero. This variable will go away when the bug is resolved properly.</p>
+
+<p>In accordance with RFC 822 and its descendants, this module demands that email addresses be ASCII only. Any non-ASCII content in the parsed addresses will cause the parser to return no results.</p>
+
+</dd>
+<dt id="new">new</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$address</span> <span class="operator">=</span> <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="string">'casey@local'</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$address</span> <span class="operator">=</span> <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Casey West'</span><span class="operator">,</span> <span class="string">'casey@local'</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$address</span> <span class="operator">=</span> <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="string">'casey@local'</span><span class="operator">,</span> <span class="string">'(Casey)'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Constructs and returns a new <code>Email::Address</code> object. Takes four positional arguments: phrase, email, and comment, and original string.</p>
+
+<p>The original string should only really be set using <code>parse</code>.</p>
+
+</dd>
+<dt id="purge_cache">purge_cache</dt>
+<dd>
+
+<pre><code>  <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">purge_cache</span><span class="operator">;</span>
+</code></pre>
+
+<p>One way this module stays fast is with internal caches. Caches live in memory and there is the remote possibility that you will have a memory problem. On the off chance that you think you&#39;re one of those people, this class method will empty those caches.</p>
+
+<p>I&#39;ve loaded over 12000 objects and not encountered a memory problem.</p>
+
+</dd>
+<dt id="disable_cache">disable_cache</dt>
+<dd>
+
+</dd>
+<dt id="enable_cache">enable_cache</dt>
+<dd>
+
+<pre><code>  <span class="variable">Email::Address</span><span class="operator">-&gt;</span><span class="variable">disable_cache</span> <span class="keyword">if</span> <span class="variable">memory_low</span><span class="operator">();</span>
+</code></pre>
+
+<p>If you&#39;d rather not cache address parses at all, you can disable (and re-enable) the Email::Address cache with these methods. The cache is enabled by default.</p>
+
+</dd>
+</dl>
+
+<h2 id="Instance-Methods">Instance Methods</h2>
+
+<dl>
+
+<dt id="phrase">phrase</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$phrase</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">phrase</span><span class="operator">;</span>
+  <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">phrase</span><span class="operator">(</span> <span class="string">"Me oh my"</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Accessor and mutator for the phrase portion of an address.</p>
+
+</dd>
+<dt id="address">address</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$addr</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">address</span><span class="operator">;</span>
+  <span class="variable">$addr</span><span class="operator">-&gt;</span><span class="variable">address</span><span class="operator">(</span> <span class="string">"me</span><span class="variable">@PROTECTED</span><span class="string">.com"</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Accessor and mutator for the address portion of an address.</p>
+
+</dd>
+<dt id="comment">comment</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$comment</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">comment</span><span class="operator">;</span>
+  <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">comment</span><span class="operator">(</span> <span class="string">"(Work address)"</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Accessor and mutator for the comment portion of an address.</p>
+
+</dd>
+<dt id="original">original</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">original</span><span class="operator">;</span>
+</code></pre>
+
+<p>Accessor for the original address found when parsing, or passed to <code>new</code>.</p>
+
+</dd>
+<dt id="host">host</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$host</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">host</span><span class="operator">;</span>
+</code></pre>
+
+<p>Accessor for the host portion of an address&#39;s address.</p>
+
+</dd>
+<dt id="user">user</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$user</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">user</span><span class="operator">;</span>
+</code></pre>
+
+<p>Accessor for the user portion of an address&#39;s address.</p>
+
+</dd>
+<dt id="format">format</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$printable</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">format</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns a properly formatted RFC 2822 address representing the object.</p>
+
+</dd>
+<dt id="name">name</dt>
+<dd>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">$address</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method tries very hard to determine the name belonging to the address. First the <code>phrase</code> is checked. If that doesn&#39;t work out the <code>comment</code> is looked into. If that still doesn&#39;t work out, the <code>user</code> portion of the <code>address</code> is returned.</p>
+
+<p>This method does <b>not</b> try to massage any name it identifies and instead leaves that up to someone else. Who is it to decide if someone wants their name capitalized, or if they&#39;re Irish?</p>
+
+</dd>
+</dl>
+
+<h2 id="Overloaded-Operators">Overloaded Operators</h2>
+
+<dl>
+
+<dt id="stringify">stringify</dt>
+<dd>
+
+<pre><code>  <span class="keyword">print</span> <span class="string">"I have your email address, </span><span class="variable">$address</span><span class="string">."</span><span class="operator">;</span>
+</code></pre>
+
+<p>Objects stringify to <code>format</code> by default. It&#39;s possible that you don&#39;t like that idea. Okay, then, you can change it by modifying <code>$Email:Address::STRINGIFY</code>. Please consider modifying this package variable using <code>local</code>. You might step on someone else&#39;s toes if you don&#39;t.</p>
+
+<pre><code>  <span class="operator">{</span>
+    <span class="keyword">local</span> <span class="variable">$Email::Address::STRINGIFY</span> <span class="operator">=</span> <span class="string">'host'</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="string">"I have your address, </span><span class="variable">$address</span><span class="string">."</span><span class="operator">;</span>
+    <span class="comment">#   geeknest.com</span>
+  <span class="operator">}</span>
+  <span class="keyword">print</span> <span class="string">"I have your address, </span><span class="variable">$address</span><span class="string">."</span><span class="operator">;</span>
+  <span class="comment">#   "Casey West" &lt;casey@geeknest.com&gt;</span>
+</code></pre>
+
+<p>Modifying this package variable is now deprecated. Subclassing is now the recommended approach.</p>
+
+</dd>
+</dl>
+
+<h2 id="Did-I-Mention-Fast">Did I Mention Fast?</h2>
+
+<p>On his 1.8GHz Apple MacBook, rjbs gets these results:</p>
+
+<pre><code>  $ perl -Ilib bench/ea-vs-ma.pl bench/corpus.txt 5
+                   Rate  Mail::Address Email::Address
+  Mail::Address  2.59/s             --           -44%
+  Email::Address 4.59/s            77%             --
+
+  $ perl -Ilib bench/ea-vs-ma.pl bench/corpus.txt 25
+                   Rate  Mail::Address Email::Address
+  Mail::Address  2.58/s             --           -67%
+  Email::Address 7.84/s           204%             --
+
+  $ perl -Ilib bench/ea-vs-ma.pl bench/corpus.txt 50
+                   Rate  Mail::Address Email::Address
+  Mail::Address  2.57/s             --           -70%
+  Email::Address 8.53/s           232%             --</code></pre>
+
+<p>...unfortunately, a known bug causes a loss of speed the string to parse has certain known characteristics, and disabling cache will also degrade performance.</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Thanks to Kevin Riggle and Tatsuhiko Miyagawa for tests for annoying phrase-quoting bugs!</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Casey West</p>
+
+</li>
+<li><p>Ricardo SIGNES &lt;rjbs@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Alex Vandiver &lt;alex@chmrr.net&gt;</p>
+
+</li>
+<li><p>David Golden &lt;dagolden@cpan.org&gt;</p>
+
+</li>
+<li><p>David Steinbrunner &lt;dsteinbrunner@pobox.com&gt;</p>
+
+</li>
+<li><p>Glenn Fowler &lt;cebjyre@cpan.org&gt;</p>
+
+</li>
+<li><p>Ruslan Zakirov &lt;ruz@bestpractical.com&gt;</p>
+
+</li>
+<li><p>William Yardley &lt;pep@veggiechinese.net&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2004 by Casey West.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

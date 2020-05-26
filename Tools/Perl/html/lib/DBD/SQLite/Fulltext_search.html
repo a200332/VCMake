@@ -1,0 +1,434 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Introduction">Introduction</a></li>
+      <li><a href="#Short-example">Short example</a></li>
+    </ul>
+  </li>
+  <li><a href="#QUERY-SYNTAX">QUERY SYNTAX</a>
+    <ul>
+      <li><a href="#Token-or-token-prefix-queries">Token or token prefix queries</a></li>
+      <li><a href="#Column-specifications">Column specifications</a></li>
+      <li><a href="#Phrase-queries">Phrase queries</a></li>
+      <li><a href="#NEAR-queries">NEAR queries.</a></li>
+      <li><a href="#Set-operations">Set operations</a></li>
+    </ul>
+  </li>
+  <li><a href="#TOKENIZERS">TOKENIZERS</a>
+    <ul>
+      <li><a href="#Concept">Concept</a></li>
+      <li><a href="#SQLite-builtin-tokenizers">SQLite builtin tokenizers</a></li>
+      <li><a href="#Perl-tokenizers">Perl tokenizers</a>
+        <ul>
+          <li><a href="#Declaring-a-perl-tokenizer">Declaring a perl tokenizer</a></li>
+          <li><a href="#Writing-a-perl-tokenizer-by-hand">Writing a perl tokenizer by hand</a></li>
+          <li><a href="#Using-Search::Tokenizer">Using Search::Tokenizer</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#Fts4aux---Direct-Access-to-the-Full-Text-Index">Fts4aux - Direct Access to the Full-Text Index</a></li>
+  <li><a href="#How-to-spare-database-space">How to spare database space</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::SQLite::Fulltext_search - Using fulltext searches with DBD::SQLite</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="Introduction">Introduction</h2>
+
+<p>SQLite is bundled with an extension module called &quot;FTS&quot; for full-text indexing. Tables with this feature enabled can be efficiently queried to find rows that contain one or more instances of some specified words (also called &quot;tokens&quot;), in any column, even if the table contains many large documents.</p>
+
+<p>The first full-text search modules for SQLite were called <code>FTS1</code> and <code>FTS2</code> and are now obsolete. The latest version is <code>FTS4</code>, but it shares many features with the former module <code>FTS3</code>, which is why parts of the API and parts of the documentation still refer to <code>FTS3</code>; from a client point of view, both can be considered largely equivalent. Detailed documentation can be found at <a href="http://www.sqlite.org/fts3.html">http://www.sqlite.org/fts3.html</a>.</p>
+
+<h2 id="Short-example">Short example</h2>
+
+<p>Here is a very short example of using FTS :</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">DBI::errstr</span><span class="operator">;</span><span class="string">
+  CREATE VIRTUAL TABLE fts_example USING fts4(content)
+  </span>
+  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(</span><span class="string">"INSERT INTO fts_example(content) VALUES (?)"</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">execute</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="keyword">foreach</span> <span class="variable">@docs_to_insert</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$results</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">selectall_arrayref</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">);</span><span class="string">
+  SELECT docid, snippet(fts_example) FROM fts_example WHERE content MATCH 'foo'
+  </span>
+</code></pre>
+
+<p>The key points in this example are :</p>
+
+<ul>
+
+<li><p>The syntax for creating FTS tables is</p>
+
+<pre><code>  CREATE VIRTUAL TABLE &lt;table_name&gt; USING fts4(&lt;columns&gt;)</code></pre>
+
+<p>where <code>&lt;columns&gt;</code> is a list of column names. Columns may be typed, but the type information is ignored. If no columns are specified, the default is a single column named <code>content</code>. In addition, FTS tables have an implicit column called <code>docid</code> (or also <code>rowid</code>) for numbering the stored documents.</p>
+
+</li>
+<li><p>Statements for inserting, updating or deleting records use the same syntax as for regular SQLite tables.</p>
+
+</li>
+<li><p>Full-text searches are specified with the <code>MATCH</code> operator, and an operand which may be a single word, a word prefix ending with &#39;*&#39;, a list of words, a &quot;phrase query&quot; in double quotes, or a boolean combination of the above.</p>
+
+</li>
+<li><p>The builtin function <code>snippet(...)</code> builds a formatted excerpt of the document text, where the words pertaining to the query are highlighted.</p>
+
+</li>
+</ul>
+
+<p>There are many more details to building and searching FTS tables, so we strongly invite you to read the full documentation at <a href="http://www.sqlite.org/fts3.html">http://www.sqlite.org/fts3.html</a>.</p>
+
+<h1 id="QUERY-SYNTAX">QUERY SYNTAX</h1>
+
+<p>Here are some explanation about FTS queries, borrowed from the sqlite documentation.</p>
+
+<h2 id="Token-or-token-prefix-queries">Token or token prefix queries</h2>
+
+<p>An FTS table may be queried for all documents that contain a specified term, or for all documents that contain a term with a specified prefix. The query expression for a specific term is simply the term itself. The query expression used to search for a term prefix is the prefix itself with a &#39;*&#39; character appended to it. For example:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">Virtual</span> <span class="variable">table</span> <span class="variable">declaration</span>
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">docs</span> <span class="variable">USING</span> <span class="variable">fts3</span><span class="operator">(</span><span class="variable">title</span><span class="operator">,</span> <span class="variable">body</span><span class="operator">);</span>
+  
+  <span class="operator">--</span> <span class="variable">Query</span> <span class="keyword">for</span> <span class="variable">all</span> <span class="variable">documents</span> <span class="variable">containing</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"linux"</span><span class="operator">:</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'linux'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Query</span> <span class="keyword">for</span> <span class="variable">all</span> <span class="variable">documents</span> <span class="variable">containing</span> <span class="variable">a</span> <span class="variable">term</span> <span class="variable">with</span> <span class="variable">the</span> <span class="variable">prefix</span> <span class="string">"lin"</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'lin*'</span><span class="operator">;</span>
+</code></pre>
+
+<p>If a search token (on the right-hand side of the MATCH operator) begins with &quot;^&quot; then that token must be the first in its field of the document : so for example <code>^lin*</code> matches &#39;linux kernel changes ...&#39; but does not match &#39;new linux implementation&#39;.</p>
+
+<h2 id="Column-specifications">Column specifications</h2>
+
+<p>Normally, a token or token prefix query is matched against the FTS table column specified as the right-hand side of the MATCH operator. Or, if the special column with the same name as the FTS table itself is specified, against all columns. This may be overridden by specifying a column-name followed by a &quot;:&quot; character before a basic term query. There may be space between the &quot;:&quot; and the term to query for, but not between the column-name and the &quot;:&quot; character. For example:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">Query</span> <span class="variable">the</span> <span class="variable">database</span> <span class="keyword">for</span> <span class="variable">documents</span> <span class="keyword">for</span> <span class="variable">which</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"linux"</span> <span class="variable">appears</span> <span class="variable">in</span>
+  <span class="operator">--</span> <span class="variable">the</span> <span class="variable">document</span> <span class="variable">title</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"problems"</span> <span class="variable">appears</span> <span class="variable">in</span> <span class="variable">either</span> <span class="variable">the</span> <span class="variable">title</span>
+  <span class="operator">--</span> <span class="keyword">or</span> <span class="variable">body</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">document</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'title:linux problems'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Query</span> <span class="variable">the</span> <span class="variable">database</span> <span class="keyword">for</span> <span class="variable">documents</span> <span class="keyword">for</span> <span class="variable">which</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"linux"</span> <span class="variable">appears</span> <span class="variable">in</span>
+  <span class="operator">--</span> <span class="variable">the</span> <span class="variable">document</span> <span class="variable">title</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"driver"</span> <span class="variable">appears</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">body</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">document</span>
+  <span class="operator">--</span> <span class="operator">(</span><span class="string">"driver"</span> <span class="variable">may</span> <span class="variable">also</span> <span class="variable">appear</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">title</span><span class="operator">,</span> <span class="variable">but</span> <span class="variable">this</span> <span class="variable">alone</span> <span class="variable">will</span> <span class="keyword">not</span> <span class="variable">satisfy</span> <span class="variable">the</span><span class="operator">.</span>
+  <span class="operator">--</span> <span class="variable">query</span> <span class="variable">criteria</span><span class="operator">).</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">body</span> <span class="variable">MATCH</span> <span class="string">'title:linux driver'</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Phrase-queries">Phrase queries</h2>
+
+<p>A phrase query is a query that retrieves all documents that contain a nominated set of terms or term prefixes in a specified order with no intervening tokens. Phrase queries are specified by enclosing a space separated sequence of terms or term prefixes in double quotes (&quot;). For example:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">Query</span> <span class="keyword">for</span> <span class="variable">all</span> <span class="variable">documents</span> <span class="variable">that</span> <span class="variable">contain</span> <span class="variable">the</span> <span class="variable">phrase</span> <span class="string">"linux applications"</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'"linux applications"'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Query</span> <span class="keyword">for</span> <span class="variable">all</span> <span class="variable">documents</span> <span class="variable">that</span> <span class="variable">contain</span> <span class="variable">a</span> <span class="variable">phrase</span> <span class="variable">that</span> <span class="variable">matches</span> <span class="string">"lin* app*"</span><span class="operator">.</span> 
+  <span class="operator">--</span> <span class="variable">As</span> <span class="variable">well</span> <span class="variable">as</span> <span class="string">"linux applications"</span><span class="operator">,</span> <span class="variable">this</span> <span class="variable">will</span> <span class="variable">match</span> <span class="variable">common</span> <span class="variable">phrases</span> <span class="variable">such</span> 
+  <span class="operator">--</span> <span class="variable">as</span> <span class="string">"linoleum appliances"</span> <span class="keyword">or</span> <span class="string">"link apprentice"</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'"lin* app*"'</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="NEAR-queries">NEAR queries.</h2>
+
+<p>A NEAR query is a query that returns documents that contain a two or more nominated terms or phrases within a specified proximity of each other (by default with 10 or less intervening terms). A NEAR query is specified by putting the keyword &quot;NEAR&quot; between two phrase, term or prefix queries. To specify a proximity other than the default, an operator of the form &quot;NEAR/&lt;N&gt;&quot; may be used, where &lt;N&gt; is the maximum number of intervening terms allowed. For example:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">Virtual</span> <span class="variable">table</span> <span class="variable">declaration</span><span class="operator">.</span>
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">docs</span> <span class="variable">USING</span> <span class="variable">fts4</span><span class="operator">();</span>
+  
+  <span class="operator">--</span> <span class="variable">Virtual</span> <span class="variable">table</span> <span class="variable">data</span><span class="operator">.</span>
+  <span class="variable">INSERT</span> <span class="variable">INTO</span> <span class="variable">docs</span> <span class="variable">VALUES</span><span class="operator">(</span><span class="string">'SQLite is an ACID compliant embedded relational database management system'</span><span class="operator">);</span>
+  
+  <span class="operator">--</span> <span class="variable">Search</span> <span class="keyword">for</span> <span class="variable">a</span> <span class="variable">document</span> <span class="variable">that</span> <span class="variable">contains</span> <span class="variable">the</span> <span class="variable">terms</span> <span class="string">"sqlite"</span> <span class="keyword">and</span> <span class="string">"database"</span> <span class="variable">with</span>
+  <span class="operator">--</span> <span class="keyword">not</span> <span class="variable">more</span> <span class="variable">than</span> <span class="number">10</span> <span class="variable">intervening</span> <span class="variable">terms</span><span class="operator">.</span> <span class="variable">This</span> <span class="variable">matches</span> <span class="variable">the</span> <span class="variable">only</span> <span class="variable">document</span> <span class="variable">in</span>
+  <span class="operator">--</span> <span class="variable">table</span> <span class="variable">docs</span> <span class="operator">(</span><span class="variable">since</span> <span class="variable">there</span> <span class="variable">are</span> <span class="variable">only</span> <span class="variable">six</span> <span class="variable">terms</span> <span class="variable">between</span> <span class="string">"SQLite"</span> <span class="keyword">and</span> <span class="string">"database"</span> 
+  <span class="operator">--</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">document</span><span class="operator">).</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'sqlite NEAR database'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Search</span> <span class="keyword">for</span> <span class="variable">a</span> <span class="variable">document</span> <span class="variable">that</span> <span class="variable">contains</span> <span class="variable">the</span> <span class="variable">terms</span> <span class="string">"sqlite"</span> <span class="keyword">and</span> <span class="string">"database"</span> <span class="variable">with</span>
+  <span class="operator">--</span> <span class="keyword">not</span> <span class="variable">more</span> <span class="variable">than</span> <span class="number">6</span> <span class="variable">intervening</span> <span class="variable">terms</span><span class="operator">.</span> <span class="variable">This</span> <span class="variable">also</span> <span class="variable">matches</span> <span class="variable">the</span> <span class="variable">only</span> <span class="variable">document</span> <span class="variable">in</span>
+  <span class="operator">--</span> <span class="variable">table</span> <span class="variable">docs</span><span class="operator">.</span> <span class="variable">Note</span> <span class="variable">that</span> <span class="variable">the</span> <span class="variable">order</span> <span class="variable">in</span> <span class="variable">which</span> <span class="variable">the</span> <span class="variable">terms</span> <span class="variable">appear</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">document</span>
+  <span class="operator">--</span> <span class="variable">does</span> <span class="keyword">not</span> <span class="variable">have</span> <span class="variable">to</span> <span class="variable">be</span> <span class="variable">the</span> <span class="variable">same</span> <span class="variable">as</span> <span class="variable">the</span> <span class="variable">order</span> <span class="variable">in</span> <span class="variable">which</span> <span class="variable">they</span> <span class="variable">appear</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">query</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'database NEAR/6 sqlite'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Search</span> <span class="keyword">for</span> <span class="variable">a</span> <span class="variable">document</span> <span class="variable">that</span> <span class="variable">contains</span> <span class="variable">the</span> <span class="variable">terms</span> <span class="string">"sqlite"</span> <span class="keyword">and</span> <span class="string">"database"</span> <span class="variable">with</span>
+  <span class="operator">--</span> <span class="keyword">not</span> <span class="variable">more</span> <span class="variable">than</span> <span class="number">5</span> <span class="variable">intervening</span> <span class="variable">terms</span><span class="operator">.</span> <span class="variable">This</span> <span class="variable">query</span> <span class="variable">matches</span> <span class="keyword">no</span> <span class="variable">documents</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'database NEAR/5 sqlite'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Search</span> <span class="keyword">for</span> <span class="variable">a</span> <span class="variable">document</span> <span class="variable">that</span> <span class="variable">contains</span> <span class="variable">the</span> <span class="variable">phrase</span> <span class="string">"ACID compliant"</span> <span class="keyword">and</span> <span class="variable">the</span> <span class="variable">term</span>
+  <span class="operator">--</span> <span class="string">"database"</span> <span class="variable">with</span> <span class="keyword">not</span> <span class="variable">more</span> <span class="variable">than</span> <span class="number">2</span> <span class="variable">terms</span> <span class="variable">separating</span> <span class="variable">the</span> <span class="variable">two</span><span class="operator">.</span> <span class="variable">This</span> <span class="variable">matches</span> <span class="variable">the</span>
+  <span class="operator">--</span> <span class="variable">document</span> <span class="variable">stored</span> <span class="variable">in</span> <span class="variable">table</span> <span class="variable">docs</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'database NEAR/2 "ACID compliant"'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">Search</span> <span class="keyword">for</span> <span class="variable">a</span> <span class="variable">document</span> <span class="variable">that</span> <span class="variable">contains</span> <span class="variable">the</span> <span class="variable">phrase</span> <span class="string">"ACID compliant"</span> <span class="keyword">and</span> <span class="variable">the</span> <span class="variable">term</span>
+  <span class="operator">--</span> <span class="string">"sqlite"</span> <span class="variable">with</span> <span class="keyword">not</span> <span class="variable">more</span> <span class="variable">than</span> <span class="number">2</span> <span class="variable">terms</span> <span class="variable">separating</span> <span class="variable">the</span> <span class="variable">two</span><span class="operator">.</span> <span class="variable">This</span> <span class="variable">also</span> <span class="variable">matches</span>
+  <span class="operator">--</span> <span class="variable">the</span> <span class="variable">only</span> <span class="variable">document</span> <span class="variable">stored</span> <span class="variable">in</span> <span class="variable">table</span> <span class="variable">docs</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'"ACID compliant" NEAR/2 sqlite'</span><span class="operator">;</span>
+</code></pre>
+
+<p>More than one NEAR operator may appear in a single query. In this case each pair of terms or phrases separated by a NEAR operator must appear within the specified proximity of each other in the document. Using the same table and data as in the block of examples above:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">The</span> <span class="variable">following</span> <span class="variable">query</span> <span class="variable">selects</span> <span class="variable">documents</span> <span class="variable">that</span> <span class="variable">contains</span> <span class="variable">an</span> <span class="variable">instance</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">term</span> 
+  <span class="operator">--</span> <span class="string">"sqlite"</span> <span class="variable">separated</span> <span class="variable">by</span> <span class="variable">two</span> <span class="keyword">or</span> <span class="variable">fewer</span> <span class="variable">terms</span> <span class="variable">from</span> <span class="variable">an</span> <span class="variable">instance</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"acid"</span><span class="operator">,</span>
+  <span class="operator">--</span> <span class="variable">which</span> <span class="variable">is</span> <span class="variable">in</span> <span class="variable">turn</span> <span class="variable">separated</span> <span class="variable">by</span> <span class="variable">two</span> <span class="keyword">or</span> <span class="variable">fewer</span> <span class="variable">terms</span> <span class="variable">from</span> <span class="variable">an</span> <span class="variable">instance</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">term</span>
+  <span class="operator">--</span> <span class="string">"relational"</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'sqlite NEAR/2 acid NEAR/2 relational'</span><span class="operator">;</span>
+  
+  <span class="operator">--</span> <span class="variable">This</span> <span class="variable">query</span> <span class="variable">matches</span> <span class="keyword">no</span> <span class="variable">documents</span><span class="operator">.</span> <span class="variable">There</span> <span class="variable">is</span> <span class="variable">an</span> <span class="variable">instance</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"sqlite"</span> <span class="variable">with</span>
+  <span class="operator">--</span> <span class="variable">sufficient</span> <span class="variable">proximity</span> <span class="variable">to</span> <span class="variable">an</span> <span class="variable">instance</span> <span class="variable">of</span> <span class="string">"acid"</span> <span class="variable">but</span> <span class="variable">it</span> <span class="variable">is</span> <span class="keyword">not</span> <span class="variable">sufficiently</span> <span class="keyword">close</span>
+  <span class="operator">--</span> <span class="variable">to</span> <span class="variable">an</span> <span class="variable">instance</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">term</span> <span class="string">"relational"</span><span class="operator">.</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">docs</span> <span class="variable">WHERE</span> <span class="variable">docs</span> <span class="variable">MATCH</span> <span class="string">'acid NEAR/2 sqlite NEAR/2 relational'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Phrase and NEAR queries may not span multiple columns within a row.</p>
+
+<h2 id="Set-operations">Set operations</h2>
+
+<p>The three basic query types described above may be used to query the full-text index for the set of documents that match the specified criteria. Using the FTS query expression language it is possible to perform various set operations on the results of basic queries. There are currently three supported operations:</p>
+
+<ul>
+
+<li><p>The AND operator determines the intersection of two sets of documents.</p>
+
+</li>
+<li><p>The OR operator calculates the union of two sets of documents.</p>
+
+</li>
+<li><p>The NOT operator may be used to compute the relative complement of one set of documents with respect to another.</p>
+
+</li>
+</ul>
+
+<p>The AND, OR and NOT binary set operators must be entered using capital letters; otherwise, they are interpreted as basic term queries instead of set operators. Each of the two operands to an operator may be a basic FTS query, or the result of another AND, OR or NOT set operation. Parenthesis may be used to control precedence and grouping.</p>
+
+<p>The AND operator is implicit for adjacent basic queries without any explicit operator. For example, the query expression &quot;implicit operator&quot; is a more succinct version of &quot;implicit AND operator&quot;.</p>
+
+<p>Boolean operations as just described correspond to the so-called &quot;enhanced query syntax&quot; of sqlite; this is the version compiled with <code>DBD::SQLite</code>, starting from version 1.31. A former version, called the &quot;standard query syntax&quot;, used to support tokens prefixed with &#39;+&#39; or &#39;-&#39; signs (for token inclusion or exclusion); if your application needs to support this old syntax, use <a>DBD::SQLite::FTS3Transitional</a> (published in a separate distribution) for doing the conversion.</p>
+
+<h1 id="TOKENIZERS">TOKENIZERS</h1>
+
+<h2 id="Concept">Concept</h2>
+
+<p>The behaviour of full-text indexes strongly depends on how documents are split into <i>tokens</i>; therefore FTS table declarations can explicitly specify how to perform tokenization:</p>
+
+<pre><code>  CREATE ... USING fts4(&lt;columns&gt;, tokenize=&lt;tokenizer&gt;)</code></pre>
+
+<p>where <code>&lt;tokenizer&gt;</code> is a sequence of space-separated words that triggers a specific tokenizer. Tokenizers can be SQLite builtins, written in C code, or Perl tokenizers. Both are as explained below.</p>
+
+<h2 id="SQLite-builtin-tokenizers">SQLite builtin tokenizers</h2>
+
+<p>SQLite comes with some builtin tokenizers (see <a href="http://www.sqlite.org/fts3.html#tokenizer">http://www.sqlite.org/fts3.html#tokenizer</a>) :</p>
+
+<dl>
+
+<dt id="simple">simple</dt>
+<dd>
+
+<p>Under the <i>simple</i> tokenizer, a term is a contiguous sequence of eligible characters, where eligible characters are all alphanumeric characters, the &quot;_&quot; character, and all characters with UTF codepoints greater than or equal to 128. All other characters are discarded when splitting a document into terms. They serve only to separate adjacent terms.</p>
+
+<p>All uppercase characters within the ASCII range (UTF codepoints less than 128), are transformed to their lowercase equivalents as part of the tokenization process. Thus, full-text queries are case-insensitive when using the simple tokenizer.</p>
+
+</dd>
+<dt id="porter">porter</dt>
+<dd>
+
+<p>The <i>porter</i> tokenizer uses the same rules to separate the input document into terms, but as well as folding all terms to lower case it uses the Porter Stemming algorithm to reduce related English language words to a common root.</p>
+
+</dd>
+<dt id="icu">icu</dt>
+<dd>
+
+<p>The <i>icu</i> tokenizer uses the ICU library to decide how to identify word characters in different languages; however, this requires SQLite to be compiled with the <code>SQLITE_ENABLE_ICU</code> pre-processor symbol defined. So, to use this tokenizer, you need edit <i>Makefile.PL</i> to add this flag in <code>@CC_DEFINE</code>, and then recompile <code>DBD::SQLite</code>; of course, the prerequisite is to have an ICU library available on your system.</p>
+
+</dd>
+<dt id="unicode61">unicode61</dt>
+<dd>
+
+<p>The <i>unicode61</i> tokenizer works very much like &quot;simple&quot; except that it does full unicode case folding according to rules in Unicode Version 6.1 and it recognizes unicode space and punctuation characters and uses those to separate tokens. By contrast, the simple tokenizer only does case folding of ASCII characters and only recognizes ASCII space and punctuation characters as token separators.</p>
+
+<p>By default, &quot;unicode61&quot; also removes all diacritics from Latin script characters. This behaviour can be overridden by adding the tokenizer argument <code>&quot;remove_diacritics=0&quot;</code>. For example:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">Create</span> <span class="variable">tables</span> <span class="variable">that</span> <span class="variable">remove</span> <span class="variable">diacritics</span> <span class="variable">from</span> <span class="variable">Latin</span> <span class="variable">script</span> <span class="variable">characters</span>
+  <span class="operator">--</span> <span class="variable">as</span> <span class="variable">part</span> <span class="variable">of</span> <span class="variable">tokenization</span><span class="operator">.</span>
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">txt1</span> <span class="variable">USING</span> <span class="variable">fts4</span><span class="operator">(</span><span class="variable">tokenize</span><span class="operator">=</span><span class="variable">unicode61</span><span class="operator">);</span>
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">txt2</span> <span class="variable">USING</span> <span class="variable">fts4</span><span class="operator">(</span><span class="variable">tokenize</span><span class="operator">=</span><span class="variable">unicode61</span> <span class="string">"remove_diacritics=1"</span><span class="operator">);</span>
+  
+  <span class="operator">--</span> <span class="variable">Create</span> <span class="variable">a</span> <span class="variable">table</span> <span class="variable">that</span> <span class="variable">does</span> <span class="keyword">not</span> <span class="variable">remove</span> <span class="variable">diacritics</span> <span class="variable">from</span> <span class="variable">Latin</span> <span class="variable">script</span>
+  <span class="operator">--</span> <span class="variable">characters</span> <span class="variable">as</span> <span class="variable">part</span> <span class="variable">of</span> <span class="variable">tokenization</span><span class="operator">.</span>
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">txt3</span> <span class="variable">USING</span> <span class="variable">fts4</span><span class="operator">(</span><span class="variable">tokenize</span><span class="operator">=</span><span class="variable">unicode61</span> <span class="string">"remove_diacritics=0"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Additional options can customize the set of codepoints that unicode61 treats as separator characters or as token characters -- see the documentation in <a href="http://www.sqlite.org/fts3.html#unicode61">http://www.sqlite.org/fts3.html#unicode61</a>.</p>
+
+</dd>
+</dl>
+
+<p>If a more complex tokenizing algorithm is required, for example to implement stemming, discard punctuation, or to recognize compound words, use the perl tokenizer to implement your own logic, as explained below.</p>
+
+<h2 id="Perl-tokenizers">Perl tokenizers</h2>
+
+<h3 id="Declaring-a-perl-tokenizer">Declaring a perl tokenizer</h3>
+
+<p>In addition to the builtin SQLite tokenizers, <code>DBD::SQLite</code> implements a <i>perl</i> tokenizer, that can hook to any tokenizing algorithm written in Perl. This is specified as follows :</p>
+
+<pre><code>  CREATE ... USING fts4(&lt;columns&gt;, tokenize=perl &#39;&lt;perl_function&gt;&#39;)</code></pre>
+
+<p>where <code>&lt;perl_function&gt;</code> is a fully qualified Perl function name (i.e. prefixed by the name of the package in which that function is declared). So for example if the function is <code>my_func</code> in the main program, write</p>
+
+<pre><code>  CREATE ... USING fts4(&lt;columns&gt;, tokenize=perl &#39;main::my_func&#39;)</code></pre>
+
+<h3 id="Writing-a-perl-tokenizer-by-hand">Writing a perl tokenizer by hand</h3>
+
+<p>That function should return a code reference that takes a string as single argument, and returns an iterator (another function), which returns a tuple <code>($term, $len, $start, $end, $index)</code> for each term. Here is a simple example that tokenizes on words according to the current perl locale</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> locale_tokenizer </span><span class="operator">{</span>
+    <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$string</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">use</span> <span class="variable">locale</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$regex</span>      <span class="operator">=</span> <span class="string">qr/\w+/</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$term_index</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="comment"># closure</span>
+        <span class="variable">$string</span> <span class="operator">=~</span> <span class="regex">/</span><span class="variable">$regex</span><span class="regex">/g</span> <span class="keyword">or</span> <span class="keyword">return</span><span class="operator">;</span> <span class="comment"># either match, or no more token</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$start</span><span class="operator">,</span> <span class="variable">$end</span><span class="operator">)</span> <span class="operator">=</span> <span class="operator">(</span><span class="variable">$-</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">$+</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">);</span>
+        <span class="keyword">my</span> <span class="variable">$len</span>           <span class="operator">=</span> <span class="variable">$end</span><span class="operator">-</span><span class="variable">$start</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$term</span>          <span class="operator">=</span> <span class="keyword">substr</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">,</span> <span class="variable">$start</span><span class="operator">,</span> <span class="variable">$len</span><span class="operator">);</span>
+        <span class="keyword">return</span> <span class="operator">(</span><span class="variable">$term</span><span class="operator">,</span> <span class="variable">$len</span><span class="operator">,</span> <span class="variable">$start</span><span class="operator">,</span> <span class="variable">$end</span><span class="operator">,</span> <span class="variable">$term_index</span><span class="operator">++);</span>
+      <span class="operator">}</span>
+    <span class="operator">};</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>There must be three levels of subs, in a kind of &quot;Russian dolls&quot; structure, because :</p>
+
+<ul>
+
+<li><p>the external, named sub is called whenever accessing a FTS table with that tokenizer</p>
+
+</li>
+<li><p>the inner, anonymous sub is called whenever a new string needs to be tokenized (either for inserting new text into the table, or for analyzing a query).</p>
+
+</li>
+<li><p>the innermost, anonymous sub is called repeatedly for retrieving all terms within that string.</p>
+
+</li>
+</ul>
+
+<h3 id="Using-Search::Tokenizer">Using Search::Tokenizer</h3>
+
+<p>Instead of writing tokenizers by hand, you can grab one of those already implemented in the <a>Search::Tokenizer</a> module. For example, if you want ignore differences between accented characters, you can write :</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Search::Tokenizer</span><span class="operator">;</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">DBI::errstr</span><span class="operator">;</span><span class="string">
+  CREATE ... USING fts4(&lt;columns&gt;, 
+                        tokenize=perl 'Search::Tokenizer::unaccent')
+  </span>
+</code></pre>
+
+<p>Alternatively, you can use <a>&quot;new&quot; in Search::Tokenizer</a> to build your own tokenizer. Here is an example that treats compound words (words with an internal dash or dot) as single tokens :</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> my_tokenizer </span><span class="operator">{</span>
+    <span class="keyword">return</span> <span class="variable">Search::Tokenizer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">regex</span> <span class="operator">=&gt;</span> <span class="string">qr{\p{Word}+(?:[-./]\p{Word}+)*}</span><span class="operator">,</span>
+     <span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="Fts4aux---Direct-Access-to-the-Full-Text-Index">Fts4aux - Direct Access to the Full-Text Index</h1>
+
+<p>The content of a full-text index can be accessed through the virtual table module &quot;fts4aux&quot;. For example, assuming that our database contains a full-text indexed table named &quot;ft&quot;, we can declare :</p>
+
+<pre><code>  CREATE VIRTUAL TABLE ft_terms USING fts4aux(ft)</code></pre>
+
+<p>and then query the <code>ft_terms</code> table to access the list of terms, their frequency, etc. Examples are documented in <a href="http://www.sqlite.org/fts3.html#fts4aux">http://www.sqlite.org/fts3.html#fts4aux</a>.</p>
+
+<h1 id="How-to-spare-database-space">How to spare database space</h1>
+
+<p>By default, FTS stores a complete copy of the indexed documents, together with the fulltext index. On a large collection of documents, this can consume quite a lot of disk space. However, FTS has some options for compressing the documents, or even for not storing them at all -- see <a href="http://www.sqlite.org/fts3.html#fts4_options">http://www.sqlite.org/fts3.html#fts4_options</a>.</p>
+
+<p>In particular, the option for <i>contentless FTS tables</i> only stores the fulltext index, without the original document content. This is specified as <code>content=&quot;&quot;</code>, like in the following example :</p>
+
+<pre><code>  CREATE VIRTUAL TABLE t1 USING fts4(content=&quot;&quot;, a, b)</code></pre>
+
+<p>Data can be inserted into such an FTS4 table using an INSERT statements. However, unlike ordinary FTS4 tables, the user must supply an explicit integer docid value. For example:</p>
+
+<pre><code>  <span class="operator">--</span> <span class="variable">This</span> <span class="variable">statement</span> <span class="variable">is</span> <span class="variable">Ok</span><span class="operator">:</span>
+  <span class="variable">INSERT</span> <span class="variable">INTO</span> <span class="variable">t1</span><span class="operator">(</span><span class="variable">docid</span><span class="operator">,</span> <span class="variable">a</span><span class="operator">,</span> <span class="variable">b</span><span class="operator">)</span> <span class="variable">VALUES</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">'a b c'</span><span class="operator">,</span> <span class="string">'d e f'</span><span class="operator">);</span>
+  
+  <span class="operator">--</span> <span class="variable">This</span> <span class="variable">statement</span> <span class="variable">causes</span> <span class="variable">an</span> <span class="variable">error</span><span class="operator">,</span> <span class="variable">as</span> <span class="keyword">no</span> <span class="variable">docid</span> <span class="variable">value</span> <span class="variable">has</span> <span class="variable">been</span> <span class="variable">provided</span><span class="operator">:</span>
+  <span class="variable">INSERT</span> <span class="variable">INTO</span> <span class="variable">t1</span><span class="operator">(</span><span class="variable">a</span><span class="operator">,</span> <span class="variable">b</span><span class="operator">)</span> <span class="variable">VALUES</span><span class="operator">(</span><span class="string">'j k l'</span><span class="operator">,</span> <span class="string">'m n o'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Of course your application will need an algorithm for finding the external resource corresponding to any <i>docid</i> stored within SQLite.</p>
+
+<p>When using placeholders, the docid must be explicitly typed to INTEGER, because this is a &quot;hidden column&quot; for which sqlite is not able to automatically infer the proper type. So the following doesn&#39;t work :</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(</span><span class="string">"INSERT INTO t1(docid, a, b) VALUES(?, ?, ?)"</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">execute</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span> <span class="string">'aa'</span><span class="operator">,</span> <span class="string">'bb'</span><span class="operator">);</span> <span class="comment"># constraint error</span>
+</code></pre>
+
+<p>but it works with an explicitly cast :</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$sql</span> <span class="operator">=</span> <span class="string">"INSERT INTO t1(docid, a, b) VALUES(CAST(? AS INTEGER), ?, ?)"</span><span class="operator">,</span>
+  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(</span><span class="variable">sql</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">execute</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span> <span class="string">'aa'</span><span class="operator">,</span> <span class="string">'bb'</span><span class="operator">);</span>
+</code></pre>
+
+<p>or with an explicitly typed <a href="../../../lib/DBI.html#bind_param">&quot;bind_param&quot; in DBI</a> :</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">DBI</span> <span class="string">qw/SQL_INTEGER/</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$sql</span> <span class="operator">=</span> <span class="string">"INSERT INTO t1(docid, a, b) VALUES(?, ?, ?)"</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(</span><span class="variable">sql</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">bind_param</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="variable">SQL_INTEGER</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">bind_param</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span> <span class="string">"aa"</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">bind_param</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span> <span class="string">"bb"</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">execute</span><span class="operator">();</span>
+</code></pre>
+
+<p>It is not possible to UPDATE or DELETE a row stored in a contentless FTS4 table. Attempting to do so is an error.</p>
+
+<p>Contentless FTS4 tables also support SELECT statements. However, it is an error to attempt to retrieve the value of any table column other than the docid column. The auxiliary function <code>matchinfo()</code> may be used, but <code>snippet()</code> and <code>offsets()</code> may not, so if such functionality is needed, it has to be directly programmed within the Perl application.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Laurent Dami &lt;dami@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2014 Laurent Dami.</p>
+
+<p>Some parts borrowed from the <a href="http://sqlite.org">http://sqlite.org</a> documentation, copyright 2014.</p>
+
+<p>This documentation is in the public domain; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

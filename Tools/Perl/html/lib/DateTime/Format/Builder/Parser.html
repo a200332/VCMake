@@ -1,0 +1,285 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONSTRUCTORS">CONSTRUCTORS</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Parameter-Handling-implementations">Parameter Handling (implementations)</a>
+        <ul>
+          <li><a href="#Common-parameters">Common parameters</a></li>
+          <li><a href="#params">params</a></li>
+          <li><a href="#params_all">params_all</a></li>
+          <li><a href="#valid_params">valid_params</a></li>
+          <li><a href="#whose_params">whose_params</a></li>
+        </ul>
+      </li>
+      <li><a href="#Organising-and-Creating-Parsers">Organising and Creating Parsers</a>
+        <ul>
+          <li><a href="#create_single_parser">create_single_parser</a></li>
+          <li><a href="#merge_callbacks">merge_callbacks</a></li>
+        </ul>
+      </li>
+      <li><a href="#create_multiple_parsers">create_multiple_parsers</a></li>
+      <li><a href="#sort_parsers">sort_parsers</a></li>
+      <li><a href="#create_parser">create_parser</a></li>
+    </ul>
+  </li>
+  <li><a href="#FINDING-IMPLEMENTATIONS">FINDING IMPLEMENTATIONS</a></li>
+  <li><a href="#WRITING-A-PARSER-IMPLEMENTATION">WRITING A PARSER IMPLEMENTATION</a>
+    <ul>
+      <li><a href="#Naming-your-parser">Naming your parser</a></li>
+      <li><a href="#Declaring-specification-arguments">Declaring specification arguments</a></li>
+      <li><a href="#Define-create_parser">Define create_parser</a></li>
+      <li><a href="#Callbacks">Callbacks</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Builder::Parser - Parser creation</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.81</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="string">'DateTime::Format::Builder::Parser'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">create_single_parser</span><span class="operator">(</span> <span class="variable">%specs</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a utility class for <a href="../../../../lib/DateTime/Format/Builder.html">DateTime::Format::Builder</a> that handles creation of parsers. It is to here that <code>Builder</code> delegates most of its responsibilities.</p>
+
+<h1 id="CONSTRUCTORS">CONSTRUCTORS</h1>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>There are two sorts of methods in this class. Those used by parser implementations and those used by <code>Builder</code>. It is generally unlikely the user will want to use any of them.</p>
+
+<p>They are presented, grouped according to use.</p>
+
+<h2 id="Parameter-Handling-implementations">Parameter Handling (implementations)</h2>
+
+<p>These methods allow implementations to have validation of their arguments in a standard manner and due to <code>Parser</code>&#39;s impelementation, these methods also allow <code>Parser</code> to determine which implementation to use.</p>
+
+<h3 id="Common-parameters">Common parameters</h3>
+
+<p>These parameters appear for all parser implementations. These are primarily documented in <a href="../../../../lib/DateTime/Format/Builder.html">DateTime::Format::Builder</a>.</p>
+
+<ul>
+
+<li><p><b>on_match</b></p>
+
+</li>
+<li><p><b>on_fail</b></p>
+
+</li>
+<li><p><b>postprocess</b></p>
+
+</li>
+<li><p><b>preprocess</b></p>
+
+</li>
+<li><p><b>label</b></p>
+
+</li>
+<li><p><b>length</b> may be a number or an arrayref of numbers indicating the length of the input. This lets us optimise in the case of static length input. If supplying an arrayref of numbers, please keep the number of numbers to a minimum.</p>
+
+</li>
+</ul>
+
+<h3 id="params">params</h3>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$params</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">params</span><span class="operator">();</span>
+    <span class="variable">validate</span><span class="operator">(</span> <span class="variable">@_</span><span class="operator">,</span> <span class="variable">$params</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns declared parameters and <code>common</code> parameters in a hashref suitable for handing to <a href="../../../../lib/Params/Validate.html">Params::Validate</a>&#39;s <code>validate</code> function.</p>
+
+<h3 id="params_all">params_all</h3>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$all_params</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">params_all</span><span class="operator">();</span>
+</code></pre>
+
+<p>Returns a hash of all the valid options. Not recommended for general use.</p>
+
+<h3 id="valid_params">valid_params</h3>
+
+<pre><code>    <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">valid_params</span><span class="operator">(</span> <span class="variable">%params</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Arguments are as per <a href="../../../../lib/Params/Validate.html">Params::Validate</a>&#39;s <code>validate</code> function. This method is used to declare what your valid arguments are in a parser specification.</p>
+
+<h3 id="whose_params">whose_params</h3>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="variable">whose_params</span><span class="operator">(</span> <span class="variable">$key</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Internal function which merely returns to which class a parameter is unique. If not unique, returns <code>undef</code>.</p>
+
+<h2 id="Organising-and-Creating-Parsers">Organising and Creating Parsers</h2>
+
+<h3 id="create_single_parser">create_single_parser</h3>
+
+<p>This takes a single specification and returns a coderef that is a parser that suits that specification. This is the end of the line for all the parser creation methods. It delegates no further.</p>
+
+<p>If a coderef is specified, then that coderef is immediately returned (it is assumed to be appropriate).</p>
+
+<p>The single specification (if not a coderef) can be either a hashref or a hash. The keys and values must be as per the specification.</p>
+
+<p>It is here that any arrays of callbacks are unified. It is also here that any parser implementations are used. With the spec that&#39;s given, the keys are looked at and whichever module is the first to have a unique key in the spec is the one to whom the spec is given.</p>
+
+<p><b>Note</b>: please declare a <code>valid_params</code> argument with an uppercase letter. For example, if you&#39;re writing <code>DateTime::Format::Builder::Parser::Fnord</code>, declare a parameter called <code>Fnord</code>. Similarly, <code>DTFBP::Strptime</code> should have <code>Strptime</code> and <code>DTFBP::Regex</code> should have <code>Regex</code>. These latter two don&#39;t for backwards compatibility reasons.</p>
+
+<p>The returned parser will return either a <code>DateTime</code> object or <code>undef</code>.</p>
+
+<h3 id="merge_callbacks">merge_callbacks</h3>
+
+<p>Produce either undef or a single coderef from either undef, an empty array, a single coderef or an array of coderefs</p>
+
+<h2 id="create_multiple_parsers">create_multiple_parsers</h2>
+
+<p>Given the options block (as made from <code>create_parser()</code>) and a list of single parser specifications, this returns a coderef that returns either the resultant <code>DateTime</code> object or <code>undef</code>.</p>
+
+<p>It first sorts the specifications using <code>sort_parsers()</code> and then creates the function based on what that returned.</p>
+
+<h2 id="sort_parsers">sort_parsers</h2>
+
+<p>This takes the list of specifications and sorts them while turning the specifications into parsers. It returns two values: the first is a hashref containing all the length based parsers. The second is an array containing all the other parsers.</p>
+
+<p>If any of the specs are not code or hash references, then it will call <code>croak()</code>.</p>
+
+<p>Code references are put directly into the &#39;other&#39; array. Any hash references without <i>length</i> keys are run through <code>create_single_parser()</code> and the resultant parser is placed in the &#39;other&#39; array.</p>
+
+<p>Hash references <b>with</b> <i>length</i> keys are run through <code>create_single_parser()</code>, but the resultant parser is used as the value in the length hashref with the length being the key. If two or more parsers have the same <i>length</i> specified then an error is thrown.</p>
+
+<h2 id="create_parser">create_parser</h2>
+
+<p><code>create_class()</code> is mostly a wrapper around <code>create_parser()</code> that does loops and stuff and calls <code>create_parser()</code> to create the actual parsers.</p>
+
+<p><code>create_parser()</code> takes the parser specifications (be they single specifications or multiple specifications) and returns an anonymous coderef that is suitable for use as a method. The coderef will call <code>croak()</code> in the event of being unable to parse the single string it expects as input.</p>
+
+<p>The simplest input is that of a single specification, presented just as a plain hash, not a hashref. This is passed directly to <code>create_single_parser()</code> with the return value from that being wrapped in a function that lets it <code>croak()</code> on failure, with that wrapper being returned.</p>
+
+<p>If the first argument to <code>create_parser()</code> is an arrayref, then that is taken to be an options block (as per the multiple parser specification documented earlier).</p>
+
+<p>Any further arguments should be either hashrefs or coderefs. If the first argument after the optional arrayref is not a hashref or coderef then that argument and all remaining arguments are passed off to <code>create_single_parser()</code> directly. If the first argument is a hashref or coderef, then it and the remaining arguments are passed to <code>create_multiple_parsers()</code>.</p>
+
+<p>The resultant coderef from calling either of the creation methods is then wrapped in a function that calls <code>croak()</code> in event of failure or the <code>DateTime</code> object in event of success.</p>
+
+<h1 id="FINDING-IMPLEMENTATIONS">FINDING IMPLEMENTATIONS</h1>
+
+<p><code>Parser</code> automatically loads any parser classes in <code>@INC</code>.</p>
+
+<p>To be loaded automatically, you must be a <code>DateTime::Format::Builder::Parser::XXX</code> module.</p>
+
+<p>To be invisible, and not loaded, start your class with a lower class letter. These are ignored.</p>
+
+<h1 id="WRITING-A-PARSER-IMPLEMENTATION">WRITING A PARSER IMPLEMENTATION</h1>
+
+<h2 id="Naming-your-parser">Naming your parser</h2>
+
+<p>Create a module and name it in the form <code>DateTime::Format::Builder::Parser::XXX</code> where <i>XXX</i> is whatever you like, so long as it doesn&#39;t start with a lower case letter.</p>
+
+<p>Alternatively, call it something completely different if you don&#39;t mind the users explicitly loading your module.</p>
+
+<p>I&#39;d recommend keeping within the <code>DateTime::Format::Builder</code> namespace though --- at the time of writing I&#39;ve not given thought to what non-auto loaded ones should be called. Any ideas, please email me.</p>
+
+<h2 id="Declaring-specification-arguments">Declaring specification arguments</h2>
+
+<p>Call <code>&lt;DateTime::Format::Builder::Parser-</code>valid_params()&gt;&gt; with <code>Params::Validate</code> style arguments. For example:</p>
+
+<pre><code>   <span class="variable">DateTime::Format::Builder::Parser</span><span class="operator">-&gt;</span><span class="variable">valid_params</span><span class="operator">(</span>
+       <span class="string">params</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">type</span> <span class="operator">=&gt;</span> <span class="variable">ARRAYREF</span> <span class="operator">}</span><span class="operator">,</span>
+       <span class="string">Regex</span>  <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">type</span> <span class="operator">=&gt;</span> <span class="variable">SCALARREF</span><span class="operator">,</span> <span class="string">callbacks</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">'is a regex'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">ref</span><span class="operator">(</span><span class="keyword">shift</span><span class="operator">)</span> <span class="keyword">eq</span> <span class="string">'Regexp'</span> <span class="operator">}</span>
+       <span class="operator">}}</span>
+   <span class="operator">);</span>
+</code></pre>
+
+<p>Start one of the key names with a capital letter. Ideally that key should match the <i>XXX</i> from earlier. This will be used to help identify which module a parser specification should be given to.</p>
+
+<p>The key names <i>on_match</i>, <i>on_fail</i>, <i>postprocess</i>, <i>preprocess</i>, <i>label</i> and <i>length</i> are predefined. You are recommended to make use of them. You may ignore <i>length</i> as <code>sort_parsers</code> takes care of that.</p>
+
+<h2 id="Define-create_parser">Define create_parser</h2>
+
+<p>A class method of the name <code>create_parser</code> that does the following:</p>
+
+<p>Its arguments are as for a normal method (i.e. class as first argument). The other arguments are the result from a call to <code>Params::Validate</code> according to your specification (the <code>valid_params</code> earlier), i.e. a hash of argument name and value.</p>
+
+<p>The return value should be a coderef that takes a date string as its first argument and returns either a <code>DateTime</code> object or <code>undef</code>.</p>
+
+<h2 id="Callbacks">Callbacks</h2>
+
+<p>It is preferred that you support some callbacks to your parsers. In particular, <code>preprocess</code>, <code>on_match</code>, <code>on_fail</code> and <code>postprocess</code>. See the <a href="../../../../lib/DateTime/Format/Builder.html">main Builder</a> docs for the appropriate placing of calls to the callbacks.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See <a href="../../../../lib/DateTime/Format/Builder.html">DateTime::Format::Builder</a> for details.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><code>datetime@perl.org</code> mailing list.</p>
+
+<p>http://datetime.perl.org/</p>
+
+<p><a href="../../../../lib/pods/perl.html">perl</a>, <a href="../../../../lib/DateTime.html">DateTime</a>, <a href="../../../../lib/DateTime/Format/Builder.html">DateTime::Format::Builder</a>.</p>
+
+<p><a href="../../../../lib/Params/Validate.html">Params::Validate</a>.</p>
+
+<p><a href="../../../../lib/DateTime/Format/Builder/Parser/generic.html">DateTime::Format::Builder::Parser::generic</a>, <a href="../../../../lib/DateTime/Format/Builder/Parser/Dispatch.html">DateTime::Format::Builder::Parser::Dispatch</a>, <a href="../../../../lib/DateTime/Format/Builder/Parser/Quick.html">DateTime::Format::Builder::Parser::Quick</a>, <a href="../../../../lib/DateTime/Format/Builder/Parser/Regex.html">DateTime::Format::Builder::Parser::Regex</a>, <a href="../../../../lib/DateTime/Format/Builder/Parser/Strptime.html">DateTime::Format::Builder::Parser::Strptime</a>.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Iain Truskett</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2013 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

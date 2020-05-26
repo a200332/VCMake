@@ -1,0 +1,254 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#MOTIVATION">MOTIVATION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#with">with</a></li>
+      <li><a href="#parameter">parameter</a></li>
+      <li><a href="#role">role</a></li>
+    </ul>
+  </li>
+  <li><a href="#USES">USES</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>MooseX::Role::Parameterized::Tutorial - why and how</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.10</p>
+
+<h1 id="MOTIVATION">MOTIVATION</h1>
+
+<p>Roles are composable units of behavior. They are useful for factoring out functionality common to many classes from any part of your class hierarchy. See <a href="../../../../lib/Moose/Cookbook/Roles/Comparable_CodeReuse.html">Moose::Cookbook::Roles::Comparable_CodeReuse</a> for an introduction to <a href="../../../../lib/Moose/Role.html">Moose::Role</a>.</p>
+
+<p>While combining roles affords you a great deal of flexibility, individual roles have very little in the way of configurability. Core Moose provides <code>-alias</code> for renaming methods and <code>-excludes</code> for ignoring methods. These options are primarily for resolving role conflicts. Depending on how much of a purist you are, these options are <i>solely</i> for resolving role conflicts. See <a href="../../../../lib/Moose/Cookbook/Roles/Restartable_AdvancedComposition.html">Moose::Cookbook::Roles::Restartable_AdvancedComposition</a> for more about <code>-alias</code> and <code>-excludes</code>.</p>
+
+<p>Because roles serve many different masters, they usually provide only the least common denominator of functionality. To empower roles further, more configurability than <code>-alias</code> and <code>-excludes</code> is required. Perhaps your role needs to know which method to call when it is done processing. Or what default value to use for its <code>url</code> attribute.</p>
+
+<p>Parameterized roles offer a solution to these (and other) kinds of problems.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<h2 id="with"><code>with</code></h2>
+
+<p>The syntax of a class consuming a parameterized role has not changed from the standard <code>with</code>. You pass in parameters just like you pass in <code>-alias</code> and <code>-excludes</code> to ordinary roles (though your custom parameters do not get hyphens, since these are not core Moose composition parameters):</p>
+
+<pre><code>    <span class="variable">with</span> <span class="string">'MyRole::InstrumentMethod'</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="string">method_name</span> <span class="operator">=&gt;</span> <span class="string">'dbh_do'</span><span class="operator">,</span>
+        <span class="string">log_to</span>      <span class="operator">=&gt;</span> <span class="string">'query.log'</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can still combine parameterized roles. You just need to specify parameters immediately after the role they belong to:</p>
+
+<pre><code>    <span class="variable">with</span> <span class="operator">(</span>
+        <span class="string">'My::Parameterized::Role'</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">needs_better_example</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">'My::Other::Role'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>We, like Moose itself, use <a href="../../../../lib/Data/OptList.html">Data::OptList</a> to make sure that a list of role names and associated parameters is handled correctly.</p>
+
+<h2 id="parameter"><code>parameter</code></h2>
+
+<p>Inside your parameterized role, you specify a set of parameters. This is exactly like specifying the attributes of a class. Instead of <a href="../../../../lib/Moose.html#has">&quot;has&quot; in Moose</a> you use the keyword <code>parameter</code>, but your parameters can use any options to <code>has</code>.</p>
+
+<pre><code>    <span class="variable">parameter</span> <span class="string">'delegation'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>       <span class="operator">=&gt;</span> <span class="string">'HashRef|ArrayRef|RegexpRef'</span><span class="operator">,</span>
+        <span class="string">predicate</span> <span class="operator">=&gt;</span> <span class="string">'has_delegation'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>You do have to declare what parameters you accept, just like you have to declare what attributes you accept for regular Moose objects.</p>
+
+<p>One departure from <code>has</code> is that we create a reader accessor for you by default. In other words, we assume <code>is =&gt; &#39;ro&#39;</code>. We create this reader for convenience because generally the parameterized role is the only consumer of the parameters object, so data hiding is not as important than in the general case of <a href="../../../../lib/Moose.html#has">&quot;has&quot; in Moose</a>. If you do not want an accessor, you can use <code>is =&gt; &#39;bare&#39;</code>.</p>
+
+<h2 id="role"><code>role</code></h2>
+
+<p><code>role</code> takes a block of code that will be used to generate your role with its parameters bound. Here is where you declare components that depend on parameters. You can declare attributes, methods, modifiers, etc. The first argument to the <code>role</code> is an object containing the parameters specified by <code>with</code>. You can access the parameters just like regular attributes on that object.</p>
+
+<p>Each time you compose this parameterized role, the <code><span class="variable">role</span> <span class="operator">{}</span>
+</code> block will be executed. It will receive a new parameter object and produce an entirely new role. That&#39;s the whole point, after all.</p>
+
+<p>Due to limitations inherent in Perl, you must declare methods with <code><span class="variable">method</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> instead of the usual <code><span class="keyword">sub</span><span class="variable"> name </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code>. Your methods may, of course, close over the parameter object. This means that your methods may use parameters however they wish!</p>
+
+<h1 id="USES">USES</h1>
+
+<p>Ideally these will become fully-explained examples in something resembling <a href="../../../../lib/Moose/Cookbook.html">Moose::Cookbook</a>. But for now, only a brain dump.</p>
+
+<dl>
+
+<dt id="Configure-a-roles-attributes">Configure a role&#39;s attributes</dt>
+<dd>
+
+<p>You can rename methods with core Moose, but now you can rename attributes. You can now also choose type, default value, whether it&#39;s required, <b>traits</b>, etc.</p>
+
+<pre><code>    <span class="variable">parameter</span> <span class="string">traits</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'ArrayRef'</span><span class="operator">,</span>
+        <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[]</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">parameter</span> <span class="string">type</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+        <span class="string">default</span> <span class="operator">=&gt;</span> <span class="string">'Any'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="variable">has</span> <span class="string">action</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+            <span class="string">traits</span> <span class="operator">=&gt;</span> <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">traits</span><span class="operator">,</span>
+            <span class="string">isa</span>    <span class="operator">=&gt;</span> <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">type</span><span class="operator">,</span>
+            <span class="operator">...</span>
+        <span class="operator">);</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="Inform-a-role-of-your-class-attributes-and-methods">Inform a role of your class&#39; attributes and methods</dt>
+<dd>
+
+<p>Core roles can only require methods with specific names chosen by the role. Now your roles can demand that the class specifies a method name you wish the role to instrument, or which attributes to dump to a file.</p>
+
+<pre><code>    <span class="variable">parameter</span> <span class="string">instrument_method</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+        <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="variable">around</span> <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">instrument_method</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="Arbitrary-execution-choices">Arbitrary execution choices</dt>
+<dd>
+
+<p>Your role may be able to provide configuration in how the role&#39;s methods operate. For example, you can tell the role whether to save intermediate states.</p>
+
+<pre><code>    <span class="variable">parameter</span> <span class="string">save_intermediate</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'Bool'</span><span class="operator">,</span>
+        <span class="string">default</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="variable">method</span> <span class="string">process</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="operator">...</span>
+            <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">save_intermediate</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+            <span class="operator">...</span>
+        <span class="operator">};</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="Deciding-a-backend">Deciding a backend</dt>
+<dd>
+
+<p>Your role may be able to freeze and thaw your instances using <a href="../../../../lib/TAP/Parser/Result/YAML.html">YAML</a>, <a href="../../../../lib/JSON.html">JSON</a>, <a href="../../../../lib/Storable.html">Storable</a>. Which backend to use can be a parameter.</p>
+
+<pre><code>    <span class="variable">parameter</span> <span class="string">format</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="operator">(</span><span class="variable">enum</span> <span class="operator">[</span><span class="string">'Storable'</span><span class="operator">,</span> <span class="string">'YAML'</span><span class="operator">,</span> <span class="string">'JSON'</span><span class="operator">]</span><span class="operator">),</span>
+        <span class="string">default</span> <span class="operator">=&gt;</span> <span class="string">'Storable'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">format</span> <span class="keyword">eq</span> <span class="string">'Storable'</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">method</span> <span class="string">freeze</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">Storable::freeze</span><span class="operator">;</span>
+            <span class="variable">method</span> <span class="string">thaw</span>   <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">Storable::thaw</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="keyword">elsif</span> <span class="operator">(</span><span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">format</span> <span class="keyword">eq</span> <span class="string">'YAML'</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">method</span> <span class="string">freeze</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">YAML::Dump</span><span class="operator">;</span>
+            <span class="variable">method</span> <span class="string">thaw</span>   <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">YAML::Load</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="operator">...</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="Additional-validation">Additional validation</dt>
+<dd>
+
+<p>Ordinary roles can require that its consumers have a particular list of method names. Since parameterized roles have direct access to its consumer, you can inspect it and throw errors if the consumer does not meet your needs.</p>
+
+<pre><code>    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$p</span>    <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">%args</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$consumer</span> <span class="operator">=</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">consumer</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="variable">$consumer</span><span class="operator">-&gt;</span><span class="variable">find_attribute_by_name</span><span class="operator">(</span><span class="string">'stack'</span><span class="operator">)</span>
+            <span class="keyword">or</span> <span class="variable">confess</span> <span class="string">"You must have a 'stack' attribute"</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$push</span> <span class="operator">=</span> <span class="variable">$consumer</span><span class="operator">-&gt;</span><span class="variable">find_method_by_name</span><span class="operator">(</span><span class="string">'push'</span><span class="operator">)</span>
+            <span class="keyword">or</span> <span class="variable">confess</span> <span class="string">"You must have a 'push' method"</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$params</span> <span class="operator">=</span> <span class="variable">$push</span><span class="operator">-&gt;</span><span class="variable">parsed_signature</span><span class="operator">-&gt;</span><span class="variable">positional_params</span><span class="operator">-&gt;</span><span class="variable">params</span><span class="operator">;</span>
+        <span class="variable">@$params</span> <span class="operator">==</span> <span class="number">1</span>
+            <span class="keyword">or</span> <span class="variable">confess</span> <span class="string">"Your push method must take a single parameter"</span><span class="operator">;</span>
+    
+        <span class="variable">$params</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">sigil</span> <span class="keyword">eq</span> <span class="string">'$'</span>
+            <span class="keyword">or</span> <span class="variable">confess</span> <span class="string">"Your push parameter must be a scalar"</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Role-Parameterized">the RT bug tracker</a> (or <a href="mailto:bug-MooseX-Role-Parameterized@rt.cpan.org">bug-MooseX-Role-Parameterized@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/moose.html">http://lists.perl.org/list/moose.html</a>.</p>
+
+<p>There is also an irc channel available for users of this distribution, at <a href="irc://irc.perl.org/#moose"><code><span class="comment">#moose</span>
+</code> on <code>irc.perl.org</code></a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2008 by Shawn M Moore.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

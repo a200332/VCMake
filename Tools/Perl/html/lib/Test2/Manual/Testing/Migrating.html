@@ -1,0 +1,454 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#LEGACY-TEST">LEGACY TEST</a></li>
+  <li><a href="#BOILERPLATE">BOILERPLATE</a></li>
+  <li><a href="#SIMPLE-ASSERTIONS">SIMPLE ASSERTIONS</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#DEEP-COMPARISONS">DEEP COMPARISONS</a></li>
+  <li><a href="#COMPARING-REFERENCES">COMPARING REFERENCES</a></li>
+  <li><a href="#TOOLS-THAT-ARE-GONE">TOOLS THAT ARE GONE</a></li>
+  <li><a href="#TOOLS-THAT-HAVE-CHANGED">TOOLS THAT HAVE CHANGED</a></li>
+  <li><a href="#FINAL-VERSION">FINAL VERSION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Manual::Testing::Migrating - How to migrate existing tests from Test::More to Test2.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This tutorial covers the conversion of an existing test. This tutorial assumes you have a test written using <a href="../../../../lib/Test/More.html">Test::More</a>.</p>
+
+<h1 id="LEGACY-TEST">LEGACY TEST</h1>
+
+<p>This tutorial will be converting this example test one section at a time:</p>
+
+<p><code>t/example.t</code>:</p>
+
+<pre><code>    <span class="comment">#####################</span>
+    <span class="comment"># Boilerplate</span>
+    
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Test::More</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">14</span><span class="operator">;</span>
+    
+    <span class="variable">use_ok</span> <span class="string">'Scalar::Util'</span><span class="operator">;</span>
+    <span class="variable">require_ok</span> <span class="string">'Exporter'</span><span class="operator">;</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Simple assertions (no changes)</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="string">"apple"</span><span class="operator">,</span> <span class="string">"apple"</span><span class="operator">,</span> <span class="string">"Simple string compare"</span><span class="operator">);</span>
+    
+    <span class="variable">like</span><span class="operator">(</span><span class="string">"foo bar baz"</span><span class="operator">,</span> <span class="string">qr/bar/</span><span class="operator">,</span> <span class="string">"Regex match"</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Todo</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">local</span> <span class="variable">$TODO</span> <span class="operator">=</span> <span class="string">"These are todo"</span><span class="operator">;</span>
+    
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"oops"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Deep comparisons</span>
+    
+    <span class="variable">is_deeply</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Deep comparison"</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Comparing references</span>
+    
+    <span class="keyword">my</span> <span class="variable">$ref</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="variable">$ref</span><span class="operator">,</span> <span class="variable">$ref</span><span class="operator">,</span> <span class="string">"Check that we have the same ref both times"</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Things that are gone</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">eq_array</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">),</span> <span class="string">"array comparison"</span><span class="operator">);</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">eq_hash</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">),</span> <span class="string">"hash comparison"</span><span class="operator">);</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">eq_set</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">),</span> <span class="string">"set comparison"</span><span class="operator">);</span>
+    
+    <span class="variable">note</span> <span class="variable">explain</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">THING</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span> <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">)</span> <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">my</span> <span class="variable">$thing</span> <span class="operator">=</span> <span class="variable">new_ok</span><span class="operator">(</span><span class="string">'THING'</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Tools that changed</span>
+    
+    <span class="variable">isa_ok</span><span class="operator">(</span><span class="variable">$thing</span><span class="operator">,</span> <span class="string">'THING'</span><span class="operator">,</span> <span class="string">'$thing'</span><span class="operator">);</span>
+    
+    <span class="variable">can_ok</span><span class="operator">(</span><span class="keyword">__PACKAGE__</span><span class="operator">,</span> <span class="string">qw/ok is/</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="BOILERPLATE">BOILERPLATE</h1>
+
+<p>BEFORE:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Test::More</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">14</span><span class="operator">;</span>
+    
+    <span class="variable">use_ok</span> <span class="string">'Scalar::Util'</span><span class="operator">;</span>
+    <span class="variable">require_ok</span> <span class="string">'Exporter'</span><span class="operator">;</span>
+</code></pre>
+
+<p>AFTER:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span><span class="operator">;</span>
+    <span class="variable">plan</span><span class="operator">(</span><span class="number">11</span><span class="operator">);</span>
+    
+    <span class="keyword">use</span> <span class="variable">Scalar::Util</span><span class="operator">;</span>
+    <span class="keyword">require</span> <span class="variable">Exporter</span><span class="operator">;</span>
+</code></pre>
+
+<dl>
+
+<dt id="Replace-Test::More-with-Test2::V0">Replace Test::More with Test2::V0</dt>
+<dd>
+
+<p><a href="../../../../lib/Test2/V0.html">Test2::V0</a> is the recommended bundle. In a full migration you will want to replace <a href="../../../../lib/Test/More.html">Test::More</a> with the <a href="../../../../lib/Test2/V0.html">Test2::V0</a> bundle.</p>
+
+<p><b>Note:</b> You should always double check the latest <a href="../../../../lib/Test2.html">Test2</a> to see if there is a new recommended bundle. When writing a new test you should always use the newest Test::V# module. Higher numbers are newer version.</p>
+
+</dd>
+<dt id="Stop-using-use_ok">Stop using use_ok()</dt>
+<dd>
+
+<p><code>use_ok()</code> has been removed. a <code>use MODULE</code> statement will throw an exception on failure anyway preventing the test from passing.</p>
+
+<p>If you <i>REALLY</i> want/need to assert that the file loaded you can use the <a href="../../../../lib/ok.html">ok</a> module:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">ok</span> <span class="string">'Scalar::Util'</span><span class="operator">;</span>
+</code></pre>
+
+<p>The main difference here is that there is a space instead of an underscore.</p>
+
+</dd>
+<dt id="Stop-using-require_ok">Stop using require_ok()</dt>
+<dd>
+
+<p><code>require_ok</code> has been removed just like <code>use_ok</code>. There is no <a href="../../../../lib/ok.html">ok</a> module equivalent here. Just use <code>require</code>.</p>
+
+</dd>
+<dt id="Remove-strict-warnings-optional">Remove strict/warnings (optional)</dt>
+<dd>
+
+<p>The <a href="../../../../lib/Test2/V0.html">Test2::V0</a> bundle turns strict and warnings on for you.</p>
+
+</dd>
+<dt id="Change-where-the-plan-is-set">Change where the plan is set</dt>
+<dd>
+
+<p>Test2 does not allow you to set the plan at import. In the old code you would pass <code>tests =&gt; 11</code> as an import argument. In <a href="../../../../lib/Test2.html">Test2</a> you either need to use the <code>plan()</code> function to set the plan, or use <code>done_testing()</code> at the end of the test.</p>
+
+<p>If your test already uses <code>done_testing()</code> you can keep that and no plan changes are necessary.</p>
+
+<p><b>Note:</b> We are also changing the plan from 14 to 11, that is because we dropped <code>use_ok</code>, <code>require_ok</code>, and we will be dropping one more later on. This is why <code>done_testing()</code> is recommended over a set plan.</p>
+
+</dd>
+</dl>
+
+<h1 id="SIMPLE-ASSERTIONS">SIMPLE ASSERTIONS</h1>
+
+<p>The vast majority of assertions will not need any changes:</p>
+
+<pre><code>    <span class="comment">#####################</span>
+    <span class="comment"># Simple assertions (no changes)</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="string">"apple"</span><span class="operator">,</span> <span class="string">"apple"</span><span class="operator">,</span> <span class="string">"Simple string compare"</span><span class="operator">);</span>
+    
+    <span class="variable">like</span><span class="operator">(</span><span class="string">"foo bar baz"</span><span class="operator">,</span> <span class="string">qr/bar/</span><span class="operator">,</span> <span class="string">"Regex match"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="TODO">TODO</h1>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="keyword">local</span> <span class="variable">$TODO</span> <span class="operator">=</span> <span class="string">"These are todo"</span><span class="operator">;</span>
+    
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"oops"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>$TODO</code> package variable is gone. You now have a <code>todo()</code> function.</p>
+
+<p>There are 2 ways this can be used:</p>
+
+<dl>
+
+<dt id="todo-reason-sub">todo $reason =&gt; sub { ... }</dt>
+<dd>
+
+<pre><code>    <span class="variable">todo</span> <span class="string">"These are todo"</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"oops"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>This is the cleanest way to do a todo. This will make all assertions inside the codeblock into TODO assertions.</p>
+
+</dd>
+<dt id="my-TODO-todo-reason">{ my $TODO = todo $reason; ... }</dt>
+<dd>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$TODO</span> <span class="operator">=</span> <span class="variable">todo</span> <span class="string">"These are todo"</span><span class="operator">;</span>
+    
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"oops"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This is a system that emulates the old way. Instead of modifying a global <code>$TODO</code> variable you create a todo object with the <code>todo()</code> function and assign it to a lexical variable. Once the todo object falls out of scope the TODO ends.</p>
+
+</dd>
+</dl>
+
+<h1 id="DEEP-COMPARISONS">DEEP COMPARISONS</h1>
+
+<pre><code>    <span class="variable">is_deeply</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Deep comparison"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Deep comparisons are easy, simply replace <code>is_deeply()</code> with <code>is()</code>.</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Deep comparison"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="COMPARING-REFERENCES">COMPARING REFERENCES</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ref</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="variable">$ref</span><span class="operator">,</span> <span class="variable">$ref</span><span class="operator">,</span> <span class="string">"Check that we have the same ref both times"</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>is()</code> function provided by <a href="../../../../lib/Test/More.html">Test::More</a> forces both arguments into strings, which makes this a comparison of the reference addresses. <a href="../../../../lib/Test2.html">Test2</a>&#39;s <code>is()</code> function is a deep comparison, so this will still pass, but fails to actually test what we want (that both references are the same exact ref, not just identical structures.)</p>
+
+<p>We now have the <code>ref_is()</code> function that does what we really want, it ensures both references are the same reference. This function does the job better than the original, which could be thrown off by string overloading.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ref</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="variable">ref_is</span><span class="operator">(</span><span class="variable">$ref</span><span class="operator">,</span> <span class="variable">$ref</span><span class="operator">,</span> <span class="string">"Check that we have the same ref both times"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="TOOLS-THAT-ARE-GONE">TOOLS THAT ARE GONE</h1>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span><span class="variable">eq_array</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">),</span> <span class="string">"array comparison"</span><span class="operator">);</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">eq_hash</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">),</span> <span class="string">"hash comparison"</span><span class="operator">);</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">eq_set</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">),</span> <span class="string">"set comparison"</span><span class="operator">);</span>
+    
+    <span class="variable">note</span> <span class="variable">explain</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">THING</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span> <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">)</span> <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">my</span> <span class="variable">$thing</span> <span class="operator">=</span> <span class="variable">new_ok</span><span class="operator">(</span><span class="string">'THING'</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>eq_array</code>, <code>eq_hash</code> and <code>eq_set</code> have been considered deprecated for a very long time, <a href="../../../../lib/Test2.html">Test2</a> does not provide them at all. Instead you can just use <code>is()</code>:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"array comparison"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"hash comparison"</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>eq_set</code> is a tad more complicated, see <a href="../../../../lib/Test2/Tools/Compare.html">Test2::Tools::Compare</a> for an explanation:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">bag</span> <span class="operator">{</span> <span class="variable">item</span> <span class="number">1</span><span class="operator">;</span> <span class="variable">item</span> <span class="number">2</span><span class="operator">;</span> <span class="variable">item</span> <span class="number">3</span><span class="operator">;</span> <span class="variable">end</span> <span class="operator">},</span> <span class="string">"set comparison"</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>explain()</code> has a rocky history. There have been arguments about how it should work. <a href="../../../../lib/Test2.html">Test2</a> decided to simply not include <code>explain()</code> to avoid the arguments. You can instead directly use Data::Dumper:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+    <span class="variable">note</span> <span class="variable">Dumper</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>new_ok()</code> is gone. The implementation was complicated, and did not add much value:</p>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">THING</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span> <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">)</span> <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">my</span> <span class="variable">$thing</span> <span class="operator">=</span> <span class="variable">THING</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">$thing</span><span class="operator">,</span> <span class="string">"made a new thing"</span><span class="operator">);</span>
+</code></pre>
+
+<p>The complete section after the conversion is:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"array comparison"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"hash comparison"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">bag</span> <span class="operator">{</span> <span class="variable">item</span> <span class="number">1</span><span class="operator">;</span> <span class="variable">item</span> <span class="number">2</span><span class="operator">;</span> <span class="variable">item</span> <span class="number">3</span><span class="operator">;</span> <span class="variable">end</span> <span class="operator">},</span> <span class="string">"set comparison"</span><span class="operator">);</span>
+    
+    <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+    <span class="variable">note</span> <span class="variable">Dumper</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">THING</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span> <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">)</span> <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">my</span> <span class="variable">$thing</span> <span class="operator">=</span> <span class="variable">THING</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">$thing</span><span class="operator">,</span> <span class="string">"made a new thing"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="TOOLS-THAT-HAVE-CHANGED">TOOLS THAT HAVE CHANGED</h1>
+
+<pre><code>    <span class="variable">isa_ok</span><span class="operator">(</span><span class="variable">$thing</span><span class="operator">,</span> <span class="string">'THING'</span><span class="operator">,</span> <span class="string">'$thing'</span><span class="operator">);</span>
+    
+    <span class="variable">can_ok</span><span class="operator">(</span><span class="keyword">__PACKAGE__</span><span class="operator">,</span> <span class="string">qw/ok is/</span><span class="operator">);</span>
+</code></pre>
+
+<p>In <a href="../../../../lib/Test/More.html">Test::More</a> these functions are very confusing, and most people use them wrong!</p>
+
+<p><code>isa_ok()</code> from <a href="../../../../lib/Test/More.html">Test::More</a> takes a thing, a class/reftype to check, and then uses the third argument as an alternative display name for the first argument (NOT a test name!).</p>
+
+<p><code>can_ok()</code> from <a href="../../../../lib/Test/More.html">Test::More</a> is not consistent with <code>isa_ok</code> as all arguments after the first are subroutine names.</p>
+
+<p><a href="../../../../lib/Test2.html">Test2</a> fixes this by making both functions consistent and obvious:</p>
+
+<pre><code>    <span class="variable">isa_ok</span><span class="operator">(</span><span class="variable">$thing</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'THING'</span><span class="operator">]</span><span class="operator">,</span> <span class="string">'got a THING'</span><span class="operator">);</span>
+    
+    <span class="variable">can_ok</span><span class="operator">(</span><span class="keyword">__PACKAGE__</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw/ok is/</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"have expected subs"</span><span class="operator">);</span>
+</code></pre>
+
+<p>You will note that both functions take a thing, an arrayref as the second argument, then a test name as the third argument.</p>
+
+<h1 id="FINAL-VERSION">FINAL VERSION</h1>
+
+<pre><code>    <span class="comment">#####################</span>
+    <span class="comment"># Boilerplate</span>
+    
+    <span class="keyword">use</span> <span class="variable">Test2::V0</span><span class="operator">;</span>
+    <span class="variable">plan</span><span class="operator">(</span><span class="number">11</span><span class="operator">);</span>
+    
+    <span class="keyword">use</span> <span class="variable">Scalar::Util</span><span class="operator">;</span>
+    <span class="keyword">require</span> <span class="variable">Exporter</span><span class="operator">;</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Simple assertions (no changes)</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="string">"apple"</span><span class="operator">,</span> <span class="string">"apple"</span><span class="operator">,</span> <span class="string">"Simple string compare"</span><span class="operator">);</span>
+    
+    <span class="variable">like</span><span class="operator">(</span><span class="string">"foo bar baz"</span><span class="operator">,</span> <span class="string">qr/bar/</span><span class="operator">,</span> <span class="string">"Regex match"</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Todo</span>
+    
+    <span class="variable">todo</span> <span class="string">"These are todo"</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"oops"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Deep comparisons</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Deep comparison"</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Comparing references</span>
+    
+    <span class="keyword">my</span> <span class="variable">$ref</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="variable">ref_is</span><span class="operator">(</span><span class="variable">$ref</span><span class="operator">,</span> <span class="variable">$ref</span><span class="operator">,</span> <span class="string">"Check that we have the same ref both times"</span><span class="operator">);</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Things that are gone</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"array comparison"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"hash comparison"</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">bag</span> <span class="operator">{</span> <span class="variable">item</span> <span class="number">1</span><span class="operator">;</span> <span class="variable">item</span> <span class="number">2</span><span class="operator">;</span> <span class="variable">item</span> <span class="number">3</span><span class="operator">;</span> <span class="variable">end</span> <span class="operator">},</span> <span class="string">"set comparison"</span><span class="operator">);</span>
+    
+    <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+    <span class="variable">note</span> <span class="variable">Dumper</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">THING</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span> <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">)</span> <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">my</span> <span class="variable">$thing</span> <span class="operator">=</span> <span class="variable">THING</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    
+    <span class="comment">#####################</span>
+    <span class="comment"># Tools that changed</span>
+    
+    <span class="variable">isa_ok</span><span class="operator">(</span><span class="variable">$thing</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'THING'</span><span class="operator">]</span><span class="operator">,</span> <span class="string">'got a THING'</span><span class="operator">);</span>
+    
+    <span class="variable">can_ok</span><span class="operator">(</span><span class="keyword">__PACKAGE__</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw/ok is/</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"have expected subs"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Test2/Manual.html">Test2::Manual</a> - Primary index of the manual.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Manual can be found at <i>http://github.com/Test-More/Test2-Manual/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

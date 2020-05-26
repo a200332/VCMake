@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li>
+    <ul>
+      <li><a href="#sub_call_lines">sub_call_lines</a></li>
+      <li><a href="#evals_by_line">evals_by_line</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="sub_call_lines">sub_call_lines</h2>
+
+<pre><code>  <span class="variable">$hash</span> <span class="operator">=</span> <span class="variable">$fi</span><span class="operator">-&gt;</span><span class="variable">sub_call_lines</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns a reference to a hash containing information about subroutine calls made at individual lines within the source file. Returns undef if no subroutine calling information is available.</p>
+
+<p>The keys of the returned hash are line numbers. The values are references to hashes with fully qualified subroutine names as keys. Each hash value is an reference to an array containing an integer call count (how many times the sub was called from that line of that file) and an inclusive time (how much time was spent inside the sub when it was called from that line of that file).</p>
+
+<p>For example, if the following was line 42 of a file <code>foo.pl</code>:</p>
+
+<pre><code>  <span class="operator">++</span><span class="variable">$wiggle</span> <span class="keyword">if</span> <span class="variable">foo</span><span class="operator">(</span><span class="number">24</span><span class="operator">)</span> <span class="operator">==</span> <span class="variable">bar</span><span class="operator">(</span><span class="number">42</span><span class="operator">);</span>
+</code></pre>
+
+<p>that line was executed once, and foo and bar were imported from pkg1, then sub_call_lines() would return something like:</p>
+
+<pre><code>  <span class="operator">{</span>
+      <span class="number">42</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="string">'pkg1::foo'</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">1</span><span class="operator">,</span> <span class="number">0</span><span class="operator">.</span><span class="number">02093</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">'pkg1::bar'</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">1</span><span class="operator">,</span> <span class="number">0</span><span class="operator">.</span><span class="number">00154</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h2 id="evals_by_line">evals_by_line</h2>
+
+<pre><code>  <span class="comment"># { line =&gt; { fid_of_eval_at_line =&gt; $fi, ... }, ... }</span>
+  <span class="variable">$hash</span> <span class="operator">=</span> <span class="variable">$fi</span><span class="operator">-&gt;</span><span class="variable">evals_by_line</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns a reference to a hash containing information about string evals executed at individual lines within a source file.</p>
+
+<p>The keys of the returned hash are line numbers. The values are references to hashes with file id integers as keys and FileInfo objects as values.</p>
+
+
+</body>
+
+</html>
+
+

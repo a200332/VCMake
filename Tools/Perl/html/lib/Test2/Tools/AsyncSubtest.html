@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Tools::AsyncSubtest - Tools for writing async subtests.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>These are tools for writing async subtests. Async subtests are subtests which can be started and stashed so that they can continue to receive events while other events are also being generated.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Bundle::Extended</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Test2::Tools::AsyncSubtest</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$ast1</span> <span class="operator">=</span> <span class="variable">async_subtest</span> <span class="string">local</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"Inside subtest"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="keyword">my</span> <span class="variable">$ast2</span> <span class="operator">=</span> <span class="variable">fork_subtest</span> <span class="string">child</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"Inside subtest in another process"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="keyword">my</span> <span class="variable">$ast3</span> <span class="operator">=</span> <span class="variable">thread_subtest</span> <span class="string">thread</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"Inside subtest in a thread"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="comment"># You must call finish on the subtests you create. Finish will wait/join on</span>
+    <span class="comment"># any child processes and threads.</span>
+    <span class="variable">$ast1</span><span class="operator">-&gt;</span><span class="variable">finish</span><span class="operator">;</span>
+    <span class="variable">$ast2</span><span class="operator">-&gt;</span><span class="variable">finish</span><span class="operator">;</span>
+    <span class="variable">$ast3</span><span class="operator">-&gt;</span><span class="variable">finish</span><span class="operator">;</span>
+    
+    <span class="variable">done_testing</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>Everything is exported by default.</p>
+
+<dl>
+
+<dt id="ast-async_subtest-name">$ast = async_subtest $name</dt>
+<dd>
+
+</dd>
+<dt id="ast-async_subtest-name-sub">$ast = async_subtest $name =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="ast-async_subtest-name-hub_params-sub">$ast = async_subtest $name =&gt; \%hub_params, sub { ... }</dt>
+<dd>
+
+<p>Create an async subtest. Run the codeblock if it is provided.</p>
+
+</dd>
+<dt id="ast-fork_subtest-name-sub">$ast = fork_subtest $name =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="ast-fork_subtest-name-hub_params-sub">$ast = fork_subtest $name =&gt; \%hub_params, sub { ... }</dt>
+<dd>
+
+<p>Create an async subtest. Run the codeblock in a forked process.</p>
+
+</dd>
+<dt id="ast-thread_subtest-name-sub">$ast = thread_subtest $name =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="ast-thread_subtest-name-hub_params-sub">$ast = thread_subtest $name =&gt; \%hub_params, sub { ... }</dt>
+<dd>
+
+<p>Create an async subtest. Run the codeblock in a thread.</p>
+
+</dd>
+</dl>
+
+<h1 id="NOTES">NOTES</h1>
+
+<dl>
+
+<dt id="Async-Subtests-are-always-buffered">Async Subtests are always buffered.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-AsyncSubtest can be found at <i>http://github.com/Test-More/Test2-AsyncSubtest/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2015 Chad Granum &lt;exodist7@gmail.com&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

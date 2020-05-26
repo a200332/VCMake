@@ -1,0 +1,174 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#IMPORTABLE-SUBROUTINES">IMPORTABLE SUBROUTINES</a></li>
+  <li><a href="#CREATING-THE-.run-FILES">CREATING THE *.run FILES</a></li>
+  <li><a href="#BUGS-AND-CAVEATS-AND-TODO-ITEMS">BUGS AND CAVEATS AND TODO ITEMS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test::Perl::Critic::Policy - A framework for testing your custom Policies</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::Perl::Critic::Policy</span> <span class="string">qw&lt; all_policies_ok &gt;</span><span class="operator">;</span>
+    
+    <span class="comment"># Assuming .run files are inside 't' directory...</span>
+    <span class="variable">all_policies_ok</span><span class="operator">()</span>
+    
+    <span class="comment"># Or if your .run files are in a different directory...</span>
+    <span class="variable">all_policies_ok</span><span class="operator">(</span> <span class="string">'-test-directory'</span> <span class="operator">=&gt;</span> <span class="string">'run'</span> <span class="operator">);</span>
+    
+    <span class="comment"># And if you just want to run tests for some polices...</span>
+    <span class="variable">all_policies_ok</span><span class="operator">(</span> <span class="string">-policies</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Some::Policy'</span><span class="operator">,</span> <span class="string">'Another::Policy'</span><span class="operator">]</span> <span class="operator">);</span>
+    
+    <span class="comment"># If you want your test program to accept short Policy names as</span>
+    <span class="comment"># command-line parameters...</span>
+    <span class="comment">#</span>
+    <span class="comment"># You can then test a single policy by running</span>
+    <span class="comment"># "perl -Ilib t/policy-test.t My::Policy".</span>
+    <span class="keyword">my</span> <span class="variable">%args</span> <span class="operator">=</span> <span class="variable">@ARGV</span> <span class="operator">?</span> <span class="operator">(</span> <span class="string">-policies</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">@ARGV</span> <span class="operator">]</span> <span class="operator">)</span> <span class="operator">:</span> <span class="operator">();</span>
+    <span class="variable">all_policies_ok</span><span class="operator">(</span><span class="variable">%args</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a framework for function-testing your custom <a href="../../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> modules. Policy testing usually involves feeding it a string of Perl code and checking its behavior. In the old days, those strings of Perl code were mixed directly in the test script. That sucked.</p>
+
+<p><b>NOTE:</b> This module is alpha code -- interfaces and implementation are subject to major changes. This module is an integral part of building and testing <a href="../../../../lib/Perl/Critic.html">Perl::Critic</a> itself, but you should not write any code against this module until it has stabilized.</p>
+
+<h1 id="IMPORTABLE-SUBROUTINES">IMPORTABLE SUBROUTINES</h1>
+
+<dl>
+
+<dt id="all_policies_ok--test-directory-path--policies-policy_names">all_policies_ok(&#39;-test-directory&#39; =&gt; $path, -policies =&gt; \@policy_names)</dt>
+<dd>
+
+<p>Loads all the <i>*.run</i> files beneath the <code>-test-directory</code> and runs the tests. If <code>-test-directory</code> is not specified, it defaults to <i>t/</i>. <code>-policies</code> is an optional reference to an array of shortened Policy names. If <code>-policies</code> specified, only the tests for Policies that match one of the <code>m/$POLICY_NAME/imx</code> will be run.</p>
+
+</dd>
+</dl>
+
+<h1 id="CREATING-THE-.run-FILES">CREATING THE *.run FILES</h1>
+
+<p>Testing a policy follows a very simple pattern:</p>
+
+<pre><code>    * Policy name
+        * Subtest name
+        * Optional parameters
+        * Number of failures expected
+        * Optional exception expected
+        * Optional filename for code</code></pre>
+
+<p>Each of the subtests for a policy is collected in a single <i>.run</i> file, with test properties as comments in front of each code block that describes how we expect Perl::Critic to react to the code. For example, say you have a policy called Variables::ProhibitVowels:</p>
+
+<pre><code>    <span class="operator">(</span><span class="variable">In</span> <span class="variable">file</span> <span class="variable">t</span><span class="operator">/</span><span class="variable">Variables</span><span class="operator">/</span><span class="variable">ProhibitVowels</span><span class="operator">.</span><span class="variable">run</span><span class="operator">)</span>
+    
+    <span class="comment">## name Basics</span>
+    <span class="comment">## failures 1</span>
+    <span class="comment">## cut</span>
+    
+    <span class="keyword">my</span> <span class="variable">$vrbl_nm</span> <span class="operator">=</span> <span class="string">'foo'</span><span class="operator">;</span>    <span class="comment"># Good, vowel-free name</span>
+    <span class="keyword">my</span> <span class="variable">$wango</span> <span class="operator">=</span> <span class="number">12</span><span class="operator">;</span>         <span class="comment"># Bad, pronouncable name</span>
+    
+    
+    <span class="comment">## name Sometimes Y</span>
+    <span class="comment">## failures 1</span>
+    <span class="comment">## cut</span>
+    
+    <span class="keyword">my</span> <span class="variable">$yllw</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>       <span class="comment"># "y" not a vowel here</span>
+    <span class="keyword">my</span> <span class="variable">$rhythm</span> <span class="operator">=</span> <span class="number">12</span><span class="operator">;</span>    <span class="comment"># But here it is</span>
+</code></pre>
+
+<p>These are called &quot;subtests&quot;, and two are shown above. The beauty of incorporating multiple subtests in a file is that the <i>.run</i> is itself a (mostly) valid Perl file, and not hidden in a HEREDOC, so your editor&#39;s color-coding still works, and it is much easier to work with the code and the POD.</p>
+
+<p>If you need to pass any configuration parameters for your subtest, do so like this:</p>
+
+<pre><code>    <span class="comment">## parms { allow_y =&gt; '0' }</span>
+</code></pre>
+
+<p>Note that all the values in this hash must be strings because that&#39;s what Perl::Critic will hand you from a <i>.perlcriticrc</i>.</p>
+
+<p>If it&#39;s a TODO subtest (probably because of some weird corner of PPI that we exercised that Adam is getting around to fixing, right?), then make a <code><span class="comment">##TODO</span>
+</code> entry.</p>
+
+<pre><code>    <span class="comment">## TODO Should pass when PPI 1.xxx comes out</span>
+</code></pre>
+
+<p>If the code is expected to trigger an exception in the policy, indicate that like so:</p>
+
+<pre><code>    <span class="comment">## error 1</span>
+</code></pre>
+
+<p>If you want to test the error message, mark it with <code>/.../</code> to indicate a <code>like()</code> test:</p>
+
+<pre><code>    <span class="comment">## error /Can't load Foo::Bar/</span>
+</code></pre>
+
+<p>If the policy you are testing cares about the filename of the code, you can indicate that <code>fcritique</code> should be used like so (see <code>fcritique</code> for more details):</p>
+
+<pre><code>    <span class="comment">## filename lib/Foo/Bar.pm</span>
+</code></pre>
+
+<p>The value of <code>parms</code> will get <code>eval</code>ed and passed to <code>pcritique()</code>, so be careful.</p>
+
+<p>In general, a subtest document runs from the <code><span class="comment">## cut</span>
+</code> that starts it to either the next <code><span class="comment">## name</span>
+</code> or the end of the file. In very rare circumstances you may need to end the test document earlier. A second <code><span class="comment">## cut</span>
+</code> will do this. The only known need for this is in <i>t/Miscellanea/RequireRcsKeywords.run</i>, where it is used to prevent the RCS keywords in the file footer from producing false positives or negatives in the last test.</p>
+
+<p>Note that nowhere within the <i>.run</i> file itself do you specify the policy that you&#39;re testing. That&#39;s implicit within the filename.</p>
+
+<h1 id="BUGS-AND-CAVEATS-AND-TODO-ITEMS">BUGS AND CAVEATS AND TODO ITEMS</h1>
+
+<p>Add policy_ok() method for running subtests in just a single TODO file.</p>
+
+<p>Can users mark this entire test as TODO or SKIP, using the normal mechanisms?</p>
+
+<p>Allow us to specify the nature of the failures, and which one. If there are 15 lines of code, and six of them fail, how do we know they&#39;re the right six?</p>
+
+<p>Consolidate code from <a href="../../../../lib/Perl/Critic/TestUtils.html">Perl::Critic::TestUtils</a> and possibly deprecate some functions there.</p>
+
+<p>Write unit tests for this module.</p>
+
+<p>Test that we have a t/*/*.run for each lib/*/*.pm</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andy Lester, Jeffrey Ryan Thalhammer &lt;thaljef@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2009-2011 Andy Lester. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

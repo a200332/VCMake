@@ -1,0 +1,756 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONSTRUCTOR-METHODS">CONSTRUCTOR METHODS</a>
+    <ul>
+      <li><a href="#clone">clone</a></li>
+      <li><a href="#new">new</a></li>
+    </ul>
+  </li>
+  <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
+    <ul>
+      <li><a href="#agent">agent</a></li>
+      <li><a href="#conn_cache">conn_cache</a></li>
+      <li><a href="#cookie_jar">cookie_jar</a></li>
+      <li><a href="#credentials">credentials</a></li>
+      <li><a href="#default_header">default_header</a></li>
+      <li><a href="#default_headers">default_headers</a></li>
+      <li><a href="#from">from</a></li>
+      <li><a href="#local_address">local_address</a></li>
+      <li><a href="#max_redirect">max_redirect</a></li>
+      <li><a href="#max_size">max_size</a></li>
+      <li><a href="#parse_head">parse_head</a></li>
+      <li><a href="#protocols_allowed">protocols_allowed</a></li>
+      <li><a href="#protocols_forbidden">protocols_forbidden</a></li>
+      <li><a href="#requests_redirectable">requests_redirectable</a></li>
+      <li><a href="#show_progress">show_progress</a></li>
+      <li><a href="#ssl_opts">ssl_opts</a></li>
+      <li><a href="#timeout">timeout</a></li>
+    </ul>
+  </li>
+  <li><a href="#PROXY-ATTRIBUTES">PROXY ATTRIBUTES</a>
+    <ul>
+      <li><a href="#env_proxy">env_proxy</a></li>
+      <li><a href="#no_proxy">no_proxy</a></li>
+      <li><a href="#proxy">proxy</a></li>
+    </ul>
+  </li>
+  <li><a href="#HANDLERS">HANDLERS</a>
+    <ul>
+      <li><a href="#add_handler">add_handler</a></li>
+      <li><a href="#get_my_handler">get_my_handler</a></li>
+      <li><a href="#handlers">handlers</a></li>
+      <li><a href="#remove_handler">remove_handler</a></li>
+      <li><a href="#set_my_handler">set_my_handler</a></li>
+    </ul>
+  </li>
+  <li><a href="#REQUEST-METHODS">REQUEST METHODS</a>
+    <ul>
+      <li><a href="#delete">delete</a></li>
+      <li><a href="#get">get</a></li>
+      <li><a href="#head">head</a></li>
+      <li><a href="#is_protocol_supported">is_protocol_supported</a></li>
+      <li><a href="#is_online">is_online</a></li>
+      <li><a href="#mirror">mirror</a></li>
+      <li><a href="#post">post</a></li>
+      <li><a href="#put">put</a></li>
+      <li><a href="#request">request</a></li>
+      <li><a href="#simple_request">simple_request</a></li>
+    </ul>
+  </li>
+  <li><a href="#CALLBACK-METHODS">CALLBACK METHODS</a>
+    <ul>
+      <li><a href="#get_basic_credentials">get_basic_credentials</a></li>
+      <li><a href="#prepare_request">prepare_request</a></li>
+      <li><a href="#progress">progress</a></li>
+      <li><a href="#redirect_ok">redirect_ok</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>LWP::UserAgent - Web user agent class</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">LWP::UserAgent</span> <span class="operator">();</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$ua</span> <span class="operator">=</span> <span class="variable">LWP::UserAgent</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">timeout</span><span class="operator">(</span><span class="number">10</span><span class="operator">);</span>
+ <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">env_proxy</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$response</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span><span class="string">'http://search.cpan.org/'</span><span class="operator">);</span>
+ 
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$response</span><span class="operator">-&gt;</span><span class="variable">is_success</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="variable">$response</span><span class="operator">-&gt;</span><span class="variable">decoded_content</span><span class="operator">;</span>  <span class="comment"># or whatever</span>
+ <span class="operator">}</span>
+ <span class="keyword">else</span> <span class="operator">{</span>
+     <span class="keyword">die</span> <span class="variable">$response</span><span class="operator">-&gt;</span><span class="variable">status_line</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> is a class implementing a web user agent. <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> objects can be used to dispatch web requests.</p>
+
+<p>In normal use the application creates an <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> object, and then configures it with values for timeouts, proxies, name, etc. It then creates an instance of <a href="../../lib/HTTP/Request.html">HTTP::Request</a> for the request that needs to be performed. This request is then passed to one of the request method the UserAgent, which dispatches it using the relevant protocol, and returns a <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object. There are convenience methods for sending the most common request types: <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a>, <a href="../../lib/LWP/UserAgent.html#head">&quot;head&quot; in LWP::UserAgent</a>, <a href="../../lib/LWP/UserAgent.html#post">&quot;post&quot; in LWP::UserAgent</a>, <a href="../../lib/LWP/UserAgent.html#put">&quot;put&quot; in LWP::UserAgent</a> and <a href="../../lib/LWP/UserAgent.html#delete">&quot;delete&quot; in LWP::UserAgent</a>. When using these methods, the creation of the request object is hidden as shown in the synopsis above.</p>
+
+<p>The basic approach of the library is to use HTTP-style communication for all protocol schemes. This means that you will construct <a href="../../lib/HTTP/Request.html">HTTP::Request</a> objects and receive <a href="../../lib/HTTP/Response.html">HTTP::Response</a> objects even for non-HTTP resources like <i>gopher</i> and <i>ftp</i>. In order to achieve even more similarity to HTTP-style communications, <i>gopher</i> menus and file directories are converted to HTML documents.</p>
+
+<h1 id="CONSTRUCTOR-METHODS">CONSTRUCTOR METHODS</h1>
+
+<p>The following constructor methods are available:</p>
+
+<h2 id="clone">clone</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ua2</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns a copy of the <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> object.</p>
+
+<p><b>CAVEAT</b>: Please be aware that the clone method does not copy or clone your <code>cookie_jar</code> attribute. Due to the limited restrictions on what can be used for your cookie jar, there is no way to clone the attribute. The <code>cookie_jar</code> attribute will be <code>undef</code> in the new object instance.</p>
+
+<h2 id="new">new</h2>
+
+<pre><code>    my $ua = LWP::UserAgent-&gt;new( %options )</code></pre>
+
+<p>This method constructs a new <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> object and returns it. Key/value pair arguments may be provided to set up the initial state. The following options correspond to attribute methods described below:</p>
+
+<pre><code>   <span class="variable">KEY</span>                     <span class="variable">DEFAULT</span>
+   <span class="operator">-----------</span>             <span class="operator">--------------------</span>
+   <span class="variable">agent</span>                   <span class="string">"libwww-perl/#.###"</span>
+   <span class="variable">from</span>                    <span class="keyword">undef</span>
+   <span class="variable">conn_cache</span>              <span class="keyword">undef</span>
+   <span class="variable">cookie_jar</span>              <span class="keyword">undef</span>
+   <span class="variable">default_headers</span>         <span class="variable">HTTP::Headers</span><span class="operator">-&gt;</span><span class="variable">new</span>
+   <span class="variable">local_address</span>           <span class="keyword">undef</span>
+   <span class="variable">ssl_opts</span>                <span class="operator">{</span> <span class="string">verify_hostname</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span>
+   <span class="variable">max_size</span>                <span class="keyword">undef</span>
+   <span class="variable">max_redirect</span>            <span class="number">7</span>
+   <span class="variable">parse_head</span>              <span class="number">1</span>
+   <span class="variable">protocols_allowed</span>       <span class="keyword">undef</span>
+   <span class="variable">protocols_forbidden</span>     <span class="keyword">undef</span>
+   <span class="variable">requests_redirectable</span>   <span class="operator">[</span><span class="string">'GET'</span><span class="operator">,</span> <span class="string">'HEAD'</span><span class="operator">]</span>
+   <span class="variable">timeout</span>                 <span class="number">180</span>
+   <span class="variable">proxy</span>                   <span class="keyword">undef</span>
+   <span class="variable">no_proxy</span>                <span class="operator">[]</span>
+</code></pre>
+
+<p>The following additional options are also accepted: If the <code>env_proxy</code> option is passed in with a true value, then proxy settings are read from environment variables (see <a href="../../lib/LWP/UserAgent.html#env_proxy">&quot;env_proxy&quot; in LWP::UserAgent</a>). If <code>env_proxy</code> isn&#39;t provided, the <code>PERL_LWP_ENV_PROXY</code> environment variable controls if <a href="../../lib/LWP/UserAgent.html#env_proxy">&quot;env_proxy&quot; in LWP::UserAgent</a> is called during initialization. If the <code>keep_alive</code> option is passed in, then a <code>LWP::ConnCache</code> is set up (see <a href="../../lib/LWP/UserAgent.html#conn_cache">&quot;conn_cache&quot; in LWP::UserAgent</a>). The <code>keep_alive</code> value is passed on as the <code>total_capacity</code> for the connection cache.</p>
+
+<p><code>proxy</code> must be set as an arrayref of key/value pairs. <code>no_proxy</code> takes an arrayref of domains.</p>
+
+<h1 id="ATTRIBUTES">ATTRIBUTES</h1>
+
+<p>The settings of the configuration attributes modify the behaviour of the <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> when it dispatches requests. Most of these can also be initialized by options passed to the constructor method.</p>
+
+<p>The following attribute methods are provided. The attribute value is left unchanged if no argument is given. The return value from each method is the old attribute value.</p>
+
+<h2 id="agent">agent</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$agent</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">agent</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">agent</span><span class="operator">(</span><span class="string">'Checkbot/0.4 '</span><span class="operator">);</span>    <span class="comment"># append the defaul to the end</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">agent</span><span class="operator">(</span><span class="string">'Mozilla/5.0'</span><span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">agent</span><span class="operator">(</span><span class="string">""</span><span class="operator">);</span>                 <span class="comment"># don't identify</span>
+</code></pre>
+
+<p>Get/set the product token that is used to identify the user agent on the network. The agent value is sent as the <code>User-Agent</code> header in the requests.</p>
+
+<p>The default is a string of the form <code>libwww-perl/#.###</code>, where <code><span class="comment">#.###</span>
+</code> is substituted with the version number of this library.</p>
+
+<p>If the provided string ends with space, the default <code>libwww-perl/#.###</code> string is appended to it.</p>
+
+<p>The user agent string should be one or more simple product identifiers with an optional version number separated by the <code>/</code> character.</p>
+
+<h2 id="conn_cache">conn_cache</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$cache_obj</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">conn_cache</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">conn_cache</span><span class="operator">(</span> <span class="variable">$cache_obj</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the <a href="../../lib/LWP/ConnCache.html">LWP::ConnCache</a> object to use. See <a href="../../lib/LWP/ConnCache.html">LWP::ConnCache</a> for details.</p>
+
+<h2 id="cookie_jar">cookie_jar</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$jar</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">cookie_jar</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">cookie_jar</span><span class="operator">(</span> <span class="variable">$cookie_jar_obj</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the cookie jar object to use. The only requirement is that the cookie jar object must implement the <code>extract_cookies($response)</code> and <code>add_cookie_header($request)</code> methods. These methods will then be invoked by the user agent as requests are sent and responses are received. Normally this will be a <a href="../../lib/HTTP/Cookies.html">HTTP::Cookies</a> object or some subclass.</p>
+
+<p>The default is to have no cookie jar, i.e. never automatically add <code>Cookie</code> headers to the requests.</p>
+
+<p>Shortcut: If a reference to a plain hash is passed in, it is replaced with an instance of <a href="../../lib/HTTP/Cookies.html">HTTP::Cookies</a> that is initialized based on the hash. This form also automatically loads the <a href="../../lib/HTTP/Cookies.html">HTTP::Cookies</a> module. It means that:</p>
+
+<pre><code>  <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">cookie_jar</span><span class="operator">(</span><span class="operator">{</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"</span><span class="variable">$ENV</span><span class="string">{HOME}/.cookies.txt"</span> <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>is really just a shortcut for:</p>
+
+<pre><code>  <span class="keyword">require</span> <span class="variable">HTTP::Cookies</span><span class="operator">;</span>
+  <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">cookie_jar</span><span class="operator">(</span><span class="variable">HTTP::Cookies</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"</span><span class="variable">$ENV</span><span class="string">{HOME}/.cookies.txt"</span><span class="operator">));</span>
+</code></pre>
+
+<h2 id="credentials">credentials</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$creds</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">credentials</span><span class="operator">();</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">credentials</span><span class="operator">(</span> <span class="variable">$netloc</span><span class="operator">,</span> <span class="variable">$realm</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">credentials</span><span class="operator">(</span> <span class="variable">$netloc</span><span class="operator">,</span> <span class="variable">$realm</span><span class="operator">,</span> <span class="variable">$uname</span><span class="operator">,</span> <span class="variable">$pass</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">credentials</span><span class="operator">(</span><span class="string">"www.example.com:80"</span><span class="operator">,</span> <span class="string">"Some Realm"</span><span class="operator">,</span> <span class="string">"foo"</span><span class="operator">,</span> <span class="string">"secret"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the user name and password to be used for a realm.</p>
+
+<p>The <code>$netloc</code> is a string of the form <code>&lt;host&gt;:&lt;port&gt;</code>. The username and password will only be passed to this server.</p>
+
+<h2 id="default_header">default_header</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">default_header</span><span class="operator">(</span> <span class="variable">$field</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">default_header</span><span class="operator">(</span> <span class="variable">$field</span> <span class="operator">=&gt;</span> <span class="variable">$value</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">default_header</span><span class="operator">(</span><span class="string">'Accept-Encoding'</span> <span class="operator">=&gt;</span> <span class="keyword">scalar</span> <span class="variable">HTTP::Message::decodable</span><span class="operator">());</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">default_header</span><span class="operator">(</span><span class="string">'Accept-Language'</span> <span class="operator">=&gt;</span> <span class="string">"no, en"</span><span class="operator">);</span>
+</code></pre>
+
+<p>This is just a shortcut for <code>$ua-&gt;default_headers-&gt;header( $field =&gt; $value )</code>.</p>
+
+<h2 id="default_headers">default_headers</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$headers</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">default_headers</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">default_headers</span><span class="operator">(</span> <span class="variable">$headers_obj</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the headers object that will provide default header values for any requests sent. By default this will be an empty <a href="../../lib/HTTP/Headers.html">HTTP::Headers</a> object.</p>
+
+<h2 id="from">from</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$from</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">from</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">from</span><span class="operator">(</span><span class="string">'foo@bar.com'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the email address for the human user who controls the requesting user agent. The address should be machine-usable, as defined in <a href="https://tools.ietf.org/html/rfc2822">RFC2822</a>. The <code>from</code> value is sent as the <code>From</code> header in the requests.</p>
+
+<p>The default is to not send a <code>From</code> header. See <a href="../../lib/LWP/UserAgent.html#default_headers">&quot;default_headers&quot; in LWP::UserAgent</a> for the more general interface that allow any header to be defaulted.</p>
+
+<h2 id="local_address">local_address</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$address</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">local_address</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">local_address</span><span class="operator">(</span> <span class="variable">$address</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the local interface to bind to for network connections. The interface can be specified as a hostname or an IP address. This value is passed as the <code>LocalAddr</code> argument to <a href="../../lib/IO/Socket/INET.html">IO::Socket::INET</a>.</p>
+
+<h2 id="max_redirect">max_redirect</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$max</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">max_redirect</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">max_redirect</span><span class="operator">(</span> <span class="variable">$n</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This reads or sets the object&#39;s limit of how many times it will obey redirection responses in a given request cycle.</p>
+
+<p>By default, the value is <code>7</code>. This means that if you call <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> and the response is a redirect elsewhere which is in turn a redirect, and so on seven times, then LWP gives up after that seventh request.</p>
+
+<h2 id="max_size">max_size</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$size</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">max_size</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">max_size</span><span class="operator">(</span> <span class="variable">$bytes</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the size limit for response content. The default is <code>undef</code>, which means that there is no limit. If the returned response content is only partial, because the size limit was exceeded, then a <code>Client-Aborted</code> header will be added to the response. The content might end up longer than <code>max_size</code> as we abort once appending a chunk of data makes the length exceed the limit. The <code>Content-Length</code> header, if present, will indicate the length of the full content and will normally not be the same as <code>length($res-&gt;content)</code>.</p>
+
+<h2 id="parse_head">parse_head</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">parse_head</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">parse_head</span><span class="operator">(</span> <span class="variable">$boolean</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set a value indicating whether we should initialize response headers from the &lt;head&gt; section of HTML documents. The default is true. <i>Do not turn this off</i> unless you know what you are doing.</p>
+
+<h2 id="protocols_allowed">protocols_allowed</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$aref</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_allowed</span><span class="operator">;</span>      <span class="comment"># get allowed protocols</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_allowed</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">@protocols</span> <span class="operator">);</span>  <span class="comment"># allow ONLY these</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_allowed</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span>          <span class="comment"># delete the list</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_allowed</span><span class="operator">(</span><span class="operator">[</span><span class="string">'http'</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>      <span class="comment"># ONLY allow http</span>
+</code></pre>
+
+<p>By default, an object has neither a <code>protocols_allowed</code> list, nor a <a href="../../lib/LWP/UserAgent.html#protocols_forbidden">&quot;protocols_forbidden&quot; in LWP::UserAgent</a> list.</p>
+
+<p>This reads (or sets) this user agent&#39;s list of protocols that the request methods will exclusively allow. The protocol names are case insensitive.</p>
+
+<p>For example: <code><span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_allowed</span><span class="operator">(</span> <span class="operator">[</span> <span class="string">'http'</span><span class="operator">,</span> <span class="string">'https'</span><span class="operator">]</span> <span class="operator">);</span>
+</code> means that this user agent will <i>allow only</i> those protocols, and attempts to use this user agent to access URLs with any other schemes (like <code>ftp://...</code>) will result in a 500 error.</p>
+
+<p>Note that having a <code>protocols_allowed</code> list causes any <a href="../../lib/LWP/UserAgent.html#protocols_forbidden">&quot;protocols_forbidden&quot; in LWP::UserAgent</a> list to be ignored.</p>
+
+<h2 id="protocols_forbidden">protocols_forbidden</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$aref</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_forbidden</span><span class="operator">;</span>    <span class="comment"># get the forbidden list</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_forbidden</span><span class="operator">(\</span><span class="variable">@protocols</span><span class="operator">);</span>  <span class="comment"># do not allow these</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_forbidden</span><span class="operator">(</span><span class="operator">[</span><span class="string">'http'</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>    <span class="comment"># All http reqs get a 500</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_forbidden</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span>        <span class="comment"># delete the list</span>
+</code></pre>
+
+<p>This reads (or sets) this user agent&#39;s list of protocols that the request method will <i>not</i> allow. The protocol names are case insensitive.</p>
+
+<p>For example: <code><span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">protocols_forbidden</span><span class="operator">(</span> <span class="operator">[</span> <span class="string">'file'</span><span class="operator">,</span> <span class="string">'mailto'</span><span class="operator">]</span> <span class="operator">);</span>
+</code> means that this user agent will <i>not</i> allow those protocols, and attempts to use this user agent to access URLs with those schemes will result in a 500 error.</p>
+
+<h2 id="requests_redirectable">requests_redirectable</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$aref</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">requests_redirectable</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">requests_redirectable</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">@requests</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">requests_redirectable</span><span class="operator">(</span><span class="operator">[</span><span class="string">'GET'</span><span class="operator">,</span> <span class="string">'HEAD'</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span> <span class="comment"># the default</span>
+</code></pre>
+
+<p>This reads or sets the object&#39;s list of request names that <a href="../../lib/LWP/UserAgent.html#redirect_ok">&quot;redirect_ok&quot; in LWP::UserAgent</a> will allow redirection for. By default, this is <code>[&#39;GET&#39;, &#39;HEAD&#39;]</code>, as per <a href="https://tools.ietf.org/html/rfc2616">RFC 2616</a>. To change to include <code>POST</code>, consider:</p>
+
+<pre><code>   <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">requests_redirectable</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">'POST'</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="show_progress">show_progress</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">show_progress</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">show_progress</span><span class="operator">(</span> <span class="variable">$boolean</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set a value indicating whether a progress bar should be displayed on the terminal as requests are processed. The default is false.</p>
+
+<h2 id="ssl_opts">ssl_opts</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@keys</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">ssl_opts</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$val</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">ssl_opts</span><span class="operator">(</span> <span class="variable">$key</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">ssl_opts</span><span class="operator">(</span> <span class="variable">$key</span> <span class="operator">=&gt;</span> <span class="variable">$value</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the options for SSL connections. Without argument return the list of options keys currently set. With a single argument return the current value for the given option. With 2 arguments set the option value and return the old. Setting an option to the value <code>undef</code> removes this option.</p>
+
+<p>The options that LWP relates to are:</p>
+
+<dl>
+
+<dt id="verify_hostname-bool"><code>verify_hostname</code> =&gt; $bool</dt>
+<dd>
+
+<p>When TRUE LWP will for secure protocol schemes ensure it connects to servers that have a valid certificate matching the expected hostname. If FALSE no checks are made and you can&#39;t be sure that you communicate with the expected peer. The no checks behaviour was the default for libwww-perl-5.837 and earlier releases.</p>
+
+<p>This option is initialized from the <a>PERL_LWP_SSL_VERIFY_HOSTNAME</a> environment variable. If this environment variable isn&#39;t set; then <code>verify_hostname</code> defaults to 1.</p>
+
+</dd>
+<dt id="SSL_ca_file-path"><code>SSL_ca_file</code> =&gt; $path</dt>
+<dd>
+
+<p>The path to a file containing Certificate Authority certificates. A default setting for this option is provided by checking the environment variables <code>PERL_LWP_SSL_CA_FILE</code> and <code>HTTPS_CA_FILE</code> in order.</p>
+
+</dd>
+<dt id="SSL_ca_path-path"><code>SSL_ca_path</code> =&gt; $path</dt>
+<dd>
+
+<p>The path to a directory containing files containing Certificate Authority certificates. A default setting for this option is provided by checking the environment variables <code>PERL_LWP_SSL_CA_PATH</code> and <code>HTTPS_CA_DIR</code> in order.</p>
+
+</dd>
+</dl>
+
+<p>Other options can be set and are processed directly by the SSL Socket implementation in use. See <a href="../../lib/IO/Socket/SSL.html">IO::Socket::SSL</a> or <a>Net::SSL</a> for details.</p>
+
+<p>The libwww-perl core no longer bundles protocol plugins for SSL. You will need to install <a href="../../lib/LWP/Protocol/https.html">LWP::Protocol::https</a> separately to enable support for processing https-URLs.</p>
+
+<h2 id="timeout">timeout</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$secs</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">timeout</span><span class="operator">;</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">timeout</span><span class="operator">(</span> <span class="variable">$secs</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set the timeout value in seconds. The default value is 180 seconds, i.e. 3 minutes.</p>
+
+<p>The requests is aborted if no activity on the connection to the server is observed for <code>timeout</code> seconds. This means that the time it takes for the complete transaction and the <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> method to actually return might be longer.</p>
+
+<h1 id="PROXY-ATTRIBUTES">PROXY ATTRIBUTES</h1>
+
+<p>The following methods set up when requests should be passed via a proxy server.</p>
+
+<h2 id="env_proxy">env_proxy</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">env_proxy</span><span class="operator">;</span>
+</code></pre>
+
+<p>Load proxy settings from <code>*_proxy</code> environment variables. You might specify proxies like this (sh-syntax):</p>
+
+<pre><code>  gopher_proxy=http://proxy.my.place/
+  wais_proxy=http://proxy.my.place/
+  no_proxy=&quot;localhost,example.com&quot;
+  export gopher_proxy wais_proxy no_proxy</code></pre>
+
+<p>csh or tcsh users should use the <code>setenv</code> command to define these environment variables.</p>
+
+<p>On systems with case insensitive environment variables there exists a name clash between the CGI environment variables and the <code>HTTP_PROXY</code> environment variable normally picked up by <code>env_proxy</code>. Because of this <code>HTTP_PROXY</code> is not honored for CGI scripts. The <code>CGI_HTTP_PROXY</code> environment variable can be used instead.</p>
+
+<h2 id="no_proxy">no_proxy</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">no_proxy</span><span class="operator">(</span> <span class="variable">@domains</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">no_proxy</span><span class="operator">(</span><span class="string">'localhost'</span><span class="operator">,</span> <span class="string">'example.com'</span><span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">no_proxy</span><span class="operator">();</span> <span class="comment"># clear the list</span>
+</code></pre>
+
+<p>Do not proxy requests to the given domains. Calling <code>no_proxy</code> without any domains clears the list of domains.</p>
+
+<h2 id="proxy">proxy</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">proxy</span><span class="operator">(\</span><span class="variable">@schemes</span><span class="operator">,</span> <span class="variable">$proxy_url</span><span class="operator">)</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">proxy</span><span class="operator">(</span><span class="operator">[</span><span class="string">'http'</span><span class="operator">,</span> <span class="string">'ftp'</span><span class="operator">]</span><span class="operator">,</span> <span class="string">'http://proxy.sn.no:8001/'</span><span class="operator">);</span>
+    
+    <span class="comment"># For a single scheme:</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">proxy</span><span class="operator">(</span><span class="variable">$scheme</span><span class="operator">,</span> <span class="variable">$proxy_url</span><span class="operator">)</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">proxy</span><span class="operator">(</span><span class="string">'gopher'</span><span class="operator">,</span> <span class="string">'http://proxy.sn.no:8001/'</span><span class="operator">);</span>
+    
+    <span class="comment"># To set multiple proxies at once:</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">proxy</span><span class="operator">(</span><span class="operator">[</span>
+        <span class="string">ftp</span> <span class="operator">=&gt;</span> <span class="string">'http://ftp.example.com:8001/'</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">'http'</span><span class="operator">,</span> <span class="string">'https'</span> <span class="operator">]</span> <span class="operator">=&gt;</span> <span class="string">'http://http.example.com:8001/'</span><span class="operator">,</span>
+    <span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>Set/retrieve proxy URL for a scheme.</p>
+
+<p>The first form specifies that the URL is to be used as a proxy for access methods listed in the list in the first method argument, i.e. <code>http</code> and <code>ftp</code>.</p>
+
+<p>The second form shows a shorthand form for specifying proxy URL for a single access scheme.</p>
+
+<p>The third form demonstrates setting multiple proxies at once. This is also the only form accepted by the constructor.</p>
+
+<h1 id="HANDLERS">HANDLERS</h1>
+
+<p>Handlers are code that injected at various phases during the processing of requests. The following methods are provided to manage the active handlers:</p>
+
+<h2 id="add_handler">add_handler</h2>
+
+<pre><code>    $ua-&gt;add_handler( $phase =&gt; \&amp;cb, %matchspec )</code></pre>
+
+<p>Add handler to be invoked in the given processing phase. For how to specify <code>%matchspec</code> see <a href="../../lib/HTTP/Config.html#Matching">&quot;Matching&quot; in HTTP::Config</a>.</p>
+
+<p>The possible values <code>$phase</code> and the corresponding callback signatures are:</p>
+
+<dl>
+
+<dt id="response_data-sub-my-response-ua-h-data-_">response_data =&gt; sub { my($response, $ua, $h, $data) = @_; ... }</dt>
+<dd>
+
+<p>This handler is called for each chunk of data received for the response. The handler might croak to abort the request.</p>
+
+<p>This handler needs to return a TRUE value to be called again for subsequent chunks for the same request.</p>
+
+</dd>
+<dt id="response_done-sub-my-response-ua-h-_">response_done =&gt; sub { my($response, $ua, $h) = @_; ... }</dt>
+<dd>
+
+<p>The handler is called after the response has been fully received, but before any redirect handling is attempted. The handler can be used to extract information or modify the response.</p>
+
+</dd>
+<dt id="response_header-sub-my-response-ua-h-_">response_header =&gt; sub { my($response, $ua, $h) = @_; ... }</dt>
+<dd>
+
+<p>This handler is called right after the response headers have been received, but before any content data. The handler might set up handlers for data and might croak to abort the request.</p>
+
+<p>The handler might set the $response-&gt;{default_add_content} value to control if any received data should be added to the response object directly. This will initially be false if the $ua-&gt;request() method was called with a $content_file or $content_cb argument; otherwise true.</p>
+
+</dd>
+<dt id="request_prepare-sub-my-request-ua-h-_">request_prepare =&gt; sub { my($request, $ua, $h) = @_; ... }</dt>
+<dd>
+
+<p>The handler is called before the request is sent and can modify the request any way it see fit. This can for instance be used to add certain headers to specific requests.</p>
+
+<p>The method can assign a new request object to $_[0] to replace the request that is sent fully.</p>
+
+<p>The return value from the callback is ignored. If an exception is raised it will abort the request and make the request method return a &quot;400 Bad request&quot; response.</p>
+
+</dd>
+<dt id="request_preprepare-sub-my-request-ua-h-_">request_preprepare =&gt; sub { my($request, $ua, $h) = @_; ... }</dt>
+<dd>
+
+<p>The handler is called before the <code>request_prepare</code> and other standard initialization of the request. This can be used to set up headers and attributes that the <code>request_prepare</code> handler depends on. Proxy initialization should take place here; but in general don&#39;t register handlers for this phase.</p>
+
+</dd>
+<dt id="request_send-sub-my-request-ua-h-_">request_send =&gt; sub { my($request, $ua, $h) = @_; ... }</dt>
+<dd>
+
+<p>This handler gets a chance of handling requests before they&#39;re sent to the protocol handlers. It should return an HTTP::Response object if it wishes to terminate the processing; otherwise it should return nothing.</p>
+
+<p>The <code>response_header</code> and <code>response_data</code> handlers will not be invoked for this response, but the <code>response_done</code> will be.</p>
+
+</dd>
+<dt id="response_redirect-sub-my-response-ua-h-_">response_redirect =&gt; sub { my($response, $ua, $h) = @_; ... }</dt>
+<dd>
+
+<p>The handler is called in $ua-&gt;request after <code>response_done</code>. If the handler returns an HTTP::Request object we&#39;ll start over with processing this request instead.</p>
+
+</dd>
+</dl>
+
+<h2 id="get_my_handler">get_my_handler</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get_my_handler</span><span class="operator">(</span> <span class="variable">$phase</span><span class="operator">,</span> <span class="variable">%matchspec</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get_my_handler</span><span class="operator">(</span> <span class="variable">$phase</span><span class="operator">,</span> <span class="variable">%matchspec</span><span class="operator">,</span> <span class="variable">$init</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Will retrieve the matching handler as hash ref.</p>
+
+<p>If <code>$init</code> is passed as a true value, create and add the handler if it&#39;s not found. If <code>$init</code> is a subroutine reference, then it&#39;s called with the created handler hash as argument. This sub might populate the hash with extra fields; especially the callback. If <code>$init</code> is a hash reference, merge the hashes.</p>
+
+<h2 id="handlers">handlers</h2>
+
+<pre><code>    $ua-&gt;handlers( $phase, $request )
+    $ua-&gt;handlers( $phase, $response )</code></pre>
+
+<p>Returns the handlers that apply to the given request or response at the given processing phase.</p>
+
+<h2 id="remove_handler">remove_handler</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">remove_handler</span><span class="operator">(</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="variable">%matchspec</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">remove_handler</span><span class="operator">(</span> <span class="variable">$phase</span><span class="operator">,</span> <span class="variable">%matchspec</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">remove_handlers</span><span class="operator">();</span> <span class="comment"># REMOVE ALL HANDLERS IN ALL PHASES</span>
+</code></pre>
+
+<p>Remove handlers that match the given <code>%matchspec</code>. If <code>$phase</code> is not provided, remove handlers from all phases.</p>
+
+<p>Be careful as calling this function with <code>%matchspec</code> that is not specific enough can remove handlers not owned by you. It&#39;s probably better to use the <a href="../../lib/LWP/UserAgent.html#set_my_handler">&quot;set_my_handler&quot; in LWP::UserAgent</a> method instead.</p>
+
+<p>The removed handlers are returned.</p>
+
+<h2 id="set_my_handler">set_my_handler</h2>
+
+<pre><code>    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">set_my_handler</span><span class="operator">(</span> <span class="variable">$phase</span><span class="operator">,</span> <span class="variable">$cb</span><span class="operator">,</span> <span class="variable">%matchspec</span> <span class="operator">);</span>
+    <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">set_my_handler</span><span class="operator">(</span><span class="variable">$phase</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">);</span> <span class="comment"># remove handler for phase</span>
+</code></pre>
+
+<p>Set handlers private to the executing subroutine. Works by defaulting an <code>owner</code> field to the <code>%matchspec</code> that holds the name of the called subroutine. You might pass an explicit <code>owner</code> to override this.</p>
+
+<p>If $cb is passed as <code>undef</code>, remove the handler.</p>
+
+<h1 id="REQUEST-METHODS">REQUEST METHODS</h1>
+
+<p>The methods described in this section are used to dispatch requests via the user agent. The following request methods are provided:</p>
+
+<h2 id="delete">delete</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">delete</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">delete</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will dispatch a <code>DELETE</code> request on the given URL. Additional headers and content options are the same as for the <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a> method.</p>
+
+<p>This method will use the DELETE() function from <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> to build the request. See <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> for a details on how to pass form content and other advanced features.</p>
+
+<h2 id="get">get</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will dispatch a <code>GET</code> request on the given URL. Further arguments can be given to initialize the headers of the request. These are given as separate name/value pairs. The return value is a response object. See <a href="../../lib/HTTP/Response.html">HTTP::Response</a> for a description of the interface it provides.</p>
+
+<p>There will still be a response object returned when LWP can&#39;t connect to the server specified in the URL or when other failures in protocol handlers occur. These internal responses use the standard HTTP status codes, so the responses can&#39;t be differentiated by testing the response status code alone. Error responses that LWP generates internally will have the &quot;Client-Warning&quot; header set to the value &quot;Internal response&quot;. If you need to differentiate these internal responses from responses that a remote server actually generates, you need to test this header value.</p>
+
+<p>Fields names that start with &quot;:&quot; are special. These will not initialize headers of the request but will determine how the response content is treated. The following special field names are recognized:</p>
+
+<pre><code>    :content_file   =&gt; $filename
+    :content_cb     =&gt; \&amp;callback
+    :read_size_hint =&gt; $bytes</code></pre>
+
+<p>If a $filename is provided with the <code>:content_file</code> option, then the response content will be saved here instead of in the response object. If a callback is provided with the <code>:content_cb</code> option then this function will be called for each chunk of the response content as it is received from the server. If neither of these options are given, then the response content will accumulate in the response object itself. This might not be suitable for very large response bodies. Only one of <code>:content_file</code> or <code>:content_cb</code> can be specified. The content of unsuccessful responses will always accumulate in the response object itself, regardless of the <code>:content_file</code> or <code>:content_cb</code> options passed in. Note that errors writing to the content file (for example due to permission denied or the filesystem being full) will be reported via the <code>Client-Aborted</code> or <code>X-Died</code> response headers, and not the <code>is_success</code> method.</p>
+
+<p>The <code>:read_size_hint</code> option is passed to the protocol module which will try to read data from the server in chunks of this size. A smaller value for the <code>:read_size_hint</code> will result in a higher number of callback invocations.</p>
+
+<p>The callback function is called with 3 arguments: a chunk of data, a reference to the response object, and a reference to the protocol object. The callback can abort the request by invoking die(). The exception message will show up as the &quot;X-Died&quot; header field in the response returned by the get() function.</p>
+
+<h2 id="head">head</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">head</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">head</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will dispatch a <code>HEAD</code> request on the given URL. Otherwise it works like the <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a> method described above.</p>
+
+<h2 id="is_protocol_supported">is_protocol_supported</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">is_protocol_supported</span><span class="operator">(</span> <span class="variable">$scheme</span> <span class="operator">);</span>
+</code></pre>
+
+<p>You can use this method to test whether this user agent object supports the specified <code>scheme</code>. (The <code>scheme</code> might be a string (like <code>http</code> or <code>ftp</code>) or it might be an <a href="../../lib/URI.html">URI</a> object reference.)</p>
+
+<p>Whether a scheme is supported is determined by the user agent&#39;s <code>protocols_allowed</code> or <code>protocols_forbidden</code> lists (if any), and by the capabilities of LWP. I.e., this will return true only if LWP supports this protocol <i>and</i> it&#39;s permitted for this particular object.</p>
+
+<h2 id="is_online">is_online</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">is_online</span><span class="operator">;</span>
+</code></pre>
+
+<p>Tries to determine if you have access to the Internet. Returns <code>1</code> (true) if the built-in heuristics determine that the user agent is able to access the Internet (over HTTP) or <code>0</code> (false).</p>
+
+<p>See also <a>LWP::Online</a>.</p>
+
+<h2 id="mirror">mirror</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">mirror</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$filename</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will get the document identified by URL and store it in file called <code>$filename</code>. If the file already exists, then the request will contain an <code>If-Modified-Since</code> header matching the modification time of the file. If the document on the server has not changed since this time, then nothing happens. If the document has been updated, it will be downloaded again. The modification time of the file will be forced to match that of the server.</p>
+
+<p>The return value is an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<h2 id="post">post</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">post</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">post</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">@form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">post</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%form</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">post</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">post</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">post</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="variable">$content</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will dispatch a <code>POST</code> request on the given URL, with <code>%form</code> or <code>@form</code> providing the key/value pairs for the fill-in form content. Additional headers and content options are the same as for the <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a> method.</p>
+
+<p>This method will use the <code>POST</code> function from <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> to build the request. See <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> for a details on how to pass form content and other advanced features.</p>
+
+<h2 id="put">put</h2>
+
+<pre><code>    <span class="comment"># Any version of HTTP::Message works with this form:</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="variable">$content</span> <span class="operator">);</span>
+    
+    <span class="comment"># Using hash or array references requires HTTP::Message &gt;= 6.07</span>
+    <span class="keyword">use</span> <span class="variable">HTTP::Request</span> <span class="number">6.07</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">@form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%form</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%form</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span> <span class="variable">$url</span><span class="operator">,</span> <span class="variable">$field_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@form</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will dispatch a <code>PUT</code> request on the given URL, with <code>%form</code> or <code>@form</code> providing the key/value pairs for the fill-in form content. Additional headers and content options are the same as for the <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a> method.</p>
+
+<p>CAVEAT:</p>
+
+<p>This method can only accept content that is in key-value pairs when using <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> prior to version <code>6.07</code>. Any use of hash or array references will result in an error prior to version <code>6.07</code>.</p>
+
+<p>This method will use the <code>PUT</code> function from <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> to build the request. See <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> for a details on how to pass form content and other advanced features.</p>
+
+<h2 id="request">request</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">request</span><span class="operator">(</span> <span class="variable">$request</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">request</span><span class="operator">(</span> <span class="variable">$request</span><span class="operator">,</span> <span class="variable">$content_file</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">request</span><span class="operator">(</span> <span class="variable">$request</span><span class="operator">,</span> <span class="variable">$content_cb</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">request</span><span class="operator">(</span> <span class="variable">$request</span><span class="operator">,</span> <span class="variable">$content_cb</span><span class="operator">,</span> <span class="variable">$read_size_hint</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method will dispatch the given <code>$request</code> object. Normally this will be an instance of the <a href="../../lib/HTTP/Request.html">HTTP::Request</a> class, but any object with a similar interface will do. The return value is an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<p>The <code>request</code> method will process redirects and authentication responses transparently. This means that it may actually send several simple requests via the <a href="../../lib/LWP/UserAgent.html#simple_request">&quot;simple_request&quot; in LWP::UserAgent</a> method described below.</p>
+
+<p>The request methods described above; <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a>, <a href="../../lib/LWP/UserAgent.html#head">&quot;head&quot; in LWP::UserAgent</a>, <a href="../../lib/LWP/UserAgent.html#post">&quot;post&quot; in LWP::UserAgent</a> and <a href="../../lib/LWP/UserAgent.html#mirror">&quot;mirror&quot; in LWP::UserAgent</a> will all dispatch the request they build via this method. They are convenience methods that simply hide the creation of the request object for you.</p>
+
+<p>The <code>$content_file</code>, <code>$content_cb</code> and <code>$read_size_hint</code> all correspond to options described with the <a href="../../lib/LWP/UserAgent.html#get">&quot;get&quot; in LWP::UserAgent</a> method above. Note that errors writing to the content file (for example due to permission denied or the filesystem being full) will be reported via the <code>Client-Aborted</code> or <code>X-Died</code> response headers, and not the <code>is_success</code> method.</p>
+
+<p>You are allowed to use a CODE reference as <code>content</code> in the request object passed in. The <code>content</code> function should return the content when called. The content can be returned in chunks. The content function will be invoked repeatedly until it return an empty string to signal that there is no more content.</p>
+
+<h2 id="simple_request">simple_request</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$request</span> <span class="operator">=</span> <span class="variable">HTTP::Request</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">simple_request</span><span class="operator">(</span> <span class="variable">$request</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">simple_request</span><span class="operator">(</span> <span class="variable">$request</span><span class="operator">,</span> <span class="variable">$content_file</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">simple_request</span><span class="operator">(</span> <span class="variable">$request</span><span class="operator">,</span> <span class="variable">$content_cb</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">simple_request</span><span class="operator">(</span> <span class="variable">$request</span><span class="operator">,</span> <span class="variable">$content_cb</span><span class="operator">,</span> <span class="variable">$read_size_hint</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method dispatches a single request and returns the response received. Arguments are the same as for the <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> described above.</p>
+
+<p>The difference from <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> is that <code>simple_request</code> will not try to handle redirects or authentication responses. The <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> method will, in fact, invoke this method for each simple request it sends.</p>
+
+<h1 id="CALLBACK-METHODS">CALLBACK METHODS</h1>
+
+<p>The following methods will be invoked as requests are processed. These methods are documented here because subclasses of <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> might want to override their behaviour.</p>
+
+<h2 id="get_basic_credentials">get_basic_credentials</h2>
+
+<pre><code>    <span class="comment"># This checks wantarray and can either return an array:</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$user</span><span class="operator">,</span> <span class="variable">$pass</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get_basic_credentials</span><span class="operator">(</span> <span class="variable">$realm</span><span class="operator">,</span> <span class="variable">$uri</span><span class="operator">,</span> <span class="variable">$isproxy</span> <span class="operator">);</span>
+    <span class="comment"># or a string that looks like "user:pass"</span>
+    <span class="keyword">my</span> <span class="variable">$creds</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">get_basic_credentials</span><span class="operator">(</span><span class="variable">$realm</span><span class="operator">,</span> <span class="variable">$uri</span><span class="operator">,</span> <span class="variable">$isproxy</span><span class="operator">);</span>
+</code></pre>
+
+<p>This is called by <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> to retrieve credentials for documents protected by Basic or Digest Authentication. The arguments passed in is the <code>$realm</code> provided by the server, the <code>$uri</code> requested and a <code>boolean flag</code> to indicate if this is authentication against a proxy server.</p>
+
+<p>The method should return a username and password. It should return an empty list to abort the authentication resolution attempt. Subclasses can override this method to prompt the user for the information. An example of this can be found in <code>lwp-request</code> program distributed with this library.</p>
+
+<p>The base implementation simply checks a set of pre-stored member variables, set up with the <a href="../../lib/LWP/UserAgent.html#credentials">&quot;credentials&quot; in LWP::UserAgent</a> method.</p>
+
+<h2 id="prepare_request">prepare_request</h2>
+
+<pre><code>    <span class="variable">$request</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">prepare_request</span><span class="operator">(</span> <span class="variable">$request</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is invoked by <a href="../../lib/LWP/UserAgent.html#simple_request">&quot;simple_request&quot; in LWP::UserAgent</a>. Its task is to modify the given <code>$request</code> object by setting up various headers based on the attributes of the user agent. The return value should normally be the <code>$request</code> object passed in. If a different request object is returned it will be the one actually processed.</p>
+
+<p>The headers affected by the base implementation are; <code>User-Agent</code>, <code>From</code>, <code>Range</code> and <code>Cookie</code>.</p>
+
+<h2 id="progress">progress</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$prog</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">progress</span><span class="operator">(</span> <span class="variable">$status</span><span class="operator">,</span> <span class="variable">$request_or_response</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This is called frequently as the response is received regardless of how the content is processed. The method is called with <code>$status</code> &quot;begin&quot; at the start of processing the request and with <code>$state</code> &quot;end&quot; before the request method returns. In between these <code>$status</code> will be the fraction of the response currently received or the string &quot;tick&quot; if the fraction can&#39;t be calculated.</p>
+
+<p>When <code>$status</code> is &quot;begin&quot; the second argument is the <a href="../../lib/HTTP/Request.html">HTTP::Request</a> object, otherwise it is the <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<h2 id="redirect_ok">redirect_ok</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">redirect_ok</span><span class="operator">(</span> <span class="variable">$prospective_request</span><span class="operator">,</span> <span class="variable">$response</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is called by <a href="../../lib/LWP/UserAgent.html#request">&quot;request&quot; in LWP::UserAgent</a> before it tries to follow a redirection to the request in <code>$response</code>. This should return a true value if this redirection is permissible. The <code>$prospective_request</code> will be the request to be sent if this method returns true.</p>
+
+<p>The base implementation will return false unless the method is in the object&#39;s <code>requests_redirectable</code> list, false if the proposed redirection is to a <code>file://...</code> URL, and true otherwise.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>See <a href="../../lib/LWP.html">LWP</a> for a complete overview of libwww-perl5. See <a href="../../lib/libwww/lwpcook.html">lwpcook</a> and the scripts <i>lwp-request</i> and <i>lwp-download</i> for examples of usage.</p>
+
+<p>See <a href="../../lib/HTTP/Request.html">HTTP::Request</a> and <a href="../../lib/HTTP/Response.html">HTTP::Response</a> for a description of the message objects dispatched and received. See <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a> and <a href="../../lib/HTML/Form.html">HTML::Form</a> for other ways to build request objects.</p>
+
+<p>See <a href="../../lib/WWW/Mechanize.html">WWW::Mechanize</a> and <a>WWW::Search</a> for examples of more specialized user agents based on <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright 1995-2009 Gisle Aas.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

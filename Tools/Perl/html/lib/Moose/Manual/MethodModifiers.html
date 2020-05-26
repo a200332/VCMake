@@ -1,0 +1,420 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#WHAT-IS-A-METHOD-MODIFIER">WHAT IS A METHOD MODIFIER?</a></li>
+  <li><a href="#WHY-USE-THEM">WHY USE THEM?</a></li>
+  <li><a href="#BEFORE-AFTER-AND-AROUND">BEFORE, AFTER, AND AROUND</a>
+    <ul>
+      <li><a href="#Before-and-after-Modifiers">Before and after Modifiers</a></li>
+      <li><a href="#Around-modifiers">Around modifiers</a></li>
+      <li><a href="#Wrapping-multiple-methods-at-once">Wrapping multiple methods at once</a></li>
+      <li><a href="#Using-regular-expressions-to-select-methods-to-wrap">Using regular expressions to select methods to wrap</a></li>
+      <li><a href="#Execution-order-of-method-modifiers-and-inheritance">Execution order of method modifiers and inheritance</a></li>
+    </ul>
+  </li>
+  <li><a href="#INNER-AND-AUGMENT">INNER AND AUGMENT</a></li>
+  <li><a href="#OVERRIDE-AND-SUPER">OVERRIDE AND SUPER</a></li>
+  <li><a href="#SEMI-COLONS">SEMI-COLONS</a></li>
+  <li><a href="#EXCEPTIONS-AND-STACK-TRACES">EXCEPTIONS AND STACK TRACES</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::MethodModifiers - Moose&#39;s method modifiers</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="WHAT-IS-A-METHOD-MODIFIER">WHAT IS A METHOD MODIFIER?</h1>
+
+<p>Moose provides a feature called &quot;method modifiers&quot;. You can also think of these as &quot;hooks&quot; or &quot;advice&quot;.</p>
+
+<p>It&#39;s probably easiest to understand this feature with a few examples:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Example</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"    foo\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="variable">before</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">print</span> <span class="string">"about to call foo\n"</span><span class="operator">;</span> <span class="operator">};</span>
+  <span class="variable">after</span> <span class="string">'foo'</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">print</span> <span class="string">"just called foo\n"</span><span class="operator">;</span> <span class="operator">};</span>
+  
+  <span class="variable">around</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">print</span> <span class="string">"  I'm around foo\n"</span><span class="operator">;</span>
+  
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+  
+      <span class="keyword">print</span> <span class="string">"  I'm still around foo\n"</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Now if I call <code>Example-&gt;new-&gt;foo</code> I&#39;ll get the following output:</p>
+
+<pre><code>  about to call foo
+    I&#39;m around foo
+      foo
+    I&#39;m still around foo
+  just called foo</code></pre>
+
+<p>You probably could have figured that out from the names &quot;before&quot;, &quot;after&quot;, and &quot;around&quot;.</p>
+
+<p>Also, as you can see, the before modifiers come before around modifiers, and after modifiers come last.</p>
+
+<p>When there are multiple modifiers of the same type, the before and around modifiers run from the last added to the first, and after modifiers run from first added to last:</p>
+
+<pre><code>   before 2
+    before 1
+     around 2
+      around 1
+       primary
+      around 1
+     around 2
+    after 1
+   after 2</code></pre>
+
+<h1 id="WHY-USE-THEM">WHY USE THEM?</h1>
+
+<p>Method modifiers have many uses. They are often used in roles to alter the behavior of methods in the classes that consume the role. See <a href="../../../lib/Moose/Manual/Roles.html">Moose::Manual::Roles</a> for more information about roles.</p>
+
+<p>Since modifiers are mostly useful in roles, some of the examples below are a bit artificial. They&#39;re intended to give you an idea of how modifiers work, but may not be the most natural usage.</p>
+
+<h1 id="BEFORE-AFTER-AND-AROUND">BEFORE, AFTER, AND AROUND</h1>
+
+<p>Method modifiers can be used to add behavior to methods without modifying the definition of those methods.</p>
+
+<h2 id="Before-and-after-Modifiers">Before and after Modifiers</h2>
+
+<p>Method modifiers can be used to add behavior to a method that Moose generates for you, such as an attribute accessor:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span> <span class="operator">);</span>
+  
+  <span class="variable">before</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">if</span> <span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">{</span>
+          <span class="variable">Carp::cluck</span><span class="operator">(</span><span class="string">'Someone is setting size'</span><span class="operator">);</span>
+      <span class="operator">}</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Another use for the before modifier would be to do some sort of prechecking on a method call. For example:</p>
+
+<pre><code>  <span class="variable">before</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">die</span> <span class="string">'Cannot set size while the person is growing'</span>
+          <span class="keyword">if</span> <span class="variable">@_</span> <span class="operator">&amp;&amp;</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">is_growing</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>This lets us implement logical checks that don&#39;t make sense as type constraints. In particular, they&#39;re useful for defining logical rules about an object&#39;s state changes.</p>
+
+<p>Similarly, an after modifier could be used for logging an action that was taken.</p>
+
+<p>Note that the return values of both before and after modifiers are ignored.</p>
+
+<h2 id="Around-modifiers">Around modifiers</h2>
+
+<p>An around modifier is more powerful than either a before or after modifier. It can modify the arguments being passed to the original method, and you can even decide to simply not call the original method at all. You can also modify the return value with an around modifier.</p>
+
+<p>An around modifier receives the original method as its first argument, <i>then</i> the object, and finally any arguments passed to the method.</p>
+
+<pre><code>  <span class="variable">around</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span><span class="operator">()</span>
+          <span class="keyword">unless</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$size</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$size</span> <span class="operator">=</span> <span class="variable">$size</span> <span class="operator">/</span> <span class="number">2</span>
+          <span class="keyword">if</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">likes_small_things</span><span class="operator">();</span>
+  
+      <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span><span class="operator">(</span><span class="variable">$size</span><span class="operator">);</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<h2 id="Wrapping-multiple-methods-at-once">Wrapping multiple methods at once</h2>
+
+<p><code>before</code>, <code>after</code>, and <code>around</code> can also modify multiple methods at once. The simplest example of this is passing them as a list:</p>
+
+<pre><code>  <span class="variable">before</span> <span class="operator">[</span><span class="string">qw(foo bar baz)</span><span class="operator">]</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">warn</span> <span class="string">"something is being called!"</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>This will add a <code>before</code> modifier to each of the <code>foo</code>, <code>bar</code>, and <code>baz</code> methods in the current class, just as though a separate call to <code>before</code> was made for each of them. The list can be passed either as a bare list, or as an arrayref. Note that the name of the function being modified isn&#39;t passed in in any way; this syntax is only intended for cases where the function being modified doesn&#39;t actually matter. If the function name does matter, use something like this:</p>
+
+<pre><code>  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$func</span> <span class="operator">(</span><span class="string">qw(foo bar baz)</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="variable">before</span> <span class="variable">$func</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+          <span class="keyword">warn</span> <span class="string">"</span><span class="variable">$func</span><span class="string"> was called!"</span><span class="operator">;</span>
+      <span class="operator">};</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Using-regular-expressions-to-select-methods-to-wrap">Using regular expressions to select methods to wrap</h2>
+
+<p>In addition, you can specify a regular expression to indicate the methods to wrap, like so:</p>
+
+<pre><code>  <span class="variable">after</span> <span class="string">qr/^command_/</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">warn</span> <span class="string">"got a command"</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>This will match the regular expression against each method name returned by <a href="../../../lib/Class/MOP/Class.html#get_method_list">&quot;get_method_list&quot; in Class::MOP::Class</a>, and add a modifier to each one that matches. The same caveats apply as above.</p>
+
+<p>Using regular expressions to determine methods to wrap is quite a bit more powerful than the previous alternatives, but it&#39;s also quite a bit more dangerous. Bear in mind that if your regular expression matches certain Perl and Moose reserved method names with a special meaning to Moose or Perl, such as <code>meta</code>, <code>new</code>, <code>BUILD</code>, <code>DESTROY</code>, <code>AUTOLOAD</code>, etc, this could cause unintended (and hard to debug) problems and is best avoided.</p>
+
+<h2 id="Execution-order-of-method-modifiers-and-inheritance">Execution order of method modifiers and inheritance</h2>
+
+<p>When both a superclass and an inheriting class have the same method modifiers, the method modifiers of the inheriting class are wrapped around the method modifiers of the superclass, as the following example illustrates:</p>
+
+<p>Here is the parent class:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Superclass</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> rant </span><span class="operator">{</span> <span class="keyword">printf</span> <span class="string">"        RANTING!\n"</span> <span class="operator">}</span>
+  <span class="variable">before</span> <span class="string">'rant'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">printf</span> <span class="string">"    In %s before\n"</span><span class="operator">,</span> <span class="keyword">__PACKAGE__</span> <span class="operator">};</span>
+  <span class="variable">after</span> <span class="string">'rant'</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">printf</span> <span class="string">"    In %s after\n"</span><span class="operator">,</span>  <span class="keyword">__PACKAGE__</span> <span class="operator">};</span>
+  <span class="variable">around</span> <span class="string">'rant'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">printf</span> <span class="string">"      In %s around before calling original\n"</span><span class="operator">,</span> <span class="keyword">__PACKAGE__</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span><span class="operator">;</span>
+      <span class="keyword">printf</span> <span class="string">"      In %s around after calling original\n"</span><span class="operator">,</span> <span class="keyword">__PACKAGE__</span><span class="operator">;</span>
+  <span class="operator">};</span>
+  <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>And the child class:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Subclass</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="variable">extends</span> <span class="string">'Superclass'</span><span class="operator">;</span>
+  <span class="variable">before</span> <span class="string">'rant'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">printf</span> <span class="string">"In %s before\n"</span><span class="operator">,</span> <span class="keyword">__PACKAGE__</span> <span class="operator">};</span>
+  <span class="variable">after</span> <span class="string">'rant'</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">printf</span> <span class="string">"In %s after\n"</span><span class="operator">,</span>  <span class="keyword">__PACKAGE__</span> <span class="operator">};</span>
+  <span class="variable">around</span> <span class="string">'rant'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">printf</span> <span class="string">"  In %s around before calling original\n"</span><span class="operator">,</span> <span class="keyword">__PACKAGE__</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span><span class="operator">;</span>
+      <span class="keyword">printf</span> <span class="string">"  In %s around after calling original\n"</span><span class="operator">,</span> <span class="keyword">__PACKAGE__</span><span class="operator">;</span>
+  <span class="operator">};</span>
+  <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>And here&#39;s the output when we call the wrapped method (<code>Child-&gt;rant</code>):</p>
+
+<pre><code>  % perl -MSubclass -e &#39;Subclass-&gt;new-&gt;rant&#39;
+
+  In Subclass before
+    In Subclass around before calling original
+      In Superclass before
+        In Superclass around before calling original
+          RANTING!
+        In Superclass around after calling original
+      In Superclass after
+    In Subclass around after calling original
+  In Subclass after</code></pre>
+
+<h1 id="INNER-AND-AUGMENT">INNER AND AUGMENT</h1>
+
+<p>Augment and inner are two halves of the same feature. The augment modifier provides a sort of inverted subclassing. You provide part of the implementation in a superclass, and then document that subclasses are expected to provide the rest.</p>
+
+<p>The superclass calls <code>inner()</code>, which then calls the <code>augment</code> modifier in the subclass:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Document</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> as_xml </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$xml</span> <span class="operator">=</span> <span class="string">"&lt;document&gt;\n"</span><span class="operator">;</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="variable">inner</span><span class="operator">();</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="string">"&lt;/document&gt;\n"</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$xml</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Using <code>inner()</code> in this method makes it possible for one or more subclasses to then augment this method with their own specific implementation:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Report</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Document'</span><span class="operator">;</span>
+  
+  <span class="variable">augment</span> <span class="string">'as_xml'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$xml</span> <span class="operator">=</span> <span class="string">"  &lt;report&gt;\n"</span><span class="operator">;</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="variable">inner</span><span class="operator">();</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="string">"  &lt;/report&gt;\n"</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$xml</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>When we call <code>as_xml</code> on a Report object, we get something like this:</p>
+
+<pre><code>  &lt;document&gt;
+    &lt;report&gt;
+    &lt;/report&gt;
+  &lt;/document&gt;</code></pre>
+
+<p>But we also called <code>inner()</code> in <code>Report</code>, so we can continue subclassing and adding more content inside the document:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Report::IncomeAndExpenses</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Report'</span><span class="operator">;</span>
+  
+  <span class="variable">augment</span> <span class="string">'as_xml'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$xml</span> <span class="operator">=</span> <span class="string">'    &lt;income&gt;'</span> <span class="operator">.</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">income</span> <span class="operator">.</span> <span class="string">'&lt;/income&gt;'</span><span class="operator">;</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="string">"\n"</span><span class="operator">;</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="string">'    &lt;expenses&gt;'</span> <span class="operator">.</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">expenses</span> <span class="operator">.</span> <span class="string">'&lt;/expenses&gt;'</span><span class="operator">;</span>
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="string">"\n"</span><span class="operator">;</span>
+  
+      <span class="variable">$xml</span> <span class="operator">.=</span> <span class="variable">inner</span><span class="operator">()</span> <span class="operator">||</span> <span class="string">q{}</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$xml</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Now our report has some content:</p>
+
+<pre><code>  &lt;document&gt;
+    &lt;report&gt;
+      &lt;income&gt;$10&lt;/income&gt;
+      &lt;expenses&gt;$8&lt;/expenses&gt;
+    &lt;/report&gt;
+  &lt;/document&gt;</code></pre>
+
+<p>What makes this combination of <code>augment</code> and <code>inner()</code> special is that it allows us to have methods which are called from parent (least specific) to child (most specific). This inverts the normal inheritance pattern.</p>
+
+<p>Note that in <code>Report::IncomeAndExpenses</code> we call <code>inner()</code> again. If the object is an instance of <code>Report::IncomeAndExpenses</code> then this call is a no-op, and just returns false. It&#39;s a good idea to always call <code>inner()</code> to allow for future subclassing.</p>
+
+<h1 id="OVERRIDE-AND-SUPER">OVERRIDE AND SUPER</h1>
+
+<p>Finally, Moose provides some simple sugar for Perl&#39;s built-in method overriding scheme. If you want to override a method from a parent class, you can do this with <code>override</code>:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Employee</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Person'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'job_title'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span> <span class="operator">);</span>
+  
+  <span class="variable">override</span> <span class="string">'display_name'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">super</span><span class="operator">()</span> <span class="operator">.</span> <span class="string">q{, }</span> <span class="operator">.</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">job_title</span><span class="operator">();</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>The call to <code>super()</code> is almost the same as calling <code>$self-&gt;SUPER::display_name</code>. The difference is that the arguments passed to the superclass&#39;s method will always be the same as the ones passed to the method modifier, and cannot be changed.</p>
+
+<p>All arguments passed to <code>super()</code> are ignored, as are any changes made to <code>@_</code> before <code>super()</code> is called.</p>
+
+<h1 id="SEMI-COLONS">SEMI-COLONS</h1>
+
+<p>Because all of these method modifiers are implemented as Perl functions, you must always end the modifier declaration with a semi-colon:</p>
+
+<pre><code>  <span class="variable">after</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">};</span>
+</code></pre>
+
+<h1 id="EXCEPTIONS-AND-STACK-TRACES">EXCEPTIONS AND STACK TRACES</h1>
+
+<p>An exception thrown in a <code>before</code> modifier will prevent the method it modifies from being called at all. An exception in an <code>around</code> modifier may prevent the modified method from being called, depending on how the <code>around</code> modifier is structured. An exception in an <code>after</code> modifier obviously cannot prevent the method it wraps from being called.</p>
+
+<p>Both <code>override</code> and <code>augment</code> are similar to <code>around</code> in that they can decide whether or not to call the method they modify before or after throwing an exception.</p>
+
+<p>From the caller&#39;s perspective, an exception in a method modifier will look like the method it called threw an exception. However, method modifiers are just standard Perl subroutines. This means that they end up on the stack in stack traces as an additional frame.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>These method modification features do not work well with multiple inheritance, due to how method resolution is performed in Perl. Experiment with a test program to ensure your class hierarchy works as expected, or more preferably, don&#39;t use multiple inheritance (roles can help with this)!</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

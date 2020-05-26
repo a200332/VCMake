@@ -1,0 +1,122 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#PARAMETERS">PARAMETERS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::SQLite::VirtualTable::FileContent -- virtual table for viewing file contents</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Within Perl :</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">sqlite_create_module</span><span class="operator">(</span><span class="string">fcontent</span> <span class="operator">=&gt;</span> <span class="string">"DBD::SQLite::VirtualTable::FileContent"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Then, within SQL :</p>
+
+<pre><code>  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">tbl</span> <span class="variable">USING</span> <span class="variable">fcontent</span><span class="operator">(</span>
+     <span class="variable">source</span>      <span class="operator">=</span> <span class="variable">src_table</span><span class="operator">,</span>
+     <span class="variable">content_col</span> <span class="operator">=</span> <span class="variable">content</span><span class="operator">,</span>
+     <span class="variable">path_col</span>    <span class="operator">=</span> <span class="variable">path</span><span class="operator">,</span>
+     <span class="variable">expose</span>      <span class="operator">=</span> <span class="string">"path, col1, col2, col3"</span><span class="operator">,</span> <span class="operator">--</span> <span class="keyword">or</span> <span class="string">"*"</span>
+     <span class="variable">root</span>        <span class="operator">=</span> <span class="string">"/foo/bar"</span>
+     <span class="variable">get_content</span> <span class="operator">=</span> <span class="variable">Foo::Bar::read_from_file</span>
+    <span class="operator">);</span>
+  
+  <span class="variable">SELECT</span> <span class="variable">col1</span><span class="operator">,</span> <span class="variable">path</span><span class="operator">,</span> <span class="variable">content</span> <span class="variable">FROM</span> <span class="variable">tbl</span> <span class="variable">WHERE</span> <span class="operator">...;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>A &quot;FileContent&quot; virtual table is bound to some underlying <i>source table</i>, which has a column containing paths to files. The virtual table behaves like a database view on the source table, with an added column which exposes the content from those files.</p>
+
+<p>This is especially useful as an &quot;external content&quot; to some fulltext table (see <a href="../../../../lib/DBD/SQLite/Fulltext_search.html">DBD::SQLite::Fulltext_search</a>) : the index table stores some metadata about files, and then the fulltext engine can index both the metadata and the file contents.</p>
+
+<h1 id="PARAMETERS">PARAMETERS</h1>
+
+<p>Parameters for creating a <code>FileContent</code> virtual table are specified within the <code>CREATE VIRTUAL TABLE</code> statement, just like regular column declarations, but with an &#39;=&#39; sign. Authorized parameters are :</p>
+
+<dl>
+
+<dt id="source"><code>source</code></dt>
+<dd>
+
+<p>The name of the <i>source table</i>. This parameter is mandatory. All other parameters are optional.</p>
+
+</dd>
+<dt id="content_col"><code>content_col</code></dt>
+<dd>
+
+<p>The name of the virtual column exposing file contents. The default is <code>content</code>.</p>
+
+</dd>
+<dt id="path_col"><code>path_col</code></dt>
+<dd>
+
+<p>The name of the column in <code>source</code> that contains paths to files. The default is <code>path</code>.</p>
+
+</dd>
+<dt id="expose"><code>expose</code></dt>
+<dd>
+
+<p>A comma-separated list (within double quotes) of source column names to be exposed by the virtual table. The default is <code>&quot;*&quot;</code>, which means all source columns.</p>
+
+</dd>
+<dt id="root"><code>root</code></dt>
+<dd>
+
+<p>An optional root directory that will be prepended to the <i>path</i> column when opening files.</p>
+
+</dd>
+<dt id="get_content"><code>get_content</code></dt>
+<dd>
+
+<p>Fully qualified name of a Perl function for reading file contents. The default implementation just slurps the entire file into a string; but this hook can point to more sophisticated implementations, like for example a function that would remove html tags. The hooked function is called like this :</p>
+
+<pre><code>  <span class="variable">$file_content</span> <span class="operator">=</span> <span class="variable">$get_content</span><span class="operator">-&gt;(</span><span class="variable">$path</span><span class="operator">,</span> <span class="variable">$root</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Laurent Dami &lt;dami@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright Laurent Dami, 2014.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

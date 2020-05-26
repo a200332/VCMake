@@ -1,0 +1,258 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Advanced-Tag-Stuff">Advanced Tag Stuff</a></li>
+      <li><a href="#More-on-Generators">More on Generators</a></li>
+      <li><a href="#Hooks">Hooks</a></li>
+      <li><a href="#Overriding-Internals">Overriding Internals</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Exporter::Tiny::Manual::Exporting - creating an exporter using Exporter::Tiny</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p><b>Read <a href="../../../../lib/Exporter/Tiny/Manual/QuickStart.html">Exporter::Tiny::Manual::QuickStart</a> first!</b></p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Simple configuration works the same as <a href="../../../../lib/Exporter.html">Exporter</a>; inherit from <a href="../../../../lib/Exporter/Tiny.html">Exporter::Tiny</a>, and use the <code>@EXPORT</code>, <code>@EXPORT_OK</code>, and <code>%EXPORT_TAGS</code> package variables to list subs to export.</p>
+
+<p>Unlike Exporter, Exporter::Tiny performs most of its internal duties (including resolution of tag names to sub names, resolution of sub names to coderefs, and installation of coderefs into the target package) as <b>method calls</b>, which means that your module (which is a subclass of Exporter::Tiny) can override them to provide interesting behaviour.</p>
+
+<h2 id="Advanced-Tag-Stuff">Advanced Tag Stuff</h2>
+
+<p>You can define tags using other tags:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">Exporter::Shiny</span> <span class="string">qw(
+      black white red green blue cyan magenta yellow
+   )</span><span class="operator">;</span>
+   
+   <span class="keyword">our</span> <span class="variable">%EXPORT_TAGS</span> <span class="operator">=</span> <span class="operator">(</span>
+      <span class="string">rgb</span>        <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( red green blue )</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">cym</span>        <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( cyan magenta yellow )</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">cymk</span>       <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( black :cym )</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">monochrome</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( black white )</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">all</span>        <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( :rgb :cymk :monochrome )</span><span class="operator">]</span><span class="operator">,</span>
+   <span class="operator">);</span>
+</code></pre>
+
+<p><b>CAVEAT:</b> If you create a cycle in the tags, this could put Exporter::Tiny into an infinite loop expanding the tags. Don&#39;t do that.</p>
+
+<h2 id="More-on-Generators">More on Generators</h2>
+
+<p>Exporter::Tiny has always allowed exported subs to be generated (like <a href="../../../../lib/Sub/Exporter.html">Sub::Exporter</a>), but until version 0.025 did not have an especially nice API for it.</p>
+
+<p>Now, it&#39;s easy. If you want to generate a sub <code>foo</code> to export, list it in <code>@EXPORT</code> or <code>@EXPORT_OK</code> as usual, and then simply give your exporter module a class method called <code>_generate_foo</code>.</p>
+
+<pre><code>   <span class="keyword">push</span> <span class="variable">@EXPORT_OK</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> _generate_foo </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$args</span><span class="operator">,</span> <span class="variable">$globals</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      
+      <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+         <span class="operator">...;</span>
+      <span class="operator">}</span>
+   <span class="operator">}</span>
+</code></pre>
+
+<p>We showed how to do that in <a href="../../../../lib/Exporter/Tiny/Manual/QuickStart.html">Exporter::Tiny::Manual::QuickStart</a>, but one thing we didn&#39;t show was that <code>$globals</code> gets passed in there. This is the global options hash, as described in <a href="../../../../lib/Exporter/Tiny/Manual/Importing.html">Exporter::Tiny::Manual::Importing</a>. It can often be useful. In particular it will tell you what package the generated sub is destined to be installed into.</p>
+
+<p>You can also generate tags:</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">%constants</span><span class="operator">;</span>
+   <span class="keyword">BEGIN</span> <span class="operator">{</span>
+      <span class="variable">%constants</span> <span class="operator">=</span> <span class="operator">(</span><span class="string">FOO</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">BAR</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">);</span>
+   <span class="operator">}</span>
+   <span class="keyword">use</span> <span class="variable">constant</span> <span class="operator">\</span><span class="variable">%constants</span><span class="operator">;</span>
+   
+   <span class="variable">$EXPORT_TAGS</span><span class="operator">{</span><span class="string">constants</span><span class="operator">}</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$args</span><span class="operator">,</span> <span class="variable">$globals</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      
+      <span class="keyword">return</span> <span class="keyword">keys</span><span class="operator">(</span><span class="variable">%constants</span><span class="operator">);</span>
+   <span class="operator">};</span>
+</code></pre>
+
+<h2 id="Hooks">Hooks</h2>
+
+<p>Sometimes as well as exporting stuff, you want to do some setup or something.</p>
+
+<p>You can define a couple of class methods in your package, and they&#39;ll get called at the appropriate time:</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="operator">...;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> _exporter_validate_opts </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$globals</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      
+      <span class="operator">...;</span>   <span class="comment"># do stuff here</span>
+      
+      <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">SUPER::_exporter_validate_opts</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+   <span class="operator">}</span>
+   
+   <span class="keyword">sub</span><span class="variable"> _exporter_validate_unimport_opts </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$globals</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      
+      <span class="operator">...;</span>   <span class="comment"># do stuff here</span>
+      
+      <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">SUPER::_exporter_validate_unimport_opts</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+   <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>$globals</code> variable is that famous global options hash. In particular, <code><span class="variable">$globals</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">into</span><span class="operator">}</span>
+</code> is useful because it tells you what package has imported you.</p>
+
+<p>As you might have guessed, these methods were originally intended to validate the global options hash, but can be used to perform any general duties before the real exporting work is done.</p>
+
+<h2 id="Overriding-Internals">Overriding Internals</h2>
+
+<p>An important difference between <a href="../../../../lib/Exporter.html">Exporter</a> and Exporter::Tiny is that the latter calls all its internal functions as <i>class methods</i>. This means that your subclass can <i>override them</i> to alter their behaviour.</p>
+
+<p>The following methods are available to be overridden. Despite being named with a leading underscore, they are considered public methods. (The underscore is there to avoid accidentally colliding with any of your own function names.)</p>
+
+<dl>
+
+<dt id="exporter_validate_opts-globals"><code>_exporter_validate_opts($globals)</code></dt>
+<dd>
+
+<p>Documented above.</p>
+
+</dd>
+<dt id="exporter_validate_unimport_opts-globals"><code>_exporter_validate_unimport_opts($globals)</code></dt>
+<dd>
+
+<p>Documented above.</p>
+
+</dd>
+<dt id="exporter_merge_opts-tag_opts-globals-exports"><code>_exporter_merge_opts($tag_opts, $globals, @exports)</code></dt>
+<dd>
+
+<p>Called to merge options which have been provided for a tag into the options provided for the exports that the tag expanded to.</p>
+
+</dd>
+<dt id="exporter_expand_tag-name-args-globals"><code>_exporter_expand_tag($name, $args, $globals)</code></dt>
+<dd>
+
+<p>This method is called to expand an import tag (e.g. <code>&quot;:constants&quot;</code>). It is passed the tag name (minus the leading &quot;:&quot;), an optional hashref of options (like <code><span class="operator">{</span> <span class="string">-prefix</span> <span class="operator">=&gt;</span> <span class="string">"foo_"</span> <span class="operator">}</span>
+</code>), and the global options hashref.</p>
+
+<p>It is expected to return a list of ($name, $args) arrayref pairs. These names can be sub names to export, or further tag names (which must have their &quot;:&quot;). If returning tag names, be careful to avoid creating a tag expansion loop!</p>
+
+<p>The default implementation uses <code>%EXPORT_TAGS</code> to expand tags, and provides fallbacks for the <code>:default</code> and <code>:all</code> tags.</p>
+
+</dd>
+<dt id="exporter_expand_regexp-regexp-args-globals"><code>_exporter_expand_regexp($regexp, $args, $globals)</code></dt>
+<dd>
+
+<p>Like <code>_exporter_expand_regexp</code>, but given a regexp-like string instead of a tag name.</p>
+
+<p>The default implementation greps through <code>@EXPORT_OK</code> for imports, and the list of already-imported functions for exports.</p>
+
+</dd>
+<dt id="exporter_expand_sub-name-args-globals"><code>_exporter_expand_sub($name, $args, $globals)</code></dt>
+<dd>
+
+<p>This method is called to translate a sub name to a hash of name =&gt; coderef pairs for exporting to the caller. In general, this would just be a hash with one key and one value, but, for example, <a>Type::Library</a> overrides this method so that <code>&quot;+Foo&quot;</code> gets expanded to:</p>
+
+<pre><code>   <span class="operator">(</span>
+      <span class="string">Foo</span>         <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$type</span> <span class="operator">},</span>
+      <span class="string">is_Foo</span>      <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$type</span><span class="operator">-&gt;</span><span class="variable">check</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">},</span>
+      <span class="string">to_Foo</span>      <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$type</span><span class="operator">-&gt;</span><span class="variable">assert_coerce</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">},</span>
+      <span class="string">assert_Foo</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$type</span><span class="operator">-&gt;</span><span class="variable">assert_return</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">},</span>
+   <span class="operator">)</span>
+</code></pre>
+
+<p>The default implementation checks that the name is allowed to be exported (using the <code>_exporter_permitted_regexp</code> method), gets the coderef using the generator if there is one (or by calling <code>can</code> on your exporter otherwise) and calls <code>_exporter_fail</code> if it&#39;s unable to generate or retrieve a coderef.</p>
+
+</dd>
+<dt id="exporter_permitted_regexp-globals"><code>_exporter_permitted_regexp($globals)</code></dt>
+<dd>
+
+<p>This method is called to retrieve a regexp for validating the names of exportable subs. If a sub doesn&#39;t match the regexp, then the default implementation of <code>_exporter_expand_sub</code> will refuse to export it. (Of course, you may override the default <code>_exporter_expand_sub</code>.)</p>
+
+<p>The default implementation of this method assembles the regexp from <code>@EXPORT</code> and <code>@EXPORT_OK</code>.</p>
+
+</dd>
+<dt id="exporter_fail-name-args-globals"><code>_exporter_fail($name, $args, $globals)</code></dt>
+<dd>
+
+<p>Called by <code>_exporter_expand_sub</code> if it can&#39;t find a coderef to export.</p>
+
+<p>The default implementation just throws an exception. But you could emit a warning instead, or just ignore the failed export.</p>
+
+<p>If you don&#39;t throw an exception then you should be aware that this method is called in list context, and any list it returns will be treated as an <code>_exporter_expand_sub</code>-style hash of names and coderefs for export.</p>
+
+</dd>
+<dt id="exporter_install_sub-name-args-globals-coderef"><code>_exporter_install_sub($name, $args, $globals, $coderef)</code></dt>
+<dd>
+
+<p>This method actually installs the exported sub into its new destination. Its return value is ignored.</p>
+
+<p>The default implementation handles sub renaming (i.e. the <code>-as</code>, <code>-prefix</code> and <code>-suffix</code> functions. This method does a lot of stuff; if you need to override it, it&#39;s probably a good idea to just pre-process the arguments and then call the super method rather than trying to handle all of it yourself.</p>
+
+</dd>
+<dt id="exporter_uninstall_sub-name-args-globals"><code>_exporter_uninstall_sub($name, $args, $globals)</code></dt>
+<dd>
+
+<p>The opposite of <code>_exporter_install_sub</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Exporter/Shiny.html">Exporter::Shiny</a>, <a href="../../../../lib/Exporter/Tiny.html">Exporter::Tiny</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Toby Inkster &lt;tobyink@cpan.org&gt;.</p>
+
+<h1 id="COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</h1>
+
+<p>This software is copyright (c) 2013-2014, 2017 by Toby Inkster.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</h1>
+
+<p>THIS PACKAGE IS PROVIDED &quot;AS IS&quot; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+
+
+</body>
+
+</html>
+
+

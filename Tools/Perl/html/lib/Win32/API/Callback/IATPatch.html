@@ -1,0 +1,161 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#CONSTRUCTORS">CONSTRUCTORS</a>
+        <ul>
+          <li><a href="#new">new</a></li>
+        </ul>
+      </li>
+      <li><a href="#METHODS">METHODS</a>
+        <ul>
+          <li><a href="#Unpatch">Unpatch</a></li>
+          <li><a href="#GetOriginalFunctionPtr">GetOriginalFunctionPtr</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::API::Callback::IATPatch - Hooking and Patching a DLL&#39;s Imported C Functions</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Win32::API::Callback</span><span class="operator">;</span>
+  <span class="keyword">warn</span> <span class="string">"usually fatally errors on Cygwin"</span> <span class="keyword">if</span> <span class="variable">$^O</span> <span class="keyword">eq</span> <span class="string">'cygwin'</span><span class="operator">;</span>
+  <span class="comment"># do not do a "use" or "require" on Win32::API::Callback::IATPatch</span>
+  <span class="comment"># IATPatch comes with Win32::API::Callback</span>
+  <span class="keyword">my</span> <span class="variable">$LoadLibraryExA</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$callback</span> <span class="operator">=</span> <span class="variable">Win32::API::Callback</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+    <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$libname</span> <span class="operator">=</span> <span class="keyword">unpack</span><span class="operator">(</span><span class="string">'p'</span><span class="operator">,</span> <span class="keyword">pack</span><span class="operator">(</span><span class="string">'J'</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">));</span>
+      <span class="keyword">print</span> <span class="string">"got </span><span class="variable">$libname</span><span class="string">\n"</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="variable">$LoadLibraryExA</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="variable">$libname</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">2</span><span class="operator">]</span><span class="operator">);</span>
+    <span class="operator">},</span>
+    <span class="string">'NNI'</span><span class="operator">,</span>
+    <span class="string">'N'</span>
+  <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$patch</span> <span class="operator">=</span> <span class="variable">Win32::API::Callback::IATPatch</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+    <span class="variable">$callback</span><span class="operator">,</span> <span class="string">"perl518.dll"</span><span class="operator">,</span> <span class="string">'kernel32.dll'</span><span class="operator">,</span> <span class="string">'LoadLibraryExA'</span><span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"failed to create IATPatch Obj $^E"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="keyword">defined</span> <span class="variable">$patch</span><span class="operator">;</span>
+  <span class="variable">$LoadLibraryExA</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="variable">$patch</span><span class="operator">-&gt;</span><span class="variable">GetOriginalFunctionPtr</span><span class="operator">(),</span> <span class="string">'
+  HMODULE
+  WINAPI
+  LoadLibraryExA(
+    LPCSTR lpLibFileName,
+    HANDLE hFile,
+    DWORD dwFlags
+    );
+  '</span><span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"failed to make old function object"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="keyword">defined</span> <span class="variable">$LoadLibraryExA</span><span class="operator">;</span>
+  <span class="keyword">require</span> <span class="variable">Encode</span><span class="operator">;</span>
+  <span class="comment">#console will get a print of the dll filename now</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Win32::API::Callback::IATPatch allows you to hook a compile time dynamic linked function call from any DLL (or EXE, from now on all examples are from a DLL to another DLL, but from a EXE to a DLL is implied) in the Perl process, to a different DLL in the same Perl process, by placing a Win32::API::Callback object in between. This module does <b>not</b> hook <b>GetProcAddress</b> function calls. It also will not hook a function call from a DLL to another function in the same DLL. The function you want to hook <b>must</b> appear in the <b>import table</b> of the DLL you want to use the hook. Functions from delay loaded DLL have their own import table, it is different import table from the normal one IATPatch supports. IATPatch will not find a delay loaded function and will not patch it. The hook occurs at the caller DLL, not the callee DLL. This means your callback will be called from all the calls to a one function in different DLL from the one particular DLL the IATPatch object patched. The caller DLL is modified at runtime, in the Perl process where the IATPatch was created, not on disk, not globally among all processes. The callee or exporting DLL is NOT modified, so your hook callback will be called from the 1 DLL that you choose to hook with 1 IATPatch object. You can create multiple IATPatch objects, one for each DLL in the Perl process that you want to call your callback and not the original destination function. If a new DLL is loaded into the process during runtime, you must create a new IATPatch object specifically targeting it. There may be a period from when the new DLL is loaded into the process, and when your Perl script creates IATPatch object, where calls from that new DLL goto the real destination function without hooking. If a DLL is unloaded, then reloaded into the process, you must call <code>Unpatch(0)</code> method on the old IATPatch object, then create a new IATPatch object. IATPatch has no notification feature that a DLL is being loaded or unloaded from the process. Unless you completely control, and have the source code of the caller DLL, and understand all of the source code of that DLL, there is a high chance that you will <b>NOT</b> hook all calls from that DLL to the destination function. If a call to the destination function is dangerous or unacceptable, do not use IATPatch. IATPatch is not Microsoft Detours or the like in any sense. Detours and its brethern will rewrite the machine code in the beginning of the destination function call, hooking all calls to that function call process wide, without exception.</p>
+
+<p>Why this module was created? So I could mock kernel32 functions to unit test Perl&#39;s C function calls to Kernel32.</p>
+
+<h2 id="CONSTRUCTORS">CONSTRUCTORS</h2>
+
+<h3 id="new">new</h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$patch</span> <span class="operator">=</span> <span class="variable">Win32::API::Callback::IATPatch</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+  <span class="variable">$A_Win32_API_Callback_Obj</span><span class="operator">,</span>    <span class="variable">$EXE_or_DLL_hmodule_or_name_to_hook</span><span class="operator">,</span>
+  <span class="variable">$import_DLL_name</span><span class="operator">,</span>             <span class="variable">$import_function_name_or_ordinal</span><span class="operator">);</span>
+</code></pre>
+
+<p>Creates a new IATPatch object. The Win32::API::Callback will be called as long as the IATPatch object exists. When an IATPatch object is DESTROYed, unless <code>-&gt;Unpatch(0)</code> is called first, the patch is undone and the original function is directly called from then on by that DLL. The DLL is not reference count saved by an IATPatch object, so it may be unloaded at any time. If it is unloaded you must call <code>-&gt;Unpatch(0)</code> before a DESTROY. Otherwise the DESTROY will croak when it tries to unpatch the DLL. The DLL to hook must be a valid PE file, while in memory. DLL and EXE &quot;packers&quot; can create invalid PE files that do load successfully into memory, but they are not full PE files in memory. On error, undef is returned and an error code is available through <a href="../../../../lib/Win32.html#Win32::GetLastError">Win32::GetLastError</a>/<a href="../../../../lib/pods/perlvar.html#E">&quot;$^E&quot; in perlvar</a>. The error code may be from either IATPatch directly, or from a Win32 call that IATPatch made. IATPatch objects do not go through a <a href="../../../../lib/pods/perlfunc.html#fork">&quot;fork&quot; in perlfunc</a> onto the child interp. IATPatch is fork safe.</p>
+
+<p>The hook dll name can be one of 3 things, if the dllname is multiple things (a number and a string), the first format found in the following order is used. A string <code>&quot;123&quot;</code> (a very strange DLL name BTW), this DLL is converted to DLL HMODULE with GetModuleHandle. If there are 2 DLLs with the same filename, refer to GetModuleHandle&#39;s <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms683199%28v=vs.85%29.aspx">MSDN documentation</a> on what happens. Then if the DLL name is an integer <code>123456</code>, it is interpreted as a HMODULE directly. If DLL name undefined, the file used to create the calling process will be patched (a .exe). Finally if the DLL name is defined, a fatal error croak occurs. It is best to use an HMODULE, since things like SxS can create multiple DLLs with the same name in the same process. How to get an HMODULE, you are on your own.</p>
+
+<p><code>$import_function_name_or_ordinal</code> can be one of 2 things. First it is checked if it is a string, if so, it is used as the function name to hook. Else it is used as an integer ordinal to hook. Importing by ordinal is obsolete in Windows, and you shouldn&#39;t ever have to use it. The author of IATPatch was unable to test if ordinal hooking works correctly in IATPatch.</p>
+
+<h2 id="METHODS">METHODS</h2>
+
+<h3 id="Unpatch">Unpatch</h3>
+
+<pre><code>  <span class="keyword">die</span> <span class="string">"failed to undo the patch error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span>
+    <span class="variable">$IATPatch</span><span class="operator">-&gt;</span><span class="variable">Unpatch</span><span class="operator">();</span> <span class="comment">#undo the patch</span>
+  <span class="comment">#or</span>
+  <span class="keyword">die</span> <span class="string">"failed to undo the patch error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span>
+    <span class="variable">$IATPatch</span><span class="operator">-&gt;</span><span class="variable">Unpatch</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span> <span class="comment">#undo the patch</span>
+  <span class="comment">#or</span>
+  <span class="keyword">die</span> <span class="string">"failed to undo the patch error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span>
+    <span class="variable">$IATPatch</span><span class="operator">-&gt;</span><span class="variable">Unpatch</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span> <span class="comment">#never undo the patch</span>
+  <span class="comment">#or</span>
+  <span class="keyword">die</span> <span class="string">"failed to undo the patch error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span>
+    <span class="variable">$IATPatch</span><span class="operator">-&gt;</span><span class="variable">Unpatch</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span> <span class="comment">#never undo the patch</span>
+</code></pre>
+
+<p>Unpatches the DLL with the original destination function from the <a href="../../../../lib/Win32/API/Callback/IATPatch.html#new">&quot;new&quot; in Win32::API::Callback::IATPatch</a> call. Returns undef on failure with error number available through <a href="../../../../lib/Win32.html#Win32::GetLastError">Win32::GetLastError</a>/<a href="../../../../lib/pods/perlvar.html#E">&quot;$^E&quot; in perlvar</a>. If Unpatch was called once already, calling it again will fail, and error will be ERROR_NO_MORE_ITEMS.</p>
+
+<h3 id="GetOriginalFunctionPtr">GetOriginalFunctionPtr</h3>
+
+<p>Returns the original function pointer found in the import table in <code>123456</code> format. If the returned pointer is 0, <a href="../../../../lib/Win32/API/Callback/IATPatch.html#Unpatch">&quot;Unpatch&quot; in Win32::API::Callback::IATPatch</a> was called earlier. There are no error numbers associated with this method. This value can be directly used to create a function pointer based Win32::API object to call the original destination function from inside your Perl callback. See <a href="../../../../lib/Win32/API/Callback/IATPatch.html#SYNOPSIS">&quot;SYNOPSIS&quot; in Win32::API::Callback::IATPatch</a> for a usage example.</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<dl>
+
+<dt id="Cygwin-not-supported">&nbsp;Cygwin not supported</dt>
+<dd>
+
+<p><a href="../../../../lib/Win32/API/Callback/IATPatch.html#new">new()</a> usually fatally errors on Cygwin with &quot;IATPatch 3GB mode not supported&quot; on Cygwins that allocate the heap at 0x80000000 or are &quot;Large Address Aware&quot;</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Win32/API/Callback.html">Win32::API::Callback</a></p>
+
+<p><a href="../../../../lib/Win32/API.html">Win32::API</a></p>
+
+<p><a href="http://msdn.microsoft.com/en-us/magazine/cc301808.aspx">http://msdn.microsoft.com/en-us/magazine/cc301808.aspx</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Daniel Dragan ( <i>bulkdd@cpan.org</i> ).</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2012 by Daniel Dragan</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.10.0 or, at your option, any later version of Perl 5 you may have available.</p>
+
+
+</body>
+
+</html>
+
+

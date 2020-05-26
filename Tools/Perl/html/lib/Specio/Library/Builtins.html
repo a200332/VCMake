@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Item">Item</a></li>
+      <li><a href="#Bool">Bool</a></li>
+      <li><a href="#Maybe-of-a">Maybe (of `a)</a></li>
+      <li><a href="#Undef">Undef</a></li>
+      <li><a href="#Value">Value</a></li>
+      <li><a href="#Str">Str</a></li>
+      <li><a href="#Num">Num</a></li>
+      <li><a href="#Int">Int</a></li>
+      <li><a href="#ClassName">ClassName</a></li>
+      <li><a href="#Ref">Ref</a></li>
+      <li><a href="#ScalarRef-of-a">ScalarRef (of `a)</a></li>
+      <li><a href="#ArrayRef-of-a">ArrayRef (of `a)</a></li>
+      <li><a href="#HashRef-of-a">HashRef (of `a)</a></li>
+      <li><a href="#CodeRef">CodeRef</a></li>
+      <li><a href="#RegexpRef">RegexpRef</a></li>
+      <li><a href="#GlobRef">GlobRef</a></li>
+      <li><a href="#FileHandle">FileHandle</a></li>
+      <li><a href="#Object">Object</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Library::Builtins - Implements type constraint objects for Perl&#39;s built-in types</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This library provides a set of types parallel to those provided by Moose.</p>
+
+<p>The types are in the following hierarchy</p>
+
+<pre><code>  Item
+      Bool
+      Maybe (of `a)
+      Undef
+      Defined
+          Value
+              Str
+                  Num
+                      Int
+                  ClassName
+          Ref
+              ScalarRef (of `a)
+              ArrayRef (of `a)
+              HashRef (of `a)
+              CodeRef
+              RegexpRef
+              GlobRef
+              FileHandle
+              Object</code></pre>
+
+<h2 id="Item">Item</h2>
+
+<p>Accepts any value</p>
+
+<h2 id="Bool">Bool</h2>
+
+<p>Accepts a non-reference that is <code>undef</code>, an empty string, <code>0</code>, or <code>1</code>. It also accepts any object which overloads boolification.</p>
+
+<h2 id="Maybe-of-a">Maybe (of `a)</h2>
+
+<p>A parameterizable type which accepts <code>undef</code> or the type <code>`a</code>. If not parameterized this type will accept any value.</p>
+
+<h2 id="Undef">Undef</h2>
+
+<p>Only accepts <code>undef</code>.</p>
+
+<h2 id="Value">Value</h2>
+
+<p>Accepts any non-reference value.</p>
+
+<h2 id="Str">Str</h2>
+
+<p>Accepts any non-reference value or an object which overloads stringification.</p>
+
+<h2 id="Num">Num</h2>
+
+<p>Accepts nearly the same values as <code>Scalar::Util::looks_like_number</code>, but does not accept numbers with leading or trailing spaces, infinities, or NaN. Also accepts an object which overloads numification.</p>
+
+<h2 id="Int">Int</h2>
+
+<p>Accepts any integer value, or an object which overloads numification and numifies to an integer.</p>
+
+<h2 id="ClassName">ClassName</h2>
+
+<p>Accepts any value which passes <code>Str</code> where the string is a loaded package.</p>
+
+<h2 id="Ref">Ref</h2>
+
+<p>Accepts any reference.</p>
+
+<h2 id="ScalarRef-of-a">ScalarRef (of `a)</h2>
+
+<p>Accepts a scalar reference or an object which overloads scalar dereferencing. If parameterized, the dereferenced value must be of type <code>`a</code>.</p>
+
+<h2 id="ArrayRef-of-a">ArrayRef (of `a)</h2>
+
+<p>Accepts a array reference or an object which overloads array dereferencing. If parameterized, the values in the arrayref must be of type <code>`a</code>.</p>
+
+<h2 id="HashRef-of-a">HashRef (of `a)</h2>
+
+<p>Accepts a hash reference or an object which overloads hash dereferencing. If parameterized, the values in the hashref must be of type <code>`a</code>.</p>
+
+<h2 id="CodeRef">CodeRef</h2>
+
+<p>Accepts a code (sub) reference or an object which overloads code dereferencing.</p>
+
+<h2 id="RegexpRef">RegexpRef</h2>
+
+<p>Accepts a regex object created by <code>qr//</code> or an object which overloads regex interpolation.</p>
+
+<h2 id="GlobRef">GlobRef</h2>
+
+<p>Accepts a glob reference or an object which overloads glob dereferencing.</p>
+
+<h2 id="FileHandle">FileHandle</h2>
+
+<p>Accepts a glob reference which is an open file handle, any <code>IO::Handle</code> Object or subclass, or an object which overloads glob dereferencing and returns a glob reference which is an open file handle.</p>
+
+<h2 id="Object">Object</h2>
+
+<p>Accepts any blessed object.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

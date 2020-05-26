@@ -1,0 +1,125 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Tkx::MegaConfig - handle configuration options for megawidgets</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">qw(Tkx::widget Tkx::MegaConfig)</span><span class="operator">;</span>
+  
+  <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">_Mega</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">);</span>
+  <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">_Config</span><span class="operator">(</span>
+      <span class="string">-option</span>  <span class="operator">=&gt;</span> <span class="operator">[</span><span class="variable">$where</span><span class="operator">,</span> <span class="variable">$dbName</span><span class="operator">,</span> <span class="variable">$dbClass</span><span class="operator">,</span> <span class="variable">$default</span><span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>Tkx::MegaConfig</code> class provide implementations of m_configure() and m_cget() that can handle configuration options for megawidgets. How these methods behave is set up by calling the _Config() class method. The _Config() method takes a set option/option spec pairs as argument.</p>
+
+<p>An option argument is either the name of an option with leading &#39;-&#39; or the string &#39;DEFAULT&#39; if this spec applies to all option with no explict spec.</p>
+
+<p>If there is no &#39;DEFAULT&#39; then unmatched options are applied directly to the megawidget root itself. This is the same behaviour you get if you specify:</p>
+
+<pre><code>   <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">_Config</span><span class="operator">(</span>
+      <span class="operator">...</span>
+      <span class="string">DEFAULT</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'.'</span><span class="operator">]</span><span class="operator">,</span>
+   <span class="operator">);</span>
+</code></pre>
+
+<p>The option spec should be an array reference. The first element of the array ($where) describe how this option is handled. Some $where specs take arguments. If you need to provide argument replace $where with an array reference containg [$where, @args]. The rest of the option spec specify names and default for the options database, but is currently ignored (feature unimplemented).</p>
+
+<p>The following $where specs are understood:</p>
+
+<dl>
+
+<dt id="foo">.foo</dt>
+<dd>
+
+<p>Delegate the given configuration option to the &quot;foo&quot; kid of the mega widget root. The name &quot;.&quot; can be used to delegate to the megawidget root itself. The name &quot;.*&quot; can be used to delegate to all kids of the megawidget root.</p>
+
+<p>An argument can be given to delegate using a different configuration name name on the &quot;foo&quot; widget. Examples:</p>
+
+<pre><code>   -foo =&gt; [&quot;.inner&quot;],                 # forward -foo
+   -bg  =&gt; [[&quot;.&quot;, &quot;-background]],      # alias
+   -bg2 =&gt; [[&quot;.inner&quot;, &quot;-background]], # forward as -background
+   -background =&gt; [&quot;.*&quot;]               # forward --background to kids</code></pre>
+
+</dd>
+<dt id="METHOD">METHOD</dt>
+<dd>
+
+<p>Call the _config_<i>opt</i> method. For m_cget() no arguments are given, while for m_configure() the new value is passed. If an extra $where argument is given it will be the method called instead of _config_<i>opt</i>. Examples:</p>
+
+<pre><code>   <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">_Config</span><span class="operator">(</span>
+      <span class="string">-foo</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">"METHOD"</span><span class="operator">]</span><span class="operator">;</span>
+      <span class="string">-bar</span> <span class="operator">=&gt;</span> <span class="operator">[[</span><span class="string">"METHOD"</span><span class="operator">,</span> <span class="string">"bar"</span><span class="operator">]]</span><span class="operator">,</span>
+   <span class="operator">}</span>
+   
+   <span class="keyword">sub</span><span class="variable"> _config_foo </span><span class="operator">{</span>
+       <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+       <span class="keyword">return</span> <span class="string">"foo"</span> <span class="keyword">unless</span> <span class="variable">@_</span><span class="operator">;</span>
+       <span class="keyword">print</span> <span class="string">"Ignoring setting configuration option -foo to '</span><span class="variable">$_</span><span class="string">[0]'"</span><span class="operator">;</span>
+   <span class="operator">}</span>
+   
+   <span class="keyword">sub</span><span class="variable"> handle_bar </span><span class="operator">{</span>
+       <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+       <span class="keyword">return</span> <span class="string">"bar"</span> <span class="keyword">unless</span> <span class="variable">@_</span><span class="operator">;</span>
+       <span class="keyword">print</span> <span class="string">"Ignoring setting configuration option -bar to '</span><span class="variable">$_</span><span class="string">[0]'"</span><span class="operator">;</span>
+   <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="PASSIVE">PASSIVE</dt>
+<dd>
+
+<p>Store or retrieve option from $self-&gt;_data.</p>
+
+</dd>
+</dl>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>Copyright 2005 ActiveState. All rights reserved.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/Tkx.html">Tkx</a>, <a href="../../lib/Tkx/LabEntry.html">Tkx::LabEntry</a></p>
+
+<p>Inspiration for this module comes from <a>Tk::ConfigSpecs</a>.</p>
+
+
+</body>
+
+</html>
+
+

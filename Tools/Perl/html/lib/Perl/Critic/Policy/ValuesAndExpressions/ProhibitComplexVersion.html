@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ValuesAndExpressions::ProhibitComplexVersion - Prohibit version values from outside the module.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>One tempting way to keep a group of related modules at the same version number is to have all of them import the version number from a designated module. For example, module <code>Foo::Master</code> could be the version master for the <code>Foo</code> package, and all other modules could use its <code>$VERSION</code> by</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Foo::Master</span><span class="operator">;</span> <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="variable">$Foo::Master::VERSION</span><span class="operator">;</span>
+</code></pre>
+
+<p>This turns out not to be a good idea, because all sorts of unintended things can happen - anything from unintended version number changes to denial-of-service attacks (since <code>Foo::Master</code> is executed by the &#39;use&#39;).</p>
+
+<p>This policy examines statements that assign to <code>$VERSION</code>, and declares a violation under two circumstances: first, if that statement uses a fully-qualified symbol that did not originate in a package declared in the file; second if there is a <code>use</code> statement on the same line that makes the assignment.</p>
+
+<p>By default, an exception is made for <code><span class="keyword">use</span> <span class="variable">version</span><span class="operator">;</span>
+</code> because of its recommendation by Perl Best Practices. See the <code>forbid_use_version</code> configuration variable if you do not want an exception made for <code><span class="keyword">use</span> <span class="variable">version</span><span class="operator">;</span>
+</code>.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>The construction</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">version</span><span class="operator">;</span> <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="variable">qv</span><span class="operator">(</span><span class="string">'1.2.3'</span><span class="operator">);</span>
+</code></pre>
+
+<p>is exempt from this policy by default, because it is recommended by Perl Best Practices. Should you wish to identify <code><span class="keyword">use</span> <span class="variable">version</span><span class="operator">;</span>
+</code> as a violation, add the following to your perlcriticrc file:</p>
+
+<pre><code>    [ValuesAndExpressions::ProhibitComplexVersion]
+    forbid_use_version = 1</code></pre>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>This code assumes that the hallmark of a violation is a &#39;use&#39; on the same line as the <code>$VERSION</code> assignment, because that is the way to have it seen by <a href="../../../../../lib/ExtUtils/MakeMaker.html">ExtUtils::MakeMaker</a>-&gt;parse_version(). Other ways to get a version value from outside the module can be imagined, and this policy is currently oblivious to them.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2009-2011 Tom Wyant.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

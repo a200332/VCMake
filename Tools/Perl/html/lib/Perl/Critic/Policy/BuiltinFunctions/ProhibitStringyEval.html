@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval - Write <code><span class="keyword">eval</span> <span class="operator">{</span> <span class="keyword">my</span> <span class="variable">$foo</span><span class="operator">;</span> <span class="variable">bar</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">)</span> <span class="operator">}</span>
+</code> instead of <code><span class="keyword">eval</span> <span class="string">"my </span><span class="variable">$foo</span><span class="string">; bar(</span><span class="variable">$foo</span><span class="string">);"</span>
+</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The string form of <code>eval</code> is recompiled every time it is executed, whereas the block form is only compiled once. Also, the string form doesn&#39;t give compile-time warnings.</p>
+
+<pre><code>    <span class="keyword">eval</span> <span class="string">"print </span><span class="variable">$foo</span><span class="string">"</span><span class="operator">;</span>        <span class="comment"># not ok</span>
+    <span class="keyword">eval</span> <span class="operator">{</span><span class="keyword">print</span> <span class="variable">$foo</span><span class="operator">};</span>        <span class="comment"># ok</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>There is an <code>allow_includes</code> boolean option for this Policy. If set, then strings that look like they only include a single &quot;use&quot; or &quot;require&quot; statement (with the possible following statement that consists of a single number) are allowed. With this option set, the following are flagged as indicated:</p>
+
+<pre><code>    <span class="keyword">eval</span> <span class="string">'use Foo'</span><span class="operator">;</span>             <span class="comment"># ok</span>
+    <span class="keyword">eval</span> <span class="string">'require Foo'</span><span class="operator">;</span>         <span class="comment"># ok</span>
+    <span class="keyword">eval</span> <span class="string">"use </span><span class="variable">$thingy</span><span class="string">;"</span><span class="operator">;</span>        <span class="comment"># ok</span>
+    <span class="keyword">eval</span> <span class="string">"require </span><span class="variable">$thingy</span><span class="string">;"</span><span class="operator">;</span>    <span class="comment"># ok</span>
+    <span class="keyword">eval</span> <span class="string">"use </span><span class="variable">$thingy</span><span class="string">; 1;"</span><span class="operator">;</span>     <span class="comment"># ok</span>
+    <span class="keyword">eval</span> <span class="string">"require </span><span class="variable">$thingy</span><span class="string">; 1;"</span><span class="operator">;</span> <span class="comment"># ok</span>
+    
+    <span class="keyword">eval</span> <span class="string">'use Foo; blah;'</span><span class="operator">;</span>      <span class="comment"># still not ok</span>
+    <span class="keyword">eval</span> <span class="string">'require Foo; 2; 1;'</span><span class="operator">;</span>  <span class="comment"># still not ok</span>
+    <span class="keyword">eval</span> <span class="string">'use $thingy;'</span><span class="operator">;</span>        <span class="comment"># still not ok</span>
+    <span class="keyword">eval</span> <span class="string">'no Foo'</span><span class="operator">;</span>              <span class="comment"># still not ok</span>
+</code></pre>
+
+<p>If you don&#39;t understand why the number is allowed, see <a href="../../../../../lib/Perl/Critic/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.html">Perl::Critic::Policy::ErrorHandling::RequireCheckingReturnValueOfEval</a>.</p>
+
+<p>This option inspired by Ricardo SIGNES&#39; <a>Perl::Critic::Policy::Lax::ProhibitStringyEval::ExceptForRequire</a>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Perl::Critic::Policy::BuiltInFunctions::RequireBlockGrep</a></p>
+
+<p><a>Perl::Critic::Policy::BuiltInFunctions::RequireBlockMap</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,346 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Special-Case-Platforms">Special Case Platforms</a></li>
+    </ul>
+  </li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#DateTime::TimeZone-new-name-tz_name">DateTime::TimeZone-&gt;new( name =&gt; $tz_name )</a>
+        <ul>
+          <li><a href="#The-local-time-zone">The &quot;local&quot; time zone</a></li>
+        </ul>
+      </li>
+      <li><a href="#tz-offset_for_datetime-dt">$tz-&gt;offset_for_datetime( $dt )</a></li>
+      <li><a href="#tz-offset_for_local_datetime-dt">$tz-&gt;offset_for_local_datetime( $dt )</a></li>
+      <li><a href="#tz-is_dst_for_datetime-dt">$tz-&gt;is_dst_for_datetime( $dt )</a></li>
+      <li><a href="#tz-name">$tz-&gt;name</a></li>
+      <li><a href="#tz-short_name_for_datetime-dt">$tz-&gt;short_name_for_datetime( $dt )</a></li>
+      <li><a href="#tz-is_floating">$tz-&gt;is_floating</a></li>
+      <li><a href="#tz-is_utc">$tz-&gt;is_utc</a></li>
+      <li><a href="#tz-has_dst_changes">$tz-&gt;has_dst_changes</a></li>
+      <li><a href="#tz-is_olson">$tz-&gt;is_olson</a></li>
+      <li><a href="#tz-category">$tz-&gt;category</a></li>
+      <li><a href="#DateTime::TimeZone-is_valid_name-name">DateTime::TimeZone-&gt;is_valid_name($name)</a></li>
+      <li><a href="#DateTime::TimeZone-all_names">DateTime::TimeZone-&gt;all_names</a></li>
+      <li><a href="#DateTime::TimeZone-categories">DateTime::TimeZone-&gt;categories</a></li>
+      <li><a href="#DateTime::TimeZone-links">DateTime::TimeZone-&gt;links</a></li>
+      <li><a href="#DateTime::TimeZone-names_in_category-category">DateTime::TimeZone-&gt;names_in_category( $category )</a></li>
+      <li><a href="#DateTime::TimeZone-countries">DateTime::TimeZone-&gt;countries()</a></li>
+      <li><a href="#DateTime::TimeZone-names_in_country-country_code">DateTime::TimeZone-&gt;names_in_country( $country_code )</a></li>
+      <li><a href="#DateTime::TimeZone-offset_as_seconds-offset">DateTime::TimeZone-&gt;offset_as_seconds( $offset )</a></li>
+      <li><a href="#DateTime::TimeZone-offset_as_string-offset">DateTime::TimeZone-&gt;offset_as_string( $offset )</a></li>
+      <li><a href="#Storable-Hooks">Storable Hooks</a></li>
+    </ul>
+  </li>
+  <li><a href="#LOADING-TIME-ZONES-IN-A-PRE-FORKING-SYSTEM">LOADING TIME ZONES IN A PRE-FORKING SYSTEM</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS1">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::TimeZone - Time zone object base class and factory</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.15</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">DateTime</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">DateTime::TimeZone</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$tz</span> <span class="operator">=</span> <span class="variable">DateTime::TimeZone</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'America/Chicago'</span> <span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">now</span><span class="operator">();</span>
+  <span class="keyword">my</span> <span class="variable">$offset</span> <span class="operator">=</span> <span class="variable">$tz</span><span class="operator">-&gt;</span><span class="variable">offset_for_datetime</span><span class="operator">(</span><span class="variable">$dt</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class is the base class for all time zone objects. A time zone is represented internally as a set of observances, each of which describes the offset from GMT for a given time period.</p>
+
+<p>Note that without the <a href="../../lib/DateTime.html">DateTime</a> module, this module does not do much. It&#39;s primary interface is through a <a href="../../lib/DateTime.html">DateTime</a> object, and most users will not need to directly use <code>DateTime::TimeZone</code> methods.</p>
+
+<h2 id="Special-Case-Platforms">Special Case Platforms</h2>
+
+<p>If you are on the Win32 platform, you will want to also install <a>DateTime::TimeZone::Local::Win32</a>. This will enable you to specify a time zone of <code>&#39;local&#39;</code> when creating a <a href="../../lib/DateTime.html">DateTime</a> object.</p>
+
+<p>If you are on HPUX, install <a>DateTime::TimeZone::HPUX</a>. This provides support for HPUX style time zones like <code>&#39;MET-1METDST&#39;</code>.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>This class has the following methods:</p>
+
+<h2 id="DateTime::TimeZone-new-name-tz_name">DateTime::TimeZone-&gt;new( name =&gt; $tz_name )</h2>
+
+<p>Given a valid time zone name, this method returns a new time zone blessed into the appropriate subclass. Subclasses are named for the given time zone, so that the time zone &quot;America/Chicago&quot; is the DateTime::TimeZone::America::Chicago class.</p>
+
+<p>If the name given is a &quot;link&quot; name in the Olson database, the object created may have a different name. For example, there is a link from the old &quot;EST5EDT&quot; name to &quot;America/New_York&quot;.</p>
+
+<p>When loading a time zone from the Olson database, the constructor checks the version of the loaded class to make sure it matches the version of the current DateTime::TimeZone installation. If they do not match it will issue a warning. This is useful because time zone names may fall out of use, but you may have an old module file installed for that time zone.</p>
+
+<p>There are also several special values that can be given as names.</p>
+
+<p>If the &quot;name&quot; parameter is &quot;floating&quot;, then a <code>DateTime::TimeZone::Floating</code> object is returned. A floating time zone does have <i>any</i> offset, and is always the same time. This is useful for calendaring applications, which may need to specify that a given event happens at the same <i>local</i> time, regardless of where it occurs. See RFC 2445 for more details.</p>
+
+<p>If the &quot;name&quot; parameter is &quot;UTC&quot;, then a <code>DateTime::TimeZone::UTC</code> object is returned.</p>
+
+<p>If the &quot;name&quot; is an offset string, it is converted to a number, and a <code>DateTime::TimeZone::OffsetOnly</code> object is returned.</p>
+
+<h3 id="The-local-time-zone">The &quot;local&quot; time zone</h3>
+
+<p>If the &quot;name&quot; parameter is &quot;local&quot;, then the module attempts to determine the local time zone for the system.</p>
+
+<p>The method for finding the local zone varies by operating system. See the appropriate module for details of how we check for the local time zone.</p>
+
+<ul>
+
+<li><p><a href="../../lib/DateTime/TimeZone/Local/Unix.html">DateTime::TimeZone::Local::Unix</a></p>
+
+</li>
+<li><p><a>DateTime::TimeZone::Local::Win32</a></p>
+
+</li>
+<li><p><a href="../../lib/DateTime/TimeZone/Local/VMS.html">DateTime::TimeZone::Local::VMS</a></p>
+
+</li>
+</ul>
+
+<p>If a local time zone is not found, then an exception will be thrown.</p>
+
+<h2 id="tz-offset_for_datetime-dt">$tz-&gt;offset_for_datetime( $dt )</h2>
+
+<p>Given a <code>DateTime</code> object, this method returns the offset in seconds for the given datetime. This takes into account historical time zone information, as well as Daylight Saving Time. The offset is determined by looking at the object&#39;s UTC Rata Die days and seconds.</p>
+
+<h2 id="tz-offset_for_local_datetime-dt">$tz-&gt;offset_for_local_datetime( $dt )</h2>
+
+<p>Given a <code>DateTime</code> object, this method returns the offset in seconds for the given datetime. Unlike the previous method, this method uses the local time&#39;s Rata Die days and seconds. This should only be done when the corresponding UTC time is not yet known, because local times can be ambiguous due to Daylight Saving Time rules.</p>
+
+<h2 id="tz-is_dst_for_datetime-dt">$tz-&gt;is_dst_for_datetime( $dt )</h2>
+
+<p>Given a <code>DateTime</code> object, this method returns true if the DateTime is currently in Daylight Saving Time.</p>
+
+<h2 id="tz-name">$tz-&gt;name</h2>
+
+<p>Returns the name of the time zone.</p>
+
+<h2 id="tz-short_name_for_datetime-dt">$tz-&gt;short_name_for_datetime( $dt )</h2>
+
+<p>Given a <code>DateTime</code> object, this method returns the &quot;short name&quot; for the current observance and rule this datetime is in. These are names like &quot;EST&quot;, &quot;GMT&quot;, etc.</p>
+
+<p>It is <b>strongly</b> recommended that you do not rely on these names for anything other than display. These names are not official, and many of them are simply the invention of the Olson database maintainers. Moreover, these names are not unique. For example, there is an &quot;EST&quot; at both -0500 and +1000/+1100.</p>
+
+<h2 id="tz-is_floating">$tz-&gt;is_floating</h2>
+
+<p>Returns a boolean indicating whether or not this object represents a floating time zone, as defined by RFC 2445.</p>
+
+<h2 id="tz-is_utc">$tz-&gt;is_utc</h2>
+
+<p>Indicates whether or not this object represents the UTC (GMT) time zone.</p>
+
+<h2 id="tz-has_dst_changes">$tz-&gt;has_dst_changes</h2>
+
+<p>Indicates whether or not this zone has <i>ever</i> had a change to and from DST, either in the past or future.</p>
+
+<h2 id="tz-is_olson">$tz-&gt;is_olson</h2>
+
+<p>Returns true if the time zone is a named time zone from the Olson database.</p>
+
+<h2 id="tz-category">$tz-&gt;category</h2>
+
+<p>Returns the part of the time zone name before the first slash. For example, the &quot;America/Chicago&quot; time zone would return &quot;America&quot;.</p>
+
+<h2 id="DateTime::TimeZone-is_valid_name-name">DateTime::TimeZone-&gt;is_valid_name($name)</h2>
+
+<p>Given a string, this method returns a boolean value indicating whether or not the string is a valid time zone name. If you are using <code>DateTime::TimeZone::Alias</code>, any aliases you&#39;ve created will be valid.</p>
+
+<h2 id="DateTime::TimeZone-all_names">DateTime::TimeZone-&gt;all_names</h2>
+
+<p>This returns a pre-sorted list of all the time zone names. This list does not include link names. In scalar context, it returns an array reference, while in list context it returns an array.</p>
+
+<h2 id="DateTime::TimeZone-categories">DateTime::TimeZone-&gt;categories</h2>
+
+<p>This returns a list of all time zone categories. In scalar context, it returns an array reference, while in list context it returns an array.</p>
+
+<h2 id="DateTime::TimeZone-links">DateTime::TimeZone-&gt;links</h2>
+
+<p>This returns a hash of all time zone links, where the keys are the old, deprecated names, and the values are the new names. In scalar context, it returns a hash reference, while in list context it returns a hash.</p>
+
+<h2 id="DateTime::TimeZone-names_in_category-category">DateTime::TimeZone-&gt;names_in_category( $category )</h2>
+
+<p>Given a valid category, this method returns a list of the names in that category, without the category portion. So the list for the &quot;America&quot; category would include the strings &quot;Chicago&quot;, &quot;Kentucky/Monticello&quot;, and &quot;New_York&quot;. In scalar context, it returns an array reference, while in list context it returns an array.</p>
+
+<h2 id="DateTime::TimeZone-countries">DateTime::TimeZone-&gt;countries()</h2>
+
+<p>Returns a sorted list of all the valid country codes (in lower-case) which can be passed to <code>names_in_country()</code>. In scalar context, it returns an array reference, while in list context it returns an array.</p>
+
+<p>If you need to convert country codes to names or vice versa you can use <code>Locale::Country</code> to do so.</p>
+
+<h2 id="DateTime::TimeZone-names_in_country-country_code">DateTime::TimeZone-&gt;names_in_country( $country_code )</h2>
+
+<p>Given a two-letter ISO3166 country code, this method returns a list of time zones used in that country. The country code may be of any case. In scalar context, it returns an array reference, while in list context it returns an array.</p>
+
+<p>This list is returned in an order vaguely based on geography and population. In general, the least used zones come last, but there are not guarantees of a specific order from one release to the next. This order is probably the best option for presenting zones names to end users.</p>
+
+<h2 id="DateTime::TimeZone-offset_as_seconds-offset">DateTime::TimeZone-&gt;offset_as_seconds( $offset )</h2>
+
+<p>Given an offset as a string, this returns the number of seconds represented by the offset as a positive or negative number. Returns <code>undef</code> if $offset is not in the range <code>-99:59:59</code> to <code>+99:59:59</code>.</p>
+
+<p>The offset is expected to match either <code>/^([\+\-])?(\d\d?):(\d\d)(?::(\d\d))?$/</code> or <code>/^([\+\-])?(\d\d)(\d\d)(\d\d)?$/</code>. If it doesn&#39;t match either of these, <code>undef</code> will be returned.</p>
+
+<p>This means that if you want to specify hours as a single digit, then each element of the offset must be separated by a colon (:).</p>
+
+<h2 id="DateTime::TimeZone-offset_as_string-offset">DateTime::TimeZone-&gt;offset_as_string( $offset )</h2>
+
+<p>Given an offset as a number, this returns the offset as a string. Returns <code>undef</code> if $offset is not in the range <code>-359999</code> to <code>359999</code>.</p>
+
+<h2 id="Storable-Hooks">Storable Hooks</h2>
+
+<p>This module provides freeze and thaw hooks for <code>Storable</code> so that the huge data structures for Olson time zones are not actually stored in the serialized structure.</p>
+
+<p>If you subclass <code>DateTime::TimeZone</code>, you will inherit its hooks, which may not work for your module, so please test the interaction of your module with Storable.</p>
+
+<h1 id="LOADING-TIME-ZONES-IN-A-PRE-FORKING-SYSTEM">LOADING TIME ZONES IN A PRE-FORKING SYSTEM</h1>
+
+<p>If you are running an application that does pre-forking (for example with Starman), then you should try to load all the time zones that you&#39;ll need in the parent process. Time zones are loaded on-demand, so loading them once in each child will waste memory that could otherwise be shared.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time, which seems unlikely at best.</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org or use the button on this page: <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a></p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>This module was inspired by Jesse Vincent&#39;s work on Date::ICal::Timezone, and written with much help from the datetime@perl.org list.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>datetime@perl.org mailing list</p>
+
+<p>http://datetime.perl.org/</p>
+
+<p>The tools directory of the DateTime::TimeZone distribution includes two scripts that may be of interest to some people. They are parse_olson and tests_from_zdump. Please run them with the --help flag to see what they can be used for.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support for this module is provided via the datetime@perl.org email list. See http://datetime.perl.org/wiki/datetime/page/Mailing_List for details.</p>
+
+<p>Please submit bugs to the CPAN RT system at http://rt.cpan.org/NoAuth/ReportBug.html?Queue=datetime%3A%3Atimezone or via email at bug-datetime-timezone@rt.cpan.org.</p>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/DateTime-TimeZone/issues">https://github.com/houseabsolute/DateTime-TimeZone/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for DateTime-TimeZone can be found at <a href="https://github.com/houseabsolute/DateTime-TimeZone">https://github.com/houseabsolute/DateTime-TimeZone</a>.</p>
+
+<h1 id="DONATIONS1">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Alexey Molchanov &lt;alexey.molchanov@gmail.com&gt;</p>
+
+</li>
+<li><p>Alfie John &lt;alfiej@fastmail.fm&gt;</p>
+
+</li>
+<li><p>Bron Gondwana &lt;brong@fastmail.fm&gt;</p>
+
+</li>
+<li><p>Daisuke Maki &lt;dmaki@cpan.org&gt;</p>
+
+</li>
+<li><p>David Pinkowitz &lt;dave@pinkowitz.com&gt;</p>
+
+</li>
+<li><p>Iain Truskett &lt;deceased&gt;</p>
+
+</li>
+<li><p>Jakub Wilk &lt;jwilk@jwilk.net&gt;</p>
+
+</li>
+<li><p>Joshua Hoblitt &lt;jhoblitt@cpan.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>karupanerura &lt;karupa@cpan.org&gt;</p>
+
+</li>
+<li><p>Olaf Alders &lt;olaf@wundersolutions.com&gt;</p>
+
+</li>
+<li><p>Peter Rabbitson &lt;ribasushi@cpan.org&gt;</p>
+
+</li>
+<li><p>Tom Wyant &lt;wyant@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2017 by Dave Rolsky.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

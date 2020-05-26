@@ -1,0 +1,1810 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#Object-Constructors:-Creating-Images">Object Constructors: Creating Images</a></li>
+  <li><a href="#GD::Image-Methods">GD::Image Methods</a>
+    <ul>
+      <li><a href="#Image-Data-Output-Methods">Image Data Output Methods</a></li>
+      <li><a href="#Color-Control">Color Control</a></li>
+      <li><a href="#Special-Colors">Special Colors</a></li>
+      <li><a href="#Drawing-Commands">Drawing Commands</a></li>
+      <li><a href="#Image-Copying-Commands">Image Copying Commands</a></li>
+      <li><a href="#Image-Transformation-Commands">Image Transformation Commands</a></li>
+      <li><a href="#Image-Interpolation-Methods">Image Interpolation Methods</a></li>
+      <li><a href="#Image-Filter-Commands">Image Filter Commands</a></li>
+      <li><a href="#Character-and-String-Drawing">Character and String Drawing</a></li>
+      <li><a href="#Alpha-channels">Alpha channels</a></li>
+      <li><a href="#Miscellaneous-Image-Methods">Miscellaneous Image Methods</a></li>
+      <li><a href="#Grouping-Methods">Grouping Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#Polygons">Polygons</a>
+    <ul>
+      <li><a href="#GD::Polyline">GD::Polyline</a></li>
+    </ul>
+  </li>
+  <li><a href="#Font-Utilities">Font Utilities</a></li>
+  <li><a href="#Helper-Functions">Helper Functions</a></li>
+  <li><a href="#Obtaining-the-C-language-version-of-gd">Obtaining the C-language version of gd</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>GD.pm - Interface to Gd Graphics Library</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">GD</span><span class="operator">;</span>
+    
+    <span class="comment"># create a new image</span>
+    <span class="variable">$im</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+    
+    <span class="comment"># allocate some colors</span>
+    <span class="variable">$white</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+    <span class="variable">$black</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>       
+    <span class="variable">$red</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>      
+    <span class="variable">$blue</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+    
+    <span class="comment"># make the background transparent and interlaced</span>
+    <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">transparent</span><span class="operator">(</span><span class="variable">$white</span><span class="operator">);</span>
+    <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">interlaced</span><span class="operator">(</span><span class="string">'true'</span><span class="operator">);</span>
+    
+    <span class="comment"># Put a black frame around the picture</span>
+    <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">rectangle</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">99</span><span class="operator">,</span><span class="number">99</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span>
+    
+    <span class="comment"># Draw a blue oval</span>
+    <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">arc</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">95</span><span class="operator">,</span><span class="number">75</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">360</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+    
+    <span class="comment"># And fill it with red</span>
+    <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">fill</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="variable">$red</span><span class="operator">);</span>
+    
+    <span class="comment"># make sure we are writing to a binary stream</span>
+    <span class="keyword">binmode</span> <span class="variable">STDOUT</span><span class="operator">;</span>
+    
+    <span class="comment"># Convert the image to PNG and print it on standard output</span>
+    <span class="keyword">print</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>GD.pm</b> is a Perl interface to Thomas Boutell&#39;s gd graphics library (version 2.01 or higher; see below). GD allows you to create color drawings using a large number of graphics primitives, and emit the drawings as PNG files.</p>
+
+<p>GD defines the following four classes:</p>
+
+<dl>
+
+<dt id="GD::Image"><code>GD::Image</code></dt>
+<dd>
+
+<p>An image class, which holds the image data and accepts graphic primitive method calls.</p>
+
+</dd>
+<dt id="GD::Font"><code>GD::Font</code></dt>
+<dd>
+
+<p>A font class, which holds static font information and used for text rendering.</p>
+
+</dd>
+<dt id="GD::Polygon"><code>GD::Polygon</code></dt>
+<dd>
+
+<p>A simple polygon object, used for storing lists of vertices prior to rendering a polygon into an image.</p>
+
+</dd>
+<dt id="GD::Simple"><code>GD::Simple</code></dt>
+<dd>
+
+<p>A &quot;simple&quot; class that simplifies the GD::Image API and then adds a set of object-oriented drawing methods using turtle graphics, simplified font handling, ability to work in polar coordinates, HSV color spaces, and human-readable color names like &quot;lightblue&quot;. Please see <a href="../lib/GD/Simple.html">GD::Simple</a> for a description of these methods.</p>
+
+</dd>
+</dl>
+
+<p>A Simple Example:</p>
+
+<pre><code>        <span class="comment">#!/usr/bin/perl</span>
+        
+        <span class="keyword">use</span> <span class="variable">GD</span><span class="operator">;</span>
+        
+        <span class="comment"># create a new image</span>
+        <span class="variable">$im</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        
+        <span class="comment"># allocate some colors</span>
+        <span class="variable">$white</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+        <span class="variable">$black</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>       
+        <span class="variable">$red</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>      
+        <span class="variable">$blue</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+        
+        <span class="comment"># make the background transparent and interlaced</span>
+        <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">transparent</span><span class="operator">(</span><span class="variable">$white</span><span class="operator">);</span>
+        <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">interlaced</span><span class="operator">(</span><span class="string">'true'</span><span class="operator">);</span>
+        
+        <span class="comment"># Put a black frame around the picture</span>
+        <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">rectangle</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">99</span><span class="operator">,</span><span class="number">99</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span>
+        
+        <span class="comment"># Draw a blue oval</span>
+        <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">arc</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">95</span><span class="operator">,</span><span class="number">75</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">360</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+        
+        <span class="comment"># And fill it with red</span>
+        <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">fill</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="variable">$red</span><span class="operator">);</span>
+        
+        <span class="comment"># make sure we are writing to a binary stream</span>
+        <span class="keyword">binmode</span> <span class="variable">STDOUT</span><span class="operator">;</span>
+        
+        <span class="comment"># Convert the image to PNG and print it on standard output</span>
+        <span class="keyword">print</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+</code></pre>
+
+<p>Notes:</p>
+
+<dl>
+
+<dt id="To-create-a-new-empty-image-send-a-new-message-to-GD::Image-passing-it-the-width-and-height-of-the-image-you-want-to-create.-An-image-object-will-be-returned.-Other-class-methods-allow-you-to-initialize-an-image-from-a-preexisting-JPG-PNG-GD-GD2-or-XBM-file">1. To create a new, empty image, send a new() message to GD::Image, passing it the width and height of the image you want to create. An image object will be returned. Other class methods allow you to initialize an image from a preexisting JPG, PNG, GD, GD2 or XBM file.</dt>
+<dd>
+
+</dd>
+<dt id="Next-you-will-ordinarily-add-colors-to-the-images-color-table.-colors-are-added-using-a-colorAllocate-method-call.-The-three-parameters-in-each-call-are-the-red-green-and-blue-rgb-triples-for-the-desired-color.-The-method-returns-the-index-of-that-color-in-the-images-color-table.-You-should-store-these-indexes-for-later-use">2. Next you will ordinarily add colors to the image&#39;s color table. colors are added using a colorAllocate() method call. The three parameters in each call are the red, green and blue (rgb) triples for the desired color. The method returns the index of that color in the image&#39;s color table. You should store these indexes for later use.</dt>
+<dd>
+
+</dd>
+<dt id="Now-you-can-do-some-drawing-The-various-graphics-primitives-are-described-below.-In-this-example-we-do-some-text-drawing-create-an-oval-and-create-and-draw-a-polygon">3. Now you can do some drawing! The various graphics primitives are described below. In this example, we do some text drawing, create an oval, and create and draw a polygon.</dt>
+<dd>
+
+</dd>
+<dt id="Polygons-are-created-with-a-new-message-to-GD::Polygon.-You-can-add-points-to-the-returned-polygon-one-at-a-time-using-the-addPt-method.-The-polygon-can-then-be-passed-to-an-image-for-rendering">4. Polygons are created with a new() message to GD::Polygon. You can add points to the returned polygon one at a time using the addPt() method. The polygon can then be passed to an image for rendering.</dt>
+<dd>
+
+</dd>
+<dt id="When-youre-done-drawing-you-can-convert-the-image-into-PNG-format-by-sending-it-a-png-message.-It-will-return-a-potentially-large-scalar-value-containing-the-binary-data-for-the-image.-Ordinarily-you-will-print-it-out-at-this-point-or-write-it-to-a-file.-To-ensure-portability-to-platforms-that-differentiate-between-text-and-binary-files-be-sure-to-call-binmode-on-the-file-you-are-writing-the-image-to">5. When you&#39;re done drawing, you can convert the image into PNG format by sending it a png() message. It will return a (potentially large) scalar value containing the binary data for the image. Ordinarily you will print it out at this point or write it to a file. To ensure portability to platforms that differentiate between text and binary files, be sure to call <code>binmode()</code> on the file you are writing the image to.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="Object-Constructors:-Creating-Images">Object Constructors: Creating Images</h1>
+
+<p>The following class methods allow you to create new GD::Image objects.</p>
+
+<dl>
+
+<dt id="image-GD::Image-new-width-height-truecolor"><b>$image = GD::Image-&gt;new([$width,$height],[$truecolor])</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-new-FILEHANDLE"><b>$image = GD::Image-&gt;new(*FILEHANDLE)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-new-filename"><b>$image = GD::Image-&gt;new($filename)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-new-data"><b>$image = GD::Image-&gt;new($data)</b></dt>
+<dd>
+
+<p>The new() method is the main constructor for the GD::Image class. Called with two integer arguments, it creates a new blank image of the specified width and height. For example:</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+</code></pre>
+
+<p>This will create an image that is 100 x 100 pixels wide. If you don&#39;t specify the dimensions, a default of 64 x 64 will be chosen.</p>
+
+<p>The optional third argument, $truecolor, tells new() to create a truecolor GD::Image object. Truecolor images have 24 bits of color data (eight bits each in the red, green and blue channels respectively), allowing for precise photograph-quality color usage. If not specified, the image will use an 8-bit palette for compatibility with older versions of libgd.</p>
+
+<p>Alternatively, you may create a GD::Image object based on an existing image by providing an open filehandle, a filename, or the image data itself. The image formats automatically recognized and accepted are: PNG, JPEG, XPM and GD2. Other formats, including WBMP, and GD version 1, cannot be recognized automatically at this time.</p>
+
+<p>If something goes wrong (e.g. insufficient memory), this call will return undef.</p>
+
+</dd>
+<dt id="image-GD::Image-trueColor-0-1"><b>$image = GD::Image-&gt;trueColor([0,1])</b></dt>
+<dd>
+
+<p>For backwards compatibility with scripts previous versions of GD, new images created from scratch (width, height) are palette based by default. To change this default to create true color images use:</p>
+
+<pre><code>        <span class="variable">GD::Image</span><span class="operator">-&gt;</span><span class="variable">trueColor</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>before creating new images. To switch back to palette based by default, use:</p>
+
+<pre><code>        <span class="variable">GD::Image</span><span class="operator">-&gt;</span><span class="variable">trueColor</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-GD::Image-newPalette-width-height"><b>$image = GD::Image-&gt;newPalette([$width,$height])</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-newTrueColor-width-height"><b>$image = GD::Image-&gt;newTrueColor([$width,$height])</b></dt>
+<dd>
+
+<p>The newPalette() and newTrueColor() methods can be used to explicitly create an palette based or true color image regardless of the current setting of trueColor().</p>
+
+</dd>
+<dt id="image-GD::Image-newFromPng-file-truecolor"><b>$image = GD::Image-&gt;newFromPng($file, [$truecolor])</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-newFromPngData-data-truecolor"><b>$image = GD::Image-&gt;newFromPngData($data, [$truecolor])</b></dt>
+<dd>
+
+<p>The newFromPng() method will create an image from a PNG file read in through the provided filehandle or file path. The filehandle must previously have been opened on a valid PNG file or pipe. If successful, this call will return an initialized image which you can then manipulate as you please. If it fails, which usually happens if the thing at the other end of the filehandle is not a valid PNG file, the call returns undef. Notice that the call doesn&#39;t automatically close the filehandle for you. But it does call <code>binmode(FILEHANDLE)</code> for you, on platforms where this matters.</p>
+
+<p>You may use any of the following as the argument:</p>
+
+<pre><code>  1) a simple filehandle, such as STDIN
+  2) a filehandle glob, such as *PNG
+  3) a reference to a glob, such as \*PNG
+  4) an IO::Handle object
+  5) the pathname of a file</code></pre>
+
+<p>In the latter case, newFromPng() will attempt to open the file for you and read the PNG information from it.</p>
+
+<pre><code>  <span class="variable">Example1</span><span class="operator">:</span>
+  
+  <span class="keyword">open</span> <span class="operator">(</span><span class="variable">PNG</span><span class="operator">,</span><span class="string">"barnswallow.png"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+  <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">newFromPng</span> <span class="variable">GD::Image</span><span class="operator">(\</span><span class="variable">*PNG</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+  <span class="keyword">close</span> <span class="variable">PNG</span><span class="operator">;</span>
+  
+  <span class="variable">Example2</span><span class="operator">:</span>
+  <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">newFromPng</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="string">'barnswallow.png'</span><span class="operator">);</span>
+</code></pre>
+
+<p>To get information about the size and color usage of the information, you can call the image query methods described below. Images created by reading PNG images will be truecolor if the image file itself is truecolor. To force the image to be palette-based, pass a value of 0 in the optional $truecolor argument.</p>
+
+<p>The newFromPngData() method will create a new GD::Image initialized with the PNG format <b>data</b> contained in <code>$data</code>.</p>
+
+</dd>
+<dt id="image-GD::Image-newFromJpeg-file-truecolor"><b>$image = GD::Image-&gt;newFromJpeg($file, [$truecolor])</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-newFromJpegData-data-truecolor"><b>$image = GD::Image-&gt;newFromJpegData($data, [$truecolor])</b></dt>
+<dd>
+
+<p>These methods will create an image from a JPEG file. They work just like newFromPng() and newFromPngData(), and will accept the same filehandle and pathname arguments.</p>
+
+<p>Images created by reading JPEG images will always be truecolor. To force the image to be palette-based, pass a value of 0 in the optional $truecolor argument.</p>
+
+</dd>
+<dt id="image-GD::Image-newFromGif-file-truecolor"><b>$image = GD::Image-&gt;newFromGif($file, [$truecolor])</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-newFromGifData-data"><b>$image = GD::Image-&gt;newFromGifData($data)</b></dt>
+<dd>
+
+<p>These methods will create an image from a GIF file. They work just like newFromPng() and newFromPngData(), and will accept the same filehandle and pathname arguments.</p>
+
+<p>Images created from GIFs are always 8-bit palette images. To convert to truecolor, you must create a truecolor image and then perform a copy.</p>
+
+</dd>
+<dt id="image-GD::Image-newFromXbm-file-truecolor"><b>$image = GD::Image-&gt;newFromXbm($file, [$truecolor])</b></dt>
+<dd>
+
+<p>This works in exactly the same way as <code>newFromPng</code>, but reads the contents of an X Bitmap (black &amp; white) file:</p>
+
+<pre><code>        <span class="keyword">open</span> <span class="operator">(</span><span class="variable">XBM</span><span class="operator">,</span><span class="string">"coredump.xbm"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">newFromXbm</span> <span class="variable">GD::Image</span><span class="operator">(\</span><span class="variable">*XBM</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">XBM</span><span class="operator">;</span>
+</code></pre>
+
+<p>There is no newFromXbmData() function, because there is no corresponding function in the gd library.</p>
+
+</dd>
+<dt id="image-GD::Image-newFromWBMP-file-truecolor"><b>$image = GD::Image-&gt;newFromWBMP($file, [$truecolor])</b></dt>
+<dd>
+
+<p>This works in exactly the same way as <code>newFromPng</code>, but reads the contents of an Windows BMP Bitmap file:</p>
+
+<pre><code>        <span class="keyword">open</span> <span class="operator">(</span><span class="variable">BMP</span><span class="operator">,</span><span class="string">"coredump.bmp"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">newFromWBMP</span> <span class="variable">GD::Image</span><span class="operator">(\</span><span class="variable">*BMP</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">BMP</span><span class="operator">;</span>
+</code></pre>
+
+<p>There is no newFromWBMPData() function, because there is no corresponding function in the gd library.</p>
+
+</dd>
+<dt id="image-GD::Image-newFromGd-file"><b>$image = GD::Image-&gt;newFromGd($file)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-newFromGdData-data"><b>$image = GD::Image-&gt;newFromGdData($data)</b></dt>
+<dd>
+
+<p>These methods initialize a GD::Image from a Gd file, filehandle, or data. Gd is Tom Boutell&#39;s disk-based storage format, intended for the rare case when you need to read and write the image to disk quickly. It&#39;s not intended for regular use, because, unlike PNG or JPEG, no image compression is performed and these files can become <b>BIG</b>.</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">newFromGd</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="string">"godzilla.gd"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">GDF</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="image-GD::Image-newFromGd2-file"><b>$image = GD::Image-&gt;newFromGd2($file)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-GD::Image-newFromGd2Data-data"><b>$image = GD::Image-&gt;newFromGd2Data($data)</b></dt>
+<dd>
+
+<p>This works in exactly the same way as <code>newFromGd()</code> and newFromGdData, but use the new compressed GD2 image format.</p>
+
+</dd>
+<dt id="image-GD::Image-newFromGd2Part-file-srcX-srcY-width-height"><b>$image = GD::Image-&gt;newFromGd2Part($file,srcX,srcY,width,height)</b></dt>
+<dd>
+
+<p>This class method allows you to read in just a portion of a GD2 image file. In addition to a filehandle, it accepts the top-left corner and dimensions (width,height) of the region of the image to read. For example:</p>
+
+<pre><code>        <span class="keyword">open</span> <span class="operator">(</span><span class="variable">GDF</span><span class="operator">,</span><span class="string">"godzilla.gd2"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">GD::Image</span><span class="operator">-&gt;</span><span class="variable">newFromGd2Part</span><span class="operator">(\</span><span class="variable">*GDF</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">20</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">GDF</span><span class="operator">;</span>
+</code></pre>
+
+<p>This reads a 100x100 square portion of the image starting from position (10,20).</p>
+
+</dd>
+<dt id="image-GD::Image-newFromXpm-filename"><b>$image = GD::Image-&gt;newFromXpm($filename)</b></dt>
+<dd>
+
+<p>This creates a new GD::Image object starting from a <b>filename</b>. This is unlike the other newFrom() functions because it does not take a filehandle. This difference comes from an inconsistency in the underlying gd library.</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">newFromXpm</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="string">'earth.xpm'</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+</code></pre>
+
+<p>This function is only available if libgd was compiled with XPM support.</p>
+
+<p>NOTE: The libgd library is unable to read certain XPM files, returning an all-black image instead.</p>
+
+</dd>
+</dl>
+
+<h1 id="GD::Image-Methods">GD::Image Methods</h1>
+
+<p>Once a GD::Image object is created, you can draw with it, copy it, and merge two images. When you are finished manipulating the object, you can convert it into a standard image file format to output or save to a file.</p>
+
+<h2 id="Image-Data-Output-Methods">Image Data Output Methods</h2>
+
+<p>The following methods convert the internal drawing format into standard output file formats.</p>
+
+<dl>
+
+<dt id="pngdata-image-png-compression_level"><b>$pngdata = $image-&gt;png([$compression_level])</b></dt>
+<dd>
+
+<p>This returns the image data in PNG format. You can then print it, pipe it to a display program, or write it to a file. Example:</p>
+
+<pre><code>        <span class="variable">$png_data</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+        <span class="keyword">open</span> <span class="operator">(</span><span class="variable">DISPLAY</span><span class="operator">,</span><span class="string">"| display -"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span><span class="operator">;</span>
+        <span class="keyword">binmode</span> <span class="variable">DISPLAY</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">DISPLAY</span> <span class="variable">$png_data</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">DISPLAY</span><span class="operator">;</span>
+</code></pre>
+
+<p>Note the use of <code>binmode()</code>. This is crucial for portability to DOSish platforms.</p>
+
+<p>The optional $compression_level argument controls the amount of compression to apply to the output PNG image. Values range from 0-9, where 0 means no compression (largest files, highest quality) and 9 means maximum compression (smallest files, worst quality). A compression level of -1 uses the default compression level selected when zlib was compiled on your system, and is the same as calling png() with no argument. Be careful not to confuse this argument with the jpeg() quality argument, which ranges from 0-100 and has the opposite meaning from compression (higher numbers give higher quality).</p>
+
+</dd>
+<dt id="gifdata-image-gifanimbegin-GlobalCM-Loops"><b>$gifdata = $image-&gt;gifanimbegin([$GlobalCM [, $Loops]])</b></dt>
+<dd>
+
+<p>For libgd version 2.0.33 and higher, this call begins an animated GIF by returning the data that comprises animated gif image file header. After you call this method, call gifanimadd() one or more times to add the frames of the image. Then call gifanimend(). Each frame must be the same width and height.</p>
+
+<p>A typical sequence will look like this:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$gifdata</span> <span class="operator">=</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">gifanimbegin</span><span class="operator">;</span>
+  <span class="variable">$gifdata</span>   <span class="operator">.=</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">gifanimadd</span><span class="operator">;</span>    <span class="comment"># first frame</span>
+  <span class="keyword">for</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">100</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="comment"># make a frame of right size</span>
+     <span class="keyword">my</span> <span class="variable">$frame</span>  <span class="operator">=</span> <span class="variable">GD::Image</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">getBounds</span><span class="operator">);</span>
+     <span class="variable">add_frame_data</span><span class="operator">(</span><span class="variable">$frame</span><span class="operator">);</span>              <span class="comment"># add the data for this frame</span>
+     <span class="variable">$gifdata</span>   <span class="operator">.=</span> <span class="variable">$frame</span><span class="operator">-&gt;</span><span class="variable">gifanimadd</span><span class="operator">;</span>     <span class="comment"># add frame</span>
+  <span class="operator">}</span>
+  <span class="variable">$gifdata</span>   <span class="operator">.=</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">gifanimend</span><span class="operator">;</span>   <span class="comment"># finish the animated GIF</span>
+  <span class="keyword">print</span> <span class="variable">$gifdata</span><span class="operator">;</span>                     <span class="comment"># write animated gif to STDOUT</span>
+</code></pre>
+
+<p>If you do not wish to store the data in memory, you can print it to stdout or a file.</p>
+
+<p>The image that you call gifanimbegin on is used to set the image size, color resolution and color map. If argument $GlobalCM is 1, the image color map becomes the GIF89a global color map. If $Loops is given and &gt;= 0, the NETSCAPE2.0 application extension is created, with looping count. Looping count 0 means forever.</p>
+
+</dd>
+<dt id="gifdata-image-gifanimadd-LocalCM-LeftOfs-TopOfs-Delay-Disposal-previm"><b>$gifdata = $image-&gt;gifanimadd([$LocalCM [, $LeftOfs [, $TopOfs [, $Delay [, $Disposal [, $previm]]]]]])</b></dt>
+<dd>
+
+<p>Returns the data that comprises one animated gif image frame. You can then print it, pipe it to a display program, or write it to a file. With $LeftOfs and $TopOfs you can place this frame in different offset than (0,0) inside the image screen. Delay between the previous frame and this frame is in 1/100s units. Disposal is usually and by default 1. Compression is activated by giving the previous image as a parameter. This function then compares the images and only writes the changed pixels to the new frame in animation. The Disposal parameter for optimized animations must be set to 1, also for the first frame. $LeftOfs and $TopOfs parameters are ignored for optimized frames.</p>
+
+</dd>
+<dt id="gifdata-image-gifanimend"><b>$gifdata = $image-&gt;gifanimend()</b></dt>
+<dd>
+
+<p>Returns the data for end segment of animated gif file. It always returns string &#39;;&#39;. This string must be printed to an animated gif file after all image frames to properly terminate it according to GIF file syntax. Image object is not used at all in this method.</p>
+
+</dd>
+<dt id="jpegdata-image-jpeg-quality"><b>$jpegdata = $image-&gt;jpeg([$quality])</b></dt>
+<dd>
+
+<p>This returns the image data in JPEG format. You can then print it, pipe it to a display program, or write it to a file. You may pass an optional quality score to jpeg() in order to control the JPEG quality. This should be an integer between 0 and 100. Higher quality scores give larger files and better image quality. If you don&#39;t specify the quality, jpeg() will choose a good default.</p>
+
+</dd>
+<dt id="gifdata-image-gif"><b>$gifdata = $image-&gt;gif()</b>.</dt>
+<dd>
+
+<p>This returns the image data in GIF format. You can then print it, pipe it to a display program, or write it to a file.</p>
+
+</dd>
+<dt id="gddata-image-gd"><b>$gddata = $image-&gt;gd</b></dt>
+<dd>
+
+<p>This returns the image data in GD format. You can then print it, pipe it to a display program, or write it to a file. Example:</p>
+
+<pre><code>        <span class="keyword">binmode</span> <span class="variable">MYOUTFILE</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">MYOUTFILE</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">gd</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="gd2data-image-gd2"><b>$gd2data = $image-&gt;gd2</b></dt>
+<dd>
+
+<p>Same as gd(), except that it returns the data in compressed GD2 format.</p>
+
+</dd>
+<dt id="wbmpdata-image-wbmp-foreground"><b>$wbmpdata = $image-&gt;wbmp([$foreground])</b></dt>
+<dd>
+
+<p>This returns the image data in WBMP format, which is a black-and-white image format. Provide the index of the color to become the foreground color. All other pixels will be considered background.</p>
+
+</dd>
+</dl>
+
+<h2 id="Color-Control">Color Control</h2>
+
+<p>These methods allow you to control and manipulate the GD::Image color table for palette, non-truecolor images.</p>
+
+<dl>
+
+<dt id="index-image-colorAllocate-red-green-blue"><b>$index = $image-&gt;colorAllocate(red,green,blue)</b></dt>
+<dd>
+
+<p>This allocates a color with the specified red, green and blue components and returns its index in the color table, if specified. The first color allocated in this way becomes the image&#39;s background color. (255,255,255) is white (all pixels on). (0,0,0) is black (all pixels off). (255,0,0) is fully saturated red. (127,127,127) is 50% gray. You can find plenty of examples in /usr/X11/lib/X11/rgb.txt.</p>
+
+<p>If no colors are allocated, then this function returns -1.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$black</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span> <span class="comment">#background color</span>
+        <span class="variable">$white</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+        <span class="variable">$peachpuff</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">218</span><span class="operator">,</span><span class="number">185</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorAllocateAlpha-reg-green-blue-alpha"><b>$index = $image-&gt;colorAllocateAlpha(reg,green,blue,alpha)</b></dt>
+<dd>
+
+<p>This allocates a color with the specified red, green, and blue components, plus the specified alpha channel. The alpha value may range from 0 (opaque) to 127 (transparent). The <code>alphaBlending</code> function changes the way this alpha channel affects the resulting image.</p>
+
+</dd>
+<dt id="image-colorDeallocate-colorIndex"><b>$image-&gt;colorDeallocate(colorIndex)</b></dt>
+<dd>
+
+<p>This marks the color at the specified index as being ripe for reallocation. The next time colorAllocate is used, this entry will be replaced. You can call this method several times to deallocate multiple colors. There&#39;s no function result from this call.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorDeallocate</span><span class="operator">(</span><span class="variable">$peachpuff</span><span class="operator">);</span>
+        <span class="variable">$peachy</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">210</span><span class="operator">,</span><span class="number">185</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorClosest-red-green-blue"><b>$index = $image-&gt;colorClosest(red,green,blue)</b></dt>
+<dd>
+
+<p>This returns the index of the color closest in the color table to the red green and blue components specified. If no colors have yet been allocated, then this call returns -1.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$apricot</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorClosest</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">200</span><span class="operator">,</span><span class="number">180</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorClosestAlpha-red-green-blue-alpha"><b>$index = $image-&gt;colorClosestAlpha(red,green,blue,alpha)</b></dt>
+<dd>
+
+<p>This returns the index of the color closest in the color table to the red green blue and alpha components specified. If no colors have yet been allocated, then this call returns -1.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$apricot</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorClosestAlpha</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">200</span><span class="operator">,</span><span class="number">180</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorClosestHWB-red-green-blue"><b>$index = $image-&gt;colorClosestHWB(red,green,blue)</b></dt>
+<dd>
+
+<p>This also attempts to return the color closest in the color table to the red green and blue components specified. It uses a Hue/White/Black color representation to make the selected color more likely to match human perceptions of similar colors.</p>
+
+<p>If no colors have yet been allocated, then this call returns -1.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$mostred</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorClosestHWB</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorExact-red-green-blue"><b>$index = $image-&gt;colorExact(red,green,blue)</b></dt>
+<dd>
+
+<p>This returns the index of a color that exactly matches the specified red green and blue components. If such a color is not in the color table, this call returns -1.</p>
+
+<pre><code>        <span class="variable">$rosey</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorExact</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">80</span><span class="operator">);</span>
+        <span class="keyword">warn</span> <span class="string">"Everything's coming up roses.\n"</span> <span class="keyword">if</span> <span class="variable">$rosey</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorExactAlpha-red-green-blue-alpha"><b>$index = $image-&gt;colorExactAlpha(red,green,blue,alpha)</b></dt>
+<dd>
+
+<p>This returns the index of a color that exactly matches the specified red green blue and alpha components. If such a color is not in the color table, this call returns -1.</p>
+
+<pre><code>        <span class="variable">$rosey</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorExactAlpha</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">80</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="keyword">warn</span> <span class="string">"Everything's coming up roses.\n"</span> <span class="keyword">if</span> <span class="variable">$rosey</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorResolve-red-green-blue"><b>$index = $image-&gt;colorResolve(red,green,blue)</b></dt>
+<dd>
+
+<p>This returns the index of a color that exactly matches the specified red green and blue components. If such a color is not in the color table and there is room, then this method allocates the color in the color table and returns its index.</p>
+
+<pre><code>        <span class="variable">$rosey</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorResolve</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">80</span><span class="operator">);</span>
+        <span class="keyword">warn</span> <span class="string">"Everything's coming up roses.\n"</span> <span class="keyword">if</span> <span class="variable">$rosey</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="index-image-colorResolveAlpha-red-green-blue-alpha"><b>$index = $image-&gt;colorResolveAlpha(red,green,blue,alpha)</b></dt>
+<dd>
+
+<p>This returns the index of a color that exactly matches the specified red green blue and alpha components. If such a color is not in the color table and there is room, then this method allocates the color in the color table and returns its index.</p>
+
+<pre><code>        <span class="variable">$rosey</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorResolveAlpha</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">80</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="keyword">warn</span> <span class="string">"Everything's coming up roses.\n"</span> <span class="keyword">if</span> <span class="variable">$rosey</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="colorsTotal-image-colorsTotal-object-method"><b>$colorsTotal = $image-&gt;colorsTotal</b> <i>object method</i></dt>
+<dd>
+
+<p>This returns the total number of colors allocated in the object.</p>
+
+<pre><code>        <span class="variable">$maxColors</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">colorsTotal</span><span class="operator">;</span>
+</code></pre>
+
+<p>In the case of a TrueColor image, this call will return undef.</p>
+
+</dd>
+<dt id="index-image-getPixel-x-y-object-method"><b>$index = $image-&gt;getPixel(x,y)</b> <i>object method</i></dt>
+<dd>
+
+<p>This returns the color table index underneath the specified point. It can be combined with rgb() to obtain the rgb color underneath the pixel.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$index</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">getPixel</span><span class="operator">(</span><span class="number">20</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="operator">(</span><span class="variable">$r</span><span class="operator">,</span><span class="variable">$g</span><span class="operator">,</span><span class="variable">$b</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">rgb</span><span class="operator">(</span><span class="variable">$index</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="red-green-blue-image-rgb-index"><b>($red,$green,$blue) = $image-&gt;rgb($index)</b></dt>
+<dd>
+
+<p>This returns a list containing the red, green and blue components of the specified color index.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">@RGB</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">rgb</span><span class="operator">(</span><span class="variable">$peachy</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="alpha-image-alpha-index"><b>($alpha) = $image-&gt;alpha($index)</b></dt>
+<dd>
+
+<p>This returns an item containing the alpha component of the specified color index.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">@RGB</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">rgb</span><span class="operator">(</span><span class="variable">$peachy</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-transparent-colorIndex"><b>$image-&gt;transparent($colorIndex)</b></dt>
+<dd>
+
+<p>This marks the color at the specified index as being transparent. Portions of the image drawn in this color will be invisible. This is useful for creating paintbrushes of odd shapes, as well as for making PNG backgrounds transparent for displaying on the Web. Only one color can be transparent at any time. To disable transparency, specify -1 for the index.</p>
+
+<p>If you call this method without any parameters, it will return the current index of the transparent color, or -1 if none.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="keyword">open</span><span class="operator">(</span><span class="variable">PNG</span><span class="operator">,</span><span class="string">"test.png"</span><span class="operator">);</span>
+        <span class="variable">$im</span> <span class="operator">=</span> <span class="variable">newFromPng</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="variable">PNG</span><span class="operator">);</span>
+        <span class="variable">$white</span> <span class="operator">=</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">colorClosest</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span> <span class="comment"># find white</span>
+        <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">transparent</span><span class="operator">(</span><span class="variable">$white</span><span class="operator">);</span>
+        <span class="keyword">binmode</span> <span class="variable">STDOUT</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">$im</span><span class="operator">-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Special-Colors">Special Colors</h2>
+
+<p>GD implements a number of special colors that can be used to achieve special effects. They are constants defined in the GD:: namespace, but automatically exported into your namespace when the GD module is loaded.</p>
+
+<dl>
+
+<dt id="image-setBrush-image"><b>$image-&gt;setBrush($image)</b></dt>
+<dd>
+
+<p>You can draw lines and shapes using a brush pattern. Brushes are just images that you can create and manipulate in the usual way. When you draw with them, their contents are used for the color and shape of the lines.</p>
+
+<p>To make a brushed line, you must create or load the brush first, then assign it to the image using setBrush(). You can then draw in that with that brush using the <b>gdBrushed</b> special color. It&#39;s often useful to set the background of the brush to transparent so that the non-colored parts don&#39;t overwrite other parts of your image.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># Create a brush at an angle</span>
+        <span class="variable">$diagonal_brush</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">5</span><span class="operator">,</span><span class="number">5</span><span class="operator">);</span>
+        <span class="variable">$white</span> <span class="operator">=</span> <span class="variable">$diagonal_brush</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+        <span class="variable">$black</span> <span class="operator">=</span> <span class="variable">$diagonal_brush</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$diagonal_brush</span><span class="operator">-&gt;</span><span class="variable">transparent</span><span class="operator">(</span><span class="variable">$white</span><span class="operator">);</span>
+        <span class="variable">$diagonal_brush</span><span class="operator">-&gt;</span><span class="variable">line</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">4</span><span class="operator">,</span><span class="number">4</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span> <span class="comment"># NE diagonal</span>
+        
+        <span class="comment"># Set the brush</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">setBrush</span><span class="operator">(</span><span class="variable">$diagonal_brush</span><span class="operator">);</span>
+        
+        <span class="comment"># Draw a circle using the brush</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">arc</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">360</span><span class="operator">,</span><span class="variable">gdBrushed</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-setThickness-thickness"><b>$image-&gt;setThickness($thickness)</b></dt>
+<dd>
+
+<p>Lines drawn with line(), rectangle(), arc(), and so forth are 1 pixel thick by default. Call setThickness() to change the line drawing width.</p>
+
+</dd>
+<dt id="image-setStyle-colors"><b>$image-&gt;setStyle(@colors)</b></dt>
+<dd>
+
+<p>Styled lines consist of an arbitrary series of repeated colors and are useful for generating dotted and dashed lines. To create a styled line, use setStyle() to specify a repeating series of colors. It accepts an array consisting of one or more color indexes. Then draw using the <b>gdStyled</b> special color. Another special color, <b>gdTransparent</b> can be used to introduce holes in the line, as the example shows.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># Set a style consisting of 4 pixels of yellow,</span>
+        <span class="comment"># 4 pixels of blue, and a 2 pixel gap</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">setStyle</span><span class="operator">(</span><span class="variable">$yellow</span><span class="operator">,</span><span class="variable">$yellow</span><span class="operator">,</span><span class="variable">$yellow</span><span class="operator">,</span><span class="variable">$yellow</span><span class="operator">,</span>
+                           <span class="variable">$blue</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">,</span>
+                           <span class="variable">gdTransparent</span><span class="operator">,</span><span class="variable">gdTransparent</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">arc</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">360</span><span class="operator">,</span><span class="variable">gdStyled</span><span class="operator">);</span>
+</code></pre>
+
+<p>To combine the <code>gdStyled</code> and <code>gdBrushed</code> behaviors, you can specify <code>gdStyledBrushed</code>. In this case, a pixel from the current brush pattern is rendered wherever the color specified in setStyle() is neither gdTransparent nor 0.</p>
+
+</dd>
+<dt id="gdTiled"><b>gdTiled</b></dt>
+<dd>
+
+<p>Draw filled shapes and flood fills using a pattern. The pattern is just another image. The image will be tiled multiple times in order to fill the required space, creating wallpaper effects. You must call <code>setTile</code> in order to define the particular tile pattern you&#39;ll use for drawing when you specify the gdTiled color. details.</p>
+
+</dd>
+<dt id="gdStyled"><b>gdStyled</b></dt>
+<dd>
+
+<p>The gdStyled color is used for creating dashed and dotted lines. A styled line can contain any series of colors and is created using the setStyled() command.</p>
+
+</dd>
+<dt id="gdAntiAliased"><b>gdAntiAliased</b></dt>
+<dd>
+
+<p>The <code>gdAntiAliased</code> color is used for drawing lines with antialiasing turned on. Antialiasing will blend the jagged edges of lines with the background, creating a smoother look. The actual color drawn is set with setAntiAliased().</p>
+
+</dd>
+<dt id="image-setAntiAliased-color"><b>$image-&gt;setAntiAliased($color)</b></dt>
+<dd>
+
+<p>&quot;Antialiasing&quot; is a process by which jagged edges associated with line drawing can be reduced by blending the foreground color with an appropriate percentage of the background, depending on how much of the pixel in question is actually within the boundaries of the line being drawn. All line-drawing methods, such as line() and polygon, will draw antialiased lines if the special &quot;color&quot; <b>gdAntiAliased</b> is used when calling them.</p>
+
+<p>setAntiAliased() is used to specify the actual foreground color to be used when drawing antialiased lines. You may set any color to be the foreground, however as of libgd version 2.0.12 an alpha channel component is not supported.</p>
+
+<p>Antialiased lines can be drawn on both truecolor and palette-based images. However, attempts to draw antialiased lines on highly complex palette-based backgrounds may not give satisfactory results, due to the limited number of colors available in the palette. Antialiased line-drawing on simple backgrounds should work well with palette-based images; otherwise create or fetch a truecolor image instead. When using palette-based images, be sure to allocate a broad spectrum of colors in order to have sufficient colors for the antialiasing to use.</p>
+
+</dd>
+<dt id="image-setAntiAliasedDontBlend-color-flag"><b>$image-&gt;setAntiAliasedDontBlend($color,[$flag])</b></dt>
+<dd>
+
+<p>Normally, when drawing lines with the special <b>gdAntiAliased</b> &quot;color,&quot; blending with the background to reduce jagged edges is the desired behavior. However, when it is desired that lines not be blended with one particular color when it is encountered in the background, the setAntiAliasedDontBlend() method can be used to indicate the special color that the foreground should stand out more clearly against.</p>
+
+<p>Once turned on, you can turn this feature off by calling setAntiAliasedDontBlend() with a second argument of 0:</p>
+
+<pre><code>  <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">setAntiAliasedDontBlend</span><span class="operator">(</span><span class="variable">$color</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Drawing-Commands">Drawing Commands</h2>
+
+<p>These methods allow you to draw lines, rectangles, and ellipses, as well as to perform various special operations like flood-fill.</p>
+
+<dl>
+
+<dt id="image-setPixel-x-y-color"><b>$image-&gt;setPixel($x,$y,$color)</b></dt>
+<dd>
+
+<p>This sets the pixel at (x,y) to the specified color index. No value is returned from this method. The coordinate system starts at the upper left at (0,0) and gets larger as you go down and to the right. You can use a real color, or one of the special colors gdBrushed, gdStyled and gdStyledBrushed can be specified.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># This assumes $peach already allocated</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">setPixel</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="variable">$peach</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-line-x1-y1-x2-y2-color"><b>$image-&gt;line($x1,$y1,$x2,$y2,$color)</b></dt>
+<dd>
+
+<p>This draws a line from (x1,y1) to (x2,y2) of the specified color. You can use a real color, or one of the special colors gdBrushed, gdStyled and gdStyledBrushed.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># Draw a diagonal line using the currently defined</span>
+        <span class="comment"># paintbrush pattern.</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">line</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">150</span><span class="operator">,</span><span class="number">150</span><span class="operator">,</span><span class="variable">gdBrushed</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-dashedLine-x1-y1-x2-y2-color"><b>$image-&gt;dashedLine($x1,$y1,$x2,$y2,$color)</b></dt>
+<dd>
+
+<p>DEPRECATED: The libgd library provides this method solely for backward compatibility with libgd version 1.0, and there have been reports that it no longer works as expected. Please use the setStyle() and gdStyled methods as described below.</p>
+
+<p>This draws a dashed line from (x1,y1) to (x2,y2) in the specified color. A more powerful way to generate arbitrary dashed and dotted lines is to use the setStyle() method described below and to draw with the special color gdStyled.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">dashedLine</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">150</span><span class="operator">,</span><span class="number">150</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-rectangle-x1-y1-x2-y2-color"><b>$image-&gt;rectangle($x1,$y1,$x2,$y2,$color)</b></dt>
+<dd>
+
+<p>This draws a rectangle with the specified color. (x1,y1) and (x2,y2) are the upper left and lower right corners respectively. Both real color indexes and the special colors gdBrushed, gdStyled and gdStyledBrushed are accepted.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">rectangle</span><span class="operator">(</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="variable">$rose</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-filledRectangle-x1-y1-x2-y2-color-item-image-setTile-otherimage"><b>$image-&gt;filledRectangle($x1,$y1,$x2,$y2,$color)</b> =item <b>$image-&gt;setTile($otherimage)</b></dt>
+<dd>
+
+<p>This draws a rectangle filled with the specified color. You can use a real color, or the special fill color gdTiled to fill the polygon with a pattern.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># read in a fill pattern and set it</span>
+        <span class="variable">$tile</span> <span class="operator">=</span> <span class="variable">newFromPng</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="string">'happyface.png'</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">setTile</span><span class="operator">(</span><span class="variable">$tile</span><span class="operator">);</span> 
+        
+        <span class="comment"># draw the rectangle, filling it with the pattern</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">filledRectangle</span><span class="operator">(</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">150</span><span class="operator">,</span><span class="number">200</span><span class="operator">,</span><span class="variable">gdTiled</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-openPolygon-polygon-color"><b>$image-&gt;openPolygon($polygon,$color)</b></dt>
+<dd>
+
+<p>This draws a polygon with the specified color. The polygon must be created first (see below). The polygon must have at least three vertices. If the last vertex doesn&#39;t close the polygon, the method will close it for you. Both real color indexes and the special colors gdBrushed, gdStyled and gdStyledBrushed can be specified.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$poly</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Polygon</span><span class="operator">;</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">99</span><span class="operator">,</span><span class="number">99</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">99</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">openPolygon</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-unclosedPolygon-polygon-color"><b>$image-&gt;unclosedPolygon($polygon,$color)</b></dt>
+<dd>
+
+<p>This draws a sequence of connected lines with the specified color, without connecting the first and last point to a closed polygon. The polygon must be created first (see below). The polygon must have at least three vertices. Both real color indexes and the special colors gdBrushed, gdStyled and gdStyledBrushed can be specified.</p>
+
+<p>You need libgd 2.0.33 or higher to use this feature.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$poly</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Polygon</span><span class="operator">;</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">99</span><span class="operator">,</span><span class="number">99</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">99</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">unclosedPolygon</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-filledPolygon-poly-color"><b>$image-&gt;filledPolygon($poly,$color)</b></dt>
+<dd>
+
+<p>This draws a polygon filled with the specified color. You can use a real color, or the special fill color gdTiled to fill the polygon with a pattern.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># make a polygon</span>
+        <span class="variable">$poly</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Polygon</span><span class="operator">;</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">99</span><span class="operator">,</span><span class="number">99</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">99</span><span class="operator">);</span>
+        
+        <span class="comment"># draw the polygon, filling it with a color</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">filledPolygon</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">,</span><span class="variable">$peachpuff</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-ellipse-cx-cy-width-height-color"><b>$image-&gt;ellipse($cx,$cy,$width,$height,$color)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-filledEllipse-cx-cy-width-height-color"><b>$image-&gt;filledEllipse($cx,$cy,$width,$height,$color)</b></dt>
+<dd>
+
+<p>These methods() draw ellipses. ($cx,$cy) is the center of the arc, and ($width,$height) specify the ellipse width and height, respectively. filledEllipse() is like Ellipse() except that the former produces filled versions of the ellipse.</p>
+
+</dd>
+<dt id="image-arc-cx-cy-width-height-start-end-color"><b>$image-&gt;arc($cx,$cy,$width,$height,$start,$end,$color)</b></dt>
+<dd>
+
+<p>This draws arcs and ellipses. (cx,cy) are the center of the arc, and (width,height) specify the width and height, respectively. The portion of the ellipse covered by the arc are controlled by start and end, both of which are given in degrees from 0 to 360. Zero is at the top of the ellipse, and angles increase clockwise. To specify a complete ellipse, use 0 and 360 as the starting and ending angles. To draw a circle, use the same value for width and height.</p>
+
+<p>You can specify a normal color or one of the special colors <b>gdBrushed</b>, <b>gdStyled</b>, or <b>gdStyledBrushed</b>.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># draw a semicircle centered at 100,100</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">arc</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">180</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-filledArc-cx-cy-width-height-start-end-color-arc_style"><b>$image-&gt;filledArc($cx,$cy,$width,$height,$start,$end,$color [,$arc_style])</b></dt>
+<dd>
+
+<p>This method is like arc() except that it colors in the pie wedge with the selected color. $arc_style is optional. If present it is a bitwise OR of the following constants:</p>
+
+<pre><code>  gdArc           connect start &amp; end points of arc with a rounded edge
+  gdChord         connect start &amp; end points of arc with a straight line
+  gdPie           synonym for gdChord
+  gdNoFill        outline the arc or chord
+  gdEdged         connect beginning and ending of the arc to the center</code></pre>
+
+<p>gdArc and gdChord are mutually exclusive. gdChord just connects the starting and ending angles with a straight line, while gdArc produces a rounded edge. gdPie is a synonym for gdArc. gdNoFill indicates that the arc or chord should be outlined, not filled. gdEdged, used together with gdNoFill, indicates that the beginning and ending angles should be connected to the center; this is a good way to outline (rather than fill) a &quot;pie slice.&quot;</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">filledArc</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">90</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">,</span><span class="variable">gdEdged</span><span class="operator">|</span><span class="variable">gdNoFill</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-fill-x-y-color"><b>$image-&gt;fill($x,$y,$color)</b></dt>
+<dd>
+
+<p>This method flood-fills regions with the specified color. The color will spread through the image, starting at point (x,y), until it is stopped by a pixel of a different color from the starting pixel (this is similar to the &quot;paintbucket&quot; in many popular drawing toys). You can specify a normal color, or the special color gdTiled, to flood-fill with patterns.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># Draw a rectangle, and then make its interior blue</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">rectangle</span><span class="operator">(</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">fill</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-fillToBorder-x-y-bordercolor-color"><b>$image-&gt;fillToBorder($x,$y,$bordercolor,$color)</b></dt>
+<dd>
+
+<p>Like <code>fill</code>, this method flood-fills regions with the specified color, starting at position (x,y). However, instead of stopping when it hits a pixel of a different color than the starting pixel, flooding will only stop when it hits the color specified by bordercolor. You must specify a normal indexed color for the bordercolor. However, you are free to use the gdTiled color for the fill.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="comment"># This has the same effect as the previous example</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">rectangle</span><span class="operator">(</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">fillToBorder</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Image-Copying-Commands">Image Copying Commands</h2>
+
+<p>Two methods are provided for copying a rectangular region from one image to another. One method copies a region without resizing it. The other allows you to stretch the region during the copy operation.</p>
+
+<p>With either of these methods it is important to know that the routines will attempt to flesh out the destination image&#39;s color table to match the colors that are being copied from the source. If the destination&#39;s color table is already full, then the routines will attempt to find the best match, with varying results.</p>
+
+<dl>
+
+<dt id="image-copy-sourceImage-dstX-dstY-srcX-srcY-width-height"><b>$image-&gt;copy($sourceImage,$dstX,$dstY,$srcX,$srcY,$width,$height)</b></dt>
+<dd>
+
+<p>This is the simplest of the several copy operations, copying the specified region from the source image to the destination image (the one performing the method call). (srcX,srcY) specify the upper left corner of a rectangle in the source image, and (width,height) give the width and height of the region to copy. (dstX,dstY) control where in the destination image to stamp the copy. You can use the same image for both the source and the destination, but the source and destination regions must not overlap or strange things will happen.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">various</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="variable">$srcImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">more</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="comment"># copy a 25x25 pixel region from $srcImage to</span>
+        <span class="comment"># the rectangle starting at (10,10) in $myImage</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">(</span><span class="variable">$srcImage</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">25</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-clone"><b>$image-&gt;clone()</b></dt>
+<dd>
+
+<p>Make a copy of the image and return it as a new object. The new image will look identical. However, it may differ in the size of the color palette and other nonessential details.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">various</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="variable">$copy</span> <span class="operator">=</span> <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="image-copyMerge-sourceImage-dstX-dstY"><b>$image-&gt;copyMerge($sourceImage,$dstX,$dstY,</b></dt>
+<dd>
+
+<p><b> $srcX,$srcY,$width,$height,$percent)</b></p>
+
+<p>This copies the indicated rectangle from the source image to the destination image, merging the colors to the extent specified by percent (an integer between 0 and 100). Specifying 100% has the same effect as copy() -- replacing the destination pixels with the source image. This is most useful for highlighting an area by merging in a solid rectangle.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">various</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="variable">$redImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">more</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="comment"># copy a 25x25 pixel region from $srcImage to</span>
+        <span class="comment"># the rectangle starting at (10,10) in $myImage, merging 50%</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">copyMerge</span><span class="operator">(</span><span class="variable">$srcImage</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">50</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-copyMergeGray-sourceImage-dstX-dstY"><b>$image-&gt;copyMergeGray($sourceImage,$dstX,$dstY,</b></dt>
+<dd>
+
+<p><b> $srcX,$srcY,$width,$height,$percent)</b></p>
+
+<p>This is identical to copyMerge() except that it preserves the hue of the source by converting all the pixels of the destination rectangle to grayscale before merging.</p>
+
+</dd>
+<dt id="image-copyResized-sourceImage-dstX-dstY"><b>$image-&gt;copyResized($sourceImage,$dstX,$dstY,</b></dt>
+<dd>
+
+<p><b> $srcX,$srcY,$destW,$destH,$srcW,$srcH)</b></p>
+
+<p>This method is similar to copy() but allows you to choose different sizes for the source and destination rectangles. The source and destination rectangle&#39;s are specified independently by (srcW,srcH) and (destW,destH) respectively. copyResized() will stretch or shrink the image to accommodate the size requirements.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">various</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="variable">$srcImage</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span><span class="operator">(</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">);</span>
+        <span class="operator">...</span> <span class="variable">more</span> <span class="variable">drawing</span> <span class="variable">stuff</span> <span class="operator">...</span>
+        <span class="comment"># copy a 25x25 pixel region from $srcImage to</span>
+        <span class="comment"># a larger rectangle starting at (10,10) in $myImage</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">copyResized</span><span class="operator">(</span><span class="variable">$srcImage</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">25</span><span class="operator">,</span><span class="number">25</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-copyResampled-sourceImage-dstX-dstY"><b>$image-&gt;copyResampled($sourceImage,$dstX,$dstY,</b></dt>
+<dd>
+
+<p><b> $srcX,$srcY,$destW,$destH,$srcW,$srcH)</b></p>
+
+<p>This method is similar to copyResized() but provides &quot;smooth&quot; copying from a large image to a smaller one, using a weighted average of the pixels of the source area rather than selecting one representative pixel. This method is identical to copyResized() when the destination image is a palette image.</p>
+
+</dd>
+<dt id="image-copyRotated-sourceImage-dstX-dstY"><b>$image-&gt;copyRotated($sourceImage,$dstX,$dstY,</b></dt>
+<dd>
+
+<p><b> $srcX,$srcY,$width,$height,$angle)</b></p>
+
+<p>Like copyResized() but the $angle argument specifies an arbitrary amount to rotate the image clockwise (in degrees). In addition, $dstX and $dstY species the <b>center</b> of the destination image, and not the top left corner.</p>
+
+</dd>
+<dt id="image-trueColorToPalette-dither-colors"><b>$image-&gt;trueColorToPalette([$dither], [$colors])</b></dt>
+<dd>
+
+<p>This method converts a truecolor image to a palette image. The code for this function was originally drawn from the Independent JPEG Group library code, which is excellent. The code has been modified to preserve as much alpha channel information as possible in the resulting palette, in addition to preserving colors as well as possible. This does not work as well as might be hoped. It is usually best to simply produce a truecolor output image instead, which guarantees the highest output quality. Both the dithering (0/1, default=0) and maximum number of colors used (&lt;=256, default = gdMaxColors) can be specified.</p>
+
+</dd>
+<dt id="image-sourceImage-createPaletteFromTrueColor-dither-colors"><b>$image = $sourceImage-&gt;createPaletteFromTrueColor([$dither], [$colors])</b></dt>
+<dd>
+
+<p>Creates a new palette image from a truecolor image. Same as above, but returns a new image.</p>
+
+<p>Don&#39;t use these function -- write real truecolor PNGs and JPEGs. The disk space gain of conversion to palette is not great (for small images it can be negative) and the quality loss is ugly.</p>
+
+</dd>
+<dt id="error-image-colorMatch-otherimage"><b>$error = $image-&gt;colorMatch($otherimage)</b></dt>
+<dd>
+
+<p>Bring the palette colors in $otherimage to be closer to truecolor $image. A negative return value is a failure.</p>
+
+<pre><code>  -1 image must be True Color
+  -2 otherimage must be indexed
+  -3 the images are meant to be the same dimensions
+  -4 At least 1 color in otherimage must be allocated</code></pre>
+
+<p>This method is only available with libgd &gt;= 2.1.0</p>
+
+</dd>
+<dt id="image-sourceImage-neuQuant-maxcolor-256-samplefactor-5"><b>$image = $sourceImage-&gt;neuQuant($maxcolor=256,$samplefactor=5)</b></dt>
+<dd>
+
+<p>Creates a new palette image from a truecolor image.</p>
+
+<pre><code>  samplefactor  The quantization precision between 1 (highest quality) and 10 (fastest).
+  maxcolor      The number of desired palette entries.</code></pre>
+
+<p>This is the same as createPaletteFromTrueColor with the quantization method GD_QUANT_NEUQUANT. This does not support dithering. This method is only available with libgd &gt;= 2.1.0</p>
+
+</dd>
+</dl>
+
+<h2 id="Image-Transformation-Commands">Image Transformation Commands</h2>
+
+<p>Gd provides these simple image transformations, non-interpolated.</p>
+
+<dl>
+
+<dt id="image-sourceImage-copyRotate90"><b>$image = $sourceImage-&gt;copyRotate90()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyRotate180"><b>$image = $sourceImage-&gt;copyRotate180()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyRotate270"><b>$image = $sourceImage-&gt;copyRotate270()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyFlipHorizontal"><b>$image = $sourceImage-&gt;copyFlipHorizontal()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyFlipVertical"><b>$image = $sourceImage-&gt;copyFlipVertical()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyTranspose"><b>$image = $sourceImage-&gt;copyTranspose()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyReverseTranspose"><b>$image = $sourceImage-&gt;copyReverseTranspose()</b></dt>
+<dd>
+
+<p>These methods can be used to rotate, flip, or transpose an image. The result of the method is a copy of the image.</p>
+
+</dd>
+<dt id="image-rotate180"><b>$image-&gt;rotate180()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-flipHorizontal"><b>$image-&gt;flipHorizontal()</b></dt>
+<dd>
+
+</dd>
+<dt id="image-flipVertical"><b>$image-&gt;flipVertical()</b></dt>
+<dd>
+
+<p>These methods are similar to the copy* versions, but instead modify the image in place.</p>
+
+</dd>
+</dl>
+
+<h2 id="Image-Interpolation-Methods">Image Interpolation Methods</h2>
+
+<p>Since libgd 2.1.0 there are better transformation methods, with these interpolation methods:</p>
+
+<pre><code>  GD_BELL                - Bell
+  GD_BESSEL              - Bessel
+  GD_BILINEAR_FIXED      - fixed point bilinear
+  GD_BICUBIC             - Bicubic
+  GD_BICUBIC_FIXED       - fixed point bicubic integer
+  GD_BLACKMAN            - Blackman
+  GD_BOX                 - Box
+  GD_BSPLINE             - BSpline
+  GD_CATMULLROM          - Catmullrom
+  GD_GAUSSIAN            - Gaussian
+  GD_GENERALIZED_CUBIC   - Generalized cubic
+  GD_HERMITE             - Hermite
+  GD_HAMMING             - Hamming
+  GD_HANNING             - Hannig
+  GD_MITCHELL            - Mitchell
+  GD_NEAREST_NEIGHBOUR   - Nearest neighbour interpolation
+  GD_POWER               - Power
+  GD_QUADRATIC           - Quadratic
+  GD_SINC                - Sinc
+  GD_TRIANGLE            - Triangle
+  GD_WEIGHTED4           - 4 pixels weighted bilinear interpolation
+  GD_LINEAR              - bilinear interpolation</code></pre>
+
+<dl>
+
+<dt id="image-interpolationMethod-method"><b>$image-&gt;interpolationMethod( [$method] )</b></dt>
+<dd>
+
+<p>Gets or sets the interpolation methods for all subsequent interpolations. See above for the valid values. Only available since libgd 2.2.0</p>
+
+</dd>
+<dt id="image-copyScaleInterpolated-width-height"><b>$image-&gt;copyScaleInterpolated( width, height )</b></dt>
+<dd>
+
+<p>Returns a copy, using interpolation.</p>
+
+</dd>
+<dt id="image-copyRotateInterpolated-angle-bgcolor"><b>$image-&gt;copyRotateInterpolated( angle, bgcolor )</b></dt>
+<dd>
+
+<p>Returns a copy, using interpolation.</p>
+
+</dd>
+</dl>
+
+<h2 id="Image-Filter-Commands">Image Filter Commands</h2>
+
+<p>Gd also provides some common image filters, they modify the image in place and return TRUE if modified or FALSE if not. Most of them need libgd &gt;= 2.1.0, with older versions those functions are undefined.</p>
+
+<dl>
+
+<dt id="ok-image-scatter-sub-plus"><b>$ok = $image-&gt;scatter($sub, $plus)</b></dt>
+<dd>
+
+<p>if $sub and $plus are 0, nothing is changed, TRUE is returned. if $sub &gt;= $plus, nothing is changed, FALSE is returned. else random pixels are changed.</p>
+
+</dd>
+<dt id="ok-image-scatterColor-sub-plus-colors"><b>$ok = $image-&gt;scatterColor($sub, $plus, @colors)</b></dt>
+<dd>
+
+<p>Similar to scatter, but using the given array of colors, i.e. palette indices.</p>
+
+</dd>
+<dt id="ok-image-pixelate-blocksize-mode"><b>$ok = $image-&gt;pixelate($blocksize, $mode)</b></dt>
+<dd>
+
+<p>if $blocksize &lt;= 0, nothing is changed, FALSE is returned. if $blocksize == 1, nothing is changed, TRUE is returned. else the following modes are observed: GD_PIXELATE_UPPERLEFT GD_PIXELATE_AVERAGE</p>
+
+</dd>
+<dt id="ok-image-negate"><b>$ok = $image-&gt;negate()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-grayscale"><b>$ok = $image-&gt;grayscale()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-brightness-add"><b>$ok = $image-&gt;brightness($add)</b></dt>
+<dd>
+
+<p>$add: -255..255</p>
+
+</dd>
+<dt id="ok-image-contrast-contrast"><b>$ok = $image-&gt;contrast($contrast)</b></dt>
+<dd>
+
+<p>$contrast: a double value. The contrast adjustment value. Negative values increase, postive values decrease the contrast. The larger the absolute value, the stronger the effect.</p>
+
+</dd>
+<dt id="ok-image-color-red-green-blue-alpha"><b>$ok = $image-&gt;color($red,$green,$blue,$alpha)</b></dt>
+<dd>
+
+<p>Change channel values of an image.</p>
+
+<pre><code>  $red   - The value to add to the red channel of all pixels.
+  $green - The value to add to the green channel of all pixels.
+  $blue  - The value to add to the blue channel of all pixels.
+  $alpha - The value to add to the alpha channel of all pixels.</code></pre>
+
+</dd>
+<dt id="ok-image-selectiveBlur"><b>$ok = $image-&gt;selectiveBlur()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-edgeDetectQuick"><b>$ok = $image-&gt;edgeDetectQuick()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-gaussianBlur"><b>$ok = $image-&gt;gaussianBlur()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-emboss"><b>$ok = $image-&gt;emboss()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-meanRemoval"><b>$ok = $image-&gt;meanRemoval()</b></dt>
+<dd>
+
+</dd>
+<dt id="ok-image-smooth-weight"><b>$ok = $image-&gt;smooth($weight)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-sourceImage-copyGaussianBlurred-radius-sigma"><b>$image = $sourceImage-&gt;copyGaussianBlurred($radius, $sigma)</b></dt>
+<dd>
+
+<p>$radius: int, the blur radius (*not* diameter--range is 2*radius + 1) a radius, not a diameter so a radius of 2 (for example) will blur across a region 5 pixels across (2 to the center, 1 for the center itself and another 2 to the other edge).</p>
+
+<p>$sigma: the sigma value or a value &lt;= 0.0 to use the computed default. represents the &quot;fatness&quot; of the curve (lower == fatter).</p>
+
+<p>The result is always truecolor.</p>
+
+</dd>
+</dl>
+
+<h2 id="Character-and-String-Drawing">Character and String Drawing</h2>
+
+<p>GD allows you to draw characters and strings, either in normal horizontal orientation or rotated 90 degrees. These routines use a GD::Font object, described in more detail below. There are four built-in monospaced fonts, available in the global variables <b>gdGiantFont</b>, <b>gdLargeFont</b>, <b>gdMediumBoldFont</b>, <b>gdSmallFont</b> and <b>gdTinyFont</b>.</p>
+
+<p>In addition, you can use the load() method to load GD-formatted bitmap font files at runtime. You can create these bitmap files from X11 BDF-format files using the bdf2gd.pl script, which should have been installed with GD (see the bdf_scripts directory if it wasn&#39;t). The format happens to be identical to the old-style MSDOS bitmap &quot;.fnt&quot; files, so you can use one of those directly if you happen to have one.</p>
+
+<p>For writing proportional scaleable fonts, GD offers the stringFT() method, which allows you to load and render any TrueType font on your system.</p>
+
+<dl>
+
+<dt id="image-string-font-x-y-string-color"><b>$image-&gt;string($font,$x,$y,$string,$color)</b></dt>
+<dd>
+
+<p>This method draws a string starting at position (x,y) in the specified font and color. Your choices of fonts are gdSmallFont, gdMediumBoldFont, gdTinyFont, gdLargeFont and gdGiantFont.</p>
+
+<p>Example:</p>
+
+<pre><code>        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">string</span><span class="operator">(</span><span class="variable">gdSmallFont</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="string">"Peachy Keen"</span><span class="operator">,</span><span class="variable">$peach</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="image-stringUp-font-x-y-string-color"><b>$image-&gt;stringUp($font,$x,$y,$string,$color)</b></dt>
+<dd>
+
+<p>Just like the previous call, but draws the text rotated counterclockwise 90 degrees.</p>
+
+</dd>
+<dt id="image-char-font-x-y-char-color"><b>$image-&gt;char($font,$x,$y,$char,$color)</b></dt>
+<dd>
+
+</dd>
+<dt id="image-charUp-font-x-y-char-color"><b>$image-&gt;charUp($font,$x,$y,$char,$color)</b></dt>
+<dd>
+
+<p>These methods draw single characters at position (x,y) in the specified font and color. They&#39;re carry-overs from the C interface, where there is a distinction between characters and strings. Perl is insensible to such subtle distinctions.</p>
+
+</dd>
+<dt id="font-GD::Font-load-fontfilepath">$font = <b>GD::Font-&gt;load($fontfilepath)</b></dt>
+<dd>
+
+<p>This method dynamically loads a font file, returning a font that you can use in subsequent calls to drawing methods. For example:</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">$courier</span> <span class="operator">=</span> <span class="variable">GD::Font</span><span class="operator">-&gt;</span><span class="variable">load</span><span class="operator">(</span><span class="string">'./courierR12.fnt'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't load font"</span><span class="operator">;</span>
+   <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">string</span><span class="operator">(</span><span class="variable">$courier</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">10</span><span class="operator">,</span><span class="string">"Peachy Keen"</span><span class="operator">,</span><span class="variable">$peach</span><span class="operator">);</span>
+</code></pre>
+
+<p>Font files must be in GD binary format, as described above.</p>
+
+</dd>
+<dt id="bounds-image-stringFT-fgcolor-fontname-ptsize-angle-x-y-string"><b>@bounds = $image-&gt;stringFT($fgcolor,$fontname,$ptsize,$angle,$x,$y,$string)</b></dt>
+<dd>
+
+</dd>
+<dt id="bounds-GD::Image-stringFT-fgcolor-fontname-ptsize-angle-x-y-string"><b>@bounds = GD::Image-&gt;stringFT($fgcolor,$fontname,$ptsize,$angle,$x,$y,$string)</b></dt>
+<dd>
+
+</dd>
+<dt id="bounds-image-stringFT-fgcolor-fontname-ptsize-angle-x-y-string-options"><b>@bounds = $image-&gt;stringFT($fgcolor,$fontname,$ptsize,$angle,$x,$y,$string,\%options)</b></dt>
+<dd>
+
+<p>This method uses TrueType to draw a scaled, antialiased string using the TrueType vector font of your choice. It requires that libgd to have been compiled with TrueType support, and for the appropriate TrueType font to be installed on your system.</p>
+
+<p>The arguments are as follows:</p>
+
+<pre><code>  fgcolor    Color index to draw the string in
+  fontname   A path to the TrueType (.ttf) font file or a font pattern.
+  ptsize     The desired point size (may be fractional)
+  angle      The rotation angle, in radians (positive values rotate counter clockwise)
+  x,y        X and Y coordinates to start drawing the string
+  string     The string itself</code></pre>
+
+<p>If successful, the method returns an eight-element list giving the boundaries of the rendered string:</p>
+
+<pre><code> @bounds[0,1]  Lower left corner (x,y)
+ @bounds[2,3]  Lower right corner (x,y)
+ @bounds[4,5]  Upper right corner (x,y)
+ @bounds[6,7]  Upper left corner (x,y)</code></pre>
+
+<p>In case of an error (such as the font not being available, or FT support not being available), the method returns an empty list and sets $@ to the error message.</p>
+
+<p>The string may contain UTF-8 sequences like: &quot;&amp;#192;&quot;</p>
+
+<p>You may also call this method from the GD::Image class name, in which case it doesn&#39;t do any actual drawing, but returns the bounding box using an inexpensive operation. You can use this to perform layout operations prior to drawing.</p>
+
+<p>Using a negative color index will disable antialiasing, as described in the libgd manual page at <a href="http://www.boutell.com/gd/manual2.0.9.html#gdImageStringFT">http://www.boutell.com/gd/manual2.0.9.html#gdImageStringFT</a>.</p>
+
+<p>An optional 8th argument allows you to pass a hashref of options to stringFT(). Several hashkeys are recognized: <b>linespacing</b>, <b>charmap</b>, <b>resolution</b>, and <b>kerning</b>.</p>
+
+<p>The value of <b>linespacing</b> is supposed to be a multiple of the character height, so setting linespacing to 2.0 will result in double-spaced lines of text. However the current version of libgd (2.0.12) does not do this. Instead the linespacing seems to be double what is provided in this argument. So use a spacing of 0.5 to get separation of exactly one line of text. In practice, a spacing of 0.6 seems to give nice results. Another thing to watch out for is that successive lines of text should be separated by the &quot;\r\n&quot; characters, not just &quot;\n&quot;.</p>
+
+<p>The value of <b>charmap</b> is one of &quot;Unicode&quot;, &quot;Shift_JIS&quot; and &quot;Big5&quot;. The interaction between Perl, Unicode and libgd is not clear to me, and you should experiment a bit if you want to use this feature.</p>
+
+<p>The value of <b>resolution</b> is the vertical and horizontal resolution, in DPI, in the format &quot;hdpi,vdpi&quot;. If present, the resolution will be passed to the Freetype rendering engine as a hint to improve the appearance of the rendered font.</p>
+
+<p>The value of <b>kerning</b> is a flag. Set it to false to turn off the default kerning of text.</p>
+
+<p>Example:</p>
+
+<pre><code> <span class="variable">$gd</span><span class="operator">-&gt;</span><span class="variable">stringFT</span><span class="operator">(</span><span class="variable">$black</span><span class="operator">,</span><span class="string">'/dosc/windows/Fonts/pala.ttf'</span><span class="operator">,</span><span class="number">40</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">20</span><span class="operator">,</span><span class="number">90</span><span class="operator">,</span>
+              <span class="string">"hi there\r\nbye now"</span><span class="operator">,</span>
+              <span class="operator">{</span><span class="string">linespacing</span><span class="operator">=&gt;</span><span class="number">0</span><span class="operator">.</span><span class="number">6</span><span class="operator">,</span>
+               <span class="string">charmap</span>  <span class="operator">=&gt;</span> <span class="string">'Unicode'</span><span class="operator">,</span>
+              <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>If GD was compiled with fontconfig support, and the fontconfig library is available on your system, then you can use a font name pattern instead of a path. Patterns are described in <a>fontconfig</a> and will look something like this &quot;Times:italic&quot;. For backward compatibility, this feature is disabled by default. You must enable it by calling useFontConfig(1) prior to the stringFT() call.</p>
+
+<pre><code>   <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">useFontConfig</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>For backward compatibility with older versions of the FreeType library, the alias stringTTF() is also recognized.</p>
+
+</dd>
+<dt id="hasfontconfig-image-useFontConfig-flag"><b>$hasfontconfig = $image-&gt;useFontConfig($flag)</b></dt>
+<dd>
+
+<p>Call useFontConfig() with a value of 1 in order to enable support for fontconfig font patterns (see stringFT). Regardless of the value of $flag, this method will return a true value if the fontconfig library is present, or false otherwise.</p>
+
+<p>This method can also be called as a class method of GD::Image;</p>
+
+</dd>
+<dt id="result-image-stringFTCircle-cx-cy-radius-textRadius-fillPortion-font-points-top-bottom-fgcolor"><b>$result = $image-&gt;stringFTCircle($cx,$cy,$radius,$textRadius,$fillPortion,$font,$points,$top,$bottom,$fgcolor)</b></dt>
+<dd>
+
+<p>This draws text in a circle. Currently (libgd 2.0.33) this function does not work for me, but the interface is provided for completeness. The call signature is somewhat complex. Here is an excerpt from the libgd manual page:</p>
+
+<p>Draws the text strings specified by top and bottom on the image, curved along the edge of a circle of radius radius, with its center at cx and cy. top is written clockwise along the top; bottom is written counterclockwise along the bottom. textRadius determines the &quot;height&quot; of each character; if textRadius is 1/2 of radius, characters extend halfway from the edge to the center. fillPortion varies from 0 to 1.0, with useful values from about 0.4 to 0.9, and determines how much of the 180 degrees of arc assigned to each section of text is actually occupied by text; 0.9 looks better than 1.0 which is rather crowded. font is a freetype font; see gdImageStringFT. points is passed to the freetype engine and has an effect on hinting; although the size of the text is determined by radius, textRadius, and fillPortion, you should pass a point size that &quot;hints&quot; appropriately -- if you know the text will be large, pass a large point size such as 24.0 to get the best results. fgcolor can be any color, and may have an alpha component, do blending, etc.</p>
+
+<p>Returns a true value on success.</p>
+
+</dd>
+</dl>
+
+<h2 id="Alpha-channels">Alpha channels</h2>
+
+<p>The alpha channel methods allow you to control the way drawings are processed according to the alpha channel. When true color is turned on, colors are encoded as four bytes, in which the last three bytes are the RGB color values, and the first byte is the alpha channel. Therefore the hexadecimal representation of a non transparent RGB color will be: C=0x00(rr)(bb)(bb)</p>
+
+<p>When alpha blending is turned on, you can use the first byte of the color to control the transparency, meaning that a rectangle painted with color 0x00(rr)(bb)(bb) will be opaque, and another one painted with 0x7f(rr)(gg)(bb) will be transparent. The Alpha value must be &gt;= 0 and &lt;= 0x7f.</p>
+
+<dl>
+
+<dt id="image-alphaBlending-integer"><b>$image-&gt;alphaBlending($integer)</b></dt>
+<dd>
+
+<p>The alphaBlending() method allows for two different modes of drawing on truecolor images. In blending mode, which is on by default (libgd 2.0.2 and above), the alpha channel component of the color supplied to all drawing functions, such as <code>setPixel</code>, determines how much of the underlying color should be allowed to shine through. As a result, GD automatically blends the existing color at that point with the drawing color, and stores the result in the image. The resulting pixel is opaque. In non-blending mode, the drawing color is copied literally with its alpha channel information, replacing the destination pixel. Blending mode is not available when drawing on palette images.</p>
+
+<p>Pass a value of 1 for blending mode, and 0 for non-blending mode.</p>
+
+</dd>
+<dt id="image-saveAlpha-saveAlpha"><b>$image-&gt;saveAlpha($saveAlpha)</b></dt>
+<dd>
+
+<p>By default, GD (libgd 2.0.2 and above) does not attempt to save full alpha channel information (as opposed to single-color transparency) when saving PNG images. (PNG is currently the only output format supported by gd which can accommodate alpha channel information.) This saves space in the output file. If you wish to create an image with alpha channel information for use with tools that support it, call <code>saveAlpha(1)</code> to turn on saving of such information, and call <code>alphaBlending(0)</code> to turn off alpha blending within the library so that alpha channel information is actually stored in the image rather than being composited immediately at the time that drawing functions are invoked.</p>
+
+</dd>
+</dl>
+
+<h2 id="Miscellaneous-Image-Methods">Miscellaneous Image Methods</h2>
+
+<p>These are various utility methods that are useful in some circumstances.</p>
+
+<dl>
+
+<dt id="image-interlaced-flag"><b>$image-&gt;interlaced([$flag])</b></dt>
+<dd>
+
+<p>This method sets or queries the image&#39;s interlaced setting. Interlace produces a cool venetian blinds effect on certain viewers. Provide a true parameter to set the interlace attribute. Provide undef to disable it. Call the method without parameters to find out the current setting.</p>
+
+</dd>
+<dt id="width-height-image-getBounds"><b>($width,$height) = $image-&gt;getBounds()</b></dt>
+<dd>
+
+<p>This method will return a two-member list containing the width and height of the image. You query but not change the size of the image once it&#39;s created.</p>
+
+</dd>
+<dt id="width-image-width"><b>$width = $image-&gt;width</b></dt>
+<dd>
+
+</dd>
+<dt id="height-image-height"><b>$height = $image-&gt;height</b></dt>
+<dd>
+
+<p>Return the width and height of the image, respectively.</p>
+
+</dd>
+<dt id="is_truecolor-image-isTrueColor"><b>$is_truecolor = $image-&gt;isTrueColor()</b></dt>
+<dd>
+
+<p>This method will return a Boolean representing whether the image is true color or not.</p>
+
+</dd>
+<dt id="flag-image1-compare-image2"><b>$flag = $image1-&gt;compare($image2)</b></dt>
+<dd>
+
+<p>Compare two images and return a bitmap describing the differences found, if any. The return value must be logically AND&#39;ed with one or more constants in order to determine the differences. The following constants are available:</p>
+
+<pre><code>  GD_CMP_IMAGE             The two images look different
+  GD_CMP_NUM_COLORS        The two images have different numbers of colors
+  GD_CMP_COLOR             The two images&#39; palettes differ
+  GD_CMP_SIZE_X            The two images differ in the horizontal dimension
+  GD_CMP_SIZE_Y            The two images differ in the vertical dimension
+  GD_CMP_TRANSPARENT       The two images have different transparency
+  GD_CMP_BACKGROUND        The two images have different background colors
+  GD_CMP_INTERLACE         The two images differ in their interlace
+  GD_CMP_TRUECOLOR         The two images are not both true color</code></pre>
+
+<p>The most important of these is GD_CMP_IMAGE, which will tell you whether the two images will look different, ignoring differences in the order of colors in the color palette and other invisible changes. The constants are not imported by default, but must be imported individually or by importing the :cmp tag. Example:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">GD</span> <span class="string">qw(:DEFAULT :cmp)</span><span class="operator">;</span>
+  <span class="comment"># get $image1 from somewhere</span>
+  <span class="comment"># get $image2 from somewhere</span>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$image1</span><span class="operator">-&gt;</span><span class="variable">compare</span><span class="operator">(</span><span class="variable">$image2</span><span class="operator">)</span> <span class="operator">&amp;</span> <span class="variable">GD_CMP_IMAGE</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">warn</span> <span class="string">"images differ!"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="image-clip-x1-y1-x2-y2"><b>$image-&gt;clip($x1,$y1,$x2,$y2)</b></dt>
+<dd>
+
+</dd>
+<dt id="x1-y1-x2-y2-image-clip"><b>($x1,$y1,$x2,$y2) = $image-&gt;clip</b></dt>
+<dd>
+
+<p>Set or get the clipping rectangle. When the clipping rectangle is set, all drawing will be clipped to occur within this rectangle. The clipping rectangle is initially set to be equal to the boundaries of the whole image. Change it by calling clip() with the coordinates of the new clipping rectangle. Calling clip() without any arguments will return the current clipping rectangle.</p>
+
+</dd>
+<dt id="flag-image-boundsSafe-x-y"><b>$flag = $image-&gt;boundsSafe($x,$y)</b></dt>
+<dd>
+
+<p>The boundsSafe() method will return true if the point indicated by ($x,$y) is within the clipping rectangle, or false if it is not. If the clipping rectangle has not been set, then it will return true if the point lies within the image boundaries.</p>
+
+</dd>
+</dl>
+
+<h2 id="Grouping-Methods">Grouping Methods</h2>
+
+<p>GD does not support grouping of objects, but GD::SVG does. In that subclass, the following methods declare new groups of graphical objects:</p>
+
+<dl>
+
+<dt id="image-startGroup-id-style">$image-&gt;startGroup([$id,\%style])</dt>
+<dd>
+
+</dd>
+<dt id="image-endGroup">$image-&gt;endGroup()</dt>
+<dd>
+
+</dd>
+<dt id="group-image-newGroup">$group = $image-&gt;newGroup</dt>
+<dd>
+
+<p>See <a>GD::SVG</a> for information.</p>
+
+</dd>
+</dl>
+
+<h1 id="Polygons">Polygons</h1>
+
+<p>A few primitive polygon creation and manipulation methods are provided. They aren&#39;t part of the Gd library, but I thought they might be handy to have around (they&#39;re borrowed from my qd.pl Quickdraw library). Also see <a href="../lib/GD/Polyline.html">GD::Polyline</a>.</p>
+
+<dl>
+
+<dt id="poly-GD::Polygon-new"><b>$poly = GD::Polygon-&gt;new</b></dt>
+<dd>
+
+<p>Create an empty polygon with no vertices.</p>
+
+<pre><code>        <span class="variable">$poly</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Polygon</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="poly-addPt-x-y"><b>$poly-&gt;addPt($x,$y)</b></dt>
+<dd>
+
+<p>Add point (x,y) to the polygon.</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">50</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">25</span><span class="operator">,</span><span class="number">25</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">fillPoly</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="x-y-poly-getPt-index"><b>($x,$y) = $poly-&gt;getPt($index)</b></dt>
+<dd>
+
+<p>Retrieve the point at the specified vertex.</p>
+
+<pre><code>        <span class="operator">(</span><span class="variable">$x</span><span class="operator">,</span><span class="variable">$y</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">getPt</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="poly-setPt-index-x-y"><b>$poly-&gt;setPt($index,$x,$y)</b></dt>
+<dd>
+
+<p>Change the value of an already existing vertex. It is an error to set a vertex that isn&#39;t already defined.</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">setPt</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span><span class="number">100</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="x-y-poly-deletePt-index"><b>($x,$y) = $poly-&gt;deletePt($index)</b></dt>
+<dd>
+
+<p>Delete the specified vertex, returning its value.</p>
+
+<pre><code>        <span class="operator">(</span><span class="variable">$x</span><span class="operator">,</span><span class="variable">$y</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">deletePt</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="poly-clear"><b>$poly-&gt;clear()</b></dt>
+<dd>
+
+<p>Delete all vertices, restoring the polygon to its initial empty state.</p>
+
+</dd>
+<dt id="poly-toPt-dx-dy"><b>$poly-&gt;toPt($dx,$dy)</b></dt>
+<dd>
+
+<p>Draw from current vertex to a new vertex, using relative (dx,dy) coordinates. If this is the first point, act like addPt().</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">toPt</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">50</span><span class="operator">);</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">toPt</span><span class="operator">(</span><span class="number">25</span><span class="operator">,-</span><span class="number">25</span><span class="operator">);</span>
+        <span class="variable">$myImage</span><span class="operator">-&gt;</span><span class="variable">fillPoly</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">,</span><span class="variable">$blue</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="vertex_count-poly-length"><b>$vertex_count = $poly-&gt;length</b></dt>
+<dd>
+
+<p>Return the number of vertices in the polygon.</p>
+
+<pre><code>        <span class="variable">$points</span> <span class="operator">=</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">length</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="vertices-poly-vertices"><b>@vertices = $poly-&gt;vertices</b></dt>
+<dd>
+
+<p>Return a list of all the vertices in the polygon object. Each member of the list is a reference to an (x,y) array.</p>
+
+<pre><code>        <span class="variable">@vertices</span> <span class="operator">=</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">vertices</span><span class="operator">;</span>
+        <span class="keyword">foreach</span> <span class="variable">$v</span> <span class="operator">(</span><span class="variable">@vertices</span><span class="operator">)</span>
+           <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">","</span><span class="operator">,</span><span class="variable">@$v</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="rect-poly-bounds"><b>@rect = $poly-&gt;bounds</b></dt>
+<dd>
+
+<p>Return the smallest rectangle that completely encloses the polygon. The return value is an array containing the (left,top,right,bottom) of the rectangle.</p>
+
+<pre><code>        <span class="operator">(</span><span class="variable">$left</span><span class="operator">,</span><span class="variable">$top</span><span class="operator">,</span><span class="variable">$right</span><span class="operator">,</span><span class="variable">$bottom</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">bounds</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="poly-offset-dx-dy"><b>$poly-&gt;offset($dx,$dy)</b></dt>
+<dd>
+
+<p>Offset all the vertices of the polygon by the specified horizontal (dh) and vertical (dy) amounts. Positive numbers move the polygon down and to the right.</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">offset</span><span class="operator">(</span><span class="number">10</span><span class="operator">,</span><span class="number">30</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="poly-map-srcL-srcT-srcR-srcB-destL-dstT-dstR-dstB"><b>$poly-&gt;map($srcL,$srcT,$srcR,$srcB,$destL,$dstT,$dstR,$dstB)</b></dt>
+<dd>
+
+<p>Map the polygon from a source rectangle to an equivalent position in a destination rectangle, moving it and resizing it as necessary. See polys.pl for an example of how this works. Both the source and destination rectangles are given in (left,top,right,bottom) coordinates. For convenience, you can use the polygon&#39;s own bounding box as the source rectangle.</p>
+
+<pre><code>        <span class="comment"># Make the polygon really tall</span>
+        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">map</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">bounds</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">,</span><span class="number">50</span><span class="operator">,</span><span class="number">200</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="poly-scale-sx-sy"><b>$poly-&gt;scale($sx,$sy)</b></dt>
+<dd>
+
+<p>Scale each vertex of the polygon by the X and Y factors indicated by sx and sy. For example scale(2,2) will make the polygon twice as large. For best results, move the center of the polygon to position (0,0) before you scale, then move it back to its previous position.</p>
+
+</dd>
+<dt id="poly-transform-sx-rx-sy-ry-tx-ty"><b>$poly-&gt;transform($sx,$rx,$sy,$ry,$tx,$ty)</b></dt>
+<dd>
+
+<p>Run each vertex of the polygon through a transformation matrix, where sx and sy are the X and Y scaling factors, rx and ry are the X and Y rotation factors, and tx and ty are X and Y offsets. See the Adobe PostScript Reference, page 154 for a full explanation, or experiment.</p>
+
+</dd>
+</dl>
+
+<h2 id="GD::Polyline">GD::Polyline</h2>
+
+<p>Please see <a href="../lib/GD/Polyline.html">GD::Polyline</a> for information on creating open polygons and splines.</p>
+
+<h1 id="Font-Utilities">Font Utilities</h1>
+
+<p>The libgd library (used by the Perl GD library) has built-in support for about half a dozen fonts, which were converted from public-domain X Windows fonts. For more fonts, compile libgd with TrueType support and use the stringFT() call.</p>
+
+<p>If you wish to add more built-in fonts, the directory bdf_scripts contains two contributed utilities that may help you convert X-Windows BDF-format fonts into the format that libgd uses internally. However these scripts were written for earlier versions of GD which included its own mini-gd library. These scripts will have to be adapted for use with libgd, and the libgd library itself will have to be recompiled and linked! Please do not contact me for help with these scripts: they are unsupported.</p>
+
+<p>Each of these fonts is available both as an imported global (e.g. <b>gdSmallFont</b>) and as a package method (e.g. <b>GD::Font-&gt;Small</b>).</p>
+
+<dl>
+
+<dt id="gdSmallFont"><b>gdSmallFont</b></dt>
+<dd>
+
+</dd>
+<dt id="GD::Font-Small"><b>GD::Font-&gt;Small</b></dt>
+<dd>
+
+<p>This is the basic small font, &quot;borrowed&quot; from a well known public domain 6x12 font.</p>
+
+</dd>
+<dt id="gdLargeFont"><b>gdLargeFont</b></dt>
+<dd>
+
+</dd>
+<dt id="GD::Font-Large"><b>GD::Font-&gt;Large</b></dt>
+<dd>
+
+<p>This is the basic large font, &quot;borrowed&quot; from a well known public domain 8x16 font.</p>
+
+</dd>
+<dt id="gdMediumBoldFont"><b>gdMediumBoldFont</b></dt>
+<dd>
+
+</dd>
+<dt id="GD::Font-MediumBold"><b>GD::Font-&gt;MediumBold</b></dt>
+<dd>
+
+<p>This is a bold font intermediate in size between the small and large fonts, borrowed from a public domain 7x13 font;</p>
+
+</dd>
+<dt id="gdTinyFont"><b>gdTinyFont</b></dt>
+<dd>
+
+</dd>
+<dt id="GD::Font-Tiny"><b>GD::Font-&gt;Tiny</b></dt>
+<dd>
+
+<p>This is a tiny, almost unreadable font, 5x8 pixels wide.</p>
+
+</dd>
+<dt id="gdGiantFont"><b>gdGiantFont</b></dt>
+<dd>
+
+</dd>
+<dt id="GD::Font-Giant"><b>GD::Font-&gt;Giant</b></dt>
+<dd>
+
+<p>This is a 9x15 bold font converted by Jan Pazdziora from a sans serif X11 font.</p>
+
+</dd>
+<dt id="font-nchars"><b>$font-&gt;nchars</b></dt>
+<dd>
+
+<p>This returns the number of characters in the font.</p>
+
+<pre><code>        <span class="keyword">print</span> <span class="string">"The large font contains "</span><span class="operator">,</span><span class="variable">gdLargeFont</span><span class="operator">-&gt;</span><span class="variable">nchars</span><span class="operator">,</span><span class="string">" characters\n"</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="font-offset"><b>$font-&gt;offset</b></dt>
+<dd>
+
+<p>This returns the ASCII value of the first character in the font</p>
+
+</dd>
+<dt id="width-font-width"><b>$width = $font-&gt;width</b></dt>
+<dd>
+
+</dd>
+<dt id="height-font-height"><b>$height = $font-&gt;height</b></dt>
+<dd>
+
+</dd>
+<dt id="height"><code>height</code></dt>
+<dd>
+
+<p>These return the width and height of the font.</p>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$w</span><span class="operator">,</span><span class="variable">$h</span><span class="operator">)</span> <span class="operator">=</span> <span class="operator">(</span><span class="variable">gdLargeFont</span><span class="operator">-&gt;</span><span class="variable">width</span><span class="operator">,</span><span class="variable">gdLargeFont</span><span class="operator">-&gt;</span><span class="variable">height</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="Helper-Functions">Helper Functions</h1>
+
+<dl>
+
+<dt id="GD::LIBGD_VERSION">GD::LIBGD_VERSION</dt>
+<dd>
+
+<p>Returns a number of the libgd VERSION, like 2.0204, 2.0033 or 2.01.</p>
+
+</dd>
+<dt id="GD::VERSION_STRING">GD::VERSION_STRING</dt>
+<dd>
+
+<p>Returns the string of the libgd VERSION, like &quot;2.2.4&quot;.</p>
+
+</dd>
+<dt id="GD::constant">GD::constant</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="Obtaining-the-C-language-version-of-gd">Obtaining the C-language version of gd</h1>
+
+<p>libgd, the C-language version of gd, can be obtained at URL http://libgd.org/ Directions for installing and using it can be found at that site. Please do not contact me for help with libgd.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>The GD.pm interface is copyright 1995-2010, Lincoln D. Stein. This package and its accompanying libraries is free software; you can redistribute it and/or modify it under the terms of the GPL (either version 1, or at your option, any later version) or the Artistic License 2.0. Refer to LICENSE for the full license text. package for details.</p>
+
+<p>The latest versions of GD.pm are available at</p>
+
+<pre><code>  https://github.com/lstein/Perl-GD</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../lib/GD/Polyline.html">GD::Polyline</a>, <a>GD::SVG</a>, <a href="../lib/GD/Simple.html">GD::Simple</a>, <a>Image::Magick</a></p>
+
+
+</body>
+
+</html>
+
+

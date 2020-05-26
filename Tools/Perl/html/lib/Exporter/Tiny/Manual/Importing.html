@@ -1,0 +1,289 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Basic-importing">Basic importing</a></li>
+      <li><a href="#Renaming-imported-functions">Renaming imported functions</a></li>
+      <li><a href="#DO-NOT-WANT">DO NOT WANT!</a></li>
+      <li><a href="#Importing-by-regexp">Importing by regexp</a></li>
+      <li><a href="#Import-functions-into-another-package">Import functions into another package</a></li>
+      <li><a href="#Lexical-subs">Lexical subs</a></li>
+      <li><a href="#Unimporting">Unimporting</a></li>
+    </ul>
+  </li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Exporter::Tiny::Manual::Importing - importing from Exporter::Tiny-based modules</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>For the purposes of this discussion we&#39;ll assume we have a module called <code>MyUtils</code> which exports functions called <code>frobnicate</code>, <code>red</code>, <code>blue</code>, and <code>green</code>. It has a tag set up called <code>:colours</code> which corresponds to <code>red</code>, <code>blue</code>, and <code>green</code>.</p>
+
+<p>Many of these tricks may seem familiar from <a href="../../../../lib/Sub/Exporter.html">Sub::Exporter</a>. That is intentional. Exporter::Tiny doesn&#39;t attempt to provide every feature of Sub::Exporter, but where it does it usually uses a fairly similar API.</p>
+
+<h2 id="Basic-importing">Basic importing</h2>
+
+<p>It&#39;s easy to import a single function from a module:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or a list of functions:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"red"</span><span class="operator">,</span> <span class="string">"green"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Perl&#39;s <code>qw()</code> shorthand for a list of words is pretty useful:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( red green )</span><span class="operator">;</span>
+</code></pre>
+
+<p>If the module defines tags, you can import them like this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( :colours )</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or with a hyphen instead of a colon:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( -colours )</span><span class="operator">;</span>
+</code></pre>
+
+<p>Hyphens are good because Perl will autoquote a bareword that follows them:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">-</span><span class="variable">colours</span><span class="operator">;</span>
+</code></pre>
+
+<p>And it&#39;s possible to mix function names and tags in the same list:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( frobnicate :colours )</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Renaming-imported-functions">Renaming imported functions</h2>
+
+<p>It&#39;s possible to rename a function you&#39;re importing:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"frob"</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or you can apply a prefix and/or suffix. The following imports the function and calls it <code>my_frobinate_thing</code>.</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-prefix</span> <span class="operator">=&gt;</span> <span class="string">"my_"</span><span class="operator">,</span> <span class="string">-suffix</span> <span class="operator">=&gt;</span> <span class="string">"_thing"</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can apply a prefix/suffix to <b>all</b> functions you import by placing the hashref <b>first</b> in the import list. (This first hashref is referred to as the global options hash, and can do some special things.)</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">{</span> <span class="string">prefix</span> <span class="operator">=&gt;</span> <span class="string">"my_"</span> <span class="operator">},</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Did you notice that we used <code>-prefix</code> and <code>-suffix</code> in the normal options hash, but <code>prefix</code> and <code>suffix</code> (no hyphen) in the global options hash? That&#39;s a common pattern with this module.</p>
+
+<p>You can import the same function multiple times with different names:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span>
+      <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"frob"</span> <span class="operator">}</span><span class="operator">,</span>
+      <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"frbnct"</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Tags can take the <code>-prefix</code> and <code>-suffix</code> options too. The following imports <code>colour_red</code>, <code>colour_green</code>, and <code>colour_blue</code>:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">-</span><span class="string">colours</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-prefix</span> <span class="operator">=&gt;</span> <span class="string">"colour_"</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can also set <code>-as</code> to be a coderef to generate a function name. This imports functions called <code>RED</code>, <code>GREEN</code>, and <code>BLUE</code>:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">-</span><span class="string">colours</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">uc</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">)</span> <span class="operator">}</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Note that it doesn&#39;t make sense to use <code>-as</code> with a tag unless you&#39;re doing this coderef thing. Coderef <code>as</code> also works in the global options hash.</p>
+
+<h2 id="DO-NOT-WANT">DO NOT WANT!</h2>
+
+<p>Sometimes you want to supply a list of functions you <b>don&#39;t</b> want to import. To do that, prefix the function with a bang. This imports everything except &quot;frobnicate&quot;:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( -all !frobnicate )</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can add the bang prefix to tags too. This will import everything except the colours.</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( -all !:colours )</span><span class="operator">;</span>
+</code></pre>
+
+<p>Negated imports always &quot;win&quot;, so the following will not import &quot;frobnicate&quot;, no matter how many times you repeat it...</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( !frobnicate frobnicate frobnicate frobnicate )</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Importing-by-regexp">Importing by regexp</h2>
+
+<p>Here&#39;s how you could import all functions beginning with an &quot;f&quot;:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( /^F/i )</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or import everything except functions beginning with a &quot;z&quot;:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">qw( -all !/^Z/i )</span><span class="operator">;</span>
+</code></pre>
+
+<p>Note that regexps are always supplied as <i>strings</i> starting with <code>&quot;/&quot;</code>, and not as quoted regexp references (<code>qr/.../</code>).</p>
+
+<h2 id="Import-functions-into-another-package">Import functions into another package</h2>
+
+<p>Occasionally you need to import functions not into your own package, but into a different package. You can do that like this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">{</span> <span class="string">into</span> <span class="operator">=&gt;</span> <span class="string">"OtherPkg"</span> <span class="operator">},</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+   
+   <span class="variable">OtherPkg::frobincate</span><span class="operator">(...);</span>
+</code></pre>
+
+<p>However, <a>Import::Into</a> will probably provide you with a better approach which doesn&#39;t just work with Exporter::Tiny, but <b>all</b> exporters.</p>
+
+<h2 id="Lexical-subs">Lexical subs</h2>
+
+<p>Often you want to make use of an exported function, but don&#39;t want it to &quot;pollute&quot; your namespace.</p>
+
+<p>There is this <a>Sub::Exporter::Lexical</a> thing that was designed as a plugin for <a href="../../../../lib/Sub/Exporter.html">Sub::Exporter</a>, but Exporter::Tiny&#39;s API is close enough that it will work. Do you remember that global options hash? Just use that to tell Exporter::Tiny to use an alternative sub installer.</p>
+
+<pre><code>   <span class="operator">{</span>
+      <span class="keyword">use</span> <span class="variable">Sub::Exporter::Lexical</span> <span class="string">lexical_installer</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"lex"</span> <span class="operator">}</span><span class="operator">;</span>
+      <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">{</span> <span class="string">installer</span> <span class="operator">=&gt;</span> <span class="variable">lex</span> <span class="operator">},</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+      
+      <span class="variable">frobnicate</span><span class="operator">(...);</span>  <span class="comment"># ok</span>
+   <span class="operator">}</span>
+   
+   <span class="variable">frobnicate</span><span class="operator">(...);</span>  <span class="comment"># not ok</span>
+</code></pre>
+
+<p>Another way to do lexical functions is to import a function into a scalar variable:</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">$func</span><span class="operator">;</span>
+   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">$func</span> <span class="operator">}</span><span class="operator">;</span>
+   
+   <span class="variable">$func</span><span class="operator">-&gt;(...);</span>
+</code></pre>
+
+<p>You can even provide a hashref to put all imported functions into as part of that global options hash I mentioned earlier.</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">%funcs</span><span class="operator">;</span>
+   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">{</span> <span class="string">into</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%funcs</span> <span class="operator">},</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+   
+   <span class="variable">$funcs</span><span class="operator">{</span><span class="string">frobnicate</span><span class="operator">}</span><span class="operator">-&gt;(...);</span>
+</code></pre>
+
+<h2 id="Unimporting">Unimporting</h2>
+
+<p>You can unimport the functions that MyUtils added to your namespace:</p>
+
+<pre><code>   <span class="keyword">no</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or just specific ones:</p>
+
+<pre><code>   <span class="keyword">no</span> <span class="variable">MyUtils</span> <span class="string">qw(frobnicate)</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you renamed a function when you imported it, you should unimport by the new name:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">frobnicate</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"frob"</span> <span class="operator">}</span><span class="operator">;</span>
+   <span class="operator">...;</span>
+   <span class="keyword">no</span> <span class="variable">MyUtils</span> <span class="string">"frob"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Unimporting using tags and regexps should mostly do what you want.</p>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<dl>
+
+<dt id="Overwriting-existing-sub-s::-s-with-sub-s-exported-by-s"><b>Overwriting existing sub &#39;%s::%s&#39; with sub &#39;%s&#39; exported by %s</b></dt>
+<dd>
+
+<p>A warning issued if Exporter::Tiny is asked to export a symbol which will result in an existing sub being overwritten. This warning can be suppressed using either of the following:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">{</span> <span class="string">replace</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">},</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-replace</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or can be upgraded to a fatal error:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">{</span> <span class="string">replace</span> <span class="operator">=&gt;</span> <span class="string">"die"</span> <span class="operator">},</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-replace</span> <span class="operator">=&gt;</span> <span class="string">"die"</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="Refusing-to-overwrite-existing-sub-s::-s-with-sub-s-exported-by-s"><b>Refusing to overwrite existing sub &#39;%s::%s&#39; with sub &#39;%s&#39; exported by %s</b></dt>
+<dd>
+
+<p>The fatal version of the above warning.</p>
+
+</dd>
+<dt id="Could-not-find-sub-s-exported-by-s"><b>Could not find sub &#39;%s&#39; exported by %s</b></dt>
+<dd>
+
+<p>You requested to import a sub which the package does not provide.</p>
+
+</dd>
+<dt id="Cannot-provide-an--as-option-for-tags"><b>Cannot provide an -as option for tags</b></dt>
+<dd>
+
+<p>Because a tag may provide more than one function, it does not make sense to request a single name for it. Instead use <code>-prefix</code> or <code>-suffix</code>.</p>
+
+</dd>
+<dt id="Passing-options-to-unimport-s-makes-no-sense"><b>Passing options to unimport &#39;%s&#39; makes no sense</b></dt>
+<dd>
+
+<p>When you import a sub, it occasionally makes sense to pass some options for it. However, when unimporting, options do nothing, so this warning is issued.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Exporter/Shiny.html">Exporter::Shiny</a>, <a href="../../../../lib/Exporter/Tiny.html">Exporter::Tiny</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Toby Inkster &lt;tobyink@cpan.org&gt;.</p>
+
+<h1 id="COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</h1>
+
+<p>This software is copyright (c) 2013-2014, 2017 by Toby Inkster.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</h1>
+
+<p>THIS PACKAGE IS PROVIDED &quot;AS IS&quot; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+
+
+</body>
+
+</html>
+
+

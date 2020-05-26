@@ -1,0 +1,277 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONSTRUCTORS">CONSTRUCTORS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#clone">clone</a></li>
+    </ul>
+  </li>
+  <li><a href="#PARSING-METHODS">PARSING METHODS</a>
+    <ul>
+      <li><a href="#loose-strict">loose, strict</a></li>
+      <li><a href="#parse_datetime">parse_datetime</a></li>
+      <li><a href="#set_year_cutoff">set_year_cutoff</a></li>
+      <li><a href="#year_cutoff">year_cutoff</a></li>
+      <li><a href="#default_cutoff">default_cutoff</a></li>
+      <li><a href="#fix_year">fix_year</a></li>
+    </ul>
+  </li>
+  <li><a href="#FORMATTING-METHODS">FORMATTING METHODS</a>
+    <ul>
+      <li><a href="#format_datetime">format_datetime</a></li>
+    </ul>
+  </li>
+  <li><a href="#THANKS-FROM-SPOON">THANKS FROM SPOON</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#LICENCE-AND-COPYRIGHT">LICENCE AND COPYRIGHT</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Mail - Convert between DateTime and RFC2822/822 formats</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">;</span>
+    
+    <span class="comment"># From RFC2822 via class method:</span>
+    
+    <span class="keyword">my</span> <span class="variable">$datetime</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">parse_datetime</span><span class="operator">(</span>
+        <span class="string">"Sat, 29 Mar 2003 22:11:18 -0800"</span>
+    <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$datetime</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">(</span><span class="string">'.'</span><span class="operator">);</span> <span class="comment"># "2003.03.29"</span>
+    
+    <span class="comment">#  or via an object</span>
+    
+    <span class="keyword">my</span> <span class="variable">$pf</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+    <span class="keyword">print</span> <span class="variable">$pf</span><span class="operator">-&gt;</span><span class="variable">parse_datetime</span><span class="operator">(</span>
+        <span class="string">"Fri, 23 Nov 2001 21:57:24 -0600"</span>
+    <span class="operator">)-&gt;</span><span class="variable">ymd</span><span class="operator">;</span> <span class="comment"># "2001-11-23"</span>
+    
+    <span class="comment"># Back to RFC2822 date</span>
+    
+    <span class="keyword">use</span> <span class="variable">DateTime</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">1979</span><span class="operator">,</span> <span class="string">month</span> <span class="operator">=&gt;</span> <span class="number">7</span><span class="operator">,</span> <span class="string">day</span> <span class="operator">=&gt;</span> <span class="number">16</span><span class="operator">,</span>
+        <span class="string">hour</span> <span class="operator">=&gt;</span> <span class="number">16</span><span class="operator">,</span> <span class="string">minute</span> <span class="operator">=&gt;</span> <span class="number">45</span><span class="operator">,</span> <span class="string">second</span> <span class="operator">=&gt;</span> <span class="number">20</span><span class="operator">,</span>
+        <span class="string">time_zone</span> <span class="operator">=&gt;</span> <span class="string">"Australia/Sydney"</span>
+    <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$str</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$str</span><span class="operator">;</span> <span class="comment"># "Mon, 16 Jul 1979 16:45:20 +1000"</span>
+    
+    <span class="comment"># or via an object</span>
+    <span class="variable">$str</span> <span class="operator">=</span> <span class="variable">$pf</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$str</span><span class="operator">;</span> <span class="comment"># "Mon, 16 Jul 1979 16:45:20 +1000"</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>RFCs 2822 and 822 specify date formats to be used by email. This module parses and emits such dates.</p>
+
+<p>RFC2822 (April 2001) introduces a slightly different format of date than that used by RFC822 (August 1982). The main correction is that the preferred format is more limited, and thus easier to parse programmatically.</p>
+
+<p>Despite the ease of generating and parsing perfectly valid RFC822 and RFC2822 people still get it wrong. So this module provides four things for those handling mail dates:</p>
+
+<ol>
+
+<li><p>A strict parser that will only accept RFC2822 dates, so you can see where you&#39;re right.</p>
+
+</li>
+<li><p>A strict formatter, so you can generate the right stuff to begin with.</p>
+
+</li>
+<li><p>A <i>loose</i> parser, so you can take the misbegotten output from other programs and turn it into something useful. This includes various minor errors as well as some somewhat more bizarre mistakes. The file <i>t/sample_dates</i> in this module&#39;s distribution should give you an idea of what&#39;s valid, while <i>t/invalid.t</i> should do the same for what&#39;s not. Those regarded as invalid are just a bit <b>too</b> strange to allow.</p>
+
+</li>
+<li><p>Interoperation with the rest of the <a href="../../../lib/DateTime.html">DateTime</a> suite. These are a collection of modules to handle dates in a modern and accurate fashion. In particular, they make it trivial to parse, manipulate and then format dates. Shifting timezones is a doddle, and converting between formats is a cinch.</p>
+
+</li>
+</ol>
+
+<p>As a future direction, I&#39;m contemplating an even stricter parser that will only accept dates with no obsolete elements.</p>
+
+<h1 id="CONSTRUCTORS">CONSTRUCTORS</h1>
+
+<h2 id="new">new</h2>
+
+<p>Creates a new <code>DateTime::Format::Mail</code> instance. This is generally not required for simple operations. If you wish to use a different parsing style from the default, strict, parser then you&#39;ll need to create an object.</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()</span>
+   <span class="keyword">my</span> <span class="variable">$copy</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+</code></pre>
+
+<p>If called on an existing object then it clones the object.</p>
+
+<p>It has two optional named parameters.</p>
+
+<ul>
+
+<li><p><code>loose</code> should be a true value if you want a loose parser, else either don&#39;t specify it or give it a false value.</p>
+
+</li>
+<li><p><code>year_cutoff</code> should be an integer greater than or equal to zero specifying the cutoff year. See <a href="#set_year_cutoff">&quot;set_year_cutoff&quot;</a> for details.</p>
+
+</li>
+</ul>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$loose</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">loose</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$post_2049</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">year_cutoff</span> <span class="operator">=&gt;</span> <span class="number">60</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="clone">clone</h2>
+
+<p>For those who prefer to explicitly clone via a method called <code>clone()</code>. If called as a class method it will die.</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">$clone</span> <span class="operator">=</span> <span class="variable">$original</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="PARSING-METHODS">PARSING METHODS</h1>
+
+<p>These methods work on either our objects or as class methods.</p>
+
+<h2 id="loose-strict">loose, strict</h2>
+
+<p>These methods set the parsing strictness.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">loose</span><span class="operator">;</span>
+    <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">strict</span><span class="operator">;</span> <span class="comment"># (the default)</span>
+    
+    <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">-&gt;</span><span class="variable">loose</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="parse_datetime">parse_datetime</h2>
+
+<p>Given an RFC2822 or 822 datetime string, return a <code>DateTime</code> object representing that date and time. Unparseable strings will cause the method to die.</p>
+
+<p>See the <a href="#SYNOPSIS">synopsis</a> for examples.</p>
+
+<h2 id="set_year_cutoff">set_year_cutoff</h2>
+
+<p>Two digit years are treated as valid in the loose translation and are translated up to a 19xx or 20xx figure. By default, following the specification of RFC2822, if the year is greater than &#39;49&#39;, it&#39;s treated as being in the 20th century (19xx). If lower, or equal, then the 21st (20xx). That is, 50 becomes 1950 while 49 is 2049.</p>
+
+<p><code>set_year_cutoff()</code> allows you to modify this behaviour by specifying a different cutoff.</p>
+
+<p>The return value is the object itself.</p>
+
+<pre><code>    <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">set_year_cutoff</span><span class="operator">(</span> <span class="number">60</span> <span class="operator">);</span>
+</code></pre>
+
+<h2 id="year_cutoff">year_cutoff</h2>
+
+<p>Returns the current cutoff. Can be used as either a class or object method.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$cutoff</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">set_year_cutoff</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="default_cutoff">default_cutoff</h2>
+
+<p>Returns the default cutoff. A useful method to override for subclasses.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$default</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">default_cutoff</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="fix_year">fix_year</h2>
+
+<p>Takes a year and returns it normalized.</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">$fixed</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">fix_year</span><span class="operator">(</span> <span class="number">3</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="FORMATTING-METHODS">FORMATTING METHODS</h1>
+
+<h2 id="format_datetime">format_datetime</h2>
+
+<p>Given a <code>DateTime</code> object, return it as an RFC2822 compliant string.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">DateTime</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">1979</span><span class="operator">,</span> <span class="string">month</span> <span class="operator">=&gt;</span> <span class="number">7</span><span class="operator">,</span> <span class="string">day</span> <span class="operator">=&gt;</span> <span class="number">16</span><span class="operator">,</span> <span class="string">time_zone</span> <span class="operator">=&gt;</span> <span class="string">'UTC'</span>
+    <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$mail</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$mail</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+    
+    <span class="comment"># or via an object</span>
+    <span class="keyword">my</span> <span class="variable">$formatter</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Mail</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+    <span class="keyword">my</span> <span class="variable">$rfcdate</span> <span class="operator">=</span> <span class="variable">$formatter</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$rfcdate</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="THANKS-FROM-SPOON">THANKS FROM SPOON</h1>
+
+<p>Dave Rolsky (DROLSKY) for kickstarting the DateTime project.</p>
+
+<p>Roderick A. Anderson for noting where the documentation was incomplete in places.</p>
+
+<p>Joshua Hoblitt (JHOBLITT) for inspiring me to check what the standard said about interpreting two digit years.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support for this module is provided via the datetime@perl.org email list. See <a href="http://datetime.perl.org/mailing_list.html">http://datetime.perl.org/mailing_list.html</a> for more details.</p>
+
+<p>Alternatively, log them via the CPAN RT system via the web or email:</p>
+
+<pre><code>    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-Mail
+    bug-datetime-format-mail@rt.cpan.org</code></pre>
+
+<p>This makes it much easier for me to track things and thus means your problem is less likely to be neglected.</p>
+
+<h1 id="LICENCE-AND-COPYRIGHT">LICENCE AND COPYRIGHT</h1>
+
+<p>Copyright &copy; Iain Truskett, 2003. All rights reserved.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the licences can be found in the <i>LICENSE</i> file included with this module, or in <a href="../../../lib/pods/perlartistic.html">perlartistic</a> and <a href="../../../lib/pods/perlgpl.html">perlgpl</a> in Perl 5.8.1 or later.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Originally written by Iain Truskett &lt;spoon@cpan.org&gt;, who died on December 29, 2003.</p>
+
+<p>Maintained by Dave Rolsky &lt;autarch@urth.org&gt; from 2003 to 2013.</p>
+
+<p>Maintained by Philippe Bruhat (BooK) &lt;book@cpan.org&gt; since 2014.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><code>datetime@perl.org</code> mailing list.</p>
+
+<p><a href="http://datetime.perl.org/">http://datetime.perl.org/</a></p>
+
+<p><a href="../../../lib/pods/perl.html">perl</a>, <a href="../../../lib/DateTime.html">DateTime</a></p>
+
+<p>RFCs 2822 and 822.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,394 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#GENERAL">GENERAL</a></li>
+      <li><a href="#NEW-API">NEW API</a>
+        <ul>
+          <li><a href="#WHAT-ARE-FACETS">WHAT ARE FACETS?</a></li>
+        </ul>
+      </li>
+      <li><a href="#LEGACY-API">LEGACY API</a></li>
+    </ul>
+  </li>
+  <li><a href="#THIRD-PARTY-META-DATA">THIRD PARTY META-DATA</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Event - Base class for events</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Base class for all event objects that get passed through <a href="../../lib/Test2.html">Test2</a>.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Test2::Event::MyEvent</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="comment"># This will make our class an event subclass (required)</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Test2::Event'</span><span class="operator">;</span>
+    
+    <span class="comment"># Add some accessors (optional)</span>
+    <span class="comment"># You are not obligated to use HashBase, you can use any object tool you</span>
+    <span class="comment"># want, or roll your own accessors.</span>
+    <span class="keyword">use</span> <span class="variable">Test2::Util::HashBase</span> <span class="string">qw/foo bar baz/</span><span class="operator">;</span>
+    
+    <span class="comment"># Use this if you want the legacy API to be written for you, for this to</span>
+    <span class="comment"># work you will need to implement a facet_data() method.</span>
+    <span class="keyword">use</span> <span class="variable">Test2::Util::Facets2Legacy</span><span class="operator">;</span>
+    
+    <span class="comment"># Chance to initialize some defaults</span>
+    <span class="keyword">sub</span><span class="variable"> init </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="comment"># no other args in @_</span>
+    
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">set_foo</span><span class="operator">(</span><span class="string">'xxx'</span><span class="operator">)</span> <span class="keyword">unless</span> <span class="keyword">defined</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+    
+    <span class="comment"># This is the new way for events to convey data to the Test2 system</span>
+    <span class="keyword">sub</span><span class="variable"> facet_data </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="comment"># Get common facets such as 'about', 'trace' 'amnesty', and 'meta'</span>
+        <span class="keyword">my</span> <span class="variable">$facet_data</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">common_facet_data</span><span class="operator">();</span>
+    
+        <span class="comment"># Are you making an assertion?</span>
+        <span class="variable">$facet_data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">assert</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span><span class="string">pass</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">details</span> <span class="operator">=&gt;</span> <span class="string">'my assertion'</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="operator">...</span>
+    
+        <span class="keyword">return</span> <span class="variable">$facet_data</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="GENERAL">GENERAL</h2>
+
+<dl>
+
+<dt id="trace-e-trace">$trace = $e-&gt;trace</dt>
+<dd>
+
+<p>Get a snapshot of the <a href="../../lib/Test2/EventFacet/Trace.html">Test2::EventFacet::Trace</a> as it was when this event was generated</p>
+
+</dd>
+<dt id="bool_or_undef-e-related-e2">$bool_or_undef = $e-&gt;related($e2)</dt>
+<dd>
+
+<p>Check if 2 events are related. In this case related means their traces share a signature meaning they were created with the same context (or at the very least by contexts which share an id, which is the same thing unless someone is doing something very bad).</p>
+
+<p>This can be used to reliably link multiple events created by the same tool. For instance a failing test like <code>ok(0, &quot;fail&quot;</code> will generate 2 events, one being a <a href="../../lib/Test2/Event/Ok.html">Test2::Event::Ok</a>, the other being a <a href="../../lib/Test2/Event/Diag.html">Test2::Event::Diag</a>, both of these events are related having been created under the same context and by the same initial tool (though multiple tools may have been nested under the initial one).</p>
+
+<p>This will return <code>undef</code> if the relationship cannot be checked, which happens if either event has an incomplete or missing trace. This will return <code>0</code> if the traces are complete, but do not match. <code>1</code> will be returned if there is a match.</p>
+
+</dd>
+<dt id="e-add_amnesty-tag-TAG-details-DETAILS">$e-&gt;add_amnesty({tag =&gt; $TAG, details =&gt; $DETAILS});</dt>
+<dd>
+
+<p>This can be used to add amnesty to this event. Amnesty only effects failing assertions in most cases, but some formatters may display them for passing assertions, or even non-assertions as well.</p>
+
+<p>Amnesty will prevent a failed assertion from causing the overall test to fail. In other words it marks a failure as expected and allowed.</p>
+
+<p><b>Note:</b> This is how &#39;TODO&#39; is implemented under the hood. TODO is essentially amnesty with the &#39;TODO&#39; tag. The details are the reason for the TODO.</p>
+
+</dd>
+</dl>
+
+<h2 id="NEW-API">NEW API</h2>
+
+<dl>
+
+<dt id="hashref-e-common_facet_data">$hashref = $e-&gt;common_facet_data();</dt>
+<dd>
+
+<p>This can be used by subclasses to generate a starting facet data hashref. This will populate the hashref with the trace, meta, amnesty, and about facets. These facets are nearly always produced the same way for all events.</p>
+
+</dd>
+<dt id="hashref-e-facet_data">$hashref = $e-&gt;facet_data()</dt>
+<dd>
+
+<p>If you do not override this then the default implementation will attempt to generate facets from the legacy API. This generation is limited only to what the legacy API can provide. It is recommended that you override this method and write out explicit facet data.</p>
+
+</dd>
+<dt id="hashref-e-facets">$hashref = $e-&gt;facets()</dt>
+<dd>
+
+<p>This takes the hashref from <code>facet_data()</code> and blesses each facet into the proper <code>Test2::EventFacet::*</code> subclass.</p>
+
+</dd>
+</dl>
+
+<h3 id="WHAT-ARE-FACETS">WHAT ARE FACETS?</h3>
+
+<p>Facets are how events convey their purpose to the Test2 internals and formatters. An event without facets will have no intentional effect on the overall test state, and will not be displayed at all by most formatters, except perhaps to say that an event of an unknown type was seen.</p>
+
+<p>Facets are produced by the <code>facet_data()</code> subroutine, which you should nearly-always override. <code>facet_data()</code> is expected to return a hashref where each key is the facet type, and the value is either a hashref with the data for that facet, or an array of hashref&#39;s. Some facets must be defined as single hashrefs, some must be defined as an array of hashrefs, No facets allow both.</p>
+
+<p><code>facet_data()</code> <b>MUST NOT</b> bless the data it returns, the main hashref, and nested facet hashref&#39;s <b>MUST</b> be bare, though items contained within each facet may be blessed. The data returned by this method <b>should</b> also be copies of the internal data in order to prevent accidental state modification.</p>
+
+<p><code>facets()</code> takes the data from <code>facet_data()</code> and blesses it into the <code>Test2::EventFacet::*</code> packages. This is rarely used however, the EventFacet packages are primarily for convenience and documentation. The EventFacet classes are not used at all internally, instead the raw data is used.</p>
+
+<p>Here is a list of facet types by package. The packages are not used internally, but are where the documentation for each type is kept.</p>
+
+<p><b>Note:</b> Every single facet type has the <code>&#39;details&#39;</code> field. This field is always intended for human consumption, and when provided, should explain the &#39;why&#39; for the facet. All other fields are facet specific.</p>
+
+<dl>
+
+<dt id="about">about =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/About.html">Test2::EventFacet::About</a></p>
+
+<p>This contains information about the event itself such as the event package name. The <code>details</code> field for this facet is an overall summary of the event.</p>
+
+</dd>
+<dt id="assert">assert =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Assert.html">Test2::EventFacet::Assert</a></p>
+
+<p>This facet is used if an assertion was made. The <code>details</code> field of this facet is the description of the assertion.</p>
+
+</dd>
+<dt id="control">control =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Control.html">Test2::EventFacet::Control</a></p>
+
+<p>This facet is used to tell the <a>Test2::Event::Hub</a> about special actions the event causes. Things like halting all testing, terminating the current test, etc. In this facet the <code>details</code> field explains why any special action was taken.</p>
+
+<p><b>Note:</b> This is how bail-out is implemented.</p>
+
+</dd>
+<dt id="meta">meta =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Meta.html">Test2::EventFacet::Meta</a></p>
+
+<p>The meta facet contains all the meta-data attached to the event. In this case the <code>details</code> field has no special meaning, but may be present if something sets the &#39;details&#39; meta-key on the event.</p>
+
+</dd>
+<dt id="parent">parent =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Parent.html">Test2::EventFacet::Parent</a></p>
+
+<p>This facet contains nested events and similar details for subtests. In this facet the <code>details</code> field will typically be the name of the subtest.</p>
+
+</dd>
+<dt id="plan">plan =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Plan.html">Test2::EventFacet::Plan</a></p>
+
+<p>This facet tells the system that a plan has been set. The <code>details</code> field of this is usually left empty, but when present explains why the plan is what it is, this is most useful if the plan is to skip-all.</p>
+
+</dd>
+<dt id="trace">trace =&gt; {...}</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Trace.html">Test2::EventFacet::Trace</a></p>
+
+<p>This facet contains information related to when and where the event was generated. This is how the test file and line number of a failure is known. This facet can also help you to tell if tests are related.</p>
+
+<p>In this facet the <code>details</code> field overrides the &quot;failed at test_file.t line 42.&quot; message provided on assertion failure.</p>
+
+</dd>
+<dt id="amnesty">amnesty =&gt; [{...}, ...]</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Amnesty.html">Test2::EventFacet::Amnesty</a></p>
+
+<p>The amnesty facet is a list instead of a single item, this is important as amnesty can come from multiple places at once.</p>
+
+<p>For each instance of amnesty the <code>details</code> field explains why amnesty was granted.</p>
+
+<p><b>Note:</b> Outside of formatters amnesty only acts to forgive a failing assertion.</p>
+
+</dd>
+<dt id="errors">errors =&gt; [{...}, ...]</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Error.html">Test2::EventFacet::Error</a></p>
+
+<p>The errors facet is a list instead of a single item, any number of errors can be listed. In this facet <code>details</code> describes the error, or may contain the raw error message itself (such as an exception). In perl exception may be blessed objects, as such the raw data for this facet may contain nested items which are blessed.</p>
+
+<p>Not all errors are considered fatal, there is a <code>fail</code> field that must be set for an error to cause the test to fail.</p>
+
+<p><b>Note:</b> This facet is unique in that the field name is &#39;errors&#39; while the package is &#39;Error&#39;. This is because this is the only facet type that is both a list, and has a name where the plural is not the same as the singular. This may cause some confusion, but I feel it will be less confusing than the alternative.</p>
+
+</dd>
+<dt id="info">info =&gt; [{...}, ...]</dt>
+<dd>
+
+<p><a href="../../lib/Test2/EventFacet/Info.html">Test2::EventFacet::Info</a></p>
+
+<p>The &#39;info&#39; facet is a list instead of a single item, any quantity of extra information can be attached to an event. Some information may be critical diagnostics, others may be simply commentary in nature, this is determined by the <code>debug</code> flag.</p>
+
+<p>For this facet the <code>details</code> flag is the info itself. This info may be a string, or it may be a data structure to display. This is one of the few facet types that may contain blessed items.</p>
+
+</dd>
+</dl>
+
+<h2 id="LEGACY-API">LEGACY API</h2>
+
+<dl>
+
+<dt id="bool-e-causes_fail">$bool = $e-&gt;causes_fail</dt>
+<dd>
+
+<p>Returns true if this event should result in a test failure. In general this should be false.</p>
+
+</dd>
+<dt id="bool-e-increments_count">$bool = $e-&gt;increments_count</dt>
+<dd>
+
+<p>Should be true if this event should result in a test count increment.</p>
+
+</dd>
+<dt id="e-callback-hub">$e-&gt;callback($hub)</dt>
+<dd>
+
+<p>If your event needs to have extra effects on the <a href="../../lib/Test2/Hub.html">Test2::Hub</a> you can override this method.</p>
+
+<p>This is called <b>BEFORE</b> your event is passed to the formatter.</p>
+
+</dd>
+<dt id="num-e-nested">$num = $e-&gt;nested</dt>
+<dd>
+
+<p>If this event is nested inside of other events, this should be the depth of nesting. (This is mainly for subtests)</p>
+
+</dd>
+<dt id="bool-e-global">$bool = $e-&gt;global</dt>
+<dd>
+
+<p>Set this to true if your event is global, that is ALL threads and processes should see it no matter when or where it is generated. This is not a common thing to want, it is used by bail-out and skip_all to end testing.</p>
+
+</dd>
+<dt id="code-e-terminate">$code = $e-&gt;terminate</dt>
+<dd>
+
+<p>This is called <b>AFTER</b> your event has been passed to the formatter. This should normally return undef, only change this if your event should cause the test to exit immediately.</p>
+
+<p>If you want this event to cause the test to exit you should return the exit code here. Exit code of 0 means exit success, any other integer means exit with failure.</p>
+
+<p>This is used by <a href="../../lib/Test2/Event/Plan.html">Test2::Event::Plan</a> to exit 0 when the plan is &#39;skip_all&#39;. This is also used by <a>Test2::Event:Bail</a> to force the test to exit with a failure.</p>
+
+<p>This is called after the event has been sent to the formatter in order to ensure the event is seen and understood.</p>
+
+</dd>
+<dt id="msg-e-summary">$msg = $e-&gt;summary</dt>
+<dd>
+
+<p>This is intended to be a human readable summary of the event. This should ideally only be one line long, but you can use multiple lines if necessary. This is intended for human consumption. You do not need to make it easy for machines to understand.</p>
+
+<p>The default is to simply return the event package name.</p>
+
+</dd>
+<dt id="count-directive-reason-e-sets_plan">($count, $directive, $reason) = $e-&gt;sets_plan()</dt>
+<dd>
+
+<p>Check if this event sets the testing plan. It will return an empty list if it does not. If it does set the plan it will return a list of 1 to 3 items in order: Expected Test Count, Test Directive, Reason for directive.</p>
+
+</dd>
+<dt id="bool-e-diagnostics">$bool = $e-&gt;diagnostics</dt>
+<dd>
+
+<p>True if the event contains diagnostics info. This is useful because a non-verbose harness may choose to hide events that are not in this category. Some formatters may choose to send these to STDERR instead of STDOUT to ensure they are seen.</p>
+
+</dd>
+<dt id="bool-e-no_display">$bool = $e-&gt;no_display</dt>
+<dd>
+
+<p>False by default. This will return true on events that should not be displayed by formatters.</p>
+
+</dd>
+<dt id="id-e-in_subtest">$id = $e-&gt;in_subtest</dt>
+<dd>
+
+<p>If the event is inside a subtest this should have the subtest ID.</p>
+
+</dd>
+<dt id="id-e-subtest_id">$id = $e-&gt;subtest_id</dt>
+<dd>
+
+<p>If the event is a final subtest event, this should contain the subtest ID.</p>
+
+</dd>
+</dl>
+
+<h1 id="THIRD-PARTY-META-DATA">THIRD PARTY META-DATA</h1>
+
+<p>This object consumes <a href="../../lib/Test2/Util/ExternalMeta.html">Test2::Util::ExternalMeta</a> which provides a consistent way for you to attach meta-data to instances of this class. This is useful for tools, plugins, and other extensions.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

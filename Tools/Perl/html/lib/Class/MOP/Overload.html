@@ -1,0 +1,244 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Class::MOP::Overload-new-options">Class::MOP::Overload-&gt;new(%options)</a></li>
+      <li><a href="#overload-operator">$overload-&gt;operator</a></li>
+      <li><a href="#overload-method_name">$overload-&gt;method_name</a></li>
+      <li><a href="#overload-has_method_name">$overload-&gt;has_method_name</a></li>
+      <li><a href="#overload-method">$overload-&gt;method</a></li>
+      <li><a href="#overload-has_method">$overload-&gt;has_method</a></li>
+      <li><a href="#overload-coderef">$overload-&gt;coderef</a></li>
+      <li><a href="#overload-has_coderef">$overload-&gt;has_coderef</a></li>
+      <li><a href="#overload-coderef_package">$overload-&gt;coderef_package</a></li>
+      <li><a href="#overload-has_coderef1">$overload-&gt;has_coderef</a></li>
+      <li><a href="#overload-coderef_name">$overload-&gt;coderef_name</a></li>
+      <li><a href="#overload-has_coderef_name">$overload-&gt;has_coderef_name</a></li>
+      <li><a href="#overload-is_anonymous">$overload-&gt;is_anonymous</a></li>
+      <li><a href="#overload-associated_metaclass">$overload-&gt;associated_metaclass</a></li>
+      <li><a href="#overload-clone">$overload-&gt;clone</a></li>
+      <li><a href="#overload-original_overload">$overload-&gt;original_overload</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::MOP::Overload - Overload Meta Object</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$meta</span>     <span class="operator">=</span> <span class="variable">Class</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$overload</span> <span class="operator">=</span> <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">get_overloaded_operator</span><span class="operator">(</span><span class="string">'+'</span><span class="operator">);</span>
+    
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$overload</span><span class="operator">-&gt;</span><span class="variable">has_method_name</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">'Method for + is '</span><span class="operator">,</span> <span class="variable">$overload</span><span class="operator">-&gt;</span><span class="variable">method_name</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    <span class="keyword">else</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">'Overloading for + is implemented by '</span><span class="operator">,</span>
+            <span class="variable">$overload</span><span class="operator">-&gt;</span><span class="variable">coderef_name</span><span class="operator">,</span> <span class="string">" sub\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class provides meta information for overloading in classes and roles.</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>Class::MOP::Overload</code> is a subclass of <a href="../../../lib/Class/MOP/Object.html">Class::MOP::Object</a>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Class::MOP::Overload-new-options">Class::MOP::Overload-&gt;new(%options)</h2>
+
+<p>This method creates a new <code>Class::MOP::Overload</code> object. It accepts a number of options:</p>
+
+<ul>
+
+<li><p>operator</p>
+
+<p>This is a string that matches an operator known by the <a href="../../../lib/overload.html">overload</a> module, such as <code>&quot;&quot;</code> or <code>+</code>. This is required.</p>
+
+</li>
+<li><p>method_name</p>
+
+<p>The name of the method which implements the overloading. Note that this does not need to actually correspond to a real method, since it&#39;s okay to declare a not-yet-implemented overloading.</p>
+
+<p>Either this or the <code>coderef</code> option must be passed.</p>
+
+</li>
+<li><p>method</p>
+
+<p>A <a href="../../../lib/Class/MOP/Method.html">Class::MOP::Method</a> object for the method which implements the overloading.</p>
+
+<p>This is optional.</p>
+
+</li>
+<li><p>coderef</p>
+
+<p>A coderef which implements the overloading.</p>
+
+<p>Either this or the <code>method_name</code> option must be passed.</p>
+
+</li>
+<li><p>coderef_package</p>
+
+<p>The package where the coderef was defined.</p>
+
+<p>This is required if <code>coderef</code> is passed.</p>
+
+</li>
+<li><p>coderef_name</p>
+
+<p>The name of the coderef. This can be &quot;__ANON__&quot;.</p>
+
+<p>This is required if <code>coderef</code> is passed.</p>
+
+</li>
+<li><p>associated_metaclass</p>
+
+<p>A <a href="../../../lib/Class/MOP/Module.html">Class::MOP::Module</a> object for the associated class or role.</p>
+
+<p>This is optional.</p>
+
+</li>
+</ul>
+
+<h2 id="overload-operator">$overload-&gt;operator</h2>
+
+<p>Returns the operator for this overload object.</p>
+
+<h2 id="overload-method_name">$overload-&gt;method_name</h2>
+
+<p>Returns the method name that implements overloading, if it has one.</p>
+
+<h2 id="overload-has_method_name">$overload-&gt;has_method_name</h2>
+
+<p>Returns true if the object has a method name.</p>
+
+<h2 id="overload-method">$overload-&gt;method</h2>
+
+<p>Returns the <a href="../../../lib/Class/MOP/Method.html">Class::MOP::Method</a> that implements overloading, if it has one.</p>
+
+<h2 id="overload-has_method">$overload-&gt;has_method</h2>
+
+<p>Returns true if the object has a method.</p>
+
+<h2 id="overload-coderef">$overload-&gt;coderef</h2>
+
+<p>Returns the coderef that implements overloading, if it has one.</p>
+
+<h2 id="overload-has_coderef">$overload-&gt;has_coderef</h2>
+
+<p>Returns true if the object has a coderef.</p>
+
+<h2 id="overload-coderef_package">$overload-&gt;coderef_package</h2>
+
+<p>Returns the package for the coderef that implements overloading, if it has one.</p>
+
+<h2 id="overload-has_coderef1">$overload-&gt;has_coderef</h2>
+
+<p>Returns true if the object has a coderef package.</p>
+
+<h2 id="overload-coderef_name">$overload-&gt;coderef_name</h2>
+
+<p>Returns the sub name for the coderef that implements overloading, if it has one.</p>
+
+<h2 id="overload-has_coderef_name">$overload-&gt;has_coderef_name</h2>
+
+<p>Returns true if the object has a coderef name.</p>
+
+<h2 id="overload-is_anonymous">$overload-&gt;is_anonymous</h2>
+
+<p>Returns true if the overloading is implemented by an anonymous coderef.</p>
+
+<h2 id="overload-associated_metaclass">$overload-&gt;associated_metaclass</h2>
+
+<p>Returns the <a href="../../../lib/Class/MOP/Module.html">Class::MOP::Module</a> (class or role) that is associated with the overload object.</p>
+
+<h2 id="overload-clone">$overload-&gt;clone</h2>
+
+<p>Clones the overloading object, setting <code>original_overload</code> in the process.</p>
+
+<h2 id="overload-original_overload">$overload-&gt;original_overload</h2>
+
+<p>For cloned objects, this returns the <a href="../../../lib/Class/MOP/Overload.html">Class::MOP::Overload</a> object from which they were cloned. This can be used to determine the source of an overloading in a class that came from a role, for example.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

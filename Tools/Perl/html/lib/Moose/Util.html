@@ -1,0 +1,218 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</a>
+    <ul>
+      <li><a href="#find_meta-class_or_obj">find_meta($class_or_obj)</a></li>
+      <li><a href="#is_role-package_or_obj">is_role($package_or_obj)</a></li>
+      <li><a href="#does_role-class_or_obj-role_or_obj">does_role($class_or_obj, $role_or_obj)</a></li>
+      <li><a href="#search_class_by_role-class_or_obj-role_or_obj">search_class_by_role($class_or_obj, $role_or_obj)</a></li>
+      <li><a href="#apply_all_roles-applicant-roles">apply_all_roles($applicant, @roles)</a></li>
+      <li><a href="#ensure_all_roles-applicant-roles">ensure_all_roles($applicant, @roles)</a></li>
+      <li><a href="#with_traits-class_name-role_names">with_traits($class_name, @role_names)</a></li>
+      <li><a href="#get_all_attribute_values-meta-instance">get_all_attribute_values($meta, $instance)</a></li>
+      <li><a href="#get_all_init_args-meta-instance">get_all_init_args($meta, $instance)</a></li>
+      <li><a href="#resolve_metaclass_alias-category-name-options">resolve_metaclass_alias($category, $name, %options)</a></li>
+      <li><a href="#resolve_metatrait_alias-category-name-options">resolve_metatrait_alias($category, $name, %options)</a></li>
+      <li><a href="#meta_class_alias-to-from">meta_class_alias($to[, $from])</a></li>
+      <li><a href="#meta_attribute_alias-to-from">meta_attribute_alias($to[, $from])</a></li>
+      <li><a href="#english_list-items">english_list(@items)</a></li>
+      <li><a href="#throw_exception-class_name-arguments_to_exception">throw_exception( $class_name, %arguments_to_exception)</a></li>
+    </ul>
+  </li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Util - Utilities for working with Moose classes</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Moose::Util</span> <span class="string">qw/find_meta does_role search_class_by_role/</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$meta</span> <span class="operator">=</span> <span class="variable">find_meta</span><span class="operator">(</span><span class="variable">$object</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span> <span class="string">"No metaclass found"</span><span class="operator">;</span>
+  
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">does_role</span><span class="operator">(</span><span class="variable">$object</span><span class="operator">,</span> <span class="variable">$role</span><span class="operator">))</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"The object can do </span><span class="variable">$role</span><span class="string">!\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="variable">search_class_by_role</span><span class="operator">(</span><span class="variable">$object</span><span class="operator">,</span> <span class="string">'FooRole'</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"Nearest class with 'FooRole' is </span><span class="variable">$class</span><span class="string">\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a set of utility functions. Many of these functions are intended for use in Moose itself or MooseX modules, but some of them may be useful for use in your own code.</p>
+
+<h1 id="EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</h1>
+
+<h2 id="find_meta-class_or_obj">find_meta($class_or_obj)</h2>
+
+<p>This method takes a class name or object and attempts to find a metaclass for the class, if one exists. It will <b>not</b> create one if it does not yet exist.</p>
+
+<h2 id="is_role-package_or_obj">is_role($package_or_obj)</h2>
+
+<p>Returns true if the provided package name or object is a <a href="../../lib/Moose/Role.html">Moose::Role</a>.</p>
+
+<h2 id="does_role-class_or_obj-role_or_obj">does_role($class_or_obj, $role_or_obj)</h2>
+
+<p>Returns true if <code>$class_or_obj</code> does the given <code>$role_or_obj</code>. The role can be provided as a name or a <a href="../../lib/Moose/Meta/Role.html">Moose::Meta::Role</a> object.</p>
+
+<p>The class must already have a metaclass for this to work. If it doesn&#39;t, this function simply returns false.</p>
+
+<h2 id="search_class_by_role-class_or_obj-role_or_obj">search_class_by_role($class_or_obj, $role_or_obj)</h2>
+
+<p>Returns the first class in the class&#39;s precedence list that does <code>$role_or_obj</code>, if any. The role can be either a name or a <a href="../../lib/Moose/Meta/Role.html">Moose::Meta::Role</a> object.</p>
+
+<p>The class must already have a metaclass for this to work.</p>
+
+<h2 id="apply_all_roles-applicant-roles">apply_all_roles($applicant, @roles)</h2>
+
+<p>This function applies one or more roles to the given <code>$applicant</code>. The applicant can be a role name, class name, or object.</p>
+
+<p>The <code>$applicant</code> must already have a metaclass object.</p>
+
+<p>The list of <code>@roles</code> should a list of names or <a href="../../lib/Moose/Meta/Role.html">Moose::Meta::Role</a> objects, each of which can be followed by an optional hash reference of options (<code>-excludes</code> and <code>-alias</code>).</p>
+
+<h2 id="ensure_all_roles-applicant-roles">ensure_all_roles($applicant, @roles)</h2>
+
+<p>This function is similar to <code>apply_all_roles</code>, but only applies roles that <code>$applicant</code> does not already consume.</p>
+
+<h2 id="with_traits-class_name-role_names">with_traits($class_name, @role_names)</h2>
+
+<p>This function creates a new class from <code>$class_name</code> with each of <code>@role_names</code> applied. It returns the name of the new class.</p>
+
+<h2 id="get_all_attribute_values-meta-instance">get_all_attribute_values($meta, $instance)</h2>
+
+<p>Returns a hash reference containing all of the <code>$instance</code>&#39;s attributes. The keys are attribute names.</p>
+
+<h2 id="get_all_init_args-meta-instance">get_all_init_args($meta, $instance)</h2>
+
+<p>Returns a hash reference containing all of the <code>init_arg</code> values for the instance&#39;s attributes. The values are the associated attribute values. If an attribute does not have a defined <code>init_arg</code>, it is skipped.</p>
+
+<p>This could be useful in cloning an object.</p>
+
+<h2 id="resolve_metaclass_alias-category-name-options">resolve_metaclass_alias($category, $name, %options)</h2>
+
+<h2 id="resolve_metatrait_alias-category-name-options">resolve_metatrait_alias($category, $name, %options)</h2>
+
+<p>Resolves a short name to a full class name. Short names are often used when specifying the <code>metaclass</code> or <code>traits</code> option for an attribute:</p>
+
+<pre><code>    <span class="variable">has</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">metaclass</span> <span class="operator">=&gt;</span> <span class="string">"Bar"</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>The name resolution mechanism is covered in <a href="../../lib/Moose.html#Metaclass-and-Trait-Name-Resolution">&quot;Metaclass and Trait Name Resolution&quot; in Moose</a>.</p>
+
+<h2 id="meta_class_alias-to-from">meta_class_alias($to[, $from])</h2>
+
+<h2 id="meta_attribute_alias-to-from">meta_attribute_alias($to[, $from])</h2>
+
+<p>Create an alias from the class <code>$from</code> (or the current package, if <code>$from</code> is unspecified), so that <a href="../../lib/Moose.html#Metaclass-and-Trait-Name-Resolution">&quot;Metaclass and Trait Name Resolution&quot; in Moose</a> works properly.</p>
+
+<h2 id="english_list-items">english_list(@items)</h2>
+
+<p>Given a list of scalars, turns them into a proper list in English (&quot;one and two&quot;, &quot;one, two, three, and four&quot;). This is used to help us make nicer error messages.</p>
+
+<h2 id="throw_exception-class_name-arguments_to_exception">throw_exception( $class_name, %arguments_to_exception)</h2>
+
+<p>Calls die with an object of Moose::Exception::$class_name, with %arguments_to_exception passed as arguments.</p>
+
+<h1 id="TODO">TODO</h1>
+
+<p>Here is a list of possible functions to write</p>
+
+<dl>
+
+<dt id="discovering-original-method-from-modified-method">discovering original method from modified method</dt>
+<dd>
+
+</dd>
+<dt id="search-for-origin-class-of-a-method-or-attribute">search for origin class of a method or attribute</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

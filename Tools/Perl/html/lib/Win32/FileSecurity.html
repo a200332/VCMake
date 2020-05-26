@@ -1,0 +1,214 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONSTANTS">CONSTANTS</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#permisshash">%permisshash</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLE1">EXAMPLE1</a></li>
+  <li><a href="#EXAMPLE2">EXAMPLE2</a></li>
+  <li><a href="#COMMON-MASKS-FROM-CACLS-AND-WINFILE">COMMON MASKS FROM CACLS AND WINFILE</a>
+    <ul>
+      <li><a href="#READ">READ</a></li>
+      <li><a href="#CHANGE">CHANGE</a></li>
+      <li><a href="#ADD-READ">ADD &amp; READ</a></li>
+      <li><a href="#FULL">FULL</a></li>
+    </ul>
+  </li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#KNOWN-ISSUES-BUGS">KNOWN ISSUES / BUGS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::FileSecurity - Manage FileSecurity Discretionary Access Control Lists in Perl</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::FileSecurity</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module offers control over the administration of system FileSecurity DACLs. You may want to use Get and EnumerateRights to get an idea of what mask values correspond to what rights as viewed from File Manager.</p>
+
+<h1 id="CONSTANTS">CONSTANTS</h1>
+
+<pre><code>  DELETE, READ_CONTROL, WRITE_DAC, WRITE_OWNER,
+  SYNCHRONIZE, STANDARD_RIGHTS_REQUIRED,
+  STANDARD_RIGHTS_READ, STANDARD_RIGHTS_WRITE,
+  STANDARD_RIGHTS_EXECUTE, STANDARD_RIGHTS_ALL,
+  SPECIFIC_RIGHTS_ALL, ACCESS_SYSTEM_SECURITY,
+  MAXIMUM_ALLOWED, GENERIC_READ, GENERIC_WRITE,
+  GENERIC_EXECUTE, GENERIC_ALL, F, FULL, R, READ,
+  C, CHANGE</code></pre>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<dl>
+
+<dt id="constant-name-set">constant( $name, $set )</dt>
+<dd>
+
+<p>Stores the value of named constant $name into $set. Same as <code><span class="variable">$set</span> <span class="operator">=</span> <span class="variable">Win32::FileSecurity::NAME_OF_CONSTANT</span><span class="operator">();</span>
+</code>.</p>
+
+</dd>
+<dt id="Get-filename-permisshash">Get( $filename, \%permisshash )</dt>
+<dd>
+
+<p>Gets the DACLs of a file or directory.</p>
+
+</dd>
+<dt id="Set-filename-permisshash">Set( $filename, \%permisshash )</dt>
+<dd>
+
+<p>Sets the DACL for a file or directory.</p>
+
+</dd>
+<dt id="EnumerateRights-mask-rightslist">EnumerateRights( $mask, \@rightslist )</dt>
+<dd>
+
+<p>Turns the bitmask in $mask into a list of strings in @rightslist.</p>
+
+</dd>
+<dt id="MakeMask-qw-DELETE-READ_CONTROL">MakeMask( qw( DELETE READ_CONTROL ) )</dt>
+<dd>
+
+<p>Takes a list of strings representing constants and returns a bitmasked integer value.</p>
+
+</dd>
+</dl>
+
+<p>Note: All of the functions return false if they fail, unless otherwise noted. Errors returned via $! containing both Win32 GetLastError() and a text message indicating Win32 function that failed.</p>
+
+<h2 id="permisshash">%permisshash</h2>
+
+<p>Entries take the form $permisshash{USERNAME} = $mask ;</p>
+
+<p>Get() may return a SID or the string &quot;&lt;Unknown&gt;&quot; when the account name cannot be determined.</p>
+
+<h1 id="EXAMPLE1">EXAMPLE1</h1>
+
+<pre><code>    <span class="comment"># Gets the rights for all files listed on the command line.</span>
+    <span class="keyword">use</span> <span class="variable">Win32::FileSecurity</span> <span class="string">qw(Get EnumerateRights)</span><span class="operator">;</span>
+    
+    <span class="keyword">foreach</span><span class="operator">(</span> <span class="variable">@ARGV</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">next</span> <span class="keyword">unless</span> <span class="keyword">-e</span> <span class="variable">$_</span> <span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">Get</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%hash</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">while</span><span class="operator">(</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$mask</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">each</span> <span class="variable">%hash</span> <span class="operator">)</span> <span class="operator">{</span>
+                <span class="keyword">print</span> <span class="string">"</span><span class="variable">$name</span><span class="string">:\n\t"</span><span class="operator">;</span>
+                <span class="variable">EnumerateRights</span><span class="operator">(</span> <span class="variable">$mask</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">@happy</span> <span class="operator">)</span> <span class="operator">;</span>
+                <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span> <span class="string">"\n\t"</span><span class="operator">,</span> <span class="variable">@happy</span> <span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">}</span>
+        <span class="keyword">else</span> <span class="operator">{</span>
+            <span class="keyword">print</span><span class="operator">(</span> <span class="string">"Error #"</span><span class="operator">,</span> <span class="keyword">int</span><span class="operator">(</span> <span class="variable">$!</span> <span class="operator">),</span> <span class="string">": $!"</span> <span class="operator">)</span> <span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="EXAMPLE2">EXAMPLE2</h1>
+
+<pre><code>    <span class="comment"># Gets existing DACL and modifies Administrator rights</span>
+    <span class="keyword">use</span> <span class="variable">Win32::FileSecurity</span> <span class="string">qw(MakeMask Get Set)</span><span class="operator">;</span>
+    
+    <span class="comment"># These masks show up as Full Control in File Manager</span>
+    <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( FULL )</span> <span class="operator">);</span>
+    
+    <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw(
+        FULL
+        GENERIC_ALL
+    )</span> <span class="operator">);</span>
+    
+    <span class="keyword">foreach</span><span class="operator">(</span> <span class="variable">@ARGV</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="regex">s/\\$//</span><span class="operator">;</span>
+        <span class="keyword">next</span> <span class="keyword">unless</span> <span class="keyword">-e</span><span class="operator">;</span>
+        <span class="variable">Get</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%hash</span> <span class="operator">)</span> <span class="operator">;</span>
+        <span class="variable">$hash</span><span class="operator">{</span><span class="string">Administrator</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">(</span> <span class="keyword">-d</span> <span class="operator">)</span> <span class="operator">?</span> <span class="variable">$dir</span> <span class="operator">:</span> <span class="variable">$file</span> <span class="operator">;</span>
+        <span class="variable">Set</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%hash</span> <span class="operator">)</span> <span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="COMMON-MASKS-FROM-CACLS-AND-WINFILE">COMMON MASKS FROM CACLS AND WINFILE</h1>
+
+<h2 id="READ">READ</h2>
+
+<pre><code>    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( FULL )</span> <span class="operator">);</span> <span class="comment"># for files</span>
+    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( READ GENERIC_READ GENERIC_EXECUTE )</span> <span class="operator">);</span> <span class="comment"># for directories</span>
+</code></pre>
+
+<h2 id="CHANGE">CHANGE</h2>
+
+<pre><code>    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( CHANGE )</span> <span class="operator">);</span> <span class="comment"># for files</span>
+    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( CHANGE GENERIC_WRITE GENERIC_READ GENERIC_EXECUTE )</span> <span class="operator">);</span> <span class="comment"># for directories</span>
+</code></pre>
+
+<h2 id="ADD-READ">ADD &amp; READ</h2>
+
+<pre><code>    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( ADD GENERIC_READ GENERIC_EXECUTE )</span> <span class="operator">);</span> <span class="comment"># for directories only!</span>
+</code></pre>
+
+<h2 id="FULL">FULL</h2>
+
+<pre><code>    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( FULL )</span> <span class="operator">);</span> <span class="comment"># for files</span>
+    <span class="variable">MakeMask</span><span class="operator">(</span> <span class="string">qw( FULL  GENERIC_ALL )</span> <span class="operator">);</span> <span class="comment"># for directories</span>
+</code></pre>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<ul>
+
+<li><p>The module currently only supports ALLOW ACLs; DENY ACLs are not being reported by Get() and cannot be Set() either.</p>
+
+</li>
+<li><p>The Get() function may return an SID when the account cannot be found, but the Set() function doesn&#39;t allow the use of SIDs for setting ACLs.</p>
+
+</li>
+</ul>
+
+<h1 id="KNOWN-ISSUES-BUGS">KNOWN ISSUES / BUGS</h1>
+
+<ul>
+
+<li><p>May not work on remote drives.</p>
+
+</li>
+<li><p>Errors croak, don&#39;t return via $! as documented.</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

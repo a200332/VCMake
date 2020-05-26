@@ -1,0 +1,833 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME   </a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#REFERENCES">REFERENCES    </a></li>
+  <li><a href="#COMMON-MISTAKES">COMMON MISTAKES</a></li>
+  <li><a href="#CAVEAT-ON-PRECEDENCE">CAVEAT ON PRECEDENCE  </a></li>
+  <li><a href="#WHY-YOU-SHOULD-ALWAYS-use-strict">WHY YOU SHOULD ALWAYS use strict</a></li>
+  <li><a href="#DEBUGGING">DEBUGGING          </a></li>
+  <li><a href="#CODE-EXAMPLES">CODE EXAMPLES</a></li>
+  <li><a href="#ARRAYS-OF-ARRAYS">ARRAYS OF ARRAYS  </a>
+    <ul>
+      <li><a href="#Declaration-of-an-ARRAY-OF-ARRAYS">Declaration of an ARRAY OF ARRAYS</a></li>
+      <li><a href="#Generation-of-an-ARRAY-OF-ARRAYS">Generation of an ARRAY OF ARRAYS</a></li>
+      <li><a href="#Access-and-Printing-of-an-ARRAY-OF-ARRAYS">Access and Printing of an ARRAY OF ARRAYS</a></li>
+    </ul>
+  </li>
+  <li><a href="#HASHES-OF-ARRAYS">HASHES OF ARRAYS  </a>
+    <ul>
+      <li><a href="#Declaration-of-a-HASH-OF-ARRAYS">Declaration of a HASH OF ARRAYS</a></li>
+      <li><a href="#Generation-of-a-HASH-OF-ARRAYS">Generation of a HASH OF ARRAYS</a></li>
+      <li><a href="#Access-and-Printing-of-a-HASH-OF-ARRAYS">Access and Printing of a HASH OF ARRAYS</a></li>
+    </ul>
+  </li>
+  <li><a href="#ARRAYS-OF-HASHES">ARRAYS OF HASHES  </a>
+    <ul>
+      <li><a href="#Declaration-of-an-ARRAY-OF-HASHES">Declaration of an ARRAY OF HASHES</a></li>
+      <li><a href="#Generation-of-an-ARRAY-OF-HASHES">Generation of an ARRAY OF HASHES</a></li>
+      <li><a href="#Access-and-Printing-of-an-ARRAY-OF-HASHES">Access and Printing of an ARRAY OF HASHES</a></li>
+    </ul>
+  </li>
+  <li><a href="#HASHES-OF-HASHES">HASHES OF HASHES  </a>
+    <ul>
+      <li><a href="#Declaration-of-a-HASH-OF-HASHES">Declaration of a HASH OF HASHES</a></li>
+      <li><a href="#Generation-of-a-HASH-OF-HASHES">Generation of a HASH OF HASHES</a></li>
+      <li><a href="#Access-and-Printing-of-a-HASH-OF-HASHES">Access and Printing of a HASH OF HASHES</a></li>
+    </ul>
+  </li>
+  <li><a href="#MORE-ELABORATE-RECORDS">MORE ELABORATE RECORDS   </a>
+    <ul>
+      <li><a href="#Declaration-of-MORE-ELABORATE-RECORDS">Declaration of MORE ELABORATE RECORDS</a></li>
+      <li><a href="#Declaration-of-a-HASH-OF-COMPLEX-RECORDS">Declaration of a HASH OF COMPLEX RECORDS</a></li>
+      <li><a href="#Generation-of-a-HASH-OF-COMPLEX-RECORDS">Generation of a HASH OF COMPLEX RECORDS</a></li>
+    </ul>
+  </li>
+  <li><a href="#Database-Ties">Database Ties</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME   </h1>
+
+<p>perldsc - Perl Data Structures Cookbook</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl lets us have complex data structures. You can write something like this and all of a sudden, you&#39;d have an array with three dimensions!</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">(</span><span class="number">1</span> <span class="operator">..</span> <span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">(</span><span class="number">1</span> <span class="operator">..</span> <span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$z</span> <span class="operator">(</span><span class="number">1</span> <span class="operator">..</span> <span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$x</span><span class="operator">][</span><span class="variable">$y</span><span class="operator">][</span><span class="variable">$z</span><span class="operator">]</span> <span class="operator">=</span>
+                    <span class="variable">$x</span> <span class="operator">**</span> <span class="variable">$y</span> <span class="operator">+</span> <span class="variable">$z</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Alas, however simple this may appear, underneath it&#39;s a much more elaborate construct than meets the eye!</p>
+
+<p>How do you print it out? Why can&#39;t you say just <code>print @AoA</code>? How do you sort it? How can you pass it to a function or get one of these back from a function? Is it an object? Can you save it to disk to read back later? How do you access whole rows or columns of that matrix? Do all the values have to be numeric?</p>
+
+<p>As you see, it&#39;s quite easy to become confused. While some small portion of the blame for this can be attributed to the reference-based implementation, it&#39;s really more due to a lack of existing documentation with examples designed for the beginner.</p>
+
+<p>This document is meant to be a detailed but understandable treatment of the many different sorts of data structures you might want to develop. It should also serve as a cookbook of examples. That way, when you need to create one of these complex data structures, you can just pinch, pilfer, or purloin a drop-in example from here.</p>
+
+<p>Let&#39;s look at each of these possible constructs in detail. There are separate sections on each of the following:</p>
+
+<ul>
+
+<li><p>arrays of arrays</p>
+
+</li>
+<li><p>hashes of arrays</p>
+
+</li>
+<li><p>arrays of hashes</p>
+
+</li>
+<li><p>hashes of hashes</p>
+
+</li>
+<li><p>more elaborate constructs</p>
+
+</li>
+</ul>
+
+<p>But for now, let&#39;s look at general issues common to all these types of data structures.</p>
+
+<h1 id="REFERENCES">REFERENCES    </h1>
+
+<p>The most important thing to understand about all data structures in Perl--including multidimensional arrays--is that even though they might appear otherwise, Perl <code>@ARRAY</code>s and <code>%HASH</code>es are all internally one-dimensional. They can hold only scalar values (meaning a string, number, or a reference). They cannot directly contain other arrays or hashes, but instead contain <i>references</i> to other arrays or hashes.  </p>
+
+<p>You can&#39;t use a reference to an array or hash in quite the same way that you would a real array or hash. For C or C++ programmers unused to distinguishing between arrays and pointers to the same, this can be confusing. If so, just think of it as the difference between a structure and a pointer to a structure.</p>
+
+<p>You can (and should) read more about references in <a href="../../lib/pods/perlref.html">perlref</a>. Briefly, references are rather like pointers that know what they point to. (Objects are also a kind of reference, but we won&#39;t be needing them right away--if ever.) This means that when you have something which looks to you like an access to a two-or-more-dimensional array and/or hash, what&#39;s really going on is that the base type is merely a one-dimensional entity that contains references to the next level. It&#39;s just that you can <i>use</i> it as though it were a two-dimensional one. This is actually the way almost all C multidimensional arrays work as well.</p>
+
+<pre><code>    <span class="variable">$array</span><span class="operator">[</span><span class="number">7</span><span class="operator">][</span><span class="number">12</span><span class="operator">]</span>                       <span class="comment"># array of arrays</span>
+    <span class="variable">$array</span><span class="operator">[</span><span class="number">7</span><span class="operator">]{</span><span class="string">string</span><span class="operator">}</span>                   <span class="comment"># array of hashes</span>
+    <span class="variable">$hash</span><span class="operator">{</span><span class="string">string</span><span class="operator">}[</span><span class="number">7</span><span class="operator">]</span>                    <span class="comment"># hash of arrays</span>
+    <span class="variable">$hash</span><span class="operator">{</span><span class="string">string</span><span class="operator">}{</span><span class="string">'another string'</span><span class="operator">}</span>     <span class="comment"># hash of hashes</span>
+</code></pre>
+
+<p>Now, because the top level contains only references, if you try to print out your array in with a simple print() function, you&#39;ll get something that doesn&#39;t look very nice, like this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@AoA</span> <span class="operator">=</span> <span class="operator">(</span> <span class="operator">[</span><span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">4</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">7</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">1</span><span class="operator">][</span><span class="number">2</span><span class="operator">]</span><span class="operator">;</span>
+      <span class="number">7</span>
+    <span class="keyword">print</span> <span class="variable">@AoA</span><span class="operator">;</span>
+      <span class="variable">ARRAY</span><span class="operator">(</span><span class="number">0x83c38</span><span class="operator">)</span><span class="variable">ARRAY</span><span class="operator">(</span><span class="number">0x8b194</span><span class="operator">)</span><span class="variable">ARRAY</span><span class="operator">(</span><span class="number">0x8b1d0</span><span class="operator">)</span>
+</code></pre>
+
+<p>That&#39;s because Perl doesn&#39;t (ever) implicitly dereference your variables. If you want to get at the thing a reference is referring to, then you have to do this yourself using either prefix typing indicators, like <code><span class="variable">$</span><span class="operator">{</span><span class="variable">$blah</span><span class="operator">}</span>
+</code>, <code><span class="variable">@</span><span class="operator">{</span><span class="variable">$blah</span><span class="operator">}</span>
+</code>, <code><span class="variable">@</span><span class="operator">{</span><span class="variable">$blah</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]}</span>
+</code>, or else postfix pointer arrows, like <code>$a-&gt;[3]</code>, <code><span class="variable">$h</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">fred</span><span class="operator">}</span>
+</code>, or even <code>$ob-&gt;method()-&gt;[3]</code>.</p>
+
+<h1 id="COMMON-MISTAKES">COMMON MISTAKES</h1>
+
+<p>The two most common mistakes made in constructing something like an array of arrays is either accidentally counting the number of elements or else taking a reference to the same memory location repeatedly. Here&#39;s the case where you just get the count instead of a nested array:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">@array</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="variable">@array</span><span class="operator">;</span>      <span class="comment"># WRONG!</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>That&#39;s just the simple case of assigning an array to a scalar and getting its element count. If that&#39;s what you really and truly want, then you might do well to consider being a tad more explicit about it, like this:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">@array</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+        <span class="variable">$counts</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="keyword">scalar</span> <span class="variable">@array</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Here&#39;s the case of taking a reference to the same memory location again and again:</p>
+
+<pre><code>    <span class="comment"># Either without strict or having an outer-scope my @array;</span>
+    <span class="comment"># declaration.</span>
+    
+    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">@array</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">@array</span><span class="operator">;</span>     <span class="comment"># WRONG!</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>So, what&#39;s the big problem with that? It looks right, doesn&#39;t it? After all, I just told you that you need an array of references, so by golly, you&#39;ve made me one!</p>
+
+<p>Unfortunately, while this is true, it&#39;s still broken. All the references in @AoA refer to the <i>very same place</i>, and they will therefore all hold whatever was last in @array! It&#39;s similar to the problem demonstrated in the following C program:</p>
+
+<pre><code>    <span class="comment">#include &lt;pwd.h&gt;</span>
+    <span class="variable">main</span><span class="operator">()</span> <span class="operator">{</span>
+        <span class="variable">struct</span> <span class="variable">passwd</span> <span class="variable">*getpwnam</span><span class="operator">(),</span> <span class="variable">*rp</span><span class="operator">,</span> <span class="variable">*dp</span><span class="operator">;</span>
+        <span class="variable">rp</span> <span class="operator">=</span> <span class="keyword">getpwnam</span><span class="operator">(</span><span class="string">"root"</span><span class="operator">);</span>
+        <span class="variable">dp</span> <span class="operator">=</span> <span class="keyword">getpwnam</span><span class="operator">(</span><span class="string">"daemon"</span><span class="operator">);</span>
+    
+        <span class="keyword">printf</span><span class="operator">(</span><span class="string">"daemon name is %s\nroot name is %s\n"</span><span class="operator">,</span>
+                <span class="variable">dp</span><span class="operator">-&gt;</span><span class="variable">pw_name</span><span class="operator">,</span> <span class="variable">rp</span><span class="operator">-&gt;</span><span class="variable">pw_name</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Which will print</p>
+
+<pre><code>    daemon name is daemon
+    root name is daemon</code></pre>
+
+<p>The problem is that both <code>rp</code> and <code>dp</code> are pointers to the same location in memory! In C, you&#39;d have to remember to malloc() yourself some new memory. In Perl, you&#39;ll want to use the array constructor <code>[]</code> or the hash constructor <code><span class="operator">{}</span>
+</code> instead. Here&#39;s the right way to do the preceding broken code fragments:  </p>
+
+<pre><code>    <span class="comment"># Either without strict or having an outer-scope my @array;</span>
+    <span class="comment"># declaration.</span>
+    
+    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">@array</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@array</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The square brackets make a reference to a new array with a <i>copy</i> of what&#39;s in @array at the time of the assignment. This is what you want.</p>
+
+<p>Note that this will produce something similar, but it&#39;s much harder to read:</p>
+
+<pre><code>    <span class="comment"># Either without strict or having an outer-scope my @array;</span>
+    <span class="comment"># declaration.</span>
+    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">@array</span> <span class="operator">=</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$i</span><span class="operator">;</span>
+        <span class="variable">@</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]}</span> <span class="operator">=</span> <span class="variable">@array</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Is it the same? Well, maybe so--and maybe not. The subtle difference is that when you assign something in square brackets, you know for sure it&#39;s always a brand new reference with a new <i>copy</i> of the data. Something else could be going on in this new case with the <code><span class="variable">@</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]}</span>
+</code> dereference on the left-hand-side of the assignment. It all depends on whether <code>$AoA[$i]</code> had been undefined to start with, or whether it already contained a reference. If you had already populated @AoA with references, as in</p>
+
+<pre><code>    <span class="variable">$AoA</span><span class="operator">[</span><span class="number">3</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">@another_array</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then the assignment with the indirection on the left-hand-side would use the existing reference that was already there:</p>
+
+<pre><code>    <span class="variable">@</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="number">3</span><span class="operator">]}</span> <span class="operator">=</span> <span class="variable">@array</span><span class="operator">;</span>
+</code></pre>
+
+<p>Of course, this <i>would</i> have the &quot;interesting&quot; effect of clobbering @another_array. (Have you ever noticed how when a programmer says something is &quot;interesting&quot;, that rather than meaning &quot;intriguing&quot;, they&#39;re disturbingly more apt to mean that it&#39;s &quot;annoying&quot;, &quot;difficult&quot;, or both? :-)</p>
+
+<p>So just remember always to use the array or hash constructors with <code>[]</code> or <code><span class="operator">{}</span>
+</code>, and you&#39;ll be fine, although it&#39;s not always optimally efficient.</p>
+
+<p>Surprisingly, the following dangerous-looking construct will actually work out fine:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">@array</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">@array</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>That&#39;s because my() is more of a run-time statement than it is a compile-time declaration <i>per se</i>. This means that the my() variable is remade afresh each time through the loop. So even though it <i>looks</i> as though you stored the same variable reference each time, you actually did not! This is a subtle distinction that can produce more efficient code at the risk of misleading all but the most experienced of programmers. So I usually advise against teaching it to beginners. In fact, except for passing arguments to functions, I seldom like to see the gimme-a-reference operator (backslash) used much at all in code. Instead, I advise beginners that they (and most of the rest of us) should try to use the much more easily understood constructors <code>[]</code> and <code><span class="operator">{}</span>
+</code> instead of relying upon lexical (or dynamic) scoping and hidden reference-counting to do the right thing behind the scenes.</p>
+
+<p>In summary:</p>
+
+<pre><code>    <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@array</span> <span class="operator">]</span><span class="operator">;</span>     <span class="comment"># usually best</span>
+    <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">@array</span><span class="operator">;</span>        <span class="comment"># perilous; just how my() was that array?</span>
+    <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">=</span> <span class="variable">@array</span><span class="operator">;</span>    <span class="comment"># way too tricky for most programmers</span>
+</code></pre>
+
+<h1 id="CAVEAT-ON-PRECEDENCE">CAVEAT ON PRECEDENCE  </h1>
+
+<p>Speaking of things like <code><span class="variable">@</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]}</span>
+</code>, the following are actually the same thing: </p>
+
+<pre><code>    $aref-&gt;[2][2]       # clear
+    $$aref[2][2]        # confusing</code></pre>
+
+<p>That&#39;s because Perl&#39;s precedence rules on its five prefix dereferencers (which look like someone swearing: <code>$ @ * % &amp;</code>) make them bind more tightly than the postfix subscripting brackets or braces! This will no doubt come as a great shock to the C or C++ programmer, who is quite accustomed to using <code>*a[i]</code> to mean what&#39;s pointed to by the <i>i&#39;th</i> element of <code>a</code>. That is, they first take the subscript, and only then dereference the thing at that subscript. That&#39;s fine in C, but this isn&#39;t C.</p>
+
+<p>The seemingly equivalent construct in Perl, <code>$$aref[$i]</code> first does the deref of $aref, making it take $aref as a reference to an array, and then dereference that, and finally tell you the <i>i&#39;th</i> value of the array pointed to by $AoA. If you wanted the C notion, you&#39;d have to write <code><span class="variable">$</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]}</span>
+</code> to force the <code>$AoA[$i]</code> to get evaluated first before the leading <code>$</code> dereferencer.</p>
+
+<h1 id="WHY-YOU-SHOULD-ALWAYS-use-strict">WHY YOU SHOULD ALWAYS <code>use strict</code></h1>
+
+<p>If this is starting to sound scarier than it&#39;s worth, relax. Perl has some features to help you avoid its most common pitfalls. The best way to avoid getting confused is to start every program like this:</p>
+
+<pre><code>    <span class="comment">#!/usr/bin/perl -w</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+</code></pre>
+
+<p>This way, you&#39;ll be forced to declare all your variables with my() and also disallow accidental &quot;symbolic dereferencing&quot;. Therefore if you&#39;d done this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$aref</span> <span class="operator">=</span> <span class="operator">[</span>
+        <span class="operator">[</span> <span class="string">"fred"</span><span class="operator">,</span> <span class="string">"barney"</span><span class="operator">,</span> <span class="string">"pebbles"</span><span class="operator">,</span> <span class="string">"bambam"</span><span class="operator">,</span> <span class="string">"dino"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">"bart"</span><span class="operator">,</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">"maggie"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">"george"</span><span class="operator">,</span> <span class="string">"jane"</span><span class="operator">,</span> <span class="string">"elroy"</span><span class="operator">,</span> <span class="string">"judy"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">]</span><span class="operator">;</span>
+    
+    <span class="keyword">print</span> <span class="variable">$aref</span><span class="operator">[</span><span class="number">2</span><span class="operator">][</span><span class="number">2</span><span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>The compiler would immediately flag that as an error <i>at compile time</i>, because you were accidentally accessing <code>@aref</code>, an undeclared variable, and it would thereby remind you to write instead:</p>
+
+<pre><code>    print $aref-&gt;[2][2]</code></pre>
+
+<h1 id="DEBUGGING">DEBUGGING          </h1>
+
+<p>You can use the debugger&#39;s <code>x</code> command to dump out complex data structures. For example, given the assignment to $AoA above, here&#39;s the debugger output:</p>
+
+<pre><code>    DB&lt;1&gt; x $AoA
+    $AoA = ARRAY(0x13b5a0)
+       0  ARRAY(0x1f0a24)
+          0  &#39;fred&#39;
+          1  &#39;barney&#39;
+          2  &#39;pebbles&#39;
+          3  &#39;bambam&#39;
+          4  &#39;dino&#39;
+       1  ARRAY(0x13b558)
+          0  &#39;homer&#39;
+          1  &#39;bart&#39;
+          2  &#39;marge&#39;
+          3  &#39;maggie&#39;
+       2  ARRAY(0x13b540)
+          0  &#39;george&#39;
+          1  &#39;jane&#39;
+          2  &#39;elroy&#39;
+          3  &#39;judy&#39;</code></pre>
+
+<h1 id="CODE-EXAMPLES">CODE EXAMPLES</h1>
+
+<p>Presented with little comment (these will get their own manpages someday) here are short code examples illustrating access of various types of data structures.</p>
+
+<h1 id="ARRAYS-OF-ARRAYS">ARRAYS OF ARRAYS  </h1>
+
+<h2 id="Declaration-of-an-ARRAY-OF-ARRAYS">Declaration of an ARRAY OF ARRAYS</h2>
+
+<pre><code> <span class="variable">@AoA</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="operator">[</span> <span class="string">"fred"</span><span class="operator">,</span> <span class="string">"barney"</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">"george"</span><span class="operator">,</span> <span class="string">"jane"</span><span class="operator">,</span> <span class="string">"elroy"</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">"bart"</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Generation-of-an-ARRAY-OF-ARRAYS">Generation of an ARRAY OF ARRAYS</h2>
+
+<pre><code> <span class="comment"># reading from file</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">push</span> <span class="variable">@AoA</span><span class="operator">,</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># calling a function</span>
+ <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># using temp vars</span>
+ <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">@tmp</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+     <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@tmp</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># add to an existing row</span>
+ <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">"wilma"</span><span class="operator">,</span> <span class="string">"betty"</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Access-and-Printing-of-an-ARRAY-OF-ARRAYS">Access and Printing of an ARRAY OF ARRAYS</h2>
+
+<pre><code> <span class="comment"># one element</span>
+ <span class="variable">$AoA</span><span class="operator">[</span><span class="number">0</span><span class="operator">][</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=</span> <span class="string">"Fred"</span><span class="operator">;</span>
+ 
+ <span class="comment"># another element</span>
+ <span class="variable">$AoA</span><span class="operator">[</span><span class="number">1</span><span class="operator">][</span><span class="number">1</span><span class="operator">]</span> <span class="operator">=~</span> <span class="regex">s/(\w)/\u$1/</span><span class="operator">;</span>
+ 
+ <span class="comment"># print the whole thing with refs</span>
+ <span class="keyword">for</span> <span class="variable">$aref</span> <span class="operator">(</span> <span class="variable">@AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"\t [ @</span><span class="variable">$aref</span><span class="string"> ],\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing with indices</span>
+ <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"\t [ @{</span><span class="variable">$AoA</span><span class="string">[</span><span class="variable">$i</span><span class="string">]} ],\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing one at a time</span>
+ <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">for</span> <span class="variable">$j</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"elt </span><span class="variable">$i</span><span class="string"> </span><span class="variable">$j</span><span class="string"> is </span><span class="variable">$AoA</span><span class="string">[</span><span class="variable">$i</span><span class="string">][</span><span class="variable">$j</span><span class="string">]\n"</span><span class="operator">;</span>
+     <span class="operator">}</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="HASHES-OF-ARRAYS">HASHES OF ARRAYS  </h1>
+
+<h2 id="Declaration-of-a-HASH-OF-ARRAYS">Declaration of a HASH OF ARRAYS</h2>
+
+<pre><code> <span class="variable">%HoA</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">flintstones</span>        <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">"fred"</span><span class="operator">,</span> <span class="string">"barney"</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">jetsons</span>            <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">"george"</span><span class="operator">,</span> <span class="string">"jane"</span><span class="operator">,</span> <span class="string">"elroy"</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">simpsons</span>           <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">"bart"</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Generation-of-a-HASH-OF-ARRAYS">Generation of a HASH OF ARRAYS</h2>
+
+<pre><code> <span class="comment"># reading from file</span>
+ <span class="comment"># flintstones: fred barney wilma dino</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">next</span> <span class="keyword">unless</span> <span class="regex">s/^(.*?):\s*//</span><span class="operator">;</span>
+     <span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$1</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># reading from file; more temps</span>
+ <span class="comment"># flintstones: fred barney wilma dino</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$line</span> <span class="operator">=</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">(</span><span class="variable">$who</span><span class="operator">,</span> <span class="variable">$rest</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/:\s*/</span><span class="operator">,</span> <span class="variable">$line</span><span class="operator">,</span> <span class="number">2</span><span class="operator">;</span>
+     <span class="variable">@fields</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="string">' '</span><span class="operator">,</span> <span class="variable">$rest</span><span class="operator">;</span>
+     <span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$who</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@fields</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># calling a function that returns a list</span>
+ <span class="keyword">for</span> <span class="variable">$group</span> <span class="operator">(</span> <span class="string">"simpsons"</span><span class="operator">,</span> <span class="string">"jetsons"</span><span class="operator">,</span> <span class="string">"flintstones"</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$group</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">get_family</span><span class="operator">(</span><span class="variable">$group</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># likewise, but using temps</span>
+ <span class="keyword">for</span> <span class="variable">$group</span> <span class="operator">(</span> <span class="string">"simpsons"</span><span class="operator">,</span> <span class="string">"jetsons"</span><span class="operator">,</span> <span class="string">"flintstones"</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">@members</span> <span class="operator">=</span> <span class="variable">get_family</span><span class="operator">(</span><span class="variable">$group</span><span class="operator">);</span>
+     <span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$group</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@members</span> <span class="operator">]</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># append new members to an existing family</span>
+ <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$HoA</span><span class="operator">{</span><span class="string">"flintstones"</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">"wilma"</span><span class="operator">,</span> <span class="string">"betty"</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Access-and-Printing-of-a-HASH-OF-ARRAYS">Access and Printing of a HASH OF ARRAYS</h2>
+
+<pre><code> <span class="comment"># one element</span>
+ <span class="variable">$HoA</span><span class="operator">{</span><span class="string">flintstones</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=</span> <span class="string">"Fred"</span><span class="operator">;</span>
+ 
+ <span class="comment"># another element</span>
+ <span class="variable">$HoA</span><span class="operator">{</span><span class="string">simpsons</span><span class="operator">}[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">=~</span> <span class="regex">s/(\w)/\u$1/</span><span class="operator">;</span>
+ 
+ <span class="comment"># print the whole thing</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%HoA</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: @{ </span><span class="variable">$HoA</span><span class="string">{</span><span class="variable">$family</span><span class="string">} }\n"</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing with indices</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%HoA</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"family: "</span><span class="operator">;</span>
+     <span class="keyword">foreach</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#</span><span class="operator">{</span> <span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">" </span><span class="variable">$i</span><span class="string"> = </span><span class="variable">$HoA</span><span class="string">{</span><span class="variable">$family</span><span class="string">}[</span><span class="variable">$i</span><span class="string">]"</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing sorted by number of members</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="operator">{</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$b</span><span class="operator">}}</span> <span class="operator">&lt;=&gt;</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}}</span> <span class="operator">}</span> <span class="keyword">keys</span> <span class="variable">%HoA</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: @{ </span><span class="variable">$HoA</span><span class="string">{</span><span class="variable">$family</span><span class="string">} }\n"</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing sorted by number of members and name</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="operator">{</span>
+                            <span class="variable">@</span><span class="operator">{</span><span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$b</span><span class="operator">}}</span> <span class="operator">&lt;=&gt;</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}}</span>
+                                        <span class="operator">||</span>
+                                    <span class="variable">$a</span> <span class="keyword">cmp</span> <span class="variable">$b</span>
+            <span class="operator">}</span> <span class="keyword">keys</span> <span class="variable">%HoA</span> <span class="operator">)</span>
+ <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: "</span><span class="operator">,</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">", "</span><span class="operator">,</span> <span class="keyword">sort</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$HoA</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="ARRAYS-OF-HASHES">ARRAYS OF HASHES  </h1>
+
+<h2 id="Declaration-of-an-ARRAY-OF-HASHES">Declaration of an ARRAY OF HASHES</h2>
+
+<pre><code> <span class="variable">@AoH</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="operator">{</span>
+            <span class="string">Lead</span>     <span class="operator">=&gt;</span> <span class="string">"fred"</span><span class="operator">,</span>
+            <span class="string">Friend</span>   <span class="operator">=&gt;</span> <span class="string">"barney"</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span>
+            <span class="string">Lead</span>     <span class="operator">=&gt;</span> <span class="string">"george"</span><span class="operator">,</span>
+            <span class="string">Wife</span>     <span class="operator">=&gt;</span> <span class="string">"jane"</span><span class="operator">,</span>
+            <span class="string">Son</span>      <span class="operator">=&gt;</span> <span class="string">"elroy"</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span>
+            <span class="string">Lead</span>     <span class="operator">=&gt;</span> <span class="string">"homer"</span><span class="operator">,</span>
+            <span class="string">Wife</span>     <span class="operator">=&gt;</span> <span class="string">"marge"</span><span class="operator">,</span>
+            <span class="string">Son</span>      <span class="operator">=&gt;</span> <span class="string">"bart"</span><span class="operator">,</span>
+        <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Generation-of-an-ARRAY-OF-HASHES">Generation of an ARRAY OF HASHES</h2>
+
+<pre><code> <span class="comment"># reading from file</span>
+ <span class="comment"># format: LEAD=fred FRIEND=barney</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">$rec</span> <span class="operator">=</span> <span class="operator">{}</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$field</span> <span class="operator">(</span> <span class="keyword">split</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="operator">(</span><span class="variable">$key</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/=/</span><span class="operator">,</span> <span class="variable">$field</span><span class="operator">;</span>
+         <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$key</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$value</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">push</span> <span class="variable">@AoH</span><span class="operator">,</span> <span class="variable">$rec</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ 
+ <span class="comment"># reading from file</span>
+ <span class="comment"># format: LEAD=fred FRIEND=barney</span>
+ <span class="comment"># no temp</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">push</span> <span class="variable">@AoH</span><span class="operator">,</span> <span class="operator">{</span> <span class="keyword">split</span> <span class="regex">/[\s+=]/</span> <span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># calling a function  that returns a key/value pair list, like</span>
+ <span class="comment"># "lead","fred","daughter","pebbles"</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">%fields</span> <span class="operator">=</span> <span class="variable">getnextpairset</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">push</span> <span class="variable">@AoH</span><span class="operator">,</span> <span class="operator">{</span> <span class="variable">%fields</span> <span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># likewise, but using no temp vars</span>
+ <span class="keyword">while</span> <span class="operator">(&lt;&gt;)</span> <span class="operator">{</span>
+     <span class="keyword">push</span> <span class="variable">@AoH</span><span class="operator">,</span> <span class="operator">{</span> <span class="variable">parsepairs</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># add key/value to an element</span>
+ <span class="variable">$AoH</span><span class="operator">[</span><span class="number">0</span><span class="operator">]{</span><span class="string">pet</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"dino"</span><span class="operator">;</span>
+ <span class="variable">$AoH</span><span class="operator">[</span><span class="number">2</span><span class="operator">]{</span><span class="string">pet</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"santa's little helper"</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Access-and-Printing-of-an-ARRAY-OF-HASHES">Access and Printing of an ARRAY OF HASHES</h2>
+
+<pre><code> <span class="comment"># one element</span>
+ <span class="variable">$AoH</span><span class="operator">[</span><span class="number">0</span><span class="operator">]{</span><span class="string">lead</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"fred"</span><span class="operator">;</span>
+ 
+ <span class="comment"># another element</span>
+ <span class="variable">$AoH</span><span class="operator">[</span><span class="number">1</span><span class="operator">]{</span><span class="string">lead</span><span class="operator">}</span> <span class="operator">=~</span> <span class="regex">s/(\w)/\u$1/</span><span class="operator">;</span>
+ 
+ <span class="comment"># print the whole thing with refs</span>
+ <span class="keyword">for</span> <span class="variable">$href</span> <span class="operator">(</span> <span class="variable">@AoH</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"{ "</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%$href</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$role</span><span class="string">=</span><span class="variable">$href</span><span class="string">-&gt;{</span><span class="variable">$role</span><span class="string">} "</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing with indices</span>
+ <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoH</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$i</span><span class="string"> is { "</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$AoH</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$role</span><span class="string">=</span><span class="variable">$AoH</span><span class="string">[</span><span class="variable">$i</span><span class="string">]{</span><span class="variable">$role</span><span class="string">} "</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing one at a time</span>
+ <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoH</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$AoH</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"elt </span><span class="variable">$i</span><span class="string"> </span><span class="variable">$role</span><span class="string"> is </span><span class="variable">$AoH</span><span class="string">[</span><span class="variable">$i</span><span class="string">]{</span><span class="variable">$role</span><span class="string">}\n"</span><span class="operator">;</span>
+     <span class="operator">}</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="HASHES-OF-HASHES">HASHES OF HASHES  </h1>
+
+<h2 id="Declaration-of-a-HASH-OF-HASHES">Declaration of a HASH OF HASHES</h2>
+
+<pre><code> <span class="variable">%HoH</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">flintstones</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">lead</span>      <span class="operator">=&gt;</span> <span class="string">"fred"</span><span class="operator">,</span>
+                <span class="string">pal</span>       <span class="operator">=&gt;</span> <span class="string">"barney"</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">jetsons</span>     <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">lead</span>      <span class="operator">=&gt;</span> <span class="string">"george"</span><span class="operator">,</span>
+                <span class="string">wife</span>      <span class="operator">=&gt;</span> <span class="string">"jane"</span><span class="operator">,</span>
+                <span class="string">"his boy"</span> <span class="operator">=&gt;</span> <span class="string">"elroy"</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">simpsons</span>    <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">lead</span>      <span class="operator">=&gt;</span> <span class="string">"homer"</span><span class="operator">,</span>
+                <span class="string">wife</span>      <span class="operator">=&gt;</span> <span class="string">"marge"</span><span class="operator">,</span>
+                <span class="string">kid</span>       <span class="operator">=&gt;</span> <span class="string">"bart"</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+ <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Generation-of-a-HASH-OF-HASHES">Generation of a HASH OF HASHES</h2>
+
+<pre><code> <span class="comment"># reading from file</span>
+ <span class="comment"># flintstones: lead=fred pal=barney wife=wilma pet=dino</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">next</span> <span class="keyword">unless</span> <span class="regex">s/^(.*?):\s*//</span><span class="operator">;</span>
+     <span class="variable">$who</span> <span class="operator">=</span> <span class="variable">$1</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$field</span> <span class="operator">(</span> <span class="keyword">split</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="operator">(</span><span class="variable">$key</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/=/</span><span class="operator">,</span> <span class="variable">$field</span><span class="operator">;</span>
+         <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$who</span><span class="operator">}{</span><span class="variable">$key</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$value</span><span class="operator">;</span>
+     <span class="operator">}</span>
+ 
+ 
+ <span class="comment"># reading from file; more temps</span>
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">&lt;&gt;</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">next</span> <span class="keyword">unless</span> <span class="regex">s/^(.*?):\s*//</span><span class="operator">;</span>
+     <span class="variable">$who</span> <span class="operator">=</span> <span class="variable">$1</span><span class="operator">;</span>
+     <span class="variable">$rec</span> <span class="operator">=</span> <span class="operator">{}</span><span class="operator">;</span>
+     <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$who</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$rec</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$field</span> <span class="operator">(</span> <span class="keyword">split</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="operator">(</span><span class="variable">$key</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/=/</span><span class="operator">,</span> <span class="variable">$field</span><span class="operator">;</span>
+         <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$key</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$value</span><span class="operator">;</span>
+     <span class="operator">}</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># calling a function  that returns a key,value hash</span>
+ <span class="keyword">for</span> <span class="variable">$group</span> <span class="operator">(</span> <span class="string">"simpsons"</span><span class="operator">,</span> <span class="string">"jetsons"</span><span class="operator">,</span> <span class="string">"flintstones"</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$group</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span> <span class="variable">get_family</span><span class="operator">(</span><span class="variable">$group</span><span class="operator">)</span> <span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># likewise, but using temps</span>
+ <span class="keyword">for</span> <span class="variable">$group</span> <span class="operator">(</span> <span class="string">"simpsons"</span><span class="operator">,</span> <span class="string">"jetsons"</span><span class="operator">,</span> <span class="string">"flintstones"</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">%members</span> <span class="operator">=</span> <span class="variable">get_family</span><span class="operator">(</span><span class="variable">$group</span><span class="operator">);</span>
+     <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$group</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span> <span class="variable">%members</span> <span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># append new members to an existing family</span>
+ <span class="variable">%new_folks</span> <span class="operator">=</span> <span class="operator">(</span>
+     <span class="string">wife</span> <span class="operator">=&gt;</span> <span class="string">"wilma"</span><span class="operator">,</span>
+     <span class="string">pet</span>  <span class="operator">=&gt;</span> <span class="string">"dino"</span><span class="operator">,</span>
+ <span class="operator">);</span>
+ 
+ <span class="keyword">for</span> <span class="variable">$what</span> <span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%new_folks</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="variable">$HoH</span><span class="operator">{</span><span class="string">flintstones</span><span class="operator">}{</span><span class="variable">$what</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$new_folks</span><span class="operator">{</span><span class="variable">$what</span><span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Access-and-Printing-of-a-HASH-OF-HASHES">Access and Printing of a HASH OF HASHES</h2>
+
+<pre><code> <span class="comment"># one element</span>
+ <span class="variable">$HoH</span><span class="operator">{</span><span class="string">flintstones</span><span class="operator">}{</span><span class="string">wife</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"wilma"</span><span class="operator">;</span>
+ 
+ <span class="comment"># another element</span>
+ <span class="variable">$HoH</span><span class="operator">{</span><span class="string">simpsons</span><span class="operator">}{</span><span class="string">lead</span><span class="operator">}</span> <span class="operator">=~</span> <span class="regex">s/(\w)/\u$1/</span><span class="operator">;</span>
+ 
+ <span class="comment"># print the whole thing</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%HoH</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: { "</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$role</span><span class="string">=</span><span class="variable">$HoH</span><span class="string">{</span><span class="variable">$family</span><span class="string">}{</span><span class="variable">$role</span><span class="string">} "</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># print the whole thing  somewhat sorted</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="keyword">keys</span> <span class="variable">%HoH</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: { "</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$role</span><span class="string">=</span><span class="variable">$HoH</span><span class="string">{</span><span class="variable">$family</span><span class="string">}{</span><span class="variable">$role</span><span class="string">} "</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ 
+ <span class="comment"># print the whole thing sorted by number of members</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="operator">{</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$b</span><span class="operator">}}</span> <span class="operator">&lt;=&gt;</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}}</span> <span class="operator">}</span>
+                                                             <span class="keyword">keys</span> <span class="variable">%HoH</span> <span class="operator">)</span>
+ <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: { "</span><span class="operator">;</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$role</span><span class="string">=</span><span class="variable">$HoH</span><span class="string">{</span><span class="variable">$family</span><span class="string">}{</span><span class="variable">$role</span><span class="string">} "</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># establish a sort order (rank) for each role</span>
+ <span class="variable">$i</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+ <span class="keyword">for</span> <span class="operator">(</span> <span class="string">qw(lead wife son daughter pal pet)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="variable">$rank</span><span class="operator">{</span><span class="variable">$_</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">++</span><span class="variable">$i</span> <span class="operator">}</span>
+ 
+ <span class="comment"># now print the whole thing sorted by number of members</span>
+ <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="operator">{</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$b</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">&lt;=&gt;</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">}</span>
+                                                             <span class="keyword">keys</span> <span class="variable">%HoH</span> <span class="operator">)</span>
+ <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$family</span><span class="string">: { "</span><span class="operator">;</span>
+     <span class="comment"># and print these according to rank order</span>
+     <span class="keyword">for</span> <span class="variable">$role</span> <span class="operator">(</span> <span class="keyword">sort</span> <span class="operator">{</span> <span class="variable">$rank</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}</span> <span class="operator">&lt;=&gt;</span> <span class="variable">$rank</span><span class="operator">{</span><span class="variable">$b</span><span class="operator">}</span> <span class="operator">}</span>
+                                               <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$HoH</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span>
+     <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$role</span><span class="string">=</span><span class="variable">$HoH</span><span class="string">{</span><span class="variable">$family</span><span class="string">}{</span><span class="variable">$role</span><span class="string">} "</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="keyword">print</span> <span class="string">"}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="MORE-ELABORATE-RECORDS">MORE ELABORATE RECORDS   </h1>
+
+<h2 id="Declaration-of-MORE-ELABORATE-RECORDS">Declaration of MORE ELABORATE RECORDS</h2>
+
+<p>Here&#39;s a sample showing how to create and use a record whose fields are of many different sorts:</p>
+
+<pre><code>     <span class="variable">$rec</span> <span class="operator">=</span> <span class="operator">{</span>
+         <span class="string">TEXT</span>      <span class="operator">=&gt;</span> <span class="variable">$string</span><span class="operator">,</span>
+         <span class="string">SEQUENCE</span>  <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">@old_values</span> <span class="operator">]</span><span class="operator">,</span>
+         <span class="string">LOOKUP</span>    <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="variable">%some_table</span> <span class="operator">}</span><span class="operator">,</span>
+         <span class="string">THATCODE</span>  <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">some_function</span><span class="operator">,</span>
+         <span class="string">THISCODE</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">**</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">},</span>
+         <span class="string">HANDLE</span>    <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*STDOUT</span><span class="operator">,</span>
+     <span class="operator">}</span><span class="operator">;</span>
+     
+     <span class="keyword">print</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">TEXT</span><span class="operator">}</span><span class="operator">;</span>
+     
+     <span class="keyword">print</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">SEQUENCE</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>
+     <span class="variable">$last</span> <span class="operator">=</span> <span class="keyword">pop</span> <span class="operator">@ {</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">SEQUENCE</span><span class="operator">}</span> <span class="operator">};</span>
+     
+     <span class="keyword">print</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">LOOKUP</span><span class="operator">}{</span><span class="string">"key"</span><span class="operator">}</span><span class="operator">;</span>
+     <span class="operator">(</span><span class="variable">$first_k</span><span class="operator">,</span> <span class="variable">$first_v</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">each</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">LOOKUP</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">;</span>
+     
+     <span class="variable">$answer</span> <span class="operator">=</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">THATCODE</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="variable">$arg</span><span class="operator">);</span>
+     <span class="variable">$answer</span> <span class="operator">=</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">THISCODE</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="variable">$arg1</span><span class="operator">,</span> <span class="variable">$arg2</span><span class="operator">);</span>
+     
+     <span class="comment"># careful of extra block braces on fh ref</span>
+     <span class="keyword">print</span> <span class="operator">{</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">HANDLE</span><span class="operator">}</span> <span class="operator">}</span> <span class="string">"a string\n"</span><span class="operator">;</span>
+     
+     <span class="keyword">use</span> <span class="variable">FileHandle</span><span class="operator">;</span>
+     <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">HANDLE</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="variable">autoflush</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+     <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">HANDLE</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">" a string\n"</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="Declaration-of-a-HASH-OF-COMPLEX-RECORDS">Declaration of a HASH OF COMPLEX RECORDS</h2>
+
+<pre><code>     <span class="variable">%TV</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">flintstones</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">series</span>   <span class="operator">=&gt;</span> <span class="string">"flintstones"</span><span class="operator">,</span>
+            <span class="string">nights</span>   <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(monday thursday friday)</span> <span class="operator">]</span><span class="operator">,</span>
+            <span class="string">members</span>  <span class="operator">=&gt;</span> <span class="operator">[</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"fred"</span><span class="operator">,</span>    <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"lead"</span><span class="operator">,</span> <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="number">36</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"wilma"</span><span class="operator">,</span>   <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"wife"</span><span class="operator">,</span> <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="number">31</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"pebbles"</span><span class="operator">,</span> <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"kid"</span><span class="operator">,</span>  <span class="string">age</span>  <span class="operator">=&gt;</span>  <span class="number">4</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+     
+        <span class="string">jetsons</span>     <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">series</span>   <span class="operator">=&gt;</span> <span class="string">"jetsons"</span><span class="operator">,</span>
+            <span class="string">nights</span>   <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(wednesday saturday)</span> <span class="operator">]</span><span class="operator">,</span>
+            <span class="string">members</span>  <span class="operator">=&gt;</span> <span class="operator">[</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"george"</span><span class="operator">,</span>  <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"lead"</span><span class="operator">,</span> <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="number">41</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"jane"</span><span class="operator">,</span>    <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"wife"</span><span class="operator">,</span> <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="number">39</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"elroy"</span><span class="operator">,</span>   <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"kid"</span><span class="operator">,</span>  <span class="string">age</span>  <span class="operator">=&gt;</span>  <span class="number">9</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">]</span><span class="operator">,</span>
+         <span class="operator">}</span><span class="operator">,</span>
+     
+        <span class="string">simpsons</span>    <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">series</span>   <span class="operator">=&gt;</span> <span class="string">"simpsons"</span><span class="operator">,</span>
+            <span class="string">nights</span>   <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(monday)</span> <span class="operator">]</span><span class="operator">,</span>
+            <span class="string">members</span>  <span class="operator">=&gt;</span> <span class="operator">[</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"lead"</span><span class="operator">,</span> <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="number">34</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"wife"</span><span class="operator">,</span> <span class="string">age</span> <span class="operator">=&gt;</span> <span class="number">37</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">"bart"</span><span class="operator">,</span>  <span class="string">role</span> <span class="operator">=&gt;</span> <span class="string">"kid"</span><span class="operator">,</span>  <span class="string">age</span>  <span class="operator">=&gt;</span>  <span class="number">11</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">]</span><span class="operator">,</span>
+         <span class="operator">}</span><span class="operator">,</span>
+      <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Generation-of-a-HASH-OF-COMPLEX-RECORDS">Generation of a HASH OF COMPLEX RECORDS</h2>
+
+<pre><code>     <span class="comment"># reading from file</span>
+     <span class="comment"># this is most easily done by having the file itself be</span>
+     <span class="comment"># in the raw data format as shown above.  perl is happy</span>
+     <span class="comment"># to parse complex data structures if declared as data, so</span>
+     <span class="comment"># sometimes it's easiest to do that</span>
+     
+     <span class="comment"># here's a piece by piece build up</span>
+     <span class="variable">$rec</span> <span class="operator">=</span> <span class="operator">{}</span><span class="operator">;</span>
+     <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">series</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"flintstones"</span><span class="operator">;</span>
+     <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">nights</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">find_days</span><span class="operator">()</span> <span class="operator">]</span><span class="operator">;</span>
+     
+     <span class="variable">@members</span> <span class="operator">=</span> <span class="operator">();</span>
+     <span class="comment"># assume this file in field=value syntax</span>
+     <span class="keyword">while</span> <span class="operator">(&lt;&gt;)</span> <span class="operator">{</span>
+         <span class="variable">%fields</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/[\s=]+/</span><span class="operator">;</span>
+         <span class="keyword">push</span> <span class="variable">@members</span><span class="operator">,</span> <span class="operator">{</span> <span class="variable">%fields</span> <span class="operator">}</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">members</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@members</span> <span class="operator">]</span><span class="operator">;</span>
+     
+     <span class="comment"># now remember the whole thing</span>
+     <span class="variable">$TV</span><span class="operator">{</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">series</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">=</span> <span class="variable">$rec</span><span class="operator">;</span>
+     
+     <span class="comment">###########################################################</span>
+     <span class="comment"># now, you might want to make interesting extra fields that</span>
+     <span class="comment"># include pointers back into the same data structure so if</span>
+     <span class="comment"># change one piece, it changes everywhere, like for example</span>
+     <span class="comment"># if you wanted a {kids} field that was a reference</span>
+     <span class="comment"># to an array of the kids' records without having duplicate</span>
+     <span class="comment"># records and thus update problems.</span>
+     <span class="comment">###########################################################</span>
+     <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%TV</span><span class="operator">)</span> <span class="operator">{</span>
+         <span class="variable">$rec</span> <span class="operator">=</span> <span class="variable">$TV</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># temp pointer</span>
+         <span class="variable">@kids</span> <span class="operator">=</span> <span class="operator">();</span>
+         <span class="keyword">for</span> <span class="variable">$person</span> <span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">members</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+             <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$person</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">role</span><span class="operator">}</span> <span class="operator">=~</span> <span class="regex">/kid|son|daughter/</span><span class="operator">)</span> <span class="operator">{</span>
+                 <span class="keyword">push</span> <span class="variable">@kids</span><span class="operator">,</span> <span class="variable">$person</span><span class="operator">;</span>
+             <span class="operator">}</span>
+         <span class="operator">}</span>
+         <span class="comment"># REMEMBER: $rec and $TV{$family} point to same data!!</span>
+         <span class="variable">$rec</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">kids</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@kids</span> <span class="operator">]</span><span class="operator">;</span>
+     <span class="operator">}</span>
+     
+     <span class="comment"># you copied the array, but the array itself contains pointers</span>
+     <span class="comment"># to uncopied objects. this means that if you make bart get</span>
+     <span class="comment"># older via</span>
+     
+     <span class="variable">$TV</span><span class="operator">{</span><span class="string">simpsons</span><span class="operator">}{</span><span class="string">kids</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]{</span><span class="string">age</span><span class="operator">}</span><span class="operator">++;</span>
+     
+     <span class="comment"># then this would also change in</span>
+     <span class="keyword">print</span> <span class="variable">$TV</span><span class="operator">{</span><span class="string">simpsons</span><span class="operator">}{</span><span class="string">members</span><span class="operator">}[</span><span class="number">2</span><span class="operator">]{</span><span class="string">age</span><span class="operator">}</span><span class="operator">;</span>
+     
+     <span class="comment"># because $TV{simpsons}{kids}[0] and $TV{simpsons}{members}[2]</span>
+     <span class="comment"># both point to the same underlying anonymous hash table</span>
+     
+     <span class="comment"># print the whole thing</span>
+     <span class="keyword">foreach</span> <span class="variable">$family</span> <span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%TV</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"the </span><span class="variable">$family</span><span class="string">"</span><span class="operator">;</span>
+         <span class="keyword">print</span> <span class="string">" is on during @{ </span><span class="variable">$TV</span><span class="string">{</span><span class="variable">$family</span><span class="string">}{nights} }\n"</span><span class="operator">;</span>
+         <span class="keyword">print</span> <span class="string">"its members are:\n"</span><span class="operator">;</span>
+         <span class="keyword">for</span> <span class="variable">$who</span> <span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$TV</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}{</span><span class="string">members</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+             <span class="keyword">print</span> <span class="string">" </span><span class="variable">$who</span><span class="string">-&gt;{name} (</span><span class="variable">$who</span><span class="string">-&gt;{role}), age </span><span class="variable">$who</span><span class="string">-&gt;{age}\n"</span><span class="operator">;</span>
+         <span class="operator">}</span>
+         <span class="keyword">print</span> <span class="string">"it turns out that </span><span class="variable">$TV</span><span class="string">{</span><span class="variable">$family</span><span class="string">}{lead} has "</span><span class="operator">;</span>
+         <span class="keyword">print</span> <span class="keyword">scalar</span> <span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$TV</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}{</span><span class="string">kids</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">),</span> <span class="string">" kids named "</span><span class="operator">;</span>
+         <span class="keyword">print</span> <span class="keyword">join</span> <span class="operator">(</span><span class="string">", "</span><span class="operator">,</span> <span class="keyword">map</span> <span class="operator">{</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">name</span><span class="operator">}</span> <span class="operator">}</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$TV</span><span class="operator">{</span><span class="variable">$family</span><span class="operator">}{</span><span class="string">kids</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">);</span>
+         <span class="keyword">print</span> <span class="string">"\n"</span><span class="operator">;</span>
+     <span class="operator">}</span>
+</code></pre>
+
+<h1 id="Database-Ties">Database Ties</h1>
+
+<p>You cannot easily tie a multilevel data structure (such as a hash of hashes) to a dbm file. The first problem is that all but GDBM and Berkeley DB have size limitations, but beyond that, you also have problems with how references are to be represented on disk. One experimental module that does partially attempt to address this need is the MLDBM module. Check your nearest CPAN site as described in <a href="../../lib/pods/perlmodlib.html">perlmodlib</a> for source code to MLDBM.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/pods/perlref.html">perlref</a>, <a href="../../lib/pods/perllol.html">perllol</a>, <a href="../../lib/pods/perldata.html">perldata</a>, <a href="../../lib/pods/perlobj.html">perlobj</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Tom Christiansen &lt;<i>tchrist@perl.com</i>&gt;</p>
+
+
+</body>
+
+</html>
+
+

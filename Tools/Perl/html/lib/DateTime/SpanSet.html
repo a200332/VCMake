@@ -1,0 +1,426 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::SpanSet - set of DateTime spans</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="variable">$spanset</span> <span class="operator">=</span> <span class="variable">DateTime::SpanSet</span><span class="operator">-&gt;</span><span class="variable">from_spans</span><span class="operator">(</span> <span class="string">spans</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">$dt_span</span><span class="operator">,</span> <span class="variable">$dt_span</span> <span class="operator">]</span> <span class="operator">);</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">union</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>         <span class="comment"># like "OR", "insert", "both"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>    <span class="comment"># like "delete", "remove"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">intersection</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>  <span class="comment"># like "AND", "while"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">;</span>             <span class="comment"># like "NOT", "negate", "invert"</span>
+    
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">intersects</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>  <span class="comment"># like "touches", "interferes"</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>    <span class="comment"># like "is-fully-inside"</span>
+    
+    <span class="comment"># data extraction </span>
+    <span class="variable">$date</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">min</span><span class="operator">;</span>           <span class="comment"># first date of the set</span>
+    <span class="variable">$date</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">max</span><span class="operator">;</span>           <span class="comment"># last date of the set</span>
+    
+    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">next</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="comment"># $dt is a DateTime::Span</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">start</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>   <span class="comment"># first date of span</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">end</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>     <span class="comment"># last date of span</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>DateTime::SpanSet</code> is a class that represents sets of datetime spans. An example would be a recurring meeting that occurs from 13:00-15:00 every Friday.</p>
+
+<p>This is different from a <code>DateTime::Set</code>, which is made of individual datetime points as opposed to ranges.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<ul>
+
+<li><p>from_spans</p>
+
+<p>Creates a new span set from one or more <code>DateTime::Span</code> objects.</p>
+
+<pre><code>   <span class="variable">$spanset</span> <span class="operator">=</span> <span class="variable">DateTime::SpanSet</span><span class="operator">-&gt;</span><span class="variable">from_spans</span><span class="operator">(</span> <span class="string">spans</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">$dt_span</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>from_set_and_duration</p>
+
+<p>Creates a new span set from one or more <code>DateTime::Set</code> objects and a duration.</p>
+
+<p>The duration can be a <code>DateTime::Duration</code> object, or the parameters to create a new <code>DateTime::Duration</code> object, such as &quot;days&quot;, &quot;months&quot;, etc.</p>
+
+<pre><code>   <span class="variable">$spanset</span> <span class="operator">=</span>
+       <span class="variable">DateTime::SpanSet</span><span class="operator">-&gt;</span><span class="variable">from_set_and_duration</span>
+           <span class="operator">(</span> <span class="string">set</span> <span class="operator">=&gt;</span> <span class="variable">$dt_set</span><span class="operator">,</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>from_sets</p>
+
+<p>Creates a new span set from two <code>DateTime::Set</code> objects.</p>
+
+<p>One set defines the <i>starting dates</i>, and the other defines the <i>end dates</i>.</p>
+
+<pre><code>   <span class="variable">$spanset</span> <span class="operator">=</span>
+       <span class="variable">DateTime::SpanSet</span><span class="operator">-&gt;</span><span class="variable">from_sets</span>
+           <span class="operator">(</span> <span class="string">start_set</span> <span class="operator">=&gt;</span> <span class="variable">$dt_set1</span><span class="operator">,</span> <span class="string">end_set</span> <span class="operator">=&gt;</span> <span class="variable">$dt_set2</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The spans have the starting date <code>closed</code>, and the end date <code>open</code>, like in <code>[$dt1, $dt2)</code>.</p>
+
+<p>If an end date comes without a starting date before it, then it defines a span like <code>(-inf, $dt)</code>.</p>
+
+<p>If a starting date comes without an end date after it, then it defines a span like <code>[$dt, inf)</code>.</p>
+
+</li>
+<li><p>empty_set</p>
+
+<p>Creates a new empty set.</p>
+
+</li>
+<li><p>is_empty_set</p>
+
+<p>Returns true is the set is empty; false otherwise.</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="string">"nothing"</span> <span class="keyword">if</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">is_empty_set</span><span class="operator">;</span>
+</code></pre>
+
+</li>
+<li><p>clone</p>
+
+<p>This object method returns a replica of the given object.</p>
+
+</li>
+<li><p>set_time_zone( $tz )</p>
+
+<p>This method accepts either a time zone object or a string that can be passed as the &quot;name&quot; parameter to <code>DateTime::TimeZone-&gt;new()</code>. If the new time zone&#39;s offset is different from the old time zone, then the <i>local</i> time is adjusted accordingly.</p>
+
+<p>If the old time zone was a floating time zone, then no adjustments to the local time are made, except to account for leap seconds. If the new time zone is floating, then the <i>UTC</i> time is adjusted in order to leave the local time untouched.</p>
+
+</li>
+<li><p>start, min</p>
+
+</li>
+<li><p>end, max</p>
+
+<p>First or last dates in the set.</p>
+
+<p>It is possible that the return value from these methods may be a <code>DateTime::Infinite::Future</code> or a <code>DateTime::Infinite::Past</code> object.</p>
+
+<p>If the set ends <code>before</code> a date <code>$dt</code>, it returns <code>$dt</code>. Note that in this case <code>$dt</code> is not a set element - but it is a set boundary.</p>
+
+<p>These methods may return <code>undef</code> if the set is empty.</p>
+
+<p>These methods return just a <i>copy</i> of the actual boundary value. If you modify the result, the set will not be modified.</p>
+
+</li>
+<li><p>duration</p>
+
+<p>The total size of the set, as a <code>DateTime::Duration</code> object.</p>
+
+<p>The duration may be infinite.</p>
+
+<p>Also available as <code>size()</code>.</p>
+
+</li>
+<li><p>span</p>
+
+<p>The total span of the set, as a <code>DateTime::Span</code> object.</p>
+
+</li>
+<li><p>next</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$span</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is used to find the next span in the set, after a given datetime or span.</p>
+
+<p>The return value is a <code>DateTime::Span</code>, or <code>undef</code> if there is no matching span in the set.</p>
+
+</li>
+<li><p>previous</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$span</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">previous</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is used to find the previous span in the set, before a given datetime or span.</p>
+
+<p>The return value is a <code>DateTime::Span</code>, or <code>undef</code> if there is no matching span in the set.</p>
+
+</li>
+<li><p>current</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$span</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">current</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is used to find the &quot;current&quot; span in the set, that intersects a given datetime or span. If no current span is found, then the &quot;previous&quot; span is returned.</p>
+
+<p>The return value is a <code>DateTime::SpanSet</code>, or <code>undef</code> if there is no matching span in the set.</p>
+
+<p>If a span parameter is given, it may happen that &quot;current&quot; returns more than one span.</p>
+
+<p>See also: <code>intersected_spans()</code> method.</p>
+
+</li>
+<li><p>closest</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$span</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">closest</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is used to find the &quot;closest&quot; span in the set, given a datetime or span.</p>
+
+<p>The return value is a <code>DateTime::SpanSet</code>, or <code>undef</code> if the set is empty.</p>
+
+<p>If a span parameter is given, it may happen that &quot;closest&quot; returns more than one span.</p>
+
+</li>
+<li><p>as_list</p>
+
+<p>Returns a list of <code>DateTime::Span</code> objects.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@dt_span</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">as_list</span><span class="operator">(</span> <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$span</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Just as with the <code>iterator()</code> method, the <code>as_list()</code> method can be limited by a span.</p>
+
+<p>Applying <code>as_list()</code> to a large recurring spanset is a very expensive operation, both in CPU time and in the memory used.</p>
+
+<p>For this reason, when <code>as_list()</code> operates on large recurrence sets, it will return at most approximately 200 spans. For larger sets, and for <i>infinite</i> sets, <code>as_list()</code> will return <code>undef</code>.</p>
+
+<p>Please note that this is explicitly not an empty list, since an empty list is a valid return value for empty sets!</p>
+
+<p>If you <i>really</i> need to extract spans from a large set, you can:</p>
+
+<p>- limit the set with a shorter span:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@short_list</span> <span class="operator">=</span> <span class="variable">$large_set</span><span class="operator">-&gt;</span><span class="variable">as_list</span><span class="operator">(</span> <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$short_span</span> <span class="operator">);</span>
+</code></pre>
+
+<p>- use an iterator:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@large_list</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$large_set</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">push</span> <span class="variable">@large_list</span><span class="operator">,</span> <span class="variable">$dt</span> <span class="keyword">while</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">;</span>
+</code></pre>
+
+</li>
+<li><p>union</p>
+
+</li>
+<li><p>intersection</p>
+
+</li>
+<li><p>complement</p>
+
+<p>Set operations may be performed not only with <code>DateTime::SpanSet</code> objects, but also with <code>DateTime</code>, <code>DateTime::Set</code> and <code>DateTime::Span</code> objects. These set operations always return a <code>DateTime::SpanSet</code> object.</p>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">union</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>         <span class="comment"># like "OR", "insert", "both"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>    <span class="comment"># like "delete", "remove"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">intersection</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>  <span class="comment"># like "AND", "while"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">;</span>             <span class="comment"># like "NOT", "negate", "invert"</span>
+</code></pre>
+
+</li>
+<li><p>intersected_spans</p>
+
+<p>This method can accept a <code>DateTime</code> list, a <code>DateTime::Set</code>, a <code>DateTime::Span</code>, or a <code>DateTime::SpanSet</code> object as an argument.</p>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">intersected_spans</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The method always returns a <code>DateTime::SpanSet</code> object, containing all spans that are intersected by the given set.</p>
+
+<p>Unlike the <code>intersection</code> method, the spans are not modified. See diagram below:</p>
+
+<pre><code>               set1   [....]   [....]   [....]   [....]
+               set2      [................]
+
+       intersection      [.]   [....]   [.]
+
+  intersected_spans   [....]   [....]   [....]</code></pre>
+
+</li>
+<li><p>intersects</p>
+
+</li>
+<li><p>contains</p>
+
+<p>These set functions return a boolean value.</p>
+
+<pre><code>    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">intersects</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>  <span class="comment"># like "touches", "interferes"</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>    <span class="comment"># like "is-fully-inside"</span>
+</code></pre>
+
+<p>These methods can accept a <code>DateTime</code>, <code>DateTime::Set</code>, <code>DateTime::Span</code>, or <code>DateTime::SpanSet</code> object as an argument.</p>
+
+<p>intersects() returns 1 for true, and 0 for false. In a few cases the algorithm can&#39;t decide if the sets intersect at all, and intersects() will return <code>undef</code>.</p>
+
+</li>
+<li><p>iterator / next / previous</p>
+
+<p>This method can be used to iterate over the spans in a set.</p>
+
+<pre><code>    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$spanset</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">next</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="comment"># $dt is a DateTime::Span</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">min</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>   <span class="comment"># first date of span</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">max</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>   <span class="comment"># last date of span</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The boundaries of the iterator can be limited by passing it a <code>span</code> parameter. This should be a <code>DateTime::Span</code> object which delimits the iterator&#39;s boundaries. Optionally, instead of passing an object, you can pass any parameters that would work for one of the <code>DateTime::Span</code> class&#39;s constructors, and an object will be created for you.</p>
+
+<p>Obviously, if the span you specify does is not restricted both at the start and end, then your iterator may iterate forever, depending on the nature of your set. User beware!</p>
+
+<p>The <code>next()</code> or <code>previous()</code> methods will return <code>undef</code> when there are no more spans in the iterator.</p>
+
+</li>
+<li><p>start_set</p>
+
+</li>
+<li><p>end_set</p>
+
+<p>These methods do the inverse of the <code>from_sets</code> method:</p>
+
+<p><code>start_set</code> retrieves a DateTime::Set with the start datetime of each span.</p>
+
+<p><code>end_set</code> retrieves a DateTime::Set with the end datetime of each span.</p>
+
+</li>
+<li><p>map ( sub { ... } )</p>
+
+<pre><code>    <span class="comment"># example: enlarge the spans</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">map</span><span class="operator">(</span> 
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$start</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">start</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$end</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">end</span><span class="operator">;</span>
+            <span class="keyword">return</span> <span class="variable">DateTime::Span</span><span class="operator">-&gt;</span><span class="variable">from_datetimes</span><span class="operator">(</span>
+                <span class="string">start</span> <span class="operator">=&gt;</span> <span class="variable">$start</span><span class="operator">,</span>
+                <span class="string">before</span> <span class="operator">=&gt;</span> <span class="variable">$end</span><span class="operator">,</span>
+            <span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This method is the &quot;set&quot; version of Perl &quot;map&quot;.</p>
+
+<p>It evaluates a subroutine for each element of the set (locally setting &quot;$_&quot; to each DateTime::Span) and returns the set composed of the results of each such evaluation.</p>
+
+<p>Like Perl &quot;map&quot;, each element of the set may produce zero, one, or more elements in the returned value.</p>
+
+<p>Unlike Perl &quot;map&quot;, changing &quot;$_&quot; does not change the original set. This means that calling map in void context has no effect.</p>
+
+<p>The callback subroutine may not be called immediately. Don&#39;t count on subroutine side-effects. For example, a <code>print</code> inside the subroutine may happen later than you expect.</p>
+
+<p>The callback return value is expected to be within the span of the <code>previous</code> and the <code>next</code> element in the original set.</p>
+
+<p>For example: given the set <code>[ 2001, 2010, 2015 ]</code>, the callback result for the value <code>2010</code> is expected to be within the span <code>[ 2001 .. 2015 ]</code>.</p>
+
+</li>
+<li><p>grep ( sub { ... } )</p>
+
+<pre><code>    <span class="comment"># example: filter out all spans happening today</span>
+    <span class="keyword">my</span> <span class="variable">$today</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">today</span><span class="operator">;</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">grep</span><span class="operator">(</span> 
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="operator">(</span> <span class="operator">!</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$today</span> <span class="operator">)</span> <span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This method is the &quot;set&quot; version of Perl &quot;grep&quot;.</p>
+
+<p>It evaluates a subroutine for each element of the set (locally setting &quot;$_&quot; to each DateTime::Span) and returns the set consisting of those elements for which the expression evaluated to true.</p>
+
+<p>Unlike Perl &quot;grep&quot;, changing &quot;$_&quot; does not change the original set. This means that calling grep in void context has no effect.</p>
+
+<p>Changing &quot;$_&quot; does change the resulting set.</p>
+
+<p>The callback subroutine may not be called immediately. Don&#39;t count on subroutine side-effects. For example, a <code>print</code> inside the subroutine may happen later than you expect.</p>
+
+</li>
+<li><p>iterate</p>
+
+<p><i>Internal method - use &quot;map&quot; or &quot;grep&quot; instead.</i></p>
+
+<p>This function apply a callback subroutine to all elements of a set and returns the resulting set.</p>
+
+<p>The parameter <code>$_[0]</code> to the callback subroutine is a <code>DateTime::Span</code> object.</p>
+
+<p>If the callback returns <code>undef</code>, the datetime is removed from the set:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> remove_sundays </span><span class="operator">{</span>
+        <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="keyword">unless</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">start</span><span class="operator">-&gt;</span><span class="variable">day_of_week</span> <span class="operator">==</span> <span class="number">7</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The callback return value is expected to be within the span of the <code>previous</code> and the <code>next</code> element in the original set.</p>
+
+<p>For example: given the set <code>[ 2001, 2010, 2015 ]</code>, the callback result for the value <code>2010</code> is expected to be within the span <code>[ 2001 .. 2015 ]</code>.</p>
+
+<p>The callback subroutine may not be called immediately. Don&#39;t count on subroutine side-effects. For example, a <code>print</code> inside the subroutine may happen later than you expect.</p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is offered through the <code>datetime@perl.org</code> mailing list.</p>
+
+<p>Please report bugs using rt.cpan.org</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Flavio Soibelmann Glock &lt;fglock@gmail.com&gt;</p>
+
+<p>The API was developed together with Dave Rolsky and the DateTime Community.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2003 Flavio Soibelmann Glock. All rights reserved. This program is free software; you can distribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Set::Infinite</p>
+
+<p>For details on the Perl DateTime Suite project please see <a href="http://datetime.perl.org">http://datetime.perl.org</a>.</p>
+
+
+</body>
+
+</html>
+
+

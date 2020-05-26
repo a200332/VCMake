@@ -1,0 +1,313 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#quote_sub">quote_sub</a>
+        <ul>
+          <li><a href="#options">options</a></li>
+        </ul>
+      </li>
+      <li><a href="#unquote_sub">unquote_sub</a></li>
+      <li><a href="#quoted_from_sub">quoted_from_sub</a></li>
+      <li><a href="#inlinify">inlinify</a></li>
+      <li><a href="#quotify">quotify</a></li>
+      <li><a href="#capture_unroll">capture_unroll</a></li>
+      <li><a href="#qsub">qsub</a></li>
+      <li><a href="#sanitize_identifier">sanitize_identifier</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a>
+    <ul>
+      <li><a href="#return">return</a></li>
+      <li><a href="#pragmas">pragmas</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Quote - Efficient generation of subroutines via string eval</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">package</span> <span class="variable">Silly</span><span class="operator">;</span>
+ 
+ <span class="keyword">use</span> <span class="variable">Sub::Quote</span> <span class="string">qw(quote_sub unquote_sub quoted_from_sub)</span><span class="operator">;</span>
+ 
+ <span class="variable">quote_sub</span> <span class="string">'Silly::kitty'</span><span class="operator">,</span> <span class="string">q{ print "meow" }</span><span class="operator">;</span>
+ 
+ <span class="variable">quote_sub</span> <span class="string">'Silly::doggy'</span><span class="operator">,</span> <span class="string">q{ print "woof" }</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$sound</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+ 
+ <span class="variable">quote_sub</span> <span class="string">'Silly::dagron'</span><span class="operator">,</span>
+   <span class="string">q{ print ++$sound % 2 ? 'burninate' : 'roar' }</span><span class="operator">,</span>
+   <span class="operator">{</span> <span class="string">'$sound'</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">$sound</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>And elsewhere:</p>
+
+<pre><code> <span class="variable">Silly</span><span class="operator">-&gt;</span><span class="variable">kitty</span><span class="operator">;</span>  <span class="comment"># meow</span>
+ <span class="variable">Silly</span><span class="operator">-&gt;</span><span class="variable">doggy</span><span class="operator">;</span>  <span class="comment"># woof</span>
+ <span class="variable">Silly</span><span class="operator">-&gt;</span><span class="variable">dagron</span><span class="operator">;</span> <span class="comment"># burninate</span>
+ <span class="variable">Silly</span><span class="operator">-&gt;</span><span class="variable">dagron</span><span class="operator">;</span> <span class="comment"># roar</span>
+ <span class="variable">Silly</span><span class="operator">-&gt;</span><span class="variable">dagron</span><span class="operator">;</span> <span class="comment"># burninate</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package provides performant ways to generate subroutines from strings.</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<h2 id="quote_sub">quote_sub</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$coderef</span> <span class="operator">=</span> <span class="variable">quote_sub</span> <span class="string">'Foo::bar'</span><span class="operator">,</span> <span class="string">q{ print $x++ . "\n" }</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">'$x'</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="number">0</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Arguments: ?$name, $code, ?\%captures, ?\%options</p>
+
+<p><code>$name</code> is the subroutine where the coderef will be installed.</p>
+
+<p><code>$code</code> is a string that will be turned into code.</p>
+
+<p><code>\%captures</code> is a hashref of variables that will be made available to the code. The keys should be the full name of the variable to be made available, including the sigil. The values should be references to the values. The variables will contain copies of the values. See the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a>&#39;s <code>Silly::dagron</code> for an example using captures.</p>
+
+<p>Exported by default.</p>
+
+<h3 id="options">options</h3>
+
+<dl>
+
+<dt id="no_install"><code>no_install</code></dt>
+<dd>
+
+<p><b>Boolean</b>. Set this option to not install the generated coderef into the passed subroutine name on undefer.</p>
+
+</dd>
+<dt id="no_defer"><code>no_defer</code></dt>
+<dd>
+
+<p><b>Boolean</b>. Prevents a Sub::Defer wrapper from being generated for the quoted sub. If the sub will most likely be called at some point, setting this is a good idea. For a sub that will most likely be inlined, it is not recommended.</p>
+
+</dd>
+<dt id="package"><code>package</code></dt>
+<dd>
+
+<p>The package that the quoted sub will be evaluated in. If not specified, the sub calling <code>quote_sub</code> will be used.</p>
+
+</dd>
+</dl>
+
+<h2 id="unquote_sub">unquote_sub</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$coderef</span> <span class="operator">=</span> <span class="variable">unquote_sub</span> <span class="variable">$sub</span><span class="operator">;</span>
+</code></pre>
+
+<p>Forcibly replace subroutine with actual code.</p>
+
+<p>If $sub is not a quoted sub, this is a no-op.</p>
+
+<p>Exported by default.</p>
+
+<h2 id="quoted_from_sub">quoted_from_sub</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">quoted_from_sub</span> <span class="variable">$sub</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$code</span><span class="operator">,</span> <span class="variable">$captures</span><span class="operator">,</span> <span class="variable">$compiled_sub</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@$data</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns original arguments to quote_sub, plus the compiled version if this sub has already been unquoted.</p>
+
+<p>Note that $sub can be either the original quoted version or the compiled version for convenience.</p>
+
+<p>Exported by default.</p>
+
+<h2 id="inlinify">inlinify</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$prelude</span> <span class="operator">=</span> <span class="variable">capture_unroll</span> <span class="string">'$captures'</span><span class="operator">,</span> <span class="operator">{</span>
+   <span class="string">'$x'</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+   <span class="string">'$y'</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span>
+ <span class="operator">}</span><span class="operator">,</span> <span class="number">4</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$inlined_code</span> <span class="operator">=</span> <span class="variable">inlinify</span> <span class="string">q{
+   my ($x, $y) = @_;
+ 
+   print $x + $y . "\n";
+ }</span><span class="operator">,</span> <span class="string">'$x, $y'</span><span class="operator">,</span> <span class="variable">$prelude</span><span class="operator">;</span>
+</code></pre>
+
+<p>Takes a string of code, a string of arguments, a string of code which acts as a &quot;prelude&quot;, and a <b>Boolean</b> representing whether or not to localize the arguments.</p>
+
+<h2 id="quotify">quotify</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$quoted_value</span> <span class="operator">=</span> <span class="variable">quotify</span> <span class="variable">$value</span><span class="operator">;</span>
+</code></pre>
+
+<p>Quotes a single (non-reference) scalar value for use in a code string. Numbers aren&#39;t treated specially and will be quoted as strings, but undef will quoted as <code>undef()</code>.</p>
+
+<h2 id="capture_unroll">capture_unroll</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$prelude</span> <span class="operator">=</span> <span class="variable">capture_unroll</span> <span class="string">'$captures'</span><span class="operator">,</span> <span class="operator">{</span>
+   <span class="string">'$x'</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+   <span class="string">'$y'</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span>
+ <span class="operator">}</span><span class="operator">,</span> <span class="number">4</span><span class="operator">;</span>
+</code></pre>
+
+<p>Arguments: $from, \%captures, $indent</p>
+
+<p>Generates a snippet of code which is suitable to be used as a prelude for <a href="#inlinify">&quot;inlinify&quot;</a>. <code>$from</code> is a string will be used as a hashref in the resulting code. The keys of <code>%captures</code> are the names of the variables and the values are ignored. <code>$indent</code> is the number of spaces to indent the result by.</p>
+
+<h2 id="qsub">qsub</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$hash</span> <span class="operator">=</span> <span class="operator">{</span>
+  <span class="string">coderef</span> <span class="operator">=&gt;</span> <span class="variable">qsub</span> <span class="string">q{ print "hello"; }</span><span class="operator">,</span>
+  <span class="string">other</span>   <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">,</span>
+ <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Arguments: $code</p>
+
+<p>Works exactly like <a href="#quote_sub">&quot;quote_sub&quot;</a>, but includes a prototype to only accept a single parameter. This makes it easier to include in hash structures or lists.</p>
+
+<p>Exported by default.</p>
+
+<h2 id="sanitize_identifier">sanitize_identifier</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$var_name</span> <span class="operator">=</span> <span class="string">'$variable_for_'</span> <span class="operator">.</span> <span class="variable">sanitize_identifier</span><span class="operator">(</span><span class="string">'@name'</span><span class="operator">);</span>
+ <span class="variable">quote_sub</span> <span class="string">qq{ print \$${var_name} }</span><span class="operator">,</span> <span class="operator">{</span> <span class="variable">$var_name</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">$value</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Arguments: $identifier</p>
+
+<p>Sanitizes a value so that it can be used in an identifier.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>Much of this is just string-based code-generation, and as a result, a few caveats apply.</p>
+
+<h2 id="return">return</h2>
+
+<p>Calling <code>return</code> from a quote_sub&#39;ed sub will not likely do what you intend. Instead of returning from the code you defined in <code>quote_sub</code>, it will return from the overall function it is composited into.</p>
+
+<p>So when you pass in:</p>
+
+<pre><code>   <span class="variable">quote_sub</span> <span class="string">q{  return 1 if $condition; $morecode }</span>
+</code></pre>
+
+<p>It might turn up in the intended context as follows:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+  
+    <span class="operator">&lt;</span><span class="variable">important</span> <span class="variable">code</span> <span class="variable">a</span><span class="operator">&gt;</span>
+    <span class="keyword">do</span> <span class="operator">{</span>
+      <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> <span class="variable">$condition</span><span class="operator">;</span>
+      <span class="variable">$morecode</span>
+    <span class="operator">};</span>
+    <span class="operator">&lt;</span><span class="variable">important</span> <span class="variable">code</span> <span class="variable">b</span><span class="operator">&gt;</span>
+  
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Which will obviously return from foo, when all you meant to do was return from the code context in quote_sub and proceed with running important code b.</p>
+
+<h2 id="pragmas">pragmas</h2>
+
+<p><code>Sub::Quote</code> preserves the environment of the code creating the quoted subs. This includes the package, strict, warnings, and any other lexical pragmas. This is done by prefixing the code with a block that sets up a matching environment. When inlining <code>Sub::Quote</code> subs, care should be taken that user pragmas won&#39;t effect the rest of the code.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Users&#39; IRC: #moose on irc.perl.org</p>
+
+<p><a href="http://chat.mibbit.com/#moose@irc.perl.org">(click for instant chatroom login)
+
+</a></p>
+
+
+
+<p>Development and contribution IRC: #web-simple on irc.perl.org</p>
+
+<p><a href="http://chat.mibbit.com/#web-simple@irc.perl.org">(click for instant chatroom login)
+
+</a></p>
+
+
+
+<p>Bugtracker: <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Quote">https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Quote</a></p>
+
+<p>Git repository: <a href="git://github.com/moose/Sub-Quote.git">git://github.com/moose/Sub-Quote.git</a></p>
+
+<p>Git browser: <a href="https://github.com/moose/Sub-Quote">https://github.com/moose/Sub-Quote</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>mst - Matt S. Trout (cpan:MSTROUT) &lt;mst@shadowcat.co.uk&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<p>frew - Arthur Axel &quot;fREW&quot; Schmidt (cpan:FREW) &lt;frioux@gmail.com&gt;</p>
+
+<p>ribasushi - Peter Rabbitson (cpan:RIBASUSHI) &lt;ribasushi@cpan.org&gt;</p>
+
+<p>Mithaldu - Christian Walde (cpan:MITHALDU) &lt;walde.christian@googlemail.com&gt;</p>
+
+<p>tobyink - Toby Inkster (cpan:TOBYINK) &lt;tobyink@cpan.org&gt;</p>
+
+<p>haarg - Graham Knop (cpan:HAARG) &lt;haarg@cpan.org&gt;</p>
+
+<p>bluefeet - Aran Deltac (cpan:BLUEFEET) &lt;bluefeet@gmail.com&gt;</p>
+
+<p>ether - Karen Etheridge (cpan:ETHER) &lt;ether@cpan.org&gt;</p>
+
+<p>dolmen - Olivier Mengu&eacute; (cpan:DOLMEN) &lt;dolmen@cpan.org&gt;</p>
+
+<p>alexbio - Alessandro Ghedini (cpan:ALEXBIO) &lt;alexbio@cpan.org&gt;</p>
+
+<p>getty - Torsten Raudssus (cpan:GETTY) &lt;torsten@raudss.us&gt;</p>
+
+<p>arcanez - Justin Hunter (cpan:ARCANEZ) &lt;justin.d.hunter@gmail.com&gt;</p>
+
+<p>kanashiro - Lucas Kanashiro (cpan:KANASHIRO) &lt;kanashiro.duarte@gmail.com&gt;</p>
+
+<p>djerius - Diab Jerius (cpan:DJERIUS) &lt;djerius@cfa.harvard.edu&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2010-2016 the Sub::Quote <a href="#AUTHOR">&quot;AUTHOR&quot;</a> and <a href="#CONTRIBUTORS">&quot;CONTRIBUTORS&quot;</a> as listed above.</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software and may be distributed under the same terms as perl itself. See <a href="http://dev.perl.org/licenses/">http://dev.perl.org/licenses/</a>.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,229 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Next-steps">Next steps</a>
+        <ul>
+          <li><a href="#Default-exports">Default exports</a></li>
+          <li><a href="#Tags">Tags</a></li>
+          <li><a href="#Generators">Generators</a></li>
+        </ul>
+      </li>
+      <li><a href="#Avoiding-Exporter::Shiny">Avoiding Exporter::Shiny</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Exporter::Tiny::Manual::QuickStart - the quickest way to get up and running with Exporter::Tiny</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="keyword">use</span> <span class="variable">Exporter::Shiny</span> <span class="string">qw( frobnicate )</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> frobnicate </span><span class="operator">{</span>
+      <span class="operator">...;</span>   <span class="comment"># your code here</span>
+   <span class="operator">}</span>
+   
+   <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>Now people can use your module like this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span><span class="operator">;</span>
+   
+   <span class="variable">frobnicate</span><span class="operator">(</span><span class="number">42</span><span class="operator">);</span>
+</code></pre>
+
+<p>Or like this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"frob"</span> <span class="operator">}</span><span class="operator">;</span>
+   
+   <span class="variable">frob</span><span class="operator">(</span><span class="number">42</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>See the synopsis. Yes, it&#39;s that simple.</p>
+
+<h2 id="Next-steps">Next steps</h2>
+
+<h3 id="Default-exports">Default exports</h3>
+
+<p>Note that the module in the synopsis doesn&#39;t export anything by default. If people load <code>MyUtils</code> like this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then they haven&#39;t imported any functions. You can specify a default set of functions to be exported like this:</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="keyword">use</span> <span class="variable">Exporter::Shiny</span> <span class="string">qw( frobnicate )</span><span class="operator">;</span>
+   
+   <span class="keyword">our</span> <span class="variable">@EXPORT</span> <span class="operator">=</span> <span class="string">qw( frobnicate )</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> frobnicate </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+   
+   <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or, if you want to be a superstar rock god:</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="keyword">use</span> <span class="variable">Exporter::Shiny</span> <span class="keyword">our</span> <span class="variable">@EXPORT</span> <span class="operator">=</span> <span class="string">qw( frobnicate )</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> frobnicate </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+   
+   <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h3 id="Tags">Tags</h3>
+
+<p>You can provide tags for people to use:</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="keyword">use</span> <span class="variable">Exporter::Shiny</span> <span class="string">qw( frobnicate red green blue )</span><span class="operator">;</span>
+   
+   <span class="keyword">our</span> <span class="variable">%EXPORT_TAGS</span> <span class="operator">=</span> <span class="operator">(</span>
+      <span class="string">utils</span>   <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw/ frobnicate /</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">colours</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw/ red green blue /</span><span class="operator">]</span><span class="operator">,</span>
+   <span class="operator">);</span>
+   
+   <span class="keyword">sub</span><span class="variable"> frobnicate </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+   <span class="keyword">sub</span><span class="variable"> red        </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+   <span class="keyword">sub</span><span class="variable"> green      </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+   <span class="keyword">sub</span><span class="variable"> blue       </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+   
+   <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>And people can now import your functions like this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">":colours"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or this:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"-colours"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or take advantage of the fact that Perl magically quotes barewords preceded by a hyphen:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="operator">-</span><span class="variable">colours</span><span class="operator">;</span>
+</code></pre>
+
+<p>Two tags are automatically defined for you: <code>-default</code> (which is just the same as <code>@EXPORT</code>) and <code>-all</code> (which is the union of <code>@EXPORT</code> and <code>@EXPORT_OK</code>). If you don&#39;t like them, then you can override them:</p>
+
+<pre><code>   <span class="keyword">our</span> <span class="variable">%EXPORT_TAGS</span> <span class="operator">=</span> <span class="operator">(</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@some_other_stuff</span><span class="operator">,</span>
+      <span class="string">all</span>     <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@more_stuff</span><span class="operator">,</span>
+   <span class="operator">);</span>
+</code></pre>
+
+<h3 id="Generators">Generators</h3>
+
+<p>Exporting normally just works by copying a sub from your package into your caller&#39;s package. But sometimes it&#39;s useful instead to generate a <i>custom</i> sub to insert into your caller&#39;s package. This is pretty easy to do.</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="keyword">use</span> <span class="variable">Exporter::Shiny</span> <span class="string">qw( frobnicate )</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> _generate_frobnicate </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$me</span>     <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$caller</span> <span class="operator">=</span> <span class="keyword">caller</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      
+      <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+          <span class="operator">...;</span>  <span class="comment"># your code here</span>
+      <span class="operator">};</span>
+   <span class="operator">}</span>
+   
+   <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>The parameter <code>$me</code> here is a string containing the package name which is being imported from; <code>$caller</code> is the destination package; <code>$name</code> is the name of the sub (in this case &quot;frobnicate&quot;); and <code>$args</code> is a hashref of custom arguments for this function.</p>
+
+<pre><code>   <span class="comment"># The hashref { foo =&gt; 42 } is $args above.</span>
+   <span class="comment">#</span>
+   <span class="keyword">use</span> <span class="variable">MyUtils</span> <span class="string">"frobnicate"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">42</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Avoiding-Exporter::Shiny">Avoiding Exporter::Shiny</h2>
+
+<p>Exporter::Shiny is a tiny shim around Exporter::Tiny. It should mostly do what you want, but you may sometimes prefer to use Exporter::Tiny directly.</p>
+
+<p>The example in the synopsis could have been written as:</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyUtils</span><span class="operator">;</span>
+   
+   <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">"Exporter::Tiny"</span><span class="operator">;</span>
+   <span class="keyword">our</span> <span class="variable">@EXPORT_OK</span> <span class="operator">=</span> <span class="string">qw( frobnicate )</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> frobnicate </span><span class="operator">{</span>
+      <span class="operator">...;</span>   <span class="comment"># your code here</span>
+   <span class="operator">}</span>
+   
+   <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>What Exporter::Shiny does is mostly just to set <code>@EXPORT_OK</code> for you and set up inheritance from the base class (Exporter::Tiny).</p>
+
+<p>Exporter::Shiny also sets <code><span class="variable">$INC</span><span class="operator">{</span><span class="string">'MyUtils.pm}</span>
+</code> for you, which in usually makes little difference, but is useful in some edge cases.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Exporter/Shiny.html">Exporter::Shiny</a>, <a href="../../../../lib/Exporter/Tiny.html">Exporter::Tiny</a>.</p>
+
+<p>For more advanced information, see <a href="../../../../lib/Exporter/Tiny/Manual/Exporting.html">Exporter::Tiny::Manual::Exporting</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Toby Inkster &lt;tobyink@cpan.org&gt;.</p>
+
+<h1 id="COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</h1>
+
+<p>This software is copyright (c) 2013-2014, 2017 by Toby Inkster.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</h1>
+
+<p>THIS PACKAGE IS PROVIDED &quot;AS IS&quot; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+
+
+</body>
+
+</html>
+
+

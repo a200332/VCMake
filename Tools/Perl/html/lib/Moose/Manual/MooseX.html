@@ -1,0 +1,306 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#MooseX">MooseX?</a></li>
+  <li><a href="#MooseX::AttributeHelpers">MooseX::AttributeHelpers</a></li>
+  <li><a href="#Moose::Autobox">Moose::Autobox</a></li>
+  <li><a href="#MooseX::StrictConstructor">MooseX::StrictConstructor</a></li>
+  <li><a href="#MooseX::Params::Validate">MooseX::Params::Validate</a></li>
+  <li><a href="#MooseX::Getopt">MooseX::Getopt</a></li>
+  <li><a href="#MooseX::Singleton">MooseX::Singleton</a></li>
+  <li><a href="#EXTENSIONS-TO-CONSIDER">EXTENSIONS TO CONSIDER</a>
+    <ul>
+      <li><a href="#MooseX::Declare">MooseX::Declare</a></li>
+      <li><a href="#MooseX::Types">MooseX::Types</a></li>
+      <li><a href="#MooseX::Types::Structured">MooseX::Types::Structured</a></li>
+      <li><a href="#MooseX::ClassAttribute">MooseX::ClassAttribute</a></li>
+      <li><a href="#MooseX::Daemonize">MooseX::Daemonize</a></li>
+      <li><a href="#MooseX::Role::Parameterized">MooseX::Role::Parameterized</a></li>
+      <li><a href="#MooseX::POE">MooseX::POE</a></li>
+      <li><a href="#MooseX::FollowPBP">MooseX::FollowPBP</a></li>
+      <li><a href="#MooseX::SemiAffordanceAccessor">MooseX::SemiAffordanceAccessor</a></li>
+      <li><a href="#MooseX::NonMoose">MooseX::NonMoose</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::MooseX - Recommended Moose extensions</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="MooseX">MooseX?</h1>
+
+<p>It&#39;s easy to extend and change Moose, and this is part of what makes Moose so powerful. You can use the MOP API to do things your own way, add new features, and generally customize your Moose.</p>
+
+<p>Writing your own extensions does require a good understanding of the meta-model. You can start learning about this with the <a href="../../../lib/Moose/Manual/MOP.html">Moose::Manual::MOP</a> docs. There are also several extension recipes in the <a href="../../../lib/Moose/Cookbook.html">Moose::Cookbook</a>.</p>
+
+<p>Explaining how to write extensions is beyond the scope of this manual. Fortunately, lots of people have already written extensions and put them on CPAN for you.</p>
+
+<p>This document covers a few of the ones we like best.</p>
+
+<h1 id="MooseX::AttributeHelpers"><a>MooseX::AttributeHelpers</a></h1>
+
+<p>The functionality of this MooseX module has been moved into Moose core. See <a href="../../../lib/Moose/Meta/Attribute/Native.html">Moose::Meta::Attribute::Native</a>.</p>
+
+<h1 id="Moose::Autobox"><a>Moose::Autobox</a></h1>
+
+<p>MooseX::AttributeHelpers, but turned inside out, Moose::Autobox provides methods on both arrays/hashes/etc. but also references to them, using Moose roles, allowing you do to things like:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Moose::Autobox</span><span class="operator">;</span>
+  
+  <span class="variable">$somebody_elses_object</span><span class="operator">-&gt;</span><span class="variable">orders</span><span class="operator">-&gt;</span><span class="variable">push</span><span class="operator">(</span><span class="variable">$order</span><span class="operator">);</span>
+</code></pre>
+
+<p>Lexically scoped and not to everybody&#39;s taste, but very handy for sugaring up other people&#39;s APIs and your own code.</p>
+
+<h1 id="MooseX::StrictConstructor"><a>MooseX::StrictConstructor</a></h1>
+
+<p>By default, Moose lets you pass any old junk into a class&#39;s constructor. If you load <a>MooseX::StrictConstructor</a>, your class will throw an error if it sees something it doesn&#39;t recognize;</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">User</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MooseX::StrictConstructor</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'name'</span><span class="operator">;</span>
+  <span class="variable">has</span> <span class="string">'email'</span><span class="operator">;</span>
+  
+  <span class="variable">User</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'Bob'</span><span class="operator">,</span> <span class="string">emali</span> <span class="operator">=&gt;</span> <span class="string">'bob@example.com'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>With <a>MooseX::StrictConstructor</a>, that typo (&quot;emali&quot;) will cause a runtime error. With plain old Moose, the &quot;emali&quot; attribute would be silently ignored.</p>
+
+<h1 id="MooseX::Params::Validate"><a>MooseX::Params::Validate</a></h1>
+
+<p>We have high hopes for the future of <a>MooseX::Method::Signatures</a> and <a>Moops</a>. However, these modules, while used regularly in production by some of the more insane members of the community, are still marked alpha just in case backwards incompatible changes need to be made.</p>
+
+<p>If you don&#39;t want to risk that, for now we recommend the decidedly more clunky (but also faster and simpler) <a>MooseX::Params::Validate</a>. This module lets you apply Moose types and coercions to any method arguments.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">User</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MooseX::Params::Validate</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> login </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$password</span><span class="operator">)</span>
+          <span class="operator">=</span> <span class="variable">validated_list</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">@_</span><span class="operator">,</span> <span class="string">password</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span> <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">);</span>
+  
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="MooseX::Getopt"><a href="../../../lib/MooseX/Getopt.html">MooseX::Getopt</a></h1>
+
+<p>This is a role which adds a <code>new_with_options</code> method to your class. This is a constructor that takes the command line options and uses them to populate attributes.</p>
+
+<p>This makes writing a command-line application as a module trivially simple:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">App::Foo</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="variable">with</span> <span class="string">'MooseX::Getopt'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'input'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>       <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+      <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">has</span> <span class="string">'output'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>       <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+      <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> run </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Then in the script that gets run we have:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">App::Foo</span><span class="operator">;</span>
+  
+  <span class="variable">App::Foo</span><span class="operator">-&gt;</span><span class="variable">new_with_options</span><span class="operator">-&gt;</span><span class="variable">run</span><span class="operator">;</span>
+</code></pre>
+
+<p>From the command line, someone can execute the script:</p>
+
+<pre><code>  foo@example&gt; foo --input /path/to/input --output /path/to/output</code></pre>
+
+<h1 id="MooseX::Singleton"><a>MooseX::Singleton</a></h1>
+
+<p>To be honest, using a singleton is just a way to have a magic global variable in languages that don&#39;t actually have global variables.</p>
+
+<p>In perl, you can just as easily use a global. However, if your colleagues are Java-infected, they might prefer a singleton. Also, if you have an existing class that <i>isn&#39;t</i> a singleton but should be, using <a>MooseX::Singleton</a> is the easiest way to convert it.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Config</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">MooseX::Singleton</span><span class="operator">;</span> <span class="comment"># instead of Moose</span>
+  
+  <span class="variable">has</span> <span class="string">'cache_dir'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<p>It&#39;s that simple.</p>
+
+<h1 id="EXTENSIONS-TO-CONSIDER">EXTENSIONS TO CONSIDER</h1>
+
+<p>There are literally dozens of other extensions on CPAN. This is a list of extensions that you might find useful, but we&#39;re not quite ready to endorse just yet.</p>
+
+<h2 id="MooseX::Declare"><a>MooseX::Declare</a></h2>
+
+<p>MooseX::Declare is based on <a>Devel::Declare</a>, a giant bag of crack originally implemented by mst with the goal of upsetting the perl core developers so much by its very existence that they implemented proper keyword handling in the core.</p>
+
+<p>As of perl5 version 14, this goal has been achieved, and modules such as <a>Devel::CallParser</a>, <a>Function::Parameters</a>, and <a>Keyword::Simple</a> provide mechanisms to mangle perl syntax that don&#39;t require hallucinogenic drugs to interpret the error messages they produce.</p>
+
+<p>If you want to use declarative syntax in new code, please for the love of kittens get yourself a recent perl and look at <a>Moops</a> instead.</p>
+
+<h2 id="MooseX::Types"><a>MooseX::Types</a></h2>
+
+<p>This extension helps you build a type library for your application. It also lets you predeclare type names and use them as barewords.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">MooseX::Types</span> <span class="operator">-</span><span class="string">declare</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'PositiveInt'</span><span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MooseX::Types::Moose</span> <span class="string">'Int'</span><span class="operator">;</span>
+  
+  <span class="variable">subtype</span> <span class="variable">PositiveInt</span><span class="operator">,</span>
+      <span class="variable">as</span> <span class="variable">Int</span><span class="operator">,</span>
+      <span class="variable">where</span> <span class="operator">{</span> <span class="variable">$_</span> <span class="operator">&gt;</span> <span class="number">0</span> <span class="operator">},</span>
+      <span class="variable">message</span> <span class="operator">{</span> <span class="string">"Int is not larger than 0"</span> <span class="operator">};</span>
+</code></pre>
+
+<p>One nice feature is that those bareword names are actually namespaced in Moose&#39;s type registry, so multiple applications can use the same bareword names, even if the type definitions differ.</p>
+
+<h2 id="MooseX::Types::Structured"><a>MooseX::Types::Structured</a></h2>
+
+<p>This extension builds on top of <a>MooseX::Types</a> to let you declare complex data structure types.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">MooseX::Types</span> <span class="operator">-</span><span class="string">declare</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw( Name Color )</span> <span class="operator">]</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MooseX::Types::Moose</span> <span class="string">qw(Str Int)</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MooseX::Types::Structured</span> <span class="string">qw(Dict Tuple Optional)</span><span class="operator">;</span>
+  
+  <span class="variable">subtype</span> <span class="string">Name</span>
+      <span class="operator">=&gt;</span> <span class="variable">as</span> <span class="variable">Dict</span><span class="operator">[</span> <span class="string">first</span> <span class="operator">=&gt;</span> <span class="variable">Str</span><span class="operator">,</span> <span class="string">middle</span> <span class="operator">=&gt;</span> <span class="variable">Optional</span><span class="operator">[</span><span class="variable">Str</span><span class="operator">]</span><span class="operator">,</span> <span class="string">last</span> <span class="operator">=&gt;</span> <span class="variable">Str</span> <span class="operator">]</span><span class="operator">;</span>
+  
+  <span class="variable">subtype</span> <span class="string">Color</span>
+      <span class="operator">=&gt;</span> <span class="variable">as</span> <span class="variable">Tuple</span><span class="operator">[</span> <span class="variable">Int</span><span class="operator">,</span> <span class="variable">Int</span><span class="operator">,</span> <span class="variable">Int</span><span class="operator">,</span> <span class="variable">Optional</span><span class="operator">[</span><span class="variable">Int</span><span class="operator">]</span> <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>Of course, you could always use objects to represent these sorts of things too.</p>
+
+<h2 id="MooseX::ClassAttribute"><a>MooseX::ClassAttribute</a></h2>
+
+<p>This extension provides class attributes for Moose classes. The declared class attributes are introspectable just like regular Moose attributes.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">User</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MooseX::ClassAttribute</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'name'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+  
+  <span class="variable">class_has</span> <span class="string">'Cache'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Note however that this class attribute does <i>not</i> inherit like a <a href="../../../lib/Class/Data/Inheritable.html">Class::Data::Inheritable</a> or similar attribute - calling</p>
+
+<pre><code>  <span class="variable">$subclass</span><span class="operator">-&gt;</span><span class="variable">Cache</span><span class="operator">(</span><span class="variable">$cache</span><span class="operator">);</span>
+</code></pre>
+
+<p>will set it for the superclass as well. Additionally, class data is usually The Wrong Thing To Do in a strongly OO program since it makes testing a lot harder - consider carefully whether you&#39;d be better off with an object that&#39;s passed around instead.</p>
+
+<h2 id="MooseX::Daemonize"><a>MooseX::Daemonize</a></h2>
+
+<p>This is a role that provides a number of methods useful for creating a daemon, including methods for starting and stopping, managing a PID file, and signal handling.</p>
+
+<h2 id="MooseX::Role::Parameterized"><a href="../../../lib/MooseX/Role/Parameterized.html">MooseX::Role::Parameterized</a></h2>
+
+<p>If you find yourself wanting a role that customizes itself for each consumer, this is the tool for you. With this module, you can create a role that accepts parameters and generates attributes, methods, etc. on a customized basis for each consumer.</p>
+
+<h2 id="MooseX::POE"><a>MooseX::POE</a></h2>
+
+<p>This is a small wrapper that ties together a Moose class with <code>POE::Session</code>, and gives you an <code>event</code> sugar function to declare event handlers.</p>
+
+<h2 id="MooseX::FollowPBP"><a>MooseX::FollowPBP</a></h2>
+
+<p>Automatically names all accessors <i>Perl Best Practices</i>-style, &quot;get_size&quot; and &quot;set_size&quot;.</p>
+
+<h2 id="MooseX::SemiAffordanceAccessor"><a>MooseX::SemiAffordanceAccessor</a></h2>
+
+<p>Automatically names all accessors with an explicit set and implicit get, &quot;size&quot; and &quot;set_size&quot;.</p>
+
+<h2 id="MooseX::NonMoose"><a>MooseX::NonMoose</a></h2>
+
+<p>MooseX::NonMoose allows for easily subclassing non-Moose classes with Moose, taking care of the annoying details connected with doing this, such as setting up proper inheritance from Moose::Object and installing (and inlining, at make_immutable time) a constructor that makes sure things like BUILD methods are called.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

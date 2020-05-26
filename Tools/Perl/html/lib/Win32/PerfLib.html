@@ -1,0 +1,263 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#NOTE">NOTE</a></li>
+    </ul>
+  </li>
+  <li><a href="#Datastructures">Datastructures</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::PerfLib - Accessing the Windows NT Performance Counter</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::PerfLib</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$server</span> <span class="operator">=</span> <span class="string">""</span><span class="operator">;</span>
+  <span class="variable">Win32::PerfLib::GetCounterNames</span><span class="operator">(</span><span class="variable">$server</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%counter</span><span class="operator">);</span>
+  <span class="variable">%r_counter</span> <span class="operator">=</span> <span class="keyword">map</span> <span class="operator">{</span> <span class="variable">$counter</span><span class="operator">{</span><span class="variable">$_</span><span class="operator">}</span> <span class="operator">=&gt;</span> <span class="variable">$_</span> <span class="operator">}</span> <span class="keyword">keys</span> <span class="variable">%counter</span><span class="operator">;</span>
+  <span class="comment"># retrieve the id for process object</span>
+  <span class="variable">$process_obj</span> <span class="operator">=</span> <span class="variable">$r_counter</span><span class="operator">{</span><span class="string">Process</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="comment"># retrieve the id for the process ID counter</span>
+  <span class="variable">$process_id</span> <span class="operator">=</span> <span class="variable">$r_counter</span><span class="operator">{</span><span class="string">'ID Process'</span><span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="comment"># create connection to $server</span>
+  <span class="variable">$perflib</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Win32::PerfLib</span><span class="operator">(</span><span class="variable">$server</span><span class="operator">);</span>
+  <span class="variable">$proc_ref</span> <span class="operator">=</span> <span class="operator">{}</span><span class="operator">;</span>
+  <span class="comment"># get the performance data for the process object</span>
+  <span class="variable">$perflib</span><span class="operator">-&gt;</span><span class="variable">GetObjectList</span><span class="operator">(</span><span class="variable">$process_obj</span><span class="operator">,</span> <span class="variable">$proc_ref</span><span class="operator">);</span>
+  <span class="variable">$perflib</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+  <span class="variable">$instance_ref</span> <span class="operator">=</span> <span class="variable">$proc_ref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$process_obj</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Instances</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="keyword">foreach</span> <span class="variable">$p</span> <span class="operator">(</span><span class="keyword">sort</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$instance_ref</span><span class="operator">}</span><span class="operator">)</span>
+  <span class="operator">{</span>
+      <span class="variable">$counter_ref</span> <span class="operator">=</span> <span class="variable">$instance_ref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$p</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Counters</span><span class="operator">}</span><span class="operator">;</span>
+      <span class="keyword">foreach</span> <span class="variable">$i</span> <span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$counter_ref</span><span class="operator">}</span><span class="operator">)</span>
+      <span class="operator">{</span>
+          <span class="keyword">if</span><span class="operator">(</span><span class="variable">$counter_ref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$i</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">CounterNameTitleIndex</span><span class="operator">}</span> <span class="operator">==</span> <span class="variable">$process_id</span><span class="operator">)</span>
+          <span class="operator">{</span>
+              <span class="keyword">printf</span><span class="operator">(</span> <span class="string">"% 6d %s\n"</span><span class="operator">,</span> <span class="variable">$counter_ref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$i</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Counter</span><span class="operator">}</span><span class="operator">,</span>
+                      <span class="variable">$instance_ref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$p</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Name</span><span class="operator">}</span>
+                    <span class="operator">);</span>
+          <span class="operator">}</span>
+      <span class="operator">}</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module allows to retrieve the performance counter of any computer (running Windows NT) in the network.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="NOTE">NOTE</h2>
+
+<p>All of the functions return false if they fail, unless otherwise noted. If the $server argument is undef the local machine is assumed.</p>
+
+<dl>
+
+<dt id="Win32::PerfLib::GetCounterNames-server-hashref">Win32::PerfLib::GetCounterNames($server,$hashref)</dt>
+<dd>
+
+<p>Retrieves the counter names and their indices from the registry and stores them in the hash reference</p>
+
+</dd>
+<dt id="Win32::PerfLib::GetCounterHelp-server-hashref">Win32::PerfLib::GetCounterHelp($server,$hashref)</dt>
+<dd>
+
+<p>Retrieves the counter help strings and their indices from the registry and stores them in the hash reference</p>
+
+</dd>
+<dt id="perflib-Win32::PerfLib-new-server">$perflib = Win32::PerfLib-&gt;new ($server)</dt>
+<dd>
+
+<p>Creates a connection to the performance counters of the given server</p>
+
+</dd>
+<dt id="perflib-GetObjectList-objectid-hashref">$perflib-&gt;GetObjectList($objectid,$hashref)</dt>
+<dd>
+
+<p>retrieves the object and counter list of the given performance object.</p>
+
+</dd>
+<dt id="perflib-Close-hashref">$perflib-&gt;Close($hashref)</dt>
+<dd>
+
+<p>closes the connection to the performance counters</p>
+
+</dd>
+<dt id="Win32::PerfLib::GetCounterType-countertype">Win32::PerfLib::GetCounterType(countertype)</dt>
+<dd>
+
+<p>converts the counter type to readable string as referenced in <a>calc.html</a> so that it is easier to find the appropriate formula to calculate the raw counter data.</p>
+
+</dd>
+</dl>
+
+<h1 id="Datastructures">Datastructures</h1>
+
+<p>The performance data is returned in the following data structure:</p>
+
+<dl>
+
+<dt id="Level-1">Level 1</dt>
+<dd>
+
+<pre><code>  <span class="variable">$hashref</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="string">'NumObjectTypes'</span>   <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'Objects'</span>          <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="string">'PerfFreq'</span>         <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'PerfTime'</span>         <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'PerfTime100nSec'</span>  <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'SystemName'</span>       <span class="operator">=&gt;</span> <span class="variable">STRING</span>
+      <span class="string">'SystemTime'</span>       <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Level-2">Level 2</dt>
+<dd>
+
+<p>The hash reference $hashref-&gt;{Objects} has the returned object ID(s) as keys and a hash reference to the object counter data as value. Even there is only one object requested in the call to GetObjectList there may be more than one object in the result.</p>
+
+<pre><code>  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span>  <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">&lt;</span><span class="variable">object2</span><span class="operator">&gt;</span>  <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Level-3">Level 3</dt>
+<dd>
+
+<p>Each returned object ID has object-specific performance information. If an object has instances like the process object there is also a reference to the instance information.</p>
+
+<pre><code>  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="string">'DetailLevel'</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'Instances'</span>             <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="string">'Counters'</span>              <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="string">'NumCounters'</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'NumInstances'</span>          <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'ObjectHelpTitleIndex'</span>  <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'ObjectNameTitleIndex'</span>  <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'PerfFreq'</span>              <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">'PerfTime'</span>              <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Level-4">Level 4</dt>
+<dd>
+
+<p>If there are instance information for the object available they are stored in the &#39;Instances&#39; hashref. If the object has no instances there is an &#39;Counters&#39; key instead. The instances or counters are numbered.</p>
+
+<pre><code>  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Instances</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">&lt;</span><span class="number">2</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">...</span>
+      <span class="operator">&lt;</span><span class="variable">n</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+  <span class="operator">}</span>
+  <span class="keyword">or</span>
+  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Counters</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">&lt;</span><span class="number">2</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">...</span>
+      <span class="operator">&lt;</span><span class="variable">n</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Level-5">Level 5</dt>
+<dd>
+
+<pre><code>  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Instances</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="string">Counters</span>               <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="string">Name</span>                   <span class="operator">=&gt;</span> <span class="variable">STRING</span>
+      <span class="string">ParentObjectInstance</span>   <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">ParentObjectTitleIndex</span> <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+  <span class="operator">}</span>
+  <span class="keyword">or</span>
+  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Counters</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="string">Counter</span>               <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterHelpTitleIndex</span> <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterNameTitleIndex</span> <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterSize</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterType</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">DefaultScale</span>          <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">DetailLevel</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">Display</span>               <span class="operator">=&gt;</span> <span class="variable">STRING</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Level-6">Level 6</dt>
+<dd>
+
+<pre><code>  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Instances</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Counters</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">&lt;</span><span class="number">2</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+      <span class="operator">...</span>
+      <span class="operator">&lt;</span><span class="variable">n</span><span class="operator">&gt;</span>     <span class="operator">=&gt;</span> <span class="variable">HASHREF</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Level-7">Level 7</dt>
+<dd>
+
+<pre><code>  <span class="variable">$hashref</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Objects</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="variable">object1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Instances</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Counters</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="operator">&lt;</span><span class="number">1</span><span class="operator">&gt;</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span>
+      <span class="string">Counter</span>               <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterHelpTitleIndex</span> <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterNameTitleIndex</span> <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterSize</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">CounterType</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">DefaultScale</span>          <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">DetailLevel</span>           <span class="operator">=&gt;</span> <span class="variable">VALUE</span>
+      <span class="string">Display</span>               <span class="operator">=&gt;</span> <span class="variable">STRING</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Depending on the <b>CounterType</b> there are calculations to do (see calc.html).</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jutta M. Klebe, jmk@bybyte.de</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>perl(1).</p>
+
+
+</body>
+
+</html>
+
+

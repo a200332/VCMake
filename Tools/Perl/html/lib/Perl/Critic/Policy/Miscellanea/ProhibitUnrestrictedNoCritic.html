@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#NOTE">NOTE</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Miscellanea::ProhibitUnrestrictedNoCritic - Forbid a bare <code><span class="comment">## no critic</span>
+</code></p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>A bare <code><span class="comment">## no critic</span>
+</code> annotation will disable <b>all</b> the active Policies. This creates holes for other, unintended violations to appear in your code. It is better to disable <b>only</b> the particular Policies that you need to get around. By putting Policy names in a comma-separated list after the <code><span class="comment">## no critic</span>
+</code> annotation, then it will only disable the named Policies. Policy names are matched as regular expressions, so you can use shortened Policy names, or patterns that match several Policies. This Policy generates a violation any time that an unrestricted <code><span class="comment">## no critic</span>
+</code> annotation appears.</p>
+
+<pre><code>    <span class="comment">## no critic                     # not ok</span>
+    <span class="comment">## no critic ''                  # not ok</span>
+    <span class="comment">## no critic ()                  # not ok</span>
+    <span class="comment">## no critic qw()                # not ok</span>
+    
+    <span class="comment">## no critic   (Policy1, Policy2)  # ok</span>
+    <span class="comment">## no critic   (Policy1 Policy2)   # ok (can use spaces to separate)</span>
+    <span class="comment">## no critic qw(Policy1 Policy2)   # ok (the preferred style)</span>
+</code></pre>
+
+<h1 id="NOTE">NOTE</h1>
+
+<p>Unfortunately, <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> is very sloppy about parsing the Policy names that appear after a <code><span class="comment">##no critic</span>
+</code> annotation. For example, you might be using one of these broken syntaxes...</p>
+
+<pre><code>    <span class="comment">## no critic Policy1 Policy2</span>
+    <span class="comment">## no critic 'Policy1, Policy2'</span>
+    <span class="comment">## no critic "Policy1, Policy2"</span>
+    <span class="comment">## no critic "Policy1", "Policy2"</span>
+</code></pre>
+
+<p>In all of these cases, Perl::Critic will silently disable <b>all</b> Policies, rather than just the ones you requested. But if you use the <code>ProhibitUnrestrictedNoCritic</code> Policy, all of these will generate violations. That way, you can track them down and correct them to use the correct syntax, as shown above in the <a href="#DESCRIPTION">&quot;DESCRIPTION&quot;</a>. If you&#39;ve been using the syntax that is shown throughout the Perl::Critic documentation for the last few years, then you should be fine.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2008-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,1188 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#DISTRIBUTION-STATUS">DISTRIBUTION STATUS</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#USAGE">USAGE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Methods-for-all-graphs">Methods for all graphs</a></li>
+      <li><a href="#Methods-for-Pie-charts">Methods for Pie charts</a></li>
+      <li><a href="#Methods-for-charts-with-axes">Methods for charts with axes.</a></li>
+    </ul>
+  </li>
+  <li><a href="#OPTIONS">OPTIONS</a>
+    <ul>
+      <li><a href="#Options-for-all-graphs">Options for all graphs</a></li>
+      <li><a href="#Colours">Colours</a></li>
+      <li><a href="#Options-for-graphs-with-axes">Options for graphs with axes.</a></li>
+      <li><a href="#Plotting-data-point-values-with-the-data-point">Plotting data point values with the data point</a></li>
+      <li><a href="#Options-for-graphs-with-a-numerical-X-axis">Options for graphs with a numerical X axis</a></li>
+      <li><a href="#Options-for-graphs-with-bars">Options for graphs with bars</a></li>
+      <li><a href="#Options-for-graphs-with-lines">Options for graphs with lines</a></li>
+      <li><a href="#Options-for-graphs-with-points">Options for graphs with points</a></li>
+      <li><a href="#Options-for-mixed-graphs">Options for mixed graphs</a></li>
+      <li><a href="#Graph-legends-axestype-graphs-only">Graph legends (axestype graphs only)</a></li>
+      <li><a href="#Options-for-pie-graphs">Options for pie graphs</a></li>
+    </ul>
+  </li>
+  <li><a href="#COLOURS">COLOURS</a></li>
+  <li><a href="#FONTS">FONTS</a></li>
+  <li><a href="#HOTSPOTS">HOTSPOTS</a></li>
+  <li><a href="#ERROR-HANDLING">ERROR HANDLING</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a>
+    <ul>
+      <li><a href="#Copyright">Copyright</a></li>
+      <li><a href="#Acknowledgements">Acknowledgements</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>GD::Graph - Graph Plotting Module for Perl 5</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use GD::Graph::moduleName;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>GD::Graph</b> is a <i>perl5</i> module to create charts using the GD module. The following classes for graphs with axes are defined:</p>
+
+<dl>
+
+<dt id="GD::Graph::lines"><code>GD::Graph::lines</code></dt>
+<dd>
+
+<p>Create a line chart.</p>
+
+</dd>
+<dt id="GD::Graph::bars-and-GD::Graph::hbars"><code>GD::Graph::bars</code> and <code>GD::Graph::hbars</code></dt>
+<dd>
+
+<p>Create a bar chart with vertical or horizontal bars.</p>
+
+</dd>
+<dt id="GD::Graph::points"><code>GD::Graph::points</code></dt>
+<dd>
+
+<p>Create an chart, displaying the data as points.</p>
+
+</dd>
+<dt id="GD::Graph::linespoints"><code>GD::Graph::linespoints</code></dt>
+<dd>
+
+<p>Combination of lines and points.</p>
+
+</dd>
+<dt id="GD::Graph::area"><code>GD::Graph::area</code></dt>
+<dd>
+
+<p>Create a graph, representing the data as areas under a line.</p>
+
+</dd>
+<dt id="GD::Graph::mixed"><code>GD::Graph::mixed</code></dt>
+<dd>
+
+<p>Create a mixed type graph, any combination of the above. At the moment this is fairly limited. Some of the options that can be used with some of the individual graph types won&#39;t work very well. Bar graphs drawn after lines or points graphs may obscure the earlier data, and specifying bar_width will not produce the results you probably expected.</p>
+
+</dd>
+</dl>
+
+<p>Additional types:</p>
+
+<dl>
+
+<dt id="GD::Graph::pie"><code>GD::Graph::pie</code></dt>
+<dd>
+
+<p>Create a pie chart.</p>
+
+</dd>
+</dl>
+
+<h1 id="DISTRIBUTION-STATUS">DISTRIBUTION STATUS</h1>
+
+<p>Distribution has no releases since 2007. It has new maintainer starting of 1.45 and my plan is to keep modules backwards compatible as much as possible, fix bugs with test cases, apply patches and release new versions to the CPAN.</p>
+
+<p>I got repository from Martien without Benjamin&#39;s work, Benjamin couldn&#39;t find his repository, so everything else is imported from CPAN and BackPAN. Now it&#39;s all on github <a href="https://github.com/ruz/GDGraph">https://github.com/ruz/GDGraph</a>. May be at some point Benjamin will find his VCS backup and we can restore full history.</p>
+
+<p>Release 1.44_01 (development release) was released in 2007 by Benjamin, but never made into production version. This dev version contains very nice changes (truecolor, anti-aliasing and alpha support), but due to nature of how GD and GD::Graph works authors had to add third optional argument (truecolor) to all constructors in GD::Graph modules. I think that this should be and can be adjusted to receive named arguments in constructor and still be backwards compatible. If you were using that dev release and want to fast forward inclusion of this work into production release then contact ruz@cpan.org</p>
+
+<p>Martien also has changes in his repository that were never published to CPAN. These are smaller and well isolated, so I can merge them faster.</p>
+
+<p>My goal at this moment is to merge existing versions together, get rid of CVS reminders, do some repo cleanup, review existing tickets on rt.cpan.org. Join if you want to help.</p>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>See the samples directory in the distribution, and read the Makefile there.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>Fill an array of arrays with the x values and the values of the data sets. Make sure that every array is the same size, otherwise <i>GD::Graph</i> will complain and refuse to compile the graph.</p>
+
+<pre><code>  <span class="variable">@data</span> <span class="operator">=</span> <span class="operator">(</span> 
+    <span class="operator">[</span><span class="string">"1st"</span><span class="operator">,</span><span class="string">"2nd"</span><span class="operator">,</span><span class="string">"3rd"</span><span class="operator">,</span><span class="string">"4th"</span><span class="operator">,</span><span class="string">"5th"</span><span class="operator">,</span><span class="string">"6th"</span><span class="operator">,</span><span class="string">"7th"</span><span class="operator">,</span> <span class="string">"8th"</span><span class="operator">,</span> <span class="string">"9th"</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span>    <span class="number">1</span><span class="operator">,</span>    <span class="number">2</span><span class="operator">,</span>    <span class="number">5</span><span class="operator">,</span>    <span class="number">6</span><span class="operator">,</span>    <span class="number">3</span><span class="operator">,</span>  <span class="number">1.5</span><span class="operator">,</span>    <span class="number">1</span><span class="operator">,</span>     <span class="number">3</span><span class="operator">,</span>     <span class="number">4</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="keyword">sort</span> <span class="operator">{</span> <span class="variable">$a</span> <span class="operator">&lt;=&gt;</span> <span class="variable">$b</span> <span class="operator">}</span> <span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">6</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">1.5</span><span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">4</span><span class="operator">)</span> <span class="operator">]</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>If you don&#39;t have a value for a point in a certain dataset, you can use <b>undef</b>, and the point will be skipped.</p>
+
+<p>Create a new <i>GD::Graph</i> object by calling the <i>new</i> method on the graph type you want to create (<i>chart</i> is <i>bars</i>, <i>hbars</i>, <i>lines</i>, <i>points</i>, <i>linespoints</i>, <i>mixed</i> or <i>pie</i>).</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$graph</span> <span class="operator">=</span> <span class="variable">GD::Graph::chart</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">400</span><span class="operator">,</span> <span class="number">300</span><span class="operator">);</span>
+</code></pre>
+
+<p>Set the graph options.</p>
+
+<pre><code>  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> 
+      <span class="string">x_label</span>           <span class="operator">=&gt;</span> <span class="string">'X Label'</span><span class="operator">,</span>
+      <span class="string">y_label</span>           <span class="operator">=&gt;</span> <span class="string">'Y label'</span><span class="operator">,</span>
+      <span class="string">title</span>             <span class="operator">=&gt;</span> <span class="string">'Some simple graph'</span><span class="operator">,</span>
+      <span class="string">y_max_value</span>       <span class="operator">=&gt;</span> <span class="number">8</span><span class="operator">,</span>
+      <span class="string">y_tick_number</span>     <span class="operator">=&gt;</span> <span class="number">8</span><span class="operator">,</span>
+      <span class="string">y_label_skip</span>      <span class="operator">=&gt;</span> <span class="number">2</span> 
+  <span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+</code></pre>
+
+<p>and plot the graph.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$gd</span> <span class="operator">=</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then do whatever your current version of GD allows you to do to save the file. For versions of GD older than 1.19 (or more recent than 2.15), you&#39;d do something like:</p>
+
+<pre><code>  <span class="keyword">open</span><span class="operator">(</span><span class="variable">IMG</span><span class="operator">,</span> <span class="string">'&gt;file.gif'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+  <span class="keyword">binmode</span> <span class="variable">IMG</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$gd</span><span class="operator">-&gt;</span><span class="variable">gif</span><span class="operator">;</span>
+  <span class="keyword">close</span> <span class="variable">IMG</span><span class="operator">;</span>
+</code></pre>
+
+<p>and for newer versions (1.20 and up) you&#39;d write</p>
+
+<pre><code>  <span class="keyword">open</span><span class="operator">(</span><span class="variable">IMG</span><span class="operator">,</span> <span class="string">'&gt;file.png'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+  <span class="keyword">binmode</span> <span class="variable">IMG</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$gd</span><span class="operator">-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>  <span class="keyword">open</span><span class="operator">(</span><span class="variable">IMG</span><span class="operator">,</span> <span class="string">'&gt;file.gd2'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+  <span class="keyword">binmode</span> <span class="variable">IMG</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$gd</span><span class="operator">-&gt;</span><span class="variable">gd2</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then there&#39;s also of course the possibility of using a shorter version (for each of the export functions that GD supports):</p>
+
+<pre><code>  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)-&gt;</span><span class="variable">gif</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)-&gt;</span><span class="variable">gd</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)-&gt;</span><span class="variable">gd2</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you want to write something that doesn&#39;t require your code to &#39;know&#39; whether to use gif or png, you could do something like:</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$gd</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'png'</span><span class="operator">))</span> <span class="operator">{</span> <span class="comment"># blabla }</span>
+</code></pre>
+
+<p>or you can use the convenience method <code>export_format</code>:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$format</span> <span class="operator">=</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">export_format</span><span class="operator">;</span>
+  <span class="keyword">open</span><span class="operator">(</span><span class="variable">IMG</span><span class="operator">,</span> <span class="string">"&gt;file.</span><span class="variable">$format</span><span class="string">"</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+  <span class="keyword">binmode</span> <span class="variable">IMG</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">IMG</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)-&gt;</span><span class="variable">$format</span><span class="operator">();</span>
+  <span class="keyword">close</span> <span class="variable">IMG</span><span class="operator">;</span>
+</code></pre>
+
+<p>or for CGI programs:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">CGI</span> <span class="string">qw(:standard)</span><span class="operator">;</span>
+  <span class="comment">#...</span>
+  <span class="keyword">my</span> <span class="variable">$format</span> <span class="operator">=</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">export_format</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">header</span><span class="operator">(</span><span class="string">"image/</span><span class="variable">$format</span><span class="string">"</span><span class="operator">);</span>
+  <span class="keyword">binmode</span> <span class="variable">STDOUT</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">)-&gt;</span><span class="variable">$format</span><span class="operator">();</span>
+</code></pre>
+
+<p>(the parentheses after $format are necessary, to help the compiler decide that you mean a method name there)</p>
+
+<p>See under <a href="#SEE-ALSO">&quot;SEE ALSO&quot;</a> for references to other documentation, especially the FAQ.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Methods-for-all-graphs">Methods for all graphs</h2>
+
+<dl>
+
+<dt id="GD::Graph::chart-new-width-height">GD::Graph::chart-&gt;new([width,height])</dt>
+<dd>
+
+<p>Create a new object $graph with optional width and height. Default width = 400, default height = 300. <i>chart</i> is either <i>bars</i>, <i>lines</i>, <i>points</i>, <i>linespoints</i>, <i>area</i>, <i>mixed</i> or <i>pie</i>.</p>
+
+</dd>
+<dt id="graph-set_text_clr-colour-name">$graph-&gt;set_text_clr(<i>colour name</i>)</dt>
+<dd>
+
+<p>Set the colour of the text. This will set the colour of the titles, labels, and axis labels to <i>colour name</i>. Also see the options <i>textclr</i>, <i>labelclr</i> and <i>axislabelclr</i>.</p>
+
+</dd>
+<dt id="graph-set_title_font-font-specification">$graph-&gt;set_title_font(font specification)</dt>
+<dd>
+
+<p>Set the font that will be used for the title of the chart. See <a href="#FONTS">&quot;FONTS&quot;</a>.</p>
+
+</dd>
+<dt id="graph-plot-data">$graph-&gt;plot(<i>\@data</i>)</dt>
+<dd>
+
+<p>Plot the chart, and return the GD::Image object.</p>
+
+</dd>
+<dt id="graph-set-attrib1-value1-attrib2-value2">$graph-&gt;set(attrib1 =&gt; value1, attrib2 =&gt; value2 ...)</dt>
+<dd>
+
+<p>Set chart options. See OPTIONS section.</p>
+
+</dd>
+<dt id="graph-get-attrib1-attrib2">$graph-&gt;get(attrib1, attrib2)</dt>
+<dd>
+
+<p>Returns a list of the values of the attributes. In scalar context returns the value of the first attribute only.</p>
+
+</dd>
+<dt id="graph-gd">$graph-&gt;gd()</dt>
+<dd>
+
+<p>Get the GD::Image object that is going to be used to draw on. You can do this either before or after calling the plot method, to do your own drawing.</p>
+
+<p><b>Note:</b> as of the current version, this GD::Image object will always be palette-based, even if the installed version of GD supports true-color images.</p>
+
+<p>Note also that if you draw on the GD::Image object before calling the plot method, you are responsible for making sure that the background colour is correct and for setting transparency.</p>
+
+</dd>
+<dt id="graph-export_format">$graph-&gt;export_format()</dt>
+<dd>
+
+<p>Query the export format of the GD library in use. In scalar context, it returns &#39;gif&#39;, &#39;png&#39; or undefined, which is sufficient for most people&#39;s use. In a list context, it returns a list of all the formats that are supported by the current version of GD. It can be called as a class or object method</p>
+
+</dd>
+<dt id="graph-can_do_ttf">$graph-&gt;can_do_ttf()</dt>
+<dd>
+
+<p>Returns true if the current GD library supports TrueType fonts, False otherwise. Can also be called as a class method or static method.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods-for-Pie-charts">Methods for Pie charts</h2>
+
+<dl>
+
+<dt id="graph-set_label_font-font-specification">$graph-&gt;set_label_font(font specification)</dt>
+<dd>
+
+</dd>
+<dt id="graph-set_value_font-font-specification">$graph-&gt;set_value_font(font specification)</dt>
+<dd>
+
+<p>Set the font that will be used for the label of the pie or the values on the pie. See <a href="#FONTS">&quot;FONTS&quot;</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Methods-for-charts-with-axes">Methods for charts with axes.</h2>
+
+<dl>
+
+<dt id="graph-set_x_label_font-font-specification">$graph-&gt;set_x_label_font(font specification)</dt>
+<dd>
+
+</dd>
+<dt id="graph-set_y_label_font-font-specification">$graph-&gt;set_y_label_font(font specification)</dt>
+<dd>
+
+</dd>
+<dt id="graph-set_x_axis_font-font-specification">$graph-&gt;set_x_axis_font(font specification)</dt>
+<dd>
+
+</dd>
+<dt id="graph-set_y_axis_font-font-specification">$graph-&gt;set_y_axis_font(font specification)</dt>
+<dd>
+
+</dd>
+<dt id="graph-set_values_font-font-specification">$graph-&gt;set_values_font(font specification)</dt>
+<dd>
+
+<p>Set the font for the x and y axis label, the x and y axis value labels, and for the values printed above the data points. See <a href="#FONTS">&quot;FONTS&quot;</a>.</p>
+
+</dd>
+<dt id="graph-get_hotspot-dataset-point">$graph-&gt;get_hotspot($dataset, $point)</dt>
+<dd>
+
+<p><b>Experimental</b>: Return a coordinate specification for a point in a dataset. Returns a list. If the point is not specified, returns a list of array references for all points in the dataset. If the dataset is also not specified, returns a list of array references for each data set. See <a href="#HOTSPOTS">&quot;HOTSPOTS&quot;</a>.</p>
+
+</dd>
+<dt id="graph-get_feature_coordinates-feature_name">$graph-&gt;get_feature_coordinates($feature_name)</dt>
+<dd>
+
+<p><b>Experimental</b>: Return a coordinate specification for a certain feature in the chart. Currently, features that are defined are <i>axes</i>, the coordinates of the rectangle within the axes; <i>x_label</i>, <i>y1_label</i> and <i>y2_label</i>, the labels printed along the axes, with <i>y_label</i> provided as an alias for <i>y1_label</i>; and <i>title</i> which is the title text box. See <a href="#HOTSPOTS">&quot;HOTSPOTS&quot;</a>.</p>
+
+</dd>
+</dl>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<h2 id="Options-for-all-graphs">Options for all graphs</h2>
+
+<dl>
+
+<dt id="width-height">width, height</dt>
+<dd>
+
+<p>The width and height of the canvas in pixels Default: 400 x 300. <b>NB</b> At the moment, these are read-only options. If you want to set the size of a graph, you will have to do that with the <i>new</i> method.</p>
+
+</dd>
+<dt id="t_margin-b_margin-l_margin-r_margin">t_margin, b_margin, l_margin, r_margin</dt>
+<dd>
+
+<p>Top, bottom, left and right margin of the canvas. These margins will be left blank. Default: 0 for all.</p>
+
+</dd>
+<dt id="logo">logo</dt>
+<dd>
+
+<p>Name of a logo file. Generally, this should be the same format as your version of GD exports images in. Currently, this file may be in any format that GD can import, but please see <a href="../../lib/GD.html">GD</a> if you use an XPM file and get unexpected results.</p>
+
+<p>Default: no logo.</p>
+
+</dd>
+<dt id="logo_resize-logo_position">logo_resize, logo_position</dt>
+<dd>
+
+<p>Factor to resize the logo by, and the position on the canvas of the logo. Possible values for logo_position are &#39;LL&#39;, &#39;LR&#39;, &#39;UL&#39;, and &#39;UR&#39;. (lower and upper left and right). Default: &#39;LR&#39;.</p>
+
+</dd>
+<dt id="transparent">transparent</dt>
+<dd>
+
+<p>If set to a true value, the produced image will have the background colour marked as transparent (see also option <i>bgclr</i>). Default: 1.</p>
+
+</dd>
+<dt id="interlaced">interlaced</dt>
+<dd>
+
+<p>If set to a true value, the produced image will be interlaced. Default: 1.</p>
+
+<p><b>Note</b>: versions of GD higher than 2.0 (that is, since GIF support was restored after being removed owing to patent issues) do not support interlacing of GIF images. Support for interlaced PNG and progressive JPEG images remains available using this option.</p>
+
+</dd>
+</dl>
+
+<h2 id="Colours">Colours</h2>
+
+<dl>
+
+<dt id="bgclr-fgclr-boxclr-accentclr-shadowclr">bgclr, fgclr, boxclr, accentclr, shadowclr</dt>
+<dd>
+
+<p>Drawing colours used for the chart: background, foreground (axes and grid), axis box fill colour, accents (bar, area and pie outlines), and shadow (currently only for bars).</p>
+
+<p>All colours should have a valid value as described in <a href="#COLOURS">&quot;COLOURS&quot;</a>, except boxclr, which can be undefined, in which case the box will not be filled.</p>
+
+</dd>
+<dt id="shadow_depth">shadow_depth</dt>
+<dd>
+
+<p>Depth of a shadow, positive for right/down shadow, negative for left/up shadow, 0 for no shadow (default). Also see the <code>shadowclr</code> and <code>bar_spacing</code> options.</p>
+
+</dd>
+<dt id="labelclr-axislabelclr-legendclr-valuesclr-textclr">labelclr, axislabelclr, legendclr, valuesclr, textclr</dt>
+<dd>
+
+<p>Text Colours used for the chart: label (labels for the axes or pie), axis label (misnomer: values printed along the axes, or on a pie slice), legend text, shown values text, and all other text.</p>
+
+<p>All colours should have a valid value as described in <a href="#COLOURS">&quot;COLOURS&quot;</a>.</p>
+
+</dd>
+<dt id="dclrs-short-for-datacolours">dclrs (short for datacolours)</dt>
+<dd>
+
+<p>This controls the colours for the bars, lines, markers, or pie slices. This should be a reference to an array of colour names as defined in <a href="../../lib/GD/Graph/colour.html">GD::Graph::colour</a> (<span style="white-space: nowrap;"><code>perldoc GD::Graph::colour</code></span> for the names available).</p>
+
+<pre><code>    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="string">dclrs</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(green pink blue cyan)</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The first (fifth, ninth) data set will be green, the next pink, etc.</p>
+
+<p>A colour can be <code>undef</code>, in which case the data set will not be drawn. This can be useful for cumulative bar sets where you want certain data series (often the first one) not to show up, which can be used to emulate error bars (see examples 1-7 and 6-3 in the distribution).</p>
+
+<p>Default: [ qw(lred lgreen lblue lyellow lpurple cyan lorange) ]</p>
+
+</dd>
+<dt id="borderclrs">borderclrs</dt>
+<dd>
+
+<p>This controls the colours of the borders of the bars data sets. Like dclrs, it is a reference to an array of colour names as defined in <a href="../../lib/GD/Graph/colour.html">GD::Graph::colour</a>. Setting a border colour to <code>undef</code> means the border will not be drawn.</p>
+
+</dd>
+<dt id="cycle_clrs">cycle_clrs</dt>
+<dd>
+
+<p>If set to a true value, bars will not have a colour from <code>dclrs</code> per dataset, but per point. The colour sequence will be identical for each dataset. Note that this may have a weird effect if you are drawing more than one data set. If this is set to a value larger than 1 the border colour of the bars will cycle through the colours in <code>borderclrs</code>.</p>
+
+</dd>
+<dt id="accent_treshold">accent_treshold</dt>
+<dd>
+
+<p>Not really a colour, but it does control a visual aspect: Accents on bars are only drawn when the width of a bar is larger than this number of pixels. Accents inside areas are only drawn when the horizontal distance between points is larger than this number. Default 4</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-graphs-with-axes">Options for graphs with axes.</h2>
+
+<p>options for <i>bars</i>, <i>lines</i>, <i>points</i>, <i>linespoints</i>, <i>mixed</i> and <i>area</i> charts.</p>
+
+<dl>
+
+<dt id="x_label-y_label">x_label, y_label</dt>
+<dd>
+
+<p>The labels to be printed next to, or just below, the axes. Note that if you use the two_axes option that you need to use y1_label and y2_label.</p>
+
+</dd>
+<dt id="long_ticks-tick_length">long_ticks, tick_length</dt>
+<dd>
+
+<p>If <i>long_ticks</i> is a true value, ticks will be drawn the same length as the axes. Otherwise ticks will be drawn with length <i>tick_length</i>. if <i>tick_length</i> is negative, the ticks will be drawn outside the axes. Default: long_ticks = 0, tick_length = 4.</p>
+
+<p>These attributes can also be set for x and y axes separately with x_long_ticks, y_long_ticks, x_tick_length and y_tick_length.</p>
+
+</dd>
+<dt id="x_ticks">x_ticks</dt>
+<dd>
+
+<p>If <i>x_ticks</i> is a true value, ticks will be drawn for the x axis. These ticks are subject to the values of <i>long_ticks</i> and <i>tick_length</i>. Default: 1.</p>
+
+</dd>
+<dt id="y_tick_number">y_tick_number</dt>
+<dd>
+
+<p>Number of ticks to print for the Y axis. Use this, together with <i>y_label_skip</i> to control the look of ticks on the y axis. Default: 5.</p>
+
+</dd>
+<dt id="y_number_format">y_number_format</dt>
+<dd>
+
+<p>This can be either a string, or a reference to a subroutine. If it is a string, it will be taken to be the first argument to a sprintf, with the value as the second argument:</p>
+
+<pre><code>    <span class="variable">$label</span> <span class="operator">=</span> <span class="keyword">sprintf</span><span class="operator">(</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">y_number_format</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">$value</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If it is a code reference, it will be executed with the value as the argument:</p>
+
+<pre><code>    <span class="variable">$label</span> <span class="operator">=</span> <span class="operator">&amp;{</span><span class="variable">$s</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">y_number_format</span><span class="operator">}</span><span class="operator">}(</span><span class="variable">$value</span><span class="operator">);</span>
+</code></pre>
+
+<p>This can be useful, for example, if you want to reformat your values in currency, with the - sign in the right spot. Something like:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> y_format
+    </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ret</span><span class="operator">;</span>
+    
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$value</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">)</span>
+        <span class="operator">{</span>
+            <span class="variable">$ret</span> <span class="operator">=</span> <span class="keyword">sprintf</span><span class="operator">(</span><span class="string">"\$%d"</span><span class="operator">,</span> <span class="variable">$value</span> <span class="operator">*</span> <span class="variable">$refit</span><span class="operator">);</span>
+        <span class="operator">}</span>
+        <span class="keyword">else</span>
+        <span class="operator">{</span>
+            <span class="variable">$ret</span> <span class="operator">=</span> <span class="keyword">sprintf</span><span class="operator">(</span><span class="string">"-\$%d"</span><span class="operator">,</span> <span class="keyword">abs</span><span class="operator">(</span><span class="variable">$value</span><span class="operator">)</span> <span class="operator">*</span> <span class="variable">$refit</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    
+        <span class="keyword">return</span> <span class="variable">$ret</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="string">'y_number_format'</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">y_format</span> <span class="operator">);</span>
+</code></pre>
+
+<p>(Yes, I know this can be much shorter and more concise)</p>
+
+<p>Default: undef.</p>
+
+</dd>
+<dt id="y1_number_format-y2_number_format">y1_number_format, y2_number_format</dt>
+<dd>
+
+<p>As with <i>y_number_format</i>, these can be either a string, or a reference to a subroutine. These are used as formats for graphs with two y-axis scales so that independent formats can be used.</p>
+
+<p>For compatibility purposes, each of these will fall back on <i>y_number_format</i> if not specified.</p>
+
+<p>Default: undef for both.</p>
+
+</dd>
+<dt id="x_label_skip-y_label_skip">x_label_skip, y_label_skip</dt>
+<dd>
+
+<p>Print every <i>x_label_skip</i>th number under the tick on the x axis, and every <i>y_label_skip</i>th number next to the tick on the y axis. Default: 1 for both.</p>
+
+</dd>
+<dt id="x_last_label_skip">x_last_label_skip</dt>
+<dd>
+
+<p>By default, when <i>x_label_skip</i> is set to something higher than 1, the last label on the axis will be printed, even when it doesn&#39;t belong to the normal series that should be printed. Setting this to a true value prevents that.</p>
+
+<p>For example, when your X values are the months of the year (i.e. Jan - Dec), and you set <i>x_label_skip</i> to 3, the months printed on the axis will be Jan, Apr, Jul, Oct and Dec; even though Dec does not really belong to that sequence. If you do not like the last month to be printed, set <i>x_last_label_skip</i> to a true value.</p>
+
+<p>This option has no effect in other circumstances. Also see <i>x_tick_offset</i> for another method to make this look better. Default: 0 for both</p>
+
+</dd>
+<dt id="x_tick_offset">x_tick_offset</dt>
+<dd>
+
+<p>When <i>x_label_skip</i> is used, this will skip the first <i>x_tick_offset</i> values in the labels before starting to print. Let me give an example. If you have a series of X labels like</p>
+
+<pre><code>  qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)</code></pre>
+
+<p>and you set <i>x_label_skip</i> to 3, you will see ticks on the X axis for Jan, Apr, Jul, Oct and Dec. This is not always what is wanted. If you set <i>x_tick_offset</i> to 1, you get Feb, May, Aug, Nov and Dec, and if you set it to 2, you get Mar, Jun Sep and Dec, and this last one definitely looks better. A combination of 6 and 5 also works nice for months.</p>
+
+<p>Note that the value for <i>x_tick_offset</i> is periodical. This means that it will have the same effect for each integer n in <i>x_tick_offset</i> + n * <i>x_label_skip</i>.</p>
+
+<p>Also see <i>x_last_label_skip</i> for another method to influence this.</p>
+
+</dd>
+<dt id="x_all_ticks">x_all_ticks</dt>
+<dd>
+
+<p>Force a print of all the x ticks, even if x_label_skip is set to a value Default: 0.</p>
+
+</dd>
+<dt id="x_label_position">x_label_position</dt>
+<dd>
+
+<p>Controls the position of the X axis label (title). The value for this should be between 0 and 1, where 0 means aligned to the left, 1 means aligned to the right, and 1/2 means centered. Default: 3/4</p>
+
+</dd>
+<dt id="y_label_position">y_label_position</dt>
+<dd>
+
+<p>Controls the position of both Y axis labels (titles). The value for this should be between 0 and 1, where 0 means aligned to the bottom, 1 means aligned to the top, and 1/2 means centered. Default: 1/2</p>
+
+</dd>
+<dt id="x_labels_vertical">x_labels_vertical</dt>
+<dd>
+
+<p>If set to a true value, the X axis labels will be printed vertically. This can be handy in case these labels get very long. Default: 0.</p>
+
+</dd>
+<dt id="x_plot_values-y_plot_values">x_plot_values, y_plot_values</dt>
+<dd>
+
+<p>If set to a true value, the values of the ticks on the x or y axes will be plotted next to the tick. Also see <i>x_label_skip, y_label_skip</i>. Default: 1 for both.</p>
+
+</dd>
+<dt id="box_axis">box_axis</dt>
+<dd>
+
+<p>Draw the axes as a box, if true. Default: 1.</p>
+
+</dd>
+<dt id="no_axes">no_axes</dt>
+<dd>
+
+<p>Draw no axes at all. If this is set to undef, all axes are drawn. If it is set to 0, the zero axis will be drawn, <i>for bar charts only</i>. If this is set to a true value, no axes will be drawn at all. Value labels on the axes and ticks will also not be drawn, but axis lables are drawn. Default: undef.</p>
+
+</dd>
+<dt id="two_axes">two_axes</dt>
+<dd>
+
+<p>Use two separate axes for the first and second data set. The first data set will be set against the left axis, the second against the right axis. If more than two data sets are being plotted, the use_axis option should be used to specify which data sets use which axis.</p>
+
+<p>Note that if you use this option, that you need to use y1_label and y2_label, instead of just y_label, if you want the two axes to have different labels. The same goes for some other options starting with the letter &#39;y&#39; and an underscore.</p>
+
+<p>Default: 0.</p>
+
+</dd>
+<dt id="use_axis">use_axis</dt>
+<dd>
+
+<p>If two y-axes are in use and more than two datasets are specified, set this option to an array reference containing a value of 1 or 2 (for the left and right scales respectively) for each dataset being plotted. That is, to plot three datasets with the second on a different scale than the first and third, set this to <code>[1,2,1]</code>.</p>
+
+<p>Default: [1,2].</p>
+
+</dd>
+<dt id="zero_axis">zero_axis</dt>
+<dd>
+
+<p>If set to a true value, the axis for y values of 0 will always be drawn. This might be useful in case your graph contains negative values, but you want it to be clear where the zero value is. (see also <i>zero_axis_only</i> and <i>box_axes</i>). Default: 0.</p>
+
+</dd>
+<dt id="zero_axis_only">zero_axis_only</dt>
+<dd>
+
+<p>If set to a true value, the zero axis will be drawn (see <i>zero_axis</i>), and no axis at the bottom of the graph will be drawn. The labels for X values will be placed on the zero axis. Default: 0.</p>
+
+</dd>
+<dt id="y_max_value-y_min_value">y_max_value, y_min_value</dt>
+<dd>
+
+<p>Maximum and minimum value displayed on the y axis.</p>
+
+<p>The range (y_min_value..y_max_value) has to include all the values of the data points, or <i>GD::Graph</i> will die with a message.</p>
+
+<p>For bar and area graphs, the range (y_min_value..y_max_value) has to include 0. If it doesn&#39;t, the values will be adapted before attempting to draw the graph.</p>
+
+<p>Default: Computed from data sets.</p>
+
+</dd>
+<dt id="y1_max_value-y1_min_value-y2_max_value-y2_min_value">y1_max_value, y1_min_value, y2_max_value, y2_min_value</dt>
+<dd>
+
+<p>Maximum and minimum values for left (y1) and right (y2) axes when <b>two_axes</b> is a true value. Take precedence over y_min_value and y_max_value.</p>
+
+<p>By default 0 of the left axis is aligned with 0 of the right axis, it&#39;s not true if any of these options is defined.</p>
+
+<p>Otherwise behaviour and default values are as with y_max_value and y_min_value.</p>
+
+</dd>
+<dt id="y_min_range-y1_min_range-y2_min_range">y_min_range, y1_min_range, y2_min_range</dt>
+<dd>
+
+<p>Minimal range between min and max values on y axis that is used to adjust computed y_min_value and y_max_value.</p>
+
+<p><b>NOTE</b> that author of the feature implemented this for two_axes case only, patches are wellcome to expand over one y axis.</p>
+
+<p>If two_axes is a true value, then y1_min_range and y2_min_range take precedence over y_min_range value.</p>
+
+<p>Default: undef</p>
+
+</dd>
+<dt id="axis_space">axis_space</dt>
+<dd>
+
+<p>This space will be left blank between the axes and the tick value text. Default: 4.</p>
+
+</dd>
+<dt id="text_space">text_space</dt>
+<dd>
+
+<p>This space will be left open between text elements and the graph (text elements are title and axis labels.</p>
+
+<p>Default: 8.</p>
+
+</dd>
+<dt id="cumulate">cumulate</dt>
+<dd>
+
+<p>If this attribute is set to a true value, the data sets will be cumulated. This means that they will be stacked on top of each other. A side effect of this is that <code>overwrite</code> will be set to a true value.</p>
+
+<p>Notes: This only works for bar and area charts at the moment.</p>
+
+<p>If you have negative values in your data sets, setting this option might produce odd results. Of course, the graph itself would be quite meaningless.</p>
+
+</dd>
+<dt id="overwrite">overwrite</dt>
+<dd>
+
+<p>If set to 0, bars of different data sets will be drawn next to each other. If set to 1, they will be drawn in front of each other. Default: 0.</p>
+
+<p>Note: Setting overwrite to 2 to produce cumulative sets is deprecated, and may disappear in future versions of GD::Graph. Instead see the <code>cumulate</code> attribute.</p>
+
+</dd>
+<dt id="correct_width">correct_width</dt>
+<dd>
+
+<p>If this is set to a true value and <code>x_tick_number</code> is false, then the width of the graph (or the height for rotated graphs like <code>GD::Graph::hbar</code>) will be recalculated to make sure that each data point is exactly an integer number of pixels wide. You probably never want to fiddle with this.</p>
+
+<p>When this value is true, you will need to make sure that the number of data points is smaller than the number of pixels in the plotting area of the chart. If you get errors saying that your horizontal size if too small, you may need to manually switch this off, or consider using something else than a bar type for your chart.</p>
+
+<p>Default: 1 for bar, calculated at runtime for mixed charts, 0 for others.</p>
+
+</dd>
+</dl>
+
+<h2 id="Plotting-data-point-values-with-the-data-point">Plotting data point values with the data point</h2>
+
+<p>Sometimes you will want to plot the value of a data point or bar above the data point for clarity. GD::Graph allows you to control this in a generic manner, or even down to the single point.</p>
+
+<dl>
+
+<dt id="show_values">show_values</dt>
+<dd>
+
+<p>Set this to 1 to display the value of each data point above the point or bar itself. No effort is being made to ensure that there is enough space for the text.</p>
+
+<p>Set this to a GD::Graph::Data object, or an array reference of the same shape, with the same dimensions as your data object that you pass in to the plot method. The reason for this option is that it allows you to make a copy of your data set, and selectively set points to <code>undef</code> to disable plotting of them.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">GD::Graph::Data</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> 
+    <span class="operator">[</span> <span class="operator">[</span> <span class="string">'A'</span><span class="operator">,</span> <span class="string">'B'</span><span class="operator">,</span> <span class="string">'C'</span> <span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span> <span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span> <span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span> <span class="number">11</span><span class="operator">,</span> <span class="number">12</span><span class="operator">,</span> <span class="number">13</span> <span class="operator">]</span> <span class="operator">]</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$values</span> <span class="operator">=</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">;</span>
+  <span class="variable">$values</span><span class="operator">-&gt;</span><span class="variable">set_y</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="number">1</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">);</span>
+  <span class="variable">$values</span><span class="operator">-&gt;</span><span class="variable">set_y</span><span class="operator">(</span><span class="number">2</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">);</span>
+  
+  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span><span class="string">show_values</span> <span class="operator">=&gt;</span> <span class="variable">$values</span><span class="operator">);</span>
+  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>Default: 0.</p>
+
+</dd>
+<dt id="values_vertical">values_vertical</dt>
+<dd>
+
+<p>If set to a true value, the values will be printed vertically, instead of horizontally. This can be handy if the values are long numbers. Default: 0.</p>
+
+</dd>
+<dt id="values_space">values_space</dt>
+<dd>
+
+<p>Space to insert between the data point and the value to print. Default: 4.</p>
+
+</dd>
+<dt id="values_format">values_format</dt>
+<dd>
+
+<p>How to format the values for display. See y_number_format for more information. Default: undef.</p>
+
+</dd>
+<dt id="hide_overlapping_values">hide_overlapping_values</dt>
+<dd>
+
+<p>If set to a true value, the values that goes out of graph space are hidden. Option is <b>EXPERIMENTAL</b>, works only for bars, text still can overlap with other bars and labels, most useful only with text in the same direction as bars. Default: undef</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-graphs-with-a-numerical-X-axis">Options for graphs with a numerical X axis</h2>
+
+<p>First of all: GD::Graph does <b>not</b> support numerical x axis the way it should. Data for X axes should be equally spaced. That understood: There is some support to make the printing of graphs with numerical X axis values a bit better, thanks to Scott Prahl. If the option <code>x_tick_number</code> is set to a defined value, GD::Graph will attempt to treat the X data as numerical.</p>
+
+<p>Extra options are:</p>
+
+<dl>
+
+<dt id="x_tick_number">x_tick_number</dt>
+<dd>
+
+<p>If set to <i>&#39;auto&#39;</i>, GD::Graph will attempt to format the X axis in a nice way, based on the actual X values. If set to a number, that&#39;s the number of ticks you will get. If set to undef, GD::Graph will treat X data as labels. Default: undef.</p>
+
+</dd>
+<dt id="x_min_value-x_max_value">x_min_value, x_max_value</dt>
+<dd>
+
+<p>The minimum and maximum value to use for the X axis. Default: computed.</p>
+
+</dd>
+<dt id="x_min_range">x_min_range</dt>
+<dd>
+
+<p>Minimal range of x axis.</p>
+
+<p>Default: undef</p>
+
+</dd>
+<dt id="x_number_format">x_number_format</dt>
+<dd>
+
+<p>See y_number_format</p>
+
+</dd>
+<dt id="x_label_skip">x_label_skip</dt>
+<dd>
+
+<p>See y_label_skip</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-graphs-with-bars">Options for graphs with bars</h2>
+
+<dl>
+
+<dt id="bar_width">bar_width</dt>
+<dd>
+
+<p>The width of a bar in pixels. Also see <code>bar_spacing</code>. Use <code>bar_width</code> If you want to have fixed-width bars, no matter how wide the chart gets. Default: as wide as possible, within the constraints of the chart size and <code>bar_spacing</code> setting.</p>
+
+</dd>
+<dt id="bar_spacing">bar_spacing</dt>
+<dd>
+
+<p>Number of pixels to leave open between bars. This works well in most cases, but on some platforms, a value of 1 will be rounded off to 0. Use <code>bar_spacing</code> to get a fixed amount of space between bars, with variable bar widths, depending on the width of the chart. Note that if <code>bar_width</code> is also set, this setting will be ignored, and automatically calculated. Default: 0</p>
+
+</dd>
+<dt id="bargroup_spacing">bargroup_spacing</dt>
+<dd>
+
+<p>Number of pixels (in addition to whatever is specified in <code>bar_spacing</code>) to leave between groups of bars when multiple datasets are being displayed. Unlike <code>bar_spacing</code>, however, this parameter will hold its value if <code>bar_width</code> is set.</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-graphs-with-lines">Options for graphs with lines</h2>
+
+<dl>
+
+<dt id="line_types">line_types</dt>
+<dd>
+
+<p>Which line types to use for <i>lines</i> and <i>linespoints</i> graphs. This should be a reference to an array of numbers:</p>
+
+<pre><code>    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="string">line_types</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">4</span><span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Available line types are 1: solid, 2: dashed, 3: dotted, 4: dot-dashed.</p>
+
+<p>Default: [1] (always use solid)</p>
+
+</dd>
+<dt id="line_type_scale">line_type_scale</dt>
+<dd>
+
+<p>Controls the length of the dashes in the line types. default: 6.</p>
+
+</dd>
+<dt id="line_width">line_width</dt>
+<dd>
+
+<p>The width of the line used in <i>lines</i> and <i>linespoints</i> graphs, in pixels. Default: 1.</p>
+
+</dd>
+<dt id="skip_undef">skip_undef</dt>
+<dd>
+
+<p>For all other axes graph types, the default behaviour is (by their nature) to not draw a point when the Y value is <code>undef</code>. For line charts the point gets skipped as well, but the line is drawn between the points n-1 to n+1 directly. If <code>skip_undef</code> has a true value, there will be a gap in the chart where a Y value is undefined.</p>
+
+<p>Note that a line will not be drawn unless there are <i>at least two</i> consecutive data points exist that have a defined value. The following data set will only plot a very short line towards the end if <code>skip_undef</code> is set:</p>
+
+<pre><code>  <span class="variable">@data</span> <span class="operator">=</span> <span class="operator">(</span>
+    <span class="operator">[</span> <span class="string">qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct )</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="number">1</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">6</span> <span class="operator">]</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>This option is useful when you have a consecutive gap in your data, or with linespoints charts. If you have data where you have intermittent gaps, be careful when you use this. Default value: 0</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-graphs-with-points">Options for graphs with points</h2>
+
+<dl>
+
+<dt id="markers">markers</dt>
+<dd>
+
+<p>This controls the order of markers in <i>points</i> and <i>linespoints</i> graphs. This should be a reference to an array of numbers:</p>
+
+<pre><code>    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="string">markers</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">3</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">6</span><span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Available markers are: 1: filled square, 2: open square, 3: horizontal cross, 4: diagonal cross, 5: filled diamond, 6: open diamond, 7: filled circle, 8: open circle, 9: horizontal line, 10: vertical line. Note that the last two are not part of the default list.</p>
+
+<p>Default: [1,2,3,4,5,6,7,8]</p>
+
+</dd>
+<dt id="marker_size">marker_size</dt>
+<dd>
+
+<p>The size of the markers used in <i>points</i> and <i>linespoints</i> graphs, in pixels. Default: 4.</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-mixed-graphs">Options for mixed graphs</h2>
+
+<dl>
+
+<dt id="types">types</dt>
+<dd>
+
+<p>A reference to an array with graph types, in the same order as the data sets. Possible values are:</p>
+
+<pre><code>  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="string">types</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw(lines bars points area linespoints)</span><span class="operator">]</span> <span class="operator">);</span>
+  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="string">types</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'lines'</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="string">'bars'</span><span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>values that are undefined or unknown will be set to <code>default_type</code>.</p>
+
+<p>Default: all set to <code>default_type</code></p>
+
+</dd>
+<dt id="default_type">default_type</dt>
+<dd>
+
+<p>The type of graph to draw for data sets that either have no type set, or that have an unknown type set.</p>
+
+<p>Default: lines</p>
+
+</dd>
+</dl>
+
+<h2 id="Graph-legends-axestype-graphs-only">Graph legends (axestype graphs only)</h2>
+
+<p>At the moment legend support is minimal.</p>
+
+<p><b>Methods</b></p>
+
+<dl>
+
+<dt id="graph-set_legend-legend_keys">$graph-&gt;set_legend(<i>@legend_keys</i>);</dt>
+<dd>
+
+<p>Sets the keys for the legend. The elements of @legend_keys correspond to the data sets as provided to <i>plot()</i>.</p>
+
+<p>If a key is <i>undef</i> or an empty string, the legend entry will be skipped.</p>
+
+</dd>
+<dt id="graph-set_legend_font-font-name">$graph-&gt;set_legend_font(<i>font name</i>);</dt>
+<dd>
+
+<p>Sets the font for the legend text (see <a href="#FONTS">&quot;FONTS&quot;</a>). Default: GD::gdTinyFont.</p>
+
+</dd>
+</dl>
+
+<p><b>Options</b></p>
+
+<dl>
+
+<dt id="legend_placement">legend_placement</dt>
+<dd>
+
+<p>Where to put the legend. This should be a two letter key of the form: &#39;B[LCR]|R[TCB]&#39;. The first letter indicates the placement (<i>B</i>ottom or <i>R</i>ight), and the second letter the alignment (<i>L</i>eft, <i>R</i>ight, <i>C</i>enter, <i>T</i>op, or <i>B</i>ottom). Default: &#39;BC&#39;</p>
+
+<p>If the legend is placed at the bottom, some calculations will be made to ensure that there is some &#39;intelligent&#39; wrapping going on. if the legend is placed at the right, all entries will be placed below each other.</p>
+
+</dd>
+<dt id="legend_spacing">legend_spacing</dt>
+<dd>
+
+<p>The number of pixels to place around a legend item, and between a legend &#39;marker&#39; and the text. Default: 4</p>
+
+</dd>
+<dt id="legend_marker_width-legend_marker_height">legend_marker_width, legend_marker_height</dt>
+<dd>
+
+<p>The width and height of a legend &#39;marker&#39; in pixels. Defaults: 12, 8</p>
+
+</dd>
+<dt id="lg_cols">lg_cols</dt>
+<dd>
+
+<p>If you, for some reason, need to force the legend at the bottom to have a specific number of columns, you can use this. Default: computed</p>
+
+</dd>
+</dl>
+
+<h2 id="Options-for-pie-graphs">Options for pie graphs</h2>
+
+<dl>
+
+<dt id="d">3d</dt>
+<dd>
+
+<p>If set to a true value, the pie chart will be drawn with a 3d look. Default: 1.</p>
+
+</dd>
+<dt id="pie_height">pie_height</dt>
+<dd>
+
+<p>The thickness of the pie when <i>3d</i> is true. Default: 0.1 x height.</p>
+
+</dd>
+<dt id="start_angle">start_angle</dt>
+<dd>
+
+<p>The angle at which the first data slice will be displayed, with 0 degrees being &quot;6 o&#39;clock&quot;. Default: 0.</p>
+
+</dd>
+<dt id="suppress_angle">suppress_angle</dt>
+<dd>
+
+<p>If a pie slice is smaller than this angle (in degrees), a label will not be drawn on it. Default: 0.</p>
+
+</dd>
+<dt id="label">label</dt>
+<dd>
+
+<p>Print this label below the pie. Default: undef.</p>
+
+</dd>
+</dl>
+
+<h1 id="COLOURS">COLOURS</h1>
+
+<p>All references to colours in the options for this module have been shortened to clr. The main reason for this was that I didn&#39;t want to support two spellings for the same word (&#39;colour&#39; and &#39;color&#39;)</p>
+
+<p>Wherever a colour is required, a colour name should be used from the package <a href="../../lib/GD/Graph/colour.html">GD::Graph::colour</a>. <span style="white-space: nowrap;"><code>perldoc GD::Graph::colour</code></span> should give you the documentation for that module, containing all valid colour names. I will probably change this to read the systems rgb.txt file if it is available.</p>
+
+<h1 id="FONTS">FONTS</h1>
+
+<p>Depending on your version of GD, this accepts both GD builtin fonts or the name of a TrueType font file. In the case of a TrueType font, you must specify the font size. See <a href="../../lib/GD/Text.html">GD::Text</a> for more details and other things, since all font handling in GD::Graph is delegated to there.</p>
+
+<p>Examples:</p>
+
+<pre><code>    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set_title_font</span><span class="operator">(</span><span class="string">'/fonts/arial.ttf'</span><span class="operator">,</span> <span class="number">18</span><span class="operator">);</span>
+    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set_legend_font</span><span class="operator">(</span><span class="variable">gdTinyFont</span><span class="operator">);</span>
+    <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set_legend_font</span><span class="operator">(</span>
+        <span class="operator">[</span><span class="string">'verdana'</span><span class="operator">,</span> <span class="string">'arial'</span><span class="operator">,</span> <span class="variable">gdMediumBoldFont</span><span class="operator">]</span><span class="operator">,</span> <span class="number">12</span><span class="operator">)</span>
+</code></pre>
+
+<p>(The above discussion is based on GD::Text 0.65. Older versions have more restrictive behaviour).</p>
+
+<h1 id="HOTSPOTS">HOTSPOTS</h1>
+
+<p><i>Note that this is an experimental feature, and its interface may, and likely will, change in the future. It currently does not work for area charts or pie charts.</i></p>
+
+<p><i>A known problem with hotspots for GD::Graph::hbars is that the x and y coordinate come out transposed. This probably won&#39;t be fixed until the redesign of this section</i></p>
+
+<p>GD::Graph keeps an internal set of coordinates for each data point and for certain features of a chart, like the title and axis labels. This specification is very similar to the HTML image map specification, and in fact exists mainly for that purpose. You can get at these hotspots with the <code>get_hotspot</code> method for data point, and <code>get_feature_coordinates</code> for the chart features.</p>
+
+<p>The &lt;get_hotspot&gt; method accepts two optional arguments, the number of the dataset you&#39;re interested in, and the number of the point in that dataset you&#39;re interested in. When called with two arguments, the method returns a list of one of the following forms:</p>
+
+<pre><code>  &#39;rect&#39;, x1, y1, x2, y2
+  &#39;poly&#39;, x1, y1, x2, y2, x3, y3, ....
+  &#39;line&#39;, xs, ys, xe, ye, width</code></pre>
+
+<p>The parameters for <code>rect</code> are the coordinates of the corners of the rectangle, the parameters for <code>poly</code> are the coordinates of the vertices of the polygon, and the parameters for the <code>line</code> are the coordinates for the start and end point, and the line width. It should be possible to almost directly translate these lists into HTML image map specifications.</p>
+
+<p>If the second argument to <code>get_hotspot</code> is omitted, a list of references to arrays will be returned. This list represents all the points in the dataset specified, and each array referred to is of the form outlined above.</p>
+
+<pre><code>  [&#39;rect&#39;, x1, y1, x2, y2 ], [&#39;rect&#39;, x1, y1, x2, y2], ...</code></pre>
+
+<p>if both arguments to <code>get_hotspot</code> are omitted, the list that comes back will contain references to arrays for each data set, which in turn contain references to arrays for each point.</p>
+
+<pre><code>  [
+    [&#39;rect&#39;, x1, y1, x2, y2 ], [&#39;rect&#39;, x1, y1, x2, y2], ...
+  ],
+  [
+    [&#39;line&#39;, xs, ys, xe, ye, w], [&#39;line&#39;, xs, ys, xe, ye, w], ...
+  ],...</code></pre>
+
+<p>The <code>get_feature</code> method, when called with the name of a feature, returns a single array reference with a type and coordinates as described above. When called with no arguments, a hash reference is returned with the keys being all the currently defined and set features, and the values array references with the type and coordinates for each of those features.</p>
+
+<h1 id="ERROR-HANDLING">ERROR HANDLING</h1>
+
+<p>GD::Graph objects inherit from the GD::Graph::Error class (not the other way around), so they behave in the same manner. The main feature of that behaviour is that you have the error() method available to get some information about what went wrong. The GD::Graph methods all return undef if something went wrong, so you should be able to write safe programs like this:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$graph</span> <span class="operator">=</span> <span class="variable">GD::Graph</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()</span>    <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">GD::Graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span> <span class="variable">%attributes</span> <span class="operator">)</span>      <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+  <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(</span><span class="variable">$gdg_data</span><span class="operator">)</span>         <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+</code></pre>
+
+<p>More advanced usage is possible, and there are some caveats with this error handling, which are all explained in <a href="../../lib/GD/Graph/Error.html">GD::Graph::Error</a>.</p>
+
+<p>Unfortunately, it is almost impossible to gracefully recover from an error in GD::Graph, so you really should get rid of the object, and recreate it from scratch if you want to recover. For example, to adjust the correct_width attribute if you get the error &quot;Horizontal size too small&quot; or &quot;Vertical size too small&quot; (in the case of hbar), you could do something like:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> plot_graph
+  </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$data</span>    <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">%attribs</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$graph</span>   <span class="operator">=</span> <span class="variable">GD::Graph::bars</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()</span>
+         <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">GD::Graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+      <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">set</span><span class="operator">(</span><span class="variable">%attribs</span><span class="operator">)</span>     <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+      <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">)</span>       <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$graph</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">my</span> <span class="variable">$gd</span><span class="operator">;</span>
+  <span class="keyword">eval</span> <span class="operator">{</span> <span class="variable">$gd</span> <span class="operator">=</span> <span class="variable">plot_graph</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">,</span> <span class="variable">%attribs</span><span class="operator">)</span> <span class="operator">};</span>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$@</span><span class="operator">)</span>
+  <span class="operator">{</span>
+      <span class="keyword">die</span> <span class="variable">$@</span> <span class="keyword">unless</span> <span class="variable">$@</span> <span class="operator">=~</span> <span class="regex">/size too small/</span><span class="operator">;</span>
+      <span class="variable">$gd</span> <span class="operator">=</span> <span class="variable">plot_graph</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">,</span> <span class="variable">%attribs</span><span class="operator">,</span> <span class="string">correct_width</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Of course, you could also adjust the width this way, and you can check for other errors.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>As with all Modules for Perl: Please stick to using the interface. If you try to fiddle too much with knowledge of the internals of this module, you could get burned. I may change them at any time.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>GD::Graph objects cannot be reused. To create a new plot, you have to create a new GD::Graph object.</p>
+
+<p>Rotated charts (ones with the X axis on the left) can currently only be created for bars. With a little work, this will work for all others as well. Please, be patient :)</p>
+
+<p>Other outstanding bugs can (alas) probably be found in the RT queue for this distribution, at http://rt.cpan.org/Public/Dist/Display.html?Name=GDGraph</p>
+
+<p>If you think you have found a bug, please check first to see if it has already been reported. If it has not, please do (you can use the web interface above or send e-mail to &lt;bug-GDGraph@rt.cpan.org&gt;). Bug reports should contain as many as possible of the following:</p>
+
+<ul>
+
+<li><p>a concise description of the buggy behavior and how it differs from what you expected,</p>
+
+</li>
+<li><p>the versions of Perl, GD::Graph and GD that you are using,</p>
+
+</li>
+<li><p>a short demonstration script that shows the bug in action,</p>
+
+</li>
+<li><p>a patch that fixes it. :-)</p>
+
+</li>
+</ul>
+
+<p>Of all of these, the third is probably the single most important, since producing a test case generally makes the explanation much more concise and understandable, as well as making it much simpler to show that the bug has been fixed. As an incidental benefit, if the bug is in fact caused by some code outside of GD::Graph, it will become apparent while you are writing the test case, thereby saving time and confusion for all concerned.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Martien Verbruggen &lt;mgjv@tradingpost.com.au&gt;</p>
+
+<p>Current maintenance (including this release) by Benjamin Warfield &lt;bwarfield@cpan.org&gt;</p>
+
+<h2 id="Copyright">Copyright</h2>
+
+<pre><code> GIFgraph: Copyright (c) 1995-1999 Martien Verbruggen.
+ Chart::PNGgraph: Copyright (c) 1999 Steve Bonds.
+ GD::Graph: Copyright (c) 1999 Martien Verbruggen.</code></pre>
+
+<p>All rights reserved. This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h2 id="Acknowledgements">Acknowledgements</h2>
+
+<p>Thanks to Steve Bonds for releasing Chart::PNGgraph, and keeping the code alive when GD reached version 1.20, and I didn&#39;t have time to do something about it.</p>
+
+<p>Thanks to the following people for contributing code, or sending me fixes: Dave Belcher, Steve Bonds, Mike Bremford, Damon Brodie, Gary Deschaines, brian d foy, Edwin Hildebrand, Ari Jolma, Tim Meadowcroft, Honza Pazdziora, Scott Prahl, Ben Tilly, Vegard Vesterheim, Jeremy Wadsack.</p>
+
+<p>And some people whose real name I don&#39;t know, and whose email address I&#39;d rather not publicise without their consent.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/GD/Graph/FAQ.html">GD::Graph::FAQ</a>, <a href="../../lib/GD/Graph/Data.html">GD::Graph::Data</a>, <a href="../../lib/GD/Graph/Error.html">GD::Graph::Error</a>, <a href="../../lib/GD/Graph/colour.html">GD::Graph::colour</a></p>
+
+
+</body>
+
+</html>
+
+

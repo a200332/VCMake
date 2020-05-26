@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#DateTime::Locale-load-locale_code-locale_name">DateTime::Locale-&gt;load( $locale_code | $locale_name )</a></li>
+      <li><a href="#DateTime::Locale-codes">DateTime::Locale-&gt;codes</a></li>
+      <li><a href="#DateTime::Locale-names">DateTime::Locale-&gt;names</a></li>
+      <li><a href="#DateTime::Locale-native_names">DateTime::Locale-&gt;native_names</a></li>
+    </ul>
+  </li>
+  <li><a href="#LOADING-LOCALES-IN-A-PRE-FORKING-SYSTEM">LOADING LOCALES IN A PRE-FORKING SYSTEM</a></li>
+  <li><a href="#CLDR-DATA-BUGS">CLDR DATA BUGS</a></li>
+  <li><a href="#AUTHOR-EMERITUS">AUTHOR EMERITUS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Locale - Localization support for DateTime.pm</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.17</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">DateTime::Locale</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$loc</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">load</span><span class="operator">(</span><span class="string">'en-GB'</span><span class="operator">);</span>
+  
+  <span class="keyword">print</span> <span class="variable">$loc</span><span class="operator">-&gt;</span><span class="variable">native_name</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">,</span> <span class="variable">$loc</span><span class="operator">-&gt;</span><span class="variable">datetime_format_long</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+  
+  <span class="comment"># but mostly just things like ...</span>
+  
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">now</span><span class="operator">(</span> <span class="string">locale</span> <span class="operator">=&gt;</span> <span class="string">'fr'</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"Aujourd'hui le mois est "</span> <span class="operator">.</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">month_name</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DateTime::Locale is primarily a factory for the various locale subclasses. It also provides some functions for getting information on all the available locales.</p>
+
+<p>If you want to know what methods are available for locale objects, then please read the <code>DateTime::Locale::FromData</code> documentation.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>This module provides the following class methods:</p>
+
+<h2 id="DateTime::Locale-load-locale_code-locale_name">DateTime::Locale-&gt;load( $locale_code | $locale_name )</h2>
+
+<p>Returns the locale object for the specified locale code or name - see the <code>DateTime::Locale::Catalog</code> documentation for the list of available codes and names. The name provided may be either the English or native name.</p>
+
+<p>If the requested locale is not found, a fallback search takes place to find a suitable replacement.</p>
+
+<p>The fallback search order is:</p>
+
+<pre><code>  <span class="operator">{</span><span class="variable">language</span><span class="operator">}-</span><span class="operator">{</span><span class="string">script</span><span class="operator">}</span><span class="operator">-</span><span class="operator">{</span><span class="string">territory</span><span class="operator">}</span>
+  <span class="operator">{</span><span class="string">language</span><span class="operator">}</span><span class="operator">-</span><span class="operator">{</span><span class="string">script</span><span class="operator">}</span>
+  <span class="operator">{</span><span class="string">language</span><span class="operator">}</span><span class="operator">-</span><span class="operator">{</span><span class="string">territory</span><span class="operator">}</span><span class="operator">-</span><span class="operator">{</span><span class="string">variant</span><span class="operator">}</span>
+  <span class="operator">{</span><span class="string">language</span><span class="operator">}</span><span class="operator">-</span><span class="operator">{</span><span class="string">territory</span><span class="operator">}</span>
+  <span class="operator">{</span><span class="string">language</span><span class="operator">}</span>
+</code></pre>
+
+<p>Eg. For the locale code <code>es-XX-UNKNOWN</code> the fallback search would be:</p>
+
+<pre><code>  es-XX-UNKNOWN   # Fails - no such locale
+  es-XX           # Fails - no such locale
+  es              # Found - the es locale is returned as the
+                  # closest match to the requested id</code></pre>
+
+<p>Eg. For the locale code <code>es-Latn-XX</code> the fallback search would be:</p>
+
+<pre><code>  es-Latn-XX      # Fails - no such locale
+  es-Latn         # Fails - no such locale
+  es-XX           # Fails - no such locale
+  es              # Found - the es locale is returned as the
+                  # closest match to the requested id</code></pre>
+
+<p>If no suitable replacement is found, then an exception is thrown.</p>
+
+<p>The loaded locale is cached, so that <b>locale objects may be singletons</b>. Calling <code>DateTime::Locale-&gt;register()</code>, <code>DateTime::Locale-&gt;add_aliases()</code>, or <code>DateTime::Locale-&gt;remove_alias()</code> clears the cache.</p>
+
+<h2 id="DateTime::Locale-codes">DateTime::Locale-&gt;codes</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@codes</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">codes</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$codes</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">codes</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns an unsorted list of the available locale codes, or an array reference if called in a scalar context. This list does not include aliases.</p>
+
+<h2 id="DateTime::Locale-names">DateTime::Locale-&gt;names</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@names</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">names</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$names</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">names</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns an unsorted list of the available locale names in English, or an array reference if called in a scalar context.</p>
+
+<h2 id="DateTime::Locale-native_names">DateTime::Locale-&gt;native_names</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@names</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">native_names</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$names</span> <span class="operator">=</span> <span class="variable">DateTime::Locale</span><span class="operator">-&gt;</span><span class="variable">native_names</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns an unsorted list of the available locale names in their native language, or an array reference if called in a scalar context. All native names use UTF-8 as appropriate.</p>
+
+<h1 id="LOADING-LOCALES-IN-A-PRE-FORKING-SYSTEM">LOADING LOCALES IN A PRE-FORKING SYSTEM</h1>
+
+<p>If you are running an application that does pre-forking (for example with Starman), then you should try to load all the locales that you&#39;ll need in the parent process. Locales are loaded on-demand, so loading them once in each child will waste memory that could otherwise be shared.</p>
+
+<h1 id="CLDR-DATA-BUGS">CLDR DATA BUGS</h1>
+
+<p>Please be aware that all locale data has been generated from the CLDR (Common Locale Data Repository) project locales data). The data is incomplete, and may contain errors in some locales.</p>
+
+<p>When reporting errors in data, please check the primary data sources first, then where necessary report errors directly to the primary source via the CLDR bug report system. See http://unicode.org/cldr/filing_bug_reports.html for details.</p>
+
+<p>Once these errors have been confirmed, please forward the error report and corrections to the DateTime mailing list, datetime@perl.org.</p>
+
+<h1 id="AUTHOR-EMERITUS">AUTHOR EMERITUS</h1>
+
+<p>Richard Evans wrote the first version of DateTime::Locale, including the tools to extract the CLDR data.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/DateTime/Locale/Base.html">DateTime::Locale::Base</a></p>
+
+<p>datetime@perl.org mailing list</p>
+
+<p>http://datetime.perl.org/</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/DateTime-Locale/issues">https://github.com/houseabsolute/DateTime-Locale/issues</a>.</p>
+
+<p>There is a mailing list available for users of this distribution, <a href="mailto:datetime@perl.org">mailto:datetime@perl.org</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for DateTime-Locale can be found at <a href="https://github.com/houseabsolute/DateTime-Locale">https://github.com/houseabsolute/DateTime-Locale</a>.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Mohammad S Anwar &lt;mohammad.anwar@yahoo.com&gt;</p>
+
+</li>
+<li><p>Sergey Leschenko &lt;Sergey.Leschenko@portaone.com&gt;</p>
+
+</li>
+<li><p>yasu47b &lt;nakayamayasuhiro1986@gmail.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2003 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,585 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ARCHITECTURE">ARCHITECTURE</a>
+    <ul>
+      <li><a href="#Classes">Classes</a></li>
+      <li><a href="#Methods">Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#TABLE-METHODS">TABLE METHODS</a>
+    <ul>
+      <li><a href="#Class-methods-for-registering-the-module">Class methods for registering the module</a>
+        <ul>
+          <li><a href="#CREATE_MODULE">CREATE_MODULE</a></li>
+          <li><a href="#DESTROY_MODULE">DESTROY_MODULE</a></li>
+        </ul>
+      </li>
+      <li><a href="#Class-methods-for-creating-a-vtable-instance">Class methods for creating a vtable instance</a>
+        <ul>
+          <li><a href="#CREATE">CREATE</a></li>
+          <li><a href="#CONNECT">CONNECT</a></li>
+          <li><a href="#PREPARE_SELF">_PREPARE_SELF</a></li>
+          <li><a href="#NEW">NEW</a></li>
+        </ul>
+      </li>
+      <li><a href="#Instance-methods-called-from-the-sqlite-kernel">Instance methods called from the sqlite kernel</a>
+        <ul>
+          <li><a href="#DROP">DROP</a></li>
+          <li><a href="#DISCONNECT">DISCONNECT</a></li>
+          <li><a href="#VTAB_TO_DECLARE">VTAB_TO_DECLARE</a></li>
+          <li><a href="#BEST_INDEX">BEST_INDEX</a>
+            <ul>
+              <li><a href="#Input-constraints">Input constraints</a></li>
+              <li><a href="#order_by-input-information">&quot;order_by&quot; input information</a></li>
+              <li><a href="#Hashref-information-returned-by-BEST_INDEX">Hashref information returned by BEST_INDEX</a></li>
+            </ul>
+          </li>
+          <li><a href="#OPEN">OPEN</a></li>
+          <li><a href="#SQLITE_UPDATE">_SQLITE_UPDATE</a></li>
+          <li><a href="#INSERT">INSERT</a></li>
+          <li><a href="#DELETE">DELETE</a></li>
+          <li><a href="#UPDATE">UPDATE</a></li>
+          <li><a href="#FIND_FUNCTION">FIND_FUNCTION</a></li>
+          <li><a href="#BEGIN_TRANSACTION">BEGIN_TRANSACTION</a></li>
+          <li><a href="#SYNC_TRANSACTION">SYNC_TRANSACTION</a></li>
+          <li><a href="#SYNC_TRANSACTION1">SYNC_TRANSACTION</a></li>
+          <li><a href="#ROLLBACK_TRANSACTION">ROLLBACK_TRANSACTION</a></li>
+          <li><a href="#RENAME">RENAME</a></li>
+          <li><a href="#SAVEPOINT">SAVEPOINT</a></li>
+          <li><a href="#ROLLBACK_TO">ROLLBACK_TO</a></li>
+          <li><a href="#RELEASE">RELEASE</a></li>
+        </ul>
+      </li>
+      <li><a href="#Utility-instance-methods">Utility instance methods</a>
+        <ul>
+          <li><a href="#dbh">dbh</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#CURSOR-METHODS">CURSOR METHODS</a>
+    <ul>
+      <li><a href="#Class-methods">Class methods</a>
+        <ul>
+          <li><a href="#NEW1">NEW</a></li>
+        </ul>
+      </li>
+      <li><a href="#Instance-methods">Instance methods</a>
+        <ul>
+          <li><a href="#FILTER">FILTER</a></li>
+          <li><a href="#EOF">EOF</a></li>
+          <li><a href="#NEXT">NEXT</a></li>
+          <li><a href="#COLUMN">COLUMN</a></li>
+          <li><a href="#ROWID">ROWID</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::SQLite::VirtualTable -- SQLite virtual tables implemented in Perl</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># register the virtual table module within sqlite</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">sqlite_create_module</span><span class="operator">(</span><span class="string">mod_name</span> <span class="operator">=&gt;</span> <span class="string">"DBD::SQLite::VirtualTable::Subclass"</span><span class="operator">);</span>
+  
+  <span class="comment"># create a virtual table</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(</span><span class="string">"CREATE VIRTUAL TABLE vtbl USING mod_name(arg1, arg2, ...)"</span><span class="operator">)</span>
+  
+  <span class="comment"># use it as any regular table</span>
+  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(</span><span class="string">"SELECT * FROM vtbl WHERE ..."</span><span class="operator">);</span>
+</code></pre>
+
+<p><b>Note</b> : VirtualTable subclasses or instances are not called directly from Perl code; everything happens indirectly through SQL statements within SQLite.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is an abstract class for implementing SQLite virtual tables, written in Perl. Such tables look like regular tables, and are accessed through regular SQL instructions and regular <a href="../../../lib/DBI.html">DBI</a> API; but the implementation is done through hidden calls to a Perl class. This is the same idea as Perl&#39;s <a href="../../../lib/pods/perltie.html">tied variables</a>, but at the SQLite level.</p>
+
+<p>The current abstract class cannot be used directly, so the synopsis above is just to give a general idea. Concrete, usable classes bundled with the present distribution are :</p>
+
+<ul>
+
+<li><p><a href="../../../lib/DBD/SQLite/VirtualTable/FileContent.html">DBD::SQLite::VirtualTable::FileContent</a> : implements a virtual column that exposes file contents. This is especially useful in conjunction with a fulltext index; see <a href="../../../lib/DBD/SQLite/Fulltext_search.html">DBD::SQLite::Fulltext_search</a>.</p>
+
+</li>
+<li><p><a href="../../../lib/DBD/SQLite/VirtualTable/PerlData.html">DBD::SQLite::VirtualTable::PerlData</a> : binds to a Perl array within the Perl program. This can be used for simple import/export operations, for debugging purposes, for joining data from different sources, etc.</p>
+
+</li>
+</ul>
+
+<p>Other Perl virtual tables may also be published separately on CPAN.</p>
+
+<p>The following chapters document the structure of the abstract class and explain how to write new subclasses; this is meant for <b>module authors</b>, not for end users. If you just need to use a virtual table module, refer to that module&#39;s documentation.</p>
+
+<h1 id="ARCHITECTURE">ARCHITECTURE</h1>
+
+<h2 id="Classes">Classes</h2>
+
+<p>A virtual table module for SQLite is implemented through a pair of classes :</p>
+
+<ul>
+
+<li><p>the <b>table</b> class implements methods for creating or connecting a virtual table, for destroying it, for opening new searches, etc.</p>
+
+</li>
+<li><p>the <b>cursor</b> class implements methods for performing a specific SQL statement</p>
+
+</li>
+</ul>
+
+<h2 id="Methods">Methods</h2>
+
+<p>Most methods in both classes are not called directly from Perl code : instead, they are callbacks, called from the sqlite kernel. Following common Perl conventions, such methods have names in uppercase.</p>
+
+<h1 id="TABLE-METHODS">TABLE METHODS</h1>
+
+<h2 id="Class-methods-for-registering-the-module">Class methods for registering the module</h2>
+
+<h3 id="CREATE_MODULE">CREATE_MODULE</h3>
+
+<pre><code>  <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">CREATE_MODULE</span><span class="operator">(</span><span class="variable">$sqlite_module_name</span><span class="operator">);</span>
+</code></pre>
+
+<p>Called when the client code invokes</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">sqlite_create_module</span><span class="operator">(</span><span class="variable">$sqlite_module_name</span> <span class="operator">=&gt;</span> <span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>The default implementation is empty.</p>
+
+<h3 id="DESTROY_MODULE">DESTROY_MODULE</h3>
+
+<pre><code>  <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">DESTROY_MODULE</span><span class="operator">();</span>
+</code></pre>
+
+<p>Called automatically when the database handle is disconnected. The default implementation is empty.</p>
+
+<h2 id="Class-methods-for-creating-a-vtable-instance">Class methods for creating a vtable instance</h2>
+
+<h3 id="CREATE">CREATE</h3>
+
+<pre><code>  <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">CREATE</span><span class="operator">(</span><span class="variable">$dbh_ref</span><span class="operator">,</span> <span class="variable">$module_name</span><span class="operator">,</span> <span class="variable">$db_name</span><span class="operator">,</span> <span class="variable">$vtab_name</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">);</span>
+</code></pre>
+
+<p>Called when sqlite receives a statement</p>
+
+<pre><code>  CREATE VIRTUAL TABLE $db_name.$vtab_name USING $module_name(@args)</code></pre>
+
+<p>The default implementation just calls <a href="#NEW">&quot;NEW&quot;</a>.</p>
+
+<h3 id="CONNECT">CONNECT</h3>
+
+<pre><code>  <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">CONNECT</span><span class="operator">(</span><span class="variable">$dbh_ref</span><span class="operator">,</span> <span class="variable">$module_name</span><span class="operator">,</span> <span class="variable">$db_name</span><span class="operator">,</span> <span class="variable">$vtab_name</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">);</span>
+</code></pre>
+
+<p>Called when attempting to access a virtual table that had been created during previous database connection. The creation arguments were stored within the sqlite database and are passed again to the CONNECT method.</p>
+
+<p>The default implementation just calls <a href="#NEW">&quot;NEW&quot;</a>.</p>
+
+<h3 id="PREPARE_SELF">_PREPARE_SELF</h3>
+
+<pre><code>  <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">_PREPARE_SELF</span><span class="operator">(</span><span class="variable">$dbh_ref</span><span class="operator">,</span> <span class="variable">$module_name</span><span class="operator">,</span> <span class="variable">$db_name</span><span class="operator">,</span> <span class="variable">$vtab_name</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">);</span>
+</code></pre>
+
+<p>Prepares the datastructure for a virtual table instance. <code>@args</code> is just the collection of strings (comma-separated) that were given within the <code>CREATE VIRTUAL TABLE</code> statement; each subclass should decide what to do with this information,</p>
+
+<p>The method parses <code>@args</code> to differentiate between <i>options</i> (strings of shape <code>$key</code>=<code>$value</code> or <code>$key</code>=<code>&quot;$value&quot;</code>, stored in <code><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">options</span><span class="operator">}</span>
+</code>), and <i>columns</i> (other <code>@args</code>, stored in <code><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">columns</span><span class="operator">}</span>
+</code>). It creates a hashref with the following fields :</p>
+
+<dl>
+
+<dt id="dbh_ref"><code>dbh_ref</code></dt>
+<dd>
+
+<p>a weak reference to the <code>$dbh</code> database handle (see <a href="../../../lib/Scalar/Util.html">Scalar::Util</a> for an explanation of weak references).</p>
+
+</dd>
+<dt id="module_name"><code>module_name</code></dt>
+<dd>
+
+<p>name of the module as declared to sqlite (not to be confounded with the Perl class name).</p>
+
+</dd>
+<dt id="db_name"><code>db_name</code></dt>
+<dd>
+
+<p>name of the database (usuallly <code>&#39;main&#39;</code> or <code>&#39;temp&#39;</code>), but it may also be an attached database</p>
+
+</dd>
+<dt id="vtab_name"><code>vtab_name</code></dt>
+<dd>
+
+<p>name of the virtual table</p>
+
+</dd>
+<dt id="columns"><code>columns</code></dt>
+<dd>
+
+<p>arrayref of column declarations</p>
+
+</dd>
+<dt id="options"><code>options</code></dt>
+<dd>
+
+<p>hashref of option declarations</p>
+
+</dd>
+</dl>
+
+<p>This method should not be redefined, since it performs general work which is supposed to be useful for all subclasses. Instead, subclasses may override the <a href="#NEW">&quot;NEW&quot;</a> method.</p>
+
+<h3 id="NEW">NEW</h3>
+
+<pre><code>  <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">NEW</span><span class="operator">(</span><span class="variable">$dbh_ref</span><span class="operator">,</span> <span class="variable">$module_name</span><span class="operator">,</span> <span class="variable">$db_name</span><span class="operator">,</span> <span class="variable">$vtab_name</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">);</span>
+</code></pre>
+
+<p>Instantiates a virtual table.</p>
+
+<h2 id="Instance-methods-called-from-the-sqlite-kernel">Instance methods called from the sqlite kernel</h2>
+
+<h3 id="DROP">DROP</h3>
+
+<p>Called whenever a virtual table is destroyed from the database through the <code>DROP TABLE</code> SQL instruction.</p>
+
+<p>Just after the <code>DROP()</code> call, the Perl instance will be destroyed (and will therefore automatically call the <code>DESTROY()</code> method if such a method is present).</p>
+
+<p>The default implementation for DROP is empty.</p>
+
+<p><b>Note</b> : this corresponds to the <code>xDestroy</code> method in the SQLite documentation; here it was not named <code>DESTROY</code>, to avoid any confusion with the standard Perl method <code>DESTROY</code> for object destruction.</p>
+
+<h3 id="DISCONNECT">DISCONNECT</h3>
+
+<p>Called for every virtual table just before the database handle is disconnected.</p>
+
+<p>Just after the <code>DISCONNECT()</code> call, the Perl instance will be destroyed (and will therefore automatically call the <code>DESTROY()</code> method if such a method is present).</p>
+
+<p>The default implementation for DISCONNECT is empty.</p>
+
+<h3 id="VTAB_TO_DECLARE">VTAB_TO_DECLARE</h3>
+
+<p>This method is called automatically just after <a href="#CREATE">&quot;CREATE&quot;</a> or <a href="#CONNECT">&quot;CONNECT&quot;</a>, to register the columns of the virtual table within the sqlite kernel. The method should return a string containing a SQL <code>CREATE TABLE</code> statement; but only the column declaration parts will be considered. Columns may be declared with the special keyword &quot;HIDDEN&quot;, which means that they are used internally for the the virtual table implementation, and are not visible to users -- see <a href="http://sqlite.org/c3ref/declare_vtab.html">http://sqlite.org/c3ref/declare_vtab.html</a> and <a href="http://www.sqlite.org/vtab.html#hiddencol">http://www.sqlite.org/vtab.html#hiddencol</a> for detailed explanations.</p>
+
+<p>The default implementation returns:</p>
+
+<pre><code>  <span class="variable">CREATE</span> <span class="variable">TABLE</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">vtab_name</span><span class="operator">}</span><span class="operator">(</span><span class="variable">@</span><span class="operator">{</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">columns</span><span class="operator">}}</span><span class="operator">)</span>
+</code></pre>
+
+<h3 id="BEST_INDEX">BEST_INDEX</h3>
+
+<pre><code>  my $index_info = $vtab-&gt;BEST_INDEX($constraints, $order_by)</code></pre>
+
+<p>This is the most complex method to redefined in subclasses. This method will be called at the beginning of a new query on the virtual table; the job of the method is to assemble some information that will be used</p>
+
+<dl>
+
+<dt id="a">a)</dt>
+<dd>
+
+<p>by the sqlite kernel to decide about the best search strategy</p>
+
+</dd>
+<dt id="b">b)</dt>
+<dd>
+
+<p>by the cursor <a href="#FILTER">&quot;FILTER&quot;</a> method to produce the desired subset of rows from the virtual table.</p>
+
+</dd>
+</dl>
+
+<p>By calling this method, the SQLite core is saying to the virtual table that it needs to access some subset of the rows in the virtual table and it wants to know the most efficient way to do that access. The <code>BEST_INDEX</code> method replies with information that the SQLite core can then use to conduct an efficient search of the virtual table.</p>
+
+<p>The method takes as input a list of <code>$constraints</code> and a list of <code>$order_by</code> instructions. It returns a hashref of indexing properties, described below; furthermore, the method also adds supplementary information within the input <code>$constraints</code>. Detailed explanations are given in <a href="http://sqlite.org/vtab.html#xbestindex">http://sqlite.org/vtab.html#xbestindex</a>.</p>
+
+<h4 id="Input-constraints">Input constraints</h4>
+
+<p>Elements of the <code>$constraints</code> arrayref correspond to specific clauses of the <code>WHERE ...</code> part of the SQL query. Each constraint is a hashref with keys :</p>
+
+<dl>
+
+<dt id="col"><code>col</code></dt>
+<dd>
+
+<p>the integer index of the column on the left-hand side of the constraint</p>
+
+</dd>
+<dt id="op"><code>op</code></dt>
+<dd>
+
+<p>the comparison operator, expressed as string containing <code>&#39;=&#39;</code>, <code>&#39;&gt;&#39;</code>, <code>&#39;&gt;=&#39;</code>, <code>&#39;&lt;&#39;</code>, <code>&#39;&lt;=&#39;</code> or <code>&#39;MATCH&#39;</code>.</p>
+
+</dd>
+<dt id="usable"><code>usable</code></dt>
+<dd>
+
+<p>a boolean indicating if that constraint is usable; some constraints might not be usable because of the way tables are ordered in a join.</p>
+
+</dd>
+</dl>
+
+<p>The <code>$constraints</code> arrayref is used both for input and for output. While iterating over the array, the method should add the following keys into usable constraints :</p>
+
+<dl>
+
+<dt id="argvIndex"><code>argvIndex</code></dt>
+<dd>
+
+<p>An index into the <code>@values</code> array that will be passed to the cursor&#39;s <a href="#FILTER">&quot;FILTER&quot;</a> method. In other words, if the current constraint corresponds to the SQL fragment <code>WHERE ... AND foo &lt; 123 ...</code>, and the corresponding <code>argvIndex</code> takes value 5, this means that the <code>FILTER</code> method will receive <code>123</code> in <code>$values[5]</code>.</p>
+
+</dd>
+<dt id="omit"><code>omit</code></dt>
+<dd>
+
+<p>A boolean telling to the sqlite core that it can safely omit to double check that constraint before returning the resultset to the calling program; this means that the FILTER method has fulfilled the filtering job on that constraint and there is no need to do any further checking.</p>
+
+</dd>
+</dl>
+
+<p>The <code>BEST_INDEX</code> method will not necessarily receive all constraints from the SQL <code>WHERE</code> clause : for example a constraint like <code>col1 &lt; col2 + col3</code> cannot be handled at this level. Furthemore, the <code>BEST_INDEX</code> might decide to ignore some of the received constraints. This is why a second pass over the results will be performed by the sqlite core.</p>
+
+<h4 id="order_by-input-information">&quot;order_by&quot; input information</h4>
+
+<p>The <code>$order_by</code> arrayref corresponds to the <code>ORDER BY</code> clauses in the SQL query. Each entry is a hashref with keys :</p>
+
+<dl>
+
+<dt id="col1"><code>col</code></dt>
+<dd>
+
+<p>the integer index of the column being ordered</p>
+
+</dd>
+<dt id="desc"><code>desc</code></dt>
+<dd>
+
+<p>a boolean telling of the ordering is DESCending or ascending</p>
+
+</dd>
+</dl>
+
+<p>This information could be used by some subclasses for optimizing the query strategfy; but usually the sqlite core will perform another sorting pass once all results are gathered.</p>
+
+<h4 id="Hashref-information-returned-by-BEST_INDEX">Hashref information returned by BEST_INDEX</h4>
+
+<p>The method should return a hashref with the following keys :</p>
+
+<dl>
+
+<dt id="idxNum"><code>idxNum</code></dt>
+<dd>
+
+<p>An arbitrary integer associated with that index; this information will be passed back to <a href="#FILTER">&quot;FILTER&quot;</a>.</p>
+
+</dd>
+<dt id="idxStr"><code>idxStr</code></dt>
+<dd>
+
+<p>An arbitrary str associated with that index; this information will be passed back to <a href="#FILTER">&quot;FILTER&quot;</a>.</p>
+
+</dd>
+<dt id="orderByConsumed"><code>orderByConsumed</code></dt>
+<dd>
+
+<p>A boolean telling the sqlite core if the <code>$order_by</code> information has been taken into account or not.</p>
+
+</dd>
+<dt id="estimatedCost"><code>estimatedCost</code></dt>
+<dd>
+
+<p>A float that should be set to the estimated number of disk access operations required to execute this query against the virtual table. The SQLite core will often call BEST_INDEX multiple times with different constraints, obtain multiple cost estimates, then choose the query plan that gives the lowest estimate.</p>
+
+</dd>
+<dt id="estimatedRows"><code>estimatedRows</code></dt>
+<dd>
+
+<p>An integer giving the estimated number of rows returned by that query.</p>
+
+</dd>
+</dl>
+
+<h3 id="OPEN">OPEN</h3>
+
+<p>Called to instantiate a new cursor. The default implementation appends <code>&quot;::Cursor&quot;</code> to the current classname and calls <code>NEW()</code> within that cursor class.</p>
+
+<h3 id="SQLITE_UPDATE">_SQLITE_UPDATE</h3>
+
+<p>This is the dispatch method implementing the <code>xUpdate()</code> callback for virtual tables. The default implementation applies the algorithm described in <a href="http://sqlite.org/vtab.html#xupdate">http://sqlite.org/vtab.html#xupdate</a> to decide to call <a href="#INSERT">&quot;INSERT&quot;</a>, <a href="#DELETE">&quot;DELETE&quot;</a> or <a href="#UPDATE">&quot;UPDATE&quot;</a>; so there is no reason to override this method in subclasses.</p>
+
+<h3 id="INSERT">INSERT</h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$rowid</span> <span class="operator">=</span> <span class="variable">$vtab</span><span class="operator">-&gt;</span><span class="variable">INSERT</span><span class="operator">(</span><span class="variable">$new_rowid</span><span class="operator">,</span> <span class="variable">@values</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method should be overridden in subclasses to implement insertion of a new row into the virtual table. The size of the <code>@values</code> array corresponds to the number of columns declared through <a href="#VTAB_TO_DECLARE">&quot;VTAB_TO_DECLARE&quot;</a>. The <code>$new_rowid</code> may be explicitly given, or it may be <code>undef</code>, in which case the method must compute a new id and return it as the result of the method call.</p>
+
+<h3 id="DELETE">DELETE</h3>
+
+<pre><code>  <span class="variable">$vtab</span><span class="operator">-&gt;</span><span class="variable">INSERT</span><span class="operator">(</span><span class="variable">$old_rowid</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method should be overridden in subclasses to implement deletion of a row from the virtual table.</p>
+
+<h3 id="UPDATE">UPDATE</h3>
+
+<pre><code>  <span class="variable">$vtab</span><span class="operator">-&gt;</span><span class="variable">UPDATE</span><span class="operator">(</span><span class="variable">$old_rowid</span><span class="operator">,</span> <span class="variable">$new_rowid</span><span class="operator">,</span> <span class="variable">@values</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method should be overridden in subclasses to implement a row update within the virtual table. Usually <code>$old_rowid</code> is equal to <code>$new_rowid</code>, which is a regular update; however, the rowid could be changed from a SQL statement such as</p>
+
+<pre><code>  <span class="variable">UPDATE</span> <span class="variable">table</span> <span class="variable">SET</span> <span class="variable">rowid</span><span class="operator">=</span><span class="variable">rowid</span><span class="operator">+</span><span class="number">1</span> <span class="variable">WHERE</span> <span class="operator">...;</span> 
+</code></pre>
+
+<h3 id="FIND_FUNCTION">FIND_FUNCTION</h3>
+
+<pre><code>  <span class="variable">$vtab</span><span class="operator">-&gt;</span><span class="variable">FIND_FUNCTION</span><span class="operator">(</span><span class="variable">$num_args</span><span class="operator">,</span> <span class="variable">$func_name</span><span class="operator">);</span>
+</code></pre>
+
+<p>When a function uses a column from a virtual table as its first argument, this method is called to see if the virtual table would like to overload the function. Parameters are the number of arguments to the function, and the name of the function. If no overloading is desired, this method should return false. To overload the function, this method should return a coderef to the function implementation.</p>
+
+<p>Each virtual table keeps a cache of results from <a>FIND_FUNCTION</a> calls, so the method will be called only once for each pair <code>($num_args, $func_name)</code>.</p>
+
+<h3 id="BEGIN_TRANSACTION">BEGIN_TRANSACTION</h3>
+
+<p>Called to begin a transaction on the virtual table.</p>
+
+<h3 id="SYNC_TRANSACTION">SYNC_TRANSACTION</h3>
+
+<p>Called to signal the start of a two-phase commit on the virtual table.</p>
+
+<h3 id="SYNC_TRANSACTION1">SYNC_TRANSACTION</h3>
+
+<p>Called to commit a virtual table transaction.</p>
+
+<h3 id="ROLLBACK_TRANSACTION">ROLLBACK_TRANSACTION</h3>
+
+<p>Called to rollback a virtual table transaction.</p>
+
+<h3 id="RENAME">RENAME</h3>
+
+<pre><code>  $vtab-&gt;RENAME($new_name)</code></pre>
+
+<p>Called to rename a virtual table.</p>
+
+<h3 id="SAVEPOINT">SAVEPOINT</h3>
+
+<pre><code>  $vtab-&gt;SAVEPOINT($savepoint)</code></pre>
+
+<p>Called to signal the virtual table to save its current state at savepoint <code>$savepoint</code> (an integer).</p>
+
+<h3 id="ROLLBACK_TO">ROLLBACK_TO</h3>
+
+<pre><code>  $vtab-&gt;ROLLBACK_TO($savepoint)</code></pre>
+
+<p>Called to signal the virtual table to return to the state <code>$savepoint</code>. This will invalidate all savepoints with values greater than <code>$savepoint</code>.</p>
+
+<h3 id="RELEASE">RELEASE</h3>
+
+<pre><code>  $vtab-&gt;RELEASE($savepoint)</code></pre>
+
+<p>Called to invalidate all savepoints with values greater or equal to <code>$savepoint</code>.</p>
+
+<h2 id="Utility-instance-methods">Utility instance methods</h2>
+
+<p>Methods in this section are in lower case, because they are not called directly from the sqlite kernel; these are utility methods to be called from other methods described above.</p>
+
+<h3 id="dbh">dbh</h3>
+
+<p>This method returns the database handle (<code>$dbh</code>) associated with the current virtual table.</p>
+
+<h1 id="CURSOR-METHODS">CURSOR METHODS</h1>
+
+<h2 id="Class-methods">Class methods</h2>
+
+<h3 id="NEW1">NEW</h3>
+
+<pre><code>  my $cursor = $cursor_class-&gt;NEW($vtable, @args)</code></pre>
+
+<p>Instantiates a new cursor. The default implementation just returns a blessed hashref with keys <code>vtable</code> and <code>args</code>.</p>
+
+<h2 id="Instance-methods">Instance methods</h2>
+
+<h3 id="FILTER">FILTER</h3>
+
+<pre><code>  <span class="variable">$cursor</span><span class="operator">-&gt;</span><span class="variable">FILTER</span><span class="operator">(</span><span class="variable">$idxNum</span><span class="operator">,</span> <span class="variable">$idxStr</span><span class="operator">,</span> <span class="variable">@values</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method begins a search of a virtual table.</p>
+
+<p>The <code>$idxNum</code> and <code>$idxStr</code> arguments correspond to values returned by <a href="#BEST_INDEX">&quot;BEST_INDEX&quot;</a> for the chosen index. The specific meanings of those values are unimportant to SQLite, as long as <code>BEST_INDEX</code> and <code>FILTER</code> agree on what that meaning is.</p>
+
+<p>The <code>BEST_INDEX</code> method may have requested the values of certain expressions using the <code>argvIndex</code> values of the <code>$constraints</code> list. Those values are passed to <code>FILTER</code> through the <code>@values</code> array.</p>
+
+<p>If the virtual table contains one or more rows that match the search criteria, then the cursor must be left point at the first row. Subsequent calls to <a href="#EOF">&quot;EOF&quot;</a> must return false. If there are no rows match, then the cursor must be left in a state that will cause <a href="#EOF">&quot;EOF&quot;</a> to return true. The SQLite engine will use the <a href="#COLUMN">&quot;COLUMN&quot;</a> and <a href="#ROWID">&quot;ROWID&quot;</a> methods to access that row content. The <a href="#NEXT">&quot;NEXT&quot;</a> method will be used to advance to the next row.</p>
+
+<h3 id="EOF">EOF</h3>
+
+<p>This method must return false if the cursor currently points to a valid row of data, or true otherwise. This method is called by the SQL engine immediately after each <a href="#FILTER">&quot;FILTER&quot;</a> and <a href="#NEXT">&quot;NEXT&quot;</a> invocation.</p>
+
+<h3 id="NEXT">NEXT</h3>
+
+<p>This method advances the cursor to the next row of a result set initiated by <a href="#FILTER">&quot;FILTER&quot;</a>. If the cursor is already pointing at the last row when this method is called, then the cursor no longer points to valid data and a subsequent call to the <a href="#EOF">&quot;EOF&quot;</a> method must return true. If the cursor is successfully advanced to another row of content, then subsequent calls to <a href="#EOF">&quot;EOF&quot;</a> must return false.</p>
+
+<h3 id="COLUMN">COLUMN</h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">=</span> <span class="variable">$cursor</span><span class="operator">-&gt;</span><span class="variable">COLUMN</span><span class="operator">(</span><span class="variable">$idxCol</span><span class="operator">);</span>
+</code></pre>
+
+<p>The SQLite core invokes this method in order to find the value for the N-th column of the current row. N is zero-based so the first column is numbered 0.</p>
+
+<h3 id="ROWID">ROWID</h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">=</span> <span class="variable">$cursor</span><span class="operator">-&gt;</span><span class="variable">ROWID</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns the <i>rowid</i> of row that the cursor is currently pointing at.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/DBD/SQLite/VirtualTable.html">SQLite::VirtualTable</a> is another module for virtual tables written in Perl, but designed for the reverse use case : instead of starting a Perl program, and embedding the SQLite library into it, the intended use is to start an sqlite program, and embed the Perl interpreter into it.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Laurent Dami &lt;dami@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright Laurent Dami, 2014.</p>
+
+<p>Parts of the code are borrowed from <a href="../../../lib/DBD/SQLite/VirtualTable.html">SQLite::VirtualTable</a>, copyright (C) 2006, 2009 by Qindel Formacion y Servicios, S. L.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

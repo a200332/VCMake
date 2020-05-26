@@ -1,0 +1,391 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#DEFAULT-TYPE">DEFAULT TYPE</a></li>
+  <li><a href="#PROVIDED-METHODS">PROVIDED METHODS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Meta::Attribute::Native::Trait::Array - Helper trait for ArrayRef attributes</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Stuff</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    
+    <span class="variable">has</span> <span class="string">'options'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">traits</span>  <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Array'</span><span class="operator">]</span><span class="operator">,</span>
+        <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+        <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'ArrayRef[Str]'</span><span class="operator">,</span>
+        <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[]</span> <span class="operator">},</span>
+        <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">all_options</span>    <span class="operator">=&gt;</span> <span class="string">'elements'</span><span class="operator">,</span>
+            <span class="string">add_option</span>     <span class="operator">=&gt;</span> <span class="string">'push'</span><span class="operator">,</span>
+            <span class="string">map_options</span>    <span class="operator">=&gt;</span> <span class="string">'map'</span><span class="operator">,</span>
+            <span class="string">filter_options</span> <span class="operator">=&gt;</span> <span class="string">'grep'</span><span class="operator">,</span>
+            <span class="string">find_option</span>    <span class="operator">=&gt;</span> <span class="string">'first'</span><span class="operator">,</span>
+            <span class="string">get_option</span>     <span class="operator">=&gt;</span> <span class="string">'get'</span><span class="operator">,</span>
+            <span class="string">join_options</span>   <span class="operator">=&gt;</span> <span class="string">'join'</span><span class="operator">,</span>
+            <span class="string">count_options</span>  <span class="operator">=&gt;</span> <span class="string">'count'</span><span class="operator">,</span>
+            <span class="string">has_options</span>    <span class="operator">=&gt;</span> <span class="string">'count'</span><span class="operator">,</span>
+            <span class="string">has_no_options</span> <span class="operator">=&gt;</span> <span class="string">'is_empty'</span><span class="operator">,</span>
+            <span class="string">sorted_options</span> <span class="operator">=&gt;</span> <span class="string">'sort'</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">no</span> <span class="variable">Moose</span><span class="operator">;</span>
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This trait provides native delegation methods for array references.</p>
+
+<h1 id="DEFAULT-TYPE">DEFAULT TYPE</h1>
+
+<p>If you don&#39;t provide an <code>isa</code> value for your attribute, it will default to <code>ArrayRef</code>.</p>
+
+<h1 id="PROVIDED-METHODS">PROVIDED METHODS</h1>
+
+<ul>
+
+<li><p><b>count</b></p>
+
+<p>Returns the number of elements in the array.</p>
+
+<pre><code>  <span class="variable">$stuff</span> <span class="operator">=</span> <span class="variable">Stuff</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">options</span><span class="operator">(</span> <span class="operator">[</span> <span class="string">"foo"</span><span class="operator">,</span> <span class="string">"bar"</span><span class="operator">,</span> <span class="string">"baz"</span><span class="operator">,</span> <span class="string">"boo"</span> <span class="operator">]</span> <span class="operator">);</span>
+  
+  <span class="keyword">print</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">count_options</span><span class="operator">;</span> <span class="comment"># prints 4</span>
+</code></pre>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>is_empty</b></p>
+
+<p>Returns a boolean value that is true when the array has no elements.</p>
+
+<pre><code>  <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">has_no_options</span> <span class="operator">?</span> <span class="keyword">die</span> <span class="string">"No options!\n"</span> <span class="operator">:</span> <span class="keyword">print</span> <span class="string">"Good boy.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>elements</b></p>
+
+<p>Returns all of the elements of the array as an array (not an array reference).</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@option</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">all_options</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">@options</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "foo bar baz boo"</span>
+</code></pre>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>get($index)</b></p>
+
+<p>Returns an element of the array by its index. You can also use negative index numbers, just as with Perl&#39;s core array handling.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$option</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">get_option</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">$option</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "bar"</span>
+</code></pre>
+
+<p>If the specified element does not exist, this will return <code>undef</code>.</p>
+
+<p>This method accepts just one argument.</p>
+
+</li>
+<li><p><b>pop</b></p>
+
+<p>Just like Perl&#39;s builtin <code>pop</code>.</p>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>push($value1, $value2, value3 ...)</b></p>
+
+<p>Just like Perl&#39;s builtin <code>push</code>. Returns the number of elements in the new array.</p>
+
+<p>This method accepts any number of arguments.</p>
+
+</li>
+<li><p><b>shift</b></p>
+
+<p>Just like Perl&#39;s builtin <code>shift</code>.</p>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>unshift($value1, $value2, value3 ...)</b></p>
+
+<p>Just like Perl&#39;s builtin <code>unshift</code>. Returns the number of elements in the new array.</p>
+
+<p>This method accepts any number of arguments.</p>
+
+</li>
+<li><p><b>splice($offset, $length, @values)</b></p>
+
+<p>Just like Perl&#39;s builtin <code>splice</code>. In scalar context, this returns the last element removed, or <code>undef</code> if no elements were removed. In list context, this returns all the elements removed from the array.</p>
+
+<p>This method requires at least one argument.</p>
+
+</li>
+<li><p><b>first( sub { ... } )</b></p>
+
+<p>This method returns the first matching item in the array, just like <a href="../../../../../../lib/List/Util.html">List::Util</a>&#39;s <code>first</code> function. The matching is done with a subroutine reference you pass to this method. The subroutine will be called against each element in the array until one matches or all elements have been checked. Each list element will be available to the sub in <code>$_</code>.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$found</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">find_option</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{/^</span><span class="variable">b</span><span class="operator">/}</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">$found</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "bar"</span>
+</code></pre>
+
+<p>This method requires a single argument.</p>
+
+</li>
+<li><p><b>first_index( sub { ... } )</b></p>
+
+<p>This method returns the index of the first matching item in the array, just like <a>&quot;first_index&quot; in List::SomeUtils</a>. The matching is done with a subroutine reference you pass to this method. The subroutine will be called against each element in the array until one matches or all elements have been checked. Each list element will be available to the sub in <code>$_</code>. If no match is made, -1 is returned.</p>
+
+<p>This method requires a single argument.</p>
+
+</li>
+<li><p><b>grep( sub { ... } )</b></p>
+
+<p>This method returns every element matching a given criteria, just like Perl&#39;s core <code>grep</code> function. This method requires a subroutine which implements the matching logic; each list element will be available to the sub in <code>$_</code>.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@found</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">filter_options</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{/^</span><span class="variable">b</span><span class="operator">/}</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">@found</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "bar baz boo"</span>
+</code></pre>
+
+<p>This method requires a single argument.</p>
+
+</li>
+<li><p><b>map( sub { ... } )</b></p>
+
+<p>This method transforms every element in the array and returns a new array, just like Perl&#39;s core <code>map</code> function. This method requires a subroutine which implements the transformation; each list element will be available to the sub in <code>$_</code>.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@mod_options</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">map_options</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span> <span class="operator">.</span> <span class="string">"-tag"</span> <span class="operator">}</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">@mod_options</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "foo-tag bar-tag baz-tag boo-tag"</span>
+</code></pre>
+
+<p>This method requires a single argument.</p>
+
+</li>
+<li><p><b>reduce( sub { ... } )</b></p>
+
+<p>This method turns an array into a single value, by passing a function the value so far and the next value in the array, just like <a href="../../../../../../lib/List/Util.html">List::Util</a>&#39;s <code>reduce</code> function. The reducing is done with a subroutine reference you pass to this method; each list element will be available to the sub in <code>$_</code>.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$found</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">reduce_options</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">.</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">$found</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "foobarbazboo"</span>
+</code></pre>
+
+<p>This method requires a single argument.</p>
+
+</li>
+<li><p><b>sort</b></p>
+
+</li>
+<li><p><b>sort( sub { ... } )</b></p>
+
+<p>Returns the elements of the array (not an array reference) in sorted order, or, like <code>elements</code>, returns the number of elements in the array in scalar context.</p>
+
+<p>You can provide an optional subroutine reference to sort with (as you can with Perl&#39;s core <code>sort</code> function). However, instead of using <code>$a</code> and <code>$b</code> in this subroutine, you will need to use <code>$_[0]</code> and <code>$_[1]</code>.</p>
+
+<pre><code>  <span class="comment"># ascending ASCIIbetical</span>
+  <span class="keyword">my</span> <span class="variable">@sorted</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">sort_options</span><span class="operator">();</span>
+  
+  <span class="comment"># Descending alphabetical order</span>
+  <span class="keyword">my</span> <span class="variable">@sorted_options</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">sort_options</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">lc</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="keyword">cmp</span> <span class="keyword">lc</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">@sorted_options</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "foo boo baz bar"</span>
+</code></pre>
+
+<p>This method accepts a single argument.</p>
+
+</li>
+<li><p><b>sort_in_place</b></p>
+
+</li>
+<li><p><b>sort_in_place( sub { ... } )</b></p>
+
+<p>Sorts the array <i>in place</i>, modifying the value of the attribute.</p>
+
+<p>You can provide an optional subroutine reference to sort with (as you can with Perl&#39;s core <code>sort</code> function). However, instead of using <code>$a</code> and <code>$b</code>, you will need to use <code>$_[0]</code> and <code>$_[1]</code> instead.</p>
+
+<p>This method does not define a return value.</p>
+
+<p>This method accepts a single argument.</p>
+
+</li>
+<li><p><b>shuffle</b></p>
+
+<p>Returns the elements of the array in random order, like <code>shuffle</code> from <a href="../../../../../../lib/List/Util.html">List::Util</a>.</p>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>uniq</b></p>
+
+<p>Returns the array with all duplicate elements removed, like <a href="../../../../../../lib/List/Util.html#uniq">&quot;uniq&quot; in List::Util</a>.</p>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>join($str)</b></p>
+
+<p>Joins every element of the array using the separator given as argument, just like Perl&#39;s core <code>join</code> function.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$joined</span> <span class="operator">=</span> <span class="variable">$stuff</span><span class="operator">-&gt;</span><span class="variable">join_options</span><span class="operator">(</span><span class="string">':'</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"</span><span class="variable">$joined</span><span class="string">\n"</span><span class="operator">;</span>    <span class="comment"># prints "foo:bar:baz:boo"</span>
+</code></pre>
+
+<p>This method requires a single argument.</p>
+
+</li>
+<li><p><b>set($index, $value)</b></p>
+
+<p>Given an index and a value, sets the specified array element&#39;s value.</p>
+
+<p>This method returns the value at <code>$index</code> after the set.</p>
+
+<p>This method requires two arguments.</p>
+
+</li>
+<li><p><b>delete($index)</b></p>
+
+<p>Removes the element at the given index from the array.</p>
+
+<p>This method returns the deleted value. Note that if no value exists, it will return <code>undef</code>.</p>
+
+<p>This method requires one argument.</p>
+
+</li>
+<li><p><b>insert($index, $value)</b></p>
+
+<p>Inserts a new element into the array at the given index.</p>
+
+<p>This method returns the new value at <code>$index</code>.</p>
+
+<p>This method requires two arguments.</p>
+
+</li>
+<li><p><b>clear</b></p>
+
+<p>Empties the entire array, like <code>@array = ()</code>.</p>
+
+<p>This method does not define a return value.</p>
+
+<p>This method does not accept any arguments.</p>
+
+</li>
+<li><p><b>accessor($index)</b></p>
+
+</li>
+<li><p><b>accessor($index, $value)</b></p>
+
+<p>This method provides a get/set accessor for the array, based on array indexes. If passed one argument, it returns the value at the specified index. If passed two arguments, it sets the value of the specified index.</p>
+
+<p>When called as a setter, this method returns the new value at <code>$index</code>.</p>
+
+<p>This method accepts one or two arguments.</p>
+
+</li>
+<li><p><b>natatime($n)</b></p>
+
+</li>
+<li><p><b>natatime($n, $code)</b></p>
+
+<p>This method returns an iterator which, on each call, returns <code>$n</code> more items from the array, in order, like <a>&quot;natatime&quot; in List::SomeUtils</a>.</p>
+
+<p>If you pass a coderef as the second argument, then this code ref will be called on each group of <code>$n</code> elements in the array until the array is exhausted.</p>
+
+<p>This method accepts one or two arguments.</p>
+
+</li>
+<li><p><b>shallow_clone</b></p>
+
+<p>This method returns a shallow clone of the array reference. The return value is a reference to a new array with the same elements. It is <i>shallow</i> because any elements that were references in the original will be the <i>same</i> references in the clone.</p>
+
+</li>
+</ul>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../../../../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

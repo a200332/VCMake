@@ -1,0 +1,142 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INTERFACE-SUPPORT">INTERFACE SUPPORT</a></li>
+  <li><a href="#CLASS-METHODS">CLASS METHODS</a></li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Annotation - A &quot;## no critic&quot; annotation in a document.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Perl::Critic::Annotation</span><span class="operator">;</span>
+  <span class="variable">$annotation</span> <span class="operator">=</span> <span class="variable">Perl::Critic::Annotation</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">-element</span> <span class="operator">=&gt;</span> <span class="variable">$no_critic_ppi_element</span> <span class="operator">);</span>
+  
+  <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$annotation</span><span class="operator">-&gt;</span><span class="variable">disables_line</span><span class="operator">(</span> <span class="variable">$number</span> <span class="operator">);</span>
+  <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$annotation</span><span class="operator">-&gt;</span><span class="variable">disables_policy</span><span class="operator">(</span> <span class="variable">$policy_object</span> <span class="operator">);</span>
+  <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$annotation</span><span class="operator">-&gt;</span><span class="variable">disables_all_policies</span><span class="operator">();</span>
+  
+  <span class="operator">(</span><span class="variable">$start</span><span class="operator">,</span> <span class="variable">$end</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$annotation</span><span class="operator">-&gt;</span><span class="variable">effective_range</span><span class="operator">();</span>
+  <span class="variable">@disabled_policy_names</span> <span class="operator">=</span> <span class="variable">$annotation</span><span class="operator">-&gt;</span><span class="variable">disabled_policies</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>Perl::Critic::Annotation</code> represents a single <code>&quot;## no critic&quot;</code> annotation in a <a href="PPI:Document">PPI:Document</a>. The Annotation takes care of parsing the annotation and keeps track of which lines and Policies it affects. It is intended to encapsulate the details of the no-critic annotations, and to provide a way for Policy objects to interact with the annotations (via a <a href="../../../lib/Perl/Critic/Document.html">Perl::Critic::Document</a>).</p>
+
+<h1 id="INTERFACE-SUPPORT">INTERFACE SUPPORT</h1>
+
+<p>This is considered to be a non-public class. Its interface is subject to change without notice.</p>
+
+<h1 id="CLASS-METHODS">CLASS METHODS</h1>
+
+<dl>
+
+<dt id="create_annotations--doc-doc">create_annotations( -doc =&gt; $doc )</dt>
+<dd>
+
+<p>Given a <a href="../../../lib/Perl/Critic/Document.html">Perl::Critic::Document</a>, finds all the <code>&quot;## no critic&quot;</code> annotations and constructs a new <code>Perl::Critic::Annotation</code> for each one and returns them. The order of the returned objects is not defined. It is generally expected that clients will use this interface rather than calling the <code>Perl::Critic::Annotation</code> constructor directly.</p>
+
+</dd>
+</dl>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<dl>
+
+<dt id="new--element-ppi_annotation_element"><code>new( -element =&gt; $ppi_annotation_element )</code></dt>
+<dd>
+
+<p>Returns a reference to a new Annotation object. The <b>-element</b> argument is required and should be a <code>PPI::Token::Comment</code> that conforms to the <code>&quot;## no critic&quot;</code> syntax.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="disables_line-line"><code>disables_line( $line )</code></dt>
+<dd>
+
+<p>Returns true if this Annotation disables <code>$line</code> for any (or all) Policies.</p>
+
+</dd>
+<dt id="disables_policy-policy_object"><code>disables_policy( $policy_object )</code></dt>
+<dd>
+
+</dd>
+<dt id="disables_policy-policy_name"><code>disables_policy( $policy_name )</code></dt>
+<dd>
+
+<p>Returns true if this Annotation disables <code>$polciy_object</code> or <code>$policy_name</code> at any (or all) lines.</p>
+
+</dd>
+<dt id="disables_all_policies"><code>disables_all_policies()</code></dt>
+<dd>
+
+<p>Returns true if this Annotation disables all Policies at any (or all) lines. If this method returns true, <code>disabled_policies</code> will return an empty list.</p>
+
+</dd>
+<dt id="effective_range"><code>effective_range()</code></dt>
+<dd>
+
+<p>Returns a two-element list, representing the first and last line numbers where this Annotation has effect.</p>
+
+</dd>
+<dt id="disabled_policies"><code>disabled_policies()</code></dt>
+<dd>
+
+<p>Returns a list of the names of the Policies that are affected by this Annotation. If this list is empty, then it means that all Policies are affected by this Annotation, and <code>disables_all_policies()</code> should return true.</p>
+
+</dd>
+<dt id="element"><code>element()</code></dt>
+<dd>
+
+<p>Returns the <a href="../../../lib/PPI/Element.html">PPI::Element</a> where this annotation started. This is typically an instance of <a href="../../../lib/PPI/Token/Comment.html">PPI::Token::Comment</a>.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

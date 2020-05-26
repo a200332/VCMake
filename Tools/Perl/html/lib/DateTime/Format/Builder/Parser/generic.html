@@ -1,0 +1,161 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Useful">Useful</a>
+        <ul>
+          <li><a href="#new">new</a></li>
+          <li><a href="#generic_parser">generic_parser</a></li>
+        </ul>
+      </li>
+      <li><a href="#Methods-for-subclassing">Methods for subclassing</a>
+        <ul>
+          <li><a href="#do_match">do_match</a></li>
+          <li><a href="#post_match">post_match</a></li>
+          <li><a href="#make">make</a></li>
+        </ul>
+      </li>
+      <li><a href="#Delegations">Delegations</a></li>
+    </ul>
+  </li>
+  <li><a href="#WRITING-A-SUBCLASS">WRITING A SUBCLASS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Builder::Parser::generic - Useful routines</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.81</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Useful">Useful</h2>
+
+<h3 id="new">new</h3>
+
+<p>Standard constructor. Returns a blessed hash; any arguments are placed in the hash. This is useful for storing information between methods.</p>
+
+<h3 id="generic_parser">generic_parser</h3>
+
+<p>This is a method provided solely for the benefit of <code>Parser</code> implementations. It semi-neatly abstracts a lot of the work involved.</p>
+
+<p>Basically, it takes parameters matching the assorted callbacks from the parser declarations and makes a coderef out of it all.</p>
+
+<p>Currently recognized callbacks are:</p>
+
+<ul>
+
+<li><p>on_match</p>
+
+</li>
+<li><p>on_fail</p>
+
+</li>
+<li><p>preprocess</p>
+
+</li>
+<li><p>postprocess</p>
+
+</li>
+</ul>
+
+<h2 id="Methods-for-subclassing">Methods for subclassing</h2>
+
+<p>These are methods you should define when writing your own subclass.</p>
+
+<p><b>Note</b>: these methods do not exist in this class. There is no point trying to call <code>$self-&gt;SUPER::do_match( ... )</code>.</p>
+
+<h3 id="do_match">do_match</h3>
+
+<p><code>do_match</code> is the first phase. Arguments are the date and @args. <code>self</code>, <code>label</code>, <code>args</code>. Return value must be defined if you match successfully.</p>
+
+<h3 id="post_match">post_match</h3>
+
+<p><code>post_match</code> is called after the appropriate callback out of <code>on_match</code>/<code>on_fail</code> is done. It&#39;s passed the date, the return value from <code>do_match</code> and the parsing hash.</p>
+
+<p>Its return value is used as the <code>post</code> argument to the <code>postprocess</code> callback, and as the second argument to <code>make</code>.</p>
+
+<h3 id="make">make</h3>
+
+<p><code>make</code> takes the original input, the return value from <code>post_match</code> and the parsing hash and should return a <code>DateTime</code> object or undefined.</p>
+
+<h2 id="Delegations">Delegations</h2>
+
+<p>For use of <code>Parser</code>, this module also delegates <code>valid_params</code> and <code>params</code>. This is just convenience to save typing the following:</p>
+
+<pre><code>    DateTime::Format::Builder::Parser-&gt;valid_params( blah )</code></pre>
+
+<p>Instead we get to type:</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">valid_params</span><span class="operator">(</span> <span class="variable">blah</span> <span class="operator">);</span>
+    <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">valid_params</span><span class="operator">(</span> <span class="variable">blah</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="WRITING-A-SUBCLASS">WRITING A SUBCLASS</h1>
+
+<p>Rather than attempt to explain how it all works, I think it&#39;s best if you take a look at <i>Regex.pm</i> and <i>Strptime.pm</i> as examples and work from there.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See <a href="../../../../../lib/DateTime/Format/Builder.html">DateTime::Format::Builder</a> for details.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><code>datetime@perl.org</code> mailing list.</p>
+
+<p>http://datetime.perl.org/</p>
+
+<p><a href="../../../../../lib/pods/perl.html">perl</a>, <a href="../../../../../lib/DateTime.html">DateTime</a>, <a href="../../../../../lib/DateTime/Format/Builder.html">DateTime::Format::Builder</a>, <a href="../../../../../lib/DateTime/Format/Builder/Parser.html">DateTime::Format::Builder::Parser</a>.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Iain Truskett</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2013 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#NOTICE">NOTICE</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>bytes - Perl pragma to expose the individual bytes of characters</p>
+
+<h1 id="NOTICE">NOTICE</h1>
+
+<p>Because the bytes pragma breaks encapsulation (i.e. it exposes the innards of how the perl executable currently happens to store a string), the byte values that result are in an unspecified encoding.</p>
+
+<p><b>Use of this module for anything other than debugging purposes is strongly discouraged.</b> If you feel that the functions here within might be useful for your application, this possibly indicates a mismatch between your mental model of Perl Unicode and the current reality. In that case, you may wish to read some of the perl Unicode documentation: <a href="../lib/pods/perluniintro.html">perluniintro</a>, <a href="../lib/pods/perlunitut.html">perlunitut</a>, <a href="../lib/pods/perlunifaq.html">perlunifaq</a> and <a href="../lib/pods/perlunicode.html">perlunicode</a>.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">bytes</span><span class="operator">;</span>
+    <span class="operator">...</span> <span class="keyword">chr</span><span class="operator">(...);</span>       <span class="comment"># or bytes::chr</span>
+    <span class="operator">...</span> <span class="keyword">index</span><span class="operator">(...);</span>     <span class="comment"># or bytes::index</span>
+    <span class="operator">...</span> <span class="keyword">length</span><span class="operator">(...);</span>    <span class="comment"># or bytes::length</span>
+    <span class="operator">...</span> <span class="keyword">ord</span><span class="operator">(...);</span>       <span class="comment"># or bytes::ord</span>
+    <span class="operator">...</span> <span class="keyword">rindex</span><span class="operator">(...);</span>    <span class="comment"># or bytes::rindex</span>
+    <span class="operator">...</span> <span class="keyword">substr</span><span class="operator">(...);</span>    <span class="comment"># or bytes::substr</span>
+    <span class="keyword">no</span> <span class="variable">bytes</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl&#39;s characters are stored internally as sequences of one or more bytes. This pragma allows for the examination of the individual bytes that together comprise a character.</p>
+
+<p>Originally the pragma was designed for the loftier goal of helping incorporate Unicode into Perl, but the approach that used it was found to be defective, and the one remaining legitimate use is for debugging when you need to non-destructively examine characters&#39; individual bytes. Just insert this pragma temporarily, and remove it after the debugging is finished.</p>
+
+<p>The original usage can be accomplished by explicit (rather than this pragma&#39;s implict) encoding using the <a href="../lib/Encode.html">Encode</a> module:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Encode</span> <span class="string">qw/encode/</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$utf8_byte_string</span>   <span class="operator">=</span> <span class="variable">encode</span> <span class="string">"UTF8"</span><span class="operator">,</span>   <span class="variable">$string</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$latin1_byte_string</span> <span class="operator">=</span> <span class="variable">encode</span> <span class="string">"Latin1"</span><span class="operator">,</span> <span class="variable">$string</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or, if performance is needed and you are only interested in the UTF-8 representation:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">utf8</span><span class="operator">;</span>
+    
+    <span class="variable">utf8::encode</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$utf8_byte_string</span> <span class="operator">=</span> <span class="variable">$string</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>no bytes</code> can be used to reverse the effect of <code>use bytes</code> within the current lexical scope.</p>
+
+<p>As an example, when Perl sees <code>$x = chr(400)</code>, it encodes the character in UTF-8 and stores it in <code>$x</code>. Then it is marked as character data, so, for instance, <code>length $x</code> returns <code>1</code>. However, in the scope of the <code>bytes</code> pragma, <code>$x</code> is treated as a series of bytes - the bytes that make up the UTF8 encoding - and <code>length $x</code> returns <code>2</code>:</p>
+
+<pre><code> <span class="variable">$x</span> <span class="operator">=</span> <span class="keyword">chr</span><span class="operator">(</span><span class="number">400</span><span class="operator">);</span>
+ <span class="keyword">print</span> <span class="string">"Length is "</span><span class="operator">,</span> <span class="keyword">length</span> <span class="variable">$x</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>     <span class="comment"># "Length is 1"</span>
+ <span class="keyword">printf</span> <span class="string">"Contents are %vd\n"</span><span class="operator">,</span> <span class="variable">$x</span><span class="operator">;</span>         <span class="comment"># "Contents are 400"</span>
+ <span class="operator">{</span>
+     <span class="keyword">use</span> <span class="variable">bytes</span><span class="operator">;</span> <span class="comment"># or "require bytes; bytes::length()"</span>
+     <span class="keyword">print</span> <span class="string">"Length is "</span><span class="operator">,</span> <span class="keyword">length</span> <span class="variable">$x</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span> <span class="comment"># "Length is 2"</span>
+     <span class="keyword">printf</span> <span class="string">"Contents are %vd\n"</span><span class="operator">,</span> <span class="variable">$x</span><span class="operator">;</span>     <span class="comment"># "Contents are 198.144 (on</span>
+                                          <span class="comment"># ASCII platforms)"</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p><code>chr()</code>, <code>ord()</code>, <code>substr()</code>, <code>index()</code> and <code>rindex()</code> behave similarly.</p>
+
+<p>For more on the implications, see <a href="../lib/pods/perluniintro.html">perluniintro</a> and <a href="../lib/pods/perlunicode.html">perlunicode</a>.</p>
+
+<p><code>bytes::length()</code> is admittedly handy if you need to know the <b>byte length</b> of a Perl scalar. But a more modern way is:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">Encode</span> <span class="string">'encode'</span><span class="operator">;</span>
+   <span class="keyword">length</span><span class="operator">(</span><span class="variable">encode</span><span class="operator">(</span><span class="string">'UTF-8'</span><span class="operator">,</span> <span class="variable">$scalar</span><span class="operator">))</span>
+</code></pre>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p><code>bytes::substr()</code> does not work as an <i>lvalue()</i>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../lib/pods/perluniintro.html">perluniintro</a>, <a href="../lib/pods/perlunicode.html">perlunicode</a>, <a href="../lib/utf8.html">utf8</a>, <a href="../lib/Encode.html">Encode</a></p>
+
+
+</body>
+
+</html>
+
+

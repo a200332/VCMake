@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>integer - Perl pragma to use integer arithmetic instead of floating point</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="number">10</span><span class="operator">/</span><span class="number">3</span><span class="operator">;</span>
+    <span class="comment"># $x is now 3, not 3.33333333333333333</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This tells the compiler to use integer operations from here to the end of the enclosing BLOCK. On many machines, this doesn&#39;t matter a great deal for most computations, but on those without floating point hardware, it can make a big difference in performance.</p>
+
+<p>Note that this only affects how most of the arithmetic and relational <b>operators</b> handle their operands and results, and <b>not</b> how all numbers everywhere are treated. Specifically, <code><span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+</code> has the effect that before computing the results of the arithmetic operators (+, -, *, /, %, +=, -=, *=, /=, %=, and unary minus), the comparison operators (&lt;, &lt;=, &gt;, &gt;=, ==, !=, &lt;=&gt;), and the bitwise operators (|, &amp;, ^, &lt;&lt;, &gt;&gt;, |=, &amp;=, ^=, &lt;&lt;=, &gt;&gt;=), the operands have their fractional portions truncated (or floored), and the result will have its fractional portion truncated as well. In addition, the range of operands and results is restricted to that of familiar two&#39;s complement integers, i.e., -(2**31) .. (2**31-1) on 32-bit architectures, and -(2**63) .. (2**63-1) on 64-bit architectures. For example, this code</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="number">5.8</span><span class="operator">;</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="number">2.5</span><span class="operator">;</span>
+    <span class="variable">$z</span> <span class="operator">=</span> <span class="number">2.7</span><span class="operator">;</span>
+    <span class="variable">$a</span> <span class="operator">=</span> <span class="number">2</span><span class="operator">**</span><span class="number">31</span> <span class="operator">-</span> <span class="number">1</span><span class="operator">;</span>  <span class="comment"># Largest positive integer on 32-bit machines</span>
+    <span class="variable">$,</span> <span class="operator">=</span> <span class="string">", "</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$x</span><span class="operator">,</span> <span class="operator">-</span><span class="variable">$x</span><span class="operator">,</span> <span class="variable">$x</span><span class="operator">+</span><span class="variable">$y</span><span class="operator">,</span> <span class="variable">$x</span><span class="operator">-</span><span class="variable">$y</span><span class="operator">,</span> <span class="variable">$x</span><span class="operator">/</span><span class="variable">$y</span><span class="operator">,</span> <span class="variable">$x</span><span class="operator">*</span><span class="variable">$y</span><span class="operator">,</span> <span class="variable">$y</span><span class="operator">==</span><span class="variable">$z</span><span class="operator">,</span> <span class="variable">$a</span><span class="operator">,</span> <span class="variable">$a</span><span class="operator">+</span><span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>will print: 5.8, -5, 7, 3, 2, 10, 1, 2147483647, -2147483648</p>
+
+<p>Note that $x is still printed as having its true non-integer value of 5.8 since it wasn&#39;t operated on. And note too the wrap-around from the largest positive integer to the largest negative one. Also, arguments passed to functions and the values returned by them are <b>not</b> affected by <code><span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+</code>. E.g.,</p>
+
+<pre><code>    <span class="keyword">srand</span><span class="operator">(</span><span class="number">1.5</span><span class="operator">);</span>
+    <span class="variable">$,</span> <span class="operator">=</span> <span class="string">", "</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="keyword">sin</span><span class="operator">(</span><span class="number">.5</span><span class="operator">),</span> <span class="keyword">cos</span><span class="operator">(</span><span class="number">.5</span><span class="operator">),</span> <span class="keyword">atan2</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">),</span> <span class="keyword">sqrt</span><span class="operator">(</span><span class="number">2</span><span class="operator">),</span> <span class="keyword">rand</span><span class="operator">(</span><span class="number">10</span><span class="operator">);</span>
+</code></pre>
+
+<p>will give the same result with or without <code><span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+</code> The power operator <code>**</code> is also not affected, so that 2 ** .5 is always the square root of 2. Now, it so happens that the pre- and post- increment and decrement operators, ++ and --, are not affected by <code><span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+</code> either. Some may rightly consider this to be a bug -- but at least it&#39;s a long-standing one.</p>
+
+<p>Finally, <code><span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+</code> also has an additional affect on the bitwise operators. Normally, the operands and results are treated as <b>unsigned</b> integers, but with <code><span class="keyword">use</span> <span class="variable">integer</span><span class="operator">;</span>
+</code> the operands and results are <b>signed</b>. This means, among other things, that ~0 is -1, and -2 &amp; -5 is -6.</p>
+
+<p>Internally, native integer arithmetic (as provided by your C compiler) is used. This means that Perl&#39;s own semantics for arithmetic operations may not be preserved. One common source of trouble is the modulus of negative numbers, which Perl does one way, but your hardware may do another.</p>
+
+<pre><code>    % perl -le &#39;print (4 % -3)&#39;
+    -2
+    % perl -Minteger -le &#39;print (4 % -3)&#39;
+    1</code></pre>
+
+<p>See <a href="../lib/pods/perlmodlib.html#Pragmatic-Modules">&quot;Pragmatic Modules&quot; in perlmodlib</a>, <a href="../lib/pods/perlop.html#Integer-Arithmetic">&quot;Integer Arithmetic&quot; in perlop</a></p>
+
+
+</body>
+
+</html>
+
+

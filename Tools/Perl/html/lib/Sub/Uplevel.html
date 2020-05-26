@@ -1,0 +1,228 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#BUGS-and-CAVEATS">BUGS and CAVEATS</a></li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+  <li><a href="#THANKS">THANKS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a>
+    <ul>
+      <li><a href="#Bugs-Feature-Requests">Bugs / Feature Requests</a></li>
+      <li><a href="#Source-Code">Source Code</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Uplevel - apparently run a function in a higher stack frame</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.2800</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sub::Uplevel</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+      <span class="keyword">print</span> <span class="keyword">join</span> <span class="string">" - "</span><span class="operator">,</span> <span class="keyword">caller</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> bar </span><span class="operator">{</span>
+      <span class="variable">uplevel</span> <span class="number">1</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">foo</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment">#line 11</span>
+  <span class="variable">bar</span><span class="operator">();</span>    <span class="comment"># main - foo.plx - 11</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Like Tcl&#39;s uplevel() function, but not quite so dangerous. The idea is just to fool caller(). All the really naughty bits of Tcl&#39;s uplevel() are avoided.</p>
+
+<p><b>THIS IS NOT THE SORT OF THING YOU WANT TO DO EVERYDAY</b></p>
+
+<dl>
+
+<dt id="uplevel"><b>uplevel</b></dt>
+<dd>
+
+<pre><code>  <span class="variable">uplevel</span> <span class="variable">$num_frames</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">func</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">;</span>
+</code></pre>
+
+<p>Makes the given function think it&#39;s being executed $num_frames higher than the current stack level. So when they use caller($frames) it will actually give caller($frames + $num_frames) for them.</p>
+
+<p><code>uplevel(1, \&amp;some_func, @_)</code> is effectively <code>goto &amp;some_func</code> but you don&#39;t immediately exit the current subroutine. So while you can&#39;t do this:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> wrapper </span><span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">"Before\n"</span><span class="operator">;</span>
+        <span class="keyword">goto</span> <span class="operator">&amp;</span><span class="variable">some_func</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="string">"After\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>you can do this:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> wrapper </span><span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">"Before\n"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">@out</span> <span class="operator">=</span> <span class="variable">uplevel</span> <span class="number">1</span><span class="operator">,</span> <span class="operator">&amp;</span><span class="variable">some_func</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="string">"After\n"</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">@out</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p><code>uplevel</code> has the ability to issue a warning if <code>$num_frames</code> is more than the current call stack depth, although this warning is disabled and compiled out by default as the check is relatively expensive.</p>
+
+<p>To enable the check for debugging or testing, you should set the global <code>$Sub::Uplevel::CHECK_FRAMES</code> to true before loading Sub::Uplevel for the first time as follows:</p>
+
+<pre><code>    <span class="comment">#!/usr/bin/perl</span>
+    
+    <span class="keyword">BEGIN</span> <span class="operator">{</span>
+        <span class="variable">$Sub::Uplevel::CHECK_FRAMES</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    <span class="keyword">use</span> <span class="variable">Sub::Uplevel</span><span class="operator">;</span>
+</code></pre>
+
+<p>Setting or changing the global after the module has been loaded will have no effect.</p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<p>The main reason I wrote this module is so I could write wrappers around functions and they wouldn&#39;t be aware they&#39;ve been wrapped.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Sub::Uplevel</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$original_foo</span> <span class="operator">=</span> <span class="operator">\&amp;</span><span class="variable">foo</span><span class="operator">;</span>
+    
+    <span class="variable">*foo</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">@output</span> <span class="operator">=</span> <span class="variable">uplevel</span> <span class="number">1</span><span class="operator">,</span> <span class="variable">$original_foo</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="string">"foo() returned:  </span><span class="variable">@output</span><span class="string">"</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">@output</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>If this code frightens you <b>you should not use this module.</b></p>
+
+<h1 id="BUGS-and-CAVEATS">BUGS and CAVEATS</h1>
+
+<p>Well, the bad news is uplevel() is about 5 times slower than a normal function call. XS implementation anyone? It also slows down every invocation of caller(), regardless of whether uplevel() is in effect.</p>
+
+<p>Sub::Uplevel overrides CORE::GLOBAL::caller temporarily for the scope of each uplevel call. It does its best to work with any previously existing CORE::GLOBAL::caller (both when Sub::Uplevel is first loaded and within each uplevel call) such as from Contextual::Return or Hook::LexWrap.</p>
+
+<p>However, if you are routinely using multiple modules that override CORE::GLOBAL::caller, you are probably asking for trouble.</p>
+
+<p>You <b>should</b> load Sub::Uplevel as early as possible within your program. As with all CORE::GLOBAL overloading, the overload will not affect modules that have already been compiled prior to the overload. One module that often is unavoidably loaded prior to Sub::Uplevel is Exporter. To forcibly recompile Exporter (and Exporter::Heavy) after loading Sub::Uplevel, use it with the &quot;:aggressive&quot; tag:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Sub::Uplevel</span> <span class="string">qw/:aggressive/</span><span class="operator">;</span>
+</code></pre>
+
+<p>The private function <code>Sub::Uplevel::_force_reload()</code> may be passed a list of additional modules to reload if &quot;:aggressive&quot; is not aggressive enough. Reloading modules may break things, so only use this as a last resort.</p>
+
+<p>As of version 0.20, Sub::Uplevel requires Perl 5.6 or greater.</p>
+
+<h1 id="HISTORY">HISTORY</h1>
+
+<p>Those who do not learn from HISTORY are doomed to repeat it.</p>
+
+<p>The lesson here is simple: Don&#39;t sit next to a Tcl programmer at the dinner table.</p>
+
+<h1 id="THANKS">THANKS</h1>
+
+<p>Thanks to Brent Welch, Damian Conway and Robin Houston.</p>
+
+<p>See http://www.perl.com/perl/misc/Artistic.html</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>PadWalker (for the similar idea with lexicals), Hook::LexWrap, Tcl&#39;s uplevel() at http://www.scriptics.com/man/tcl8.4/TclCmd/uplevel.htm</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<h2 id="Bugs-Feature-Requests">Bugs / Feature Requests</h2>
+
+<p>Please report any bugs or feature requests through the issue tracker at <a href="https://github.com/Perl-Toolchain-Gang/Sub-Uplevel/issues">https://github.com/Perl-Toolchain-Gang/Sub-Uplevel/issues</a>. You will be notified automatically of any progress on your issue.</p>
+
+<h2 id="Source-Code">Source Code</h2>
+
+<p>This is open source software. The code repository is available for public review and contribution under the terms of the license.</p>
+
+<p><a href="https://github.com/Perl-Toolchain-Gang/Sub-Uplevel">https://github.com/Perl-Toolchain-Gang/Sub-Uplevel</a></p>
+
+<pre><code>  git clone https://github.com/Perl-Toolchain-Gang/Sub-Uplevel.git</code></pre>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Michael Schwern &lt;mschwern@cpan.org&gt;</p>
+
+</li>
+<li><p>David Golden &lt;dagolden@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+</li>
+<li><p>Alexandr Ciornii &lt;alexchorny@gmail.com&gt;</p>
+
+</li>
+<li><p>David Golden &lt;xdg@xdg.me&gt;</p>
+
+</li>
+<li><p>Graham Ollis &lt;plicease@cpan.org&gt;</p>
+
+</li>
+<li><p>J. Nick Koston &lt;nick@cpanel.net&gt;</p>
+
+</li>
+<li><p>Michael Gray &lt;mg13@sanger.ac.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2017 by Michael Schwern and David Golden.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

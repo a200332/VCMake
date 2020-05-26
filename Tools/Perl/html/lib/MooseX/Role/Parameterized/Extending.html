@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#NAME1">NAME</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>MooseX::Role::Parameterized::Extending - extending MooseX::Role::Parameterized roles</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.10</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>There are heaps of useful modules in the <code>MooseX</code> namespace that you can use to make your roles more powerful. However, they do not always work out of the box with <a href="../../../../lib/MooseX/Role/Parameterized.html">MooseX::Role::Parameterized</a>, but it&#39;s fairly straight-forward to achieve the functionality you desire.</p>
+
+<p><a href="../../../../lib/MooseX/Role/Parameterized.html">MooseX::Role::Parameterized</a> was designed to be as extensible as the rest of <a href="../../../../lib/Moose.html">Moose</a>, and as such it is possible to apply custom traits to both the parameterizable role or the ordinary roles they generate. In this example, we will look at applying the fake trait <code>MooseX::MagicRole</code> to a parameterizable role.</p>
+
+<p>First we need to define a new metaclass for our parameterizable role.</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyApp::Meta::Role::Parameterizable</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    <span class="variable">extends</span> <span class="string">'MooseX::Role::Parameterized::Meta::Role::Parameterizable'</span><span class="operator">;</span>
+    <span class="variable">with</span> <span class="string">'MooseX::MagicRole'</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is a class (observe that it uses <a href="../../../../lib/Moose.html">Moose</a>, not <a href="../../../../lib/Moose/Role.html">Moose::Role</a>) which extends the class which governs parameterizable roles. <a>MooseX::Role::Parameterized::Meta::Role::Parameterizable</a> is the metaclass that packages using <a href="../../../../lib/MooseX/Role/Parameterized.html">MooseX::Role::Parameterized</a> receive by default.</p>
+
+<p>Note that the class we are extending, <a>MooseX::Role::Parameterized::Meta::Role::Parameteriz<b><i>able</i></b></a>, is entirely distinct from the similarly-named class which governs the ordinary roles that parameterized roles generate. An instance of <a href="../../../../lib/MooseX/Role/Parameterized.html">MooseX::Role::Parameterized::Meta::Role::Parameteriz<b><i>ed</i></b></a> represents a role with its parameters already bound.</p>
+
+<p>Now we can take advantage of our new subclass by specifying that we want to use <code>MyApp::Meta::Role::Parameterizable</code> as our metaclass when importing <a href="../../../../lib/MooseX/Role/Parameterized.html">MooseX::Role::Parameterized</a>:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyApp::Role</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">MooseX::Role::Parameterized</span> <span class="operator">-</span><span class="string">metaclass</span> <span class="operator">=&gt;</span> <span class="string">'MyApp::Meta::Role::Parameterizable'</span><span class="operator">;</span>
+    
+    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>And there you go! <code>MyApp::Role</code> now has the <code>MooseX::MagicRole</code> trait applied.</p>
+
+<h1 id="NAME1">NAME</h1>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Role-Parameterized">the RT bug tracker</a> (or <a href="mailto:bug-MooseX-Role-Parameterized@rt.cpan.org">bug-MooseX-Role-Parameterized@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/moose.html">http://lists.perl.org/list/moose.html</a>.</p>
+
+<p>There is also an irc channel available for users of this distribution, at <a href="irc://irc.perl.org/#moose"><code><span class="comment">#moose</span>
+</code> on <code>irc.perl.org</code></a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2008 by Shawn M Moore.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

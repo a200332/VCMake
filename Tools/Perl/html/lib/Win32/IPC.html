@@ -1,0 +1,208 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Methods">Methods</a></li>
+      <li><a href="#Functions">Functions</a></li>
+      <li><a href="#Deprecated-Functions-and-Methods">Deprecated Functions and Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#INTERNALS">INTERNALS</a></li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#INCOMPATIBILITIES">INCOMPATIBILITIES</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::IPC - Base class for Win32 synchronization objects</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes version 1.11 of Win32::IPC, released November 15, 2014 as part of Win32-IPC version 1.11.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::Event</span> <span class="number">1.00</span> <span class="string">qw(wait_any)</span><span class="operator">;</span>
+    <span class="comment">#Create objects.</span>
+    
+    <span class="variable">wait_any</span><span class="operator">(</span><span class="variable">@ListOfObjects</span><span class="operator">,</span> <span class="variable">$timeout</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is loaded by the other Win32 synchronization modules. You shouldn&#39;t need to load it yourself. It supplies the wait functions to those modules.</p>
+
+<p>The synchronization modules are <a href="../../lib/Win32/ChangeNotify.html">Win32::ChangeNotify</a>, <a href="../../lib/Win32/Event.html">Win32::Event</a>, <a href="../../lib/Win32/Mutex.html">Win32::Mutex</a>, &amp; <a href="../../lib/Win32/Semaphore.html">Win32::Semaphore</a>.</p>
+
+<p>In addition, you can use <code>wait_any</code> and <code>wait_all</code> with <a href="../../lib/Win32/Console.html">Win32::Console</a> and <a href="../../lib/Win32/Process.html">Win32::Process</a> objects. (However, those modules do not export the wait functions; you must load one of the synchronization modules (or just Win32::IPC)).</p>
+
+<h2 id="Methods">Methods</h2>
+
+<p>Win32::IPC supplies one method to all synchronization objects.</p>
+
+<dl>
+
+<dt id="obj-wait-timeout">$obj-&gt;wait([$timeout])</dt>
+<dd>
+
+<p>Waits for <code>$obj</code> to become signalled. <code>$timeout</code> is the maximum time to wait (in milliseconds). If <code>$timeout</code> is omitted or <code>undef</code>, waits forever. If <code>$timeout</code> is 0, returns immediately.</p>
+
+<p>Returns:</p>
+
+<pre><code>   +1    The object is signalled
+   -1    The object is an abandoned mutex
+    0    Timed out
+  undef  An error occurred (check C&lt;$^E&gt; for details)</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Functions">Functions</h2>
+
+<dl>
+
+<dt id="wait_any-objects-timeout">wait_any(@objects, [$timeout])</dt>
+<dd>
+
+<p>Waits for at least one of the <code>@objects</code> to become signalled. <code>$timeout</code> is the maximum time to wait (in milliseconds). If <code>$timeout</code> is omitted or <code>undef</code>, waits forever. If <code>$timeout</code> is 0, returns immediately.</p>
+
+<p>The return value indicates which object ended the wait:</p>
+
+<pre><code>   +N    $object[N-1] is signalled
+   -N    $object[N-1] is an abandoned mutex
+    0    Timed out
+  undef  An error occurred (check C&lt;$^E&gt; for details)</code></pre>
+
+<p>If more than one object became signalled, the one with the lowest index is used.</p>
+
+</dd>
+<dt id="wait_all-objects-timeout">wait_all(@objects, [$timeout])</dt>
+<dd>
+
+<p>This is the same as <code>wait_any</code>, but it waits for all the <code>@objects</code> to become signalled. The return value indicates the last object to become signalled, and is negative if at least one of the <code>@objects</code> is an abandoned mutex.</p>
+
+</dd>
+</dl>
+
+<h2 id="Deprecated-Functions-and-Methods">Deprecated Functions and Methods</h2>
+
+<p>Win32::IPC still supports the ActiveWare syntax, but its use is deprecated.</p>
+
+<dl>
+
+<dt id="INFINITE">INFINITE</dt>
+<dd>
+
+<p>Constant value for an infinite timeout. Omit the <code>$timeout</code> argument (or pass <code>undef</code>) instead.</p>
+
+<p><code>INFINITE</code> is only mildly deprecated. If you have a good use for it, feel free to continue to use it. That is, <code>$object-&gt;wait(INFINITE)</code> is pointless, but <code>$object-&gt;wait($timeout)</code> (where <code>$timeout</code> may or may not equal <code>INFINITE</code>) may make sense.</p>
+
+</dd>
+<dt id="WaitForMultipleObjects-objects-wait_all-timeout">WaitForMultipleObjects(\@objects, $wait_all, $timeout)</dt>
+<dd>
+
+<p>Warning: <code>WaitForMultipleObjects</code> erases <code>@objects</code>! Use <code>wait_all</code> or <code>wait_any</code> instead.</p>
+
+</dd>
+<dt id="obj-Wait-timeout">$obj-&gt;Wait($timeout)</dt>
+<dd>
+
+<p>Similar to <code>not $obj-&gt;wait($timeout)</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="INTERNALS">INTERNALS</h1>
+
+<p>The <code>wait_any</code> and <code>wait_all</code> functions support two kinds of objects. Objects derived from <code>Win32::IPC</code> are expected to consist of a reference to a scalar containing the Win32 HANDLE as an IV.</p>
+
+<p>Other objects (for which <code>UNIVERSAL::isa($object, &quot;Win32::IPC&quot;)</code> is false), are expected to implement a <code>get_Win32_IPC_HANDLE</code> method. When called in scalar context with no arguments, this method should return a Win32 HANDLE (as an IV) suitable for passing to the Win32 WaitForMultipleObjects API function.</p>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<p>None.</p>
+
+<h1 id="CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</h1>
+
+<p>Win32::IPC requires no configuration files or environment variables.</p>
+
+<p>It runs under 32-bit or 64-bit Microsoft Windows, either natively or under Cygwin.</p>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p>None.</p>
+
+<h1 id="INCOMPATIBILITIES">INCOMPATIBILITIES</h1>
+
+<p>Prior to version 1.06, the Win32 IPC modules treated <code>undef</code> values differently. In version 1.06 and later, passing <code>undef</code> as the value of an optional parameter is the same as omitting that parameter. In previous versions, <code>undef</code> was interpreted as either the empty string or 0 (along with a warning about &quot;Use of uninitialized value...&quot;).</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>If your program uses signal handlers (installed using <code>%SIG</code>), and a handled signal arrives while the program is in one of the IPC wait functions (<code>wait</code>, <code>wait_any</code>, or <code>wait_all</code>), the signal handler will not be executed until the wait ends. For instance, this means you can&#39;t interrupt a wait with Control-C if you have installed a <code><span class="variable">$SIG</span><span class="operator">{</span><span class="string">INT</span><span class="operator">}</span>
+</code> handler.</p>
+
+<p>The root cause of this is that Perl defers running the signal handler until the Perl interpreter is in a safe state. See <a href="../../lib/pods/perlipc.html#Deferred-Signals-Safe-Signals">&quot;Deferred Signals (Safe Signals)&quot; in perlipc</a>. I don&#39;t know of any proper solution to this; if you do, please let me know.</p>
+
+<p>One possible workaround is to use threads, and do the wait in a secondary thread while the main thread continues to handle signals. The main thread could signal the secondary thread using a <a href="../../lib/Win32/Event.html">Win32::Event</a> object.</p>
+
+<p>Another workaround is to use a relatively short timeout. You can retry the wait as needed. Each timeout gives any queued-up signal handlers a chance to run.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Christopher J. Madsen <span style="white-space: nowrap;"><code>&lt;perl AT cjmweb.net&gt;</code></span></p>
+
+<p>Please report any bugs or feature requests to <span style="white-space: nowrap;"><code>&lt;bug-Win32-IPC AT rt.cpan.org&gt;</code></span> or through the web interface at <a href="http://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-IPC">http://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-IPC</a>.</p>
+
+<p>You can follow or contribute to Win32-IPC&#39;s development at <a href="https://github.com/madsen/win32-ipc">https://github.com/madsen/win32-ipc</a>.</p>
+
+<p>Loosely based on the original module by ActiveWare Internet Corp., <a href="http://www.ActiveState.com">http://www.ActiveState.com</a></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright 1998-2014 Christopher J. Madsen</p>
+
+<p>Created: 3 Feb 1998 from the ActiveWare version (c) 1995 Microsoft Corporation. All rights reserved. Developed by ActiveWare Internet Corp., http://www.ActiveState.com</p>
+
+<pre><code>  Other modifications (c) 1997 by Gurusamy Sarathy &lt;gsar AT cpan.org&gt;</code></pre>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+
+
+</body>
+
+</html>
+
+

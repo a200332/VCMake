@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#bits">%bits</a></li>
+      <li><a href="#defines">%defines</a></li>
+      <li><a href="#labels">%labels</a></li>
+      <li><a href="#ops_using">%ops_using</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>B::Op_private - OP op_private flag definitions</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">B::Op_private</span><span class="operator">;</span>
+    
+    <span class="comment"># flag details for bit 7 of OP_AELEM's op_private:</span>
+    <span class="keyword">my</span> <span class="variable">$name</span>  <span class="operator">=</span> <span class="variable">$B::Op_private::bits</span><span class="operator">{</span><span class="string">aelem</span><span class="operator">}{</span><span class="string">7</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># OPpLVAL_INTRO</span>
+    <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">=</span> <span class="variable">$B::Op_private::defines</span><span class="operator">{</span><span class="variable">$name</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># 128</span>
+    <span class="keyword">my</span> <span class="variable">$label</span> <span class="operator">=</span> <span class="variable">$B::Op_private::labels</span><span class="operator">{</span><span class="variable">$name</span><span class="operator">}</span><span class="operator">;</span>  <span class="comment"># LVINTRO</span>
+    
+    <span class="comment"># the bit field at bits 5..6 of OP_AELEM's op_private:</span>
+    <span class="keyword">my</span> <span class="variable">$bf</span>  <span class="operator">=</span> <span class="variable">$B::Op_private::bits</span><span class="operator">{</span><span class="string">aelem</span><span class="operator">}{</span><span class="string">6</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$mask</span> <span class="operator">=</span> <span class="variable">$bf</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">bitmask</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># etc</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides four global hashes:</p>
+
+<pre><code>    %B::Op_private::bits
+    %B::Op_private::defines
+    %B::Op_private::labels
+    %B::Op_private::ops_using</code></pre>
+
+<p>which contain information about the per-op meanings of the bits in the op_private field.</p>
+
+<h2 id="bits"><code>%bits</code></h2>
+
+<p>This is indexed by op name and then bit number (0..7). For single bit flags, it returns the name of the define (if any) for that bit:</p>
+
+<pre><code>   <span class="variable">$B::Op_private::bits</span><span class="operator">{</span><span class="string">aelem</span><span class="operator">}{</span><span class="string">7</span><span class="operator">}</span> <span class="keyword">eq</span> <span class="string">'OPpLVAL_INTRO'</span><span class="operator">;</span>
+</code></pre>
+
+<p>For bit fields, it returns a hash ref containing details about the field. The same reference will be returned for all bit positions that make up the bit field; so for example these both return the same hash ref:</p>
+
+<pre><code>    <span class="variable">$bitfield</span> <span class="operator">=</span> <span class="variable">$B::Op_private::bits</span><span class="operator">{</span><span class="string">aelem</span><span class="operator">}{</span><span class="string">5</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="variable">$bitfield</span> <span class="operator">=</span> <span class="variable">$B::Op_private::bits</span><span class="operator">{</span><span class="string">aelem</span><span class="operator">}{</span><span class="string">6</span><span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>The general format of this hash ref is</p>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="comment"># The bit range and mask; these are always present.</span>
+        <span class="string">bitmin</span>        <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">,</span>
+        <span class="string">bitmax</span>        <span class="operator">=&gt;</span> <span class="number">6</span><span class="operator">,</span>
+        <span class="string">bitmask</span>       <span class="operator">=&gt;</span> <span class="number">0x60</span><span class="operator">,</span>
+    
+        <span class="comment"># (The remaining keys are optional)</span>
+    
+        <span class="comment"># The names of any defines that were requested:</span>
+        <span class="string">mask_def</span>      <span class="operator">=&gt;</span> <span class="string">'OPpFOO_MASK'</span><span class="operator">,</span>
+        <span class="string">baseshift_def</span> <span class="operator">=&gt;</span> <span class="string">'OPpFOO_SHIFT'</span><span class="operator">,</span>
+        <span class="string">bitcount_def</span>  <span class="operator">=&gt;</span> <span class="string">'OPpFOO_BITS'</span><span class="operator">,</span>
+    
+        <span class="comment"># If present, Concise etc will display the value with a 'FOO='</span>
+        <span class="comment"># prefix. If it equals '-', then Concise will treat the bit</span>
+        <span class="comment"># field as raw bits and not try to interpret it.</span>
+        <span class="string">label</span>         <span class="operator">=&gt;</span> <span class="string">'FOO'</span><span class="operator">,</span>
+    
+        <span class="comment"># If present, specifies the names of some defines and the</span>
+        <span class="comment"># display labels that are used to assign meaning to particu-</span>
+        <span class="comment"># lar integer values within the bit field; e.g. 3 is dis-</span>
+        <span class="comment"># played as 'C'.</span>
+        <span class="string">enum</span>          <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(
+                             1   OPpFOO_A  A
+                             2   OPpFOO_B  B
+                             3   OPpFOO_C  C
+                         )</span><span class="operator">]</span><span class="operator">,</span>
+    
+    <span class="operator">};</span>
+</code></pre>
+
+<h2 id="defines"><code>%defines</code></h2>
+
+<p>This gives the value of every <code>OPp</code> define, e.g.</p>
+
+<pre><code>    <span class="variable">$B::Op_private::defines</span><span class="operator">{</span><span class="string">OPpLVAL_INTRO</span><span class="operator">}</span> <span class="operator">==</span> <span class="number">128</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="labels"><code>%labels</code></h2>
+
+<p>This gives the short display label for each define, as used by <code>B::Concise</code> and <code>perl -Dx</code>, e.g.</p>
+
+<pre><code>    <span class="variable">$B::Op_private::labels</span><span class="operator">{</span><span class="string">OPpLVAL_INTRO</span><span class="operator">}</span> <span class="keyword">eq</span> <span class="string">'LVINTRO'</span><span class="operator">;</span>
+</code></pre>
+
+<p>If the label equals &#39;-&#39;, then Concise will treat the bit as a raw bit and not try to display it symbolically.</p>
+
+<h2 id="ops_using"><code>%ops_using</code></h2>
+
+<p>For each define, this gives a reference to an array of op names that use the flag.</p>
+
+<pre><code>    <span class="variable">@ops_using_lvintro</span> <span class="operator">=</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$B::Op_private::ops_using</span><span class="operator">{</span><span class="string">OPp_LVAL_INTRO</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+
+</body>
+
+</html>
+
+

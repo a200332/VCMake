@@ -1,0 +1,476 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#DateTime::Format::Strptime-new-args">DateTime::Format::Strptime-&gt;new(%args)</a></li>
+      <li><a href="#strptime-parse_datetime-string">$strptime-&gt;parse_datetime($string)</a></li>
+      <li><a href="#strptime-format_datetime-datetime">$strptime-&gt;format_datetime($datetime)</a></li>
+      <li><a href="#strptime-locale">$strptime-&gt;locale</a></li>
+      <li><a href="#strptime-pattern">$strptime-&gt;pattern</a></li>
+      <li><a href="#strptime-time_zone">$strptime-&gt;time_zone</a></li>
+      <li><a href="#strptime-errmsg">$strptime-&gt;errmsg</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#strptime-strptime_pattern-string">strptime( $strptime_pattern, $string )</a></li>
+      <li><a href="#strftime-strftime_pattern-datetime">strftime( $strftime_pattern, $datetime )</a></li>
+    </ul>
+  </li>
+  <li><a href="#STRPTIME-PATTERN-TOKENS">STRPTIME PATTERN TOKENS</a></li>
+  <li><a href="#AUTHOR-EMERITUS">AUTHOR EMERITUS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Strptime - Parse and format strp and strf time patterns</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.74</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">DateTime::Format::Strptime</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$strp</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Strptime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">pattern</span>   <span class="operator">=&gt;</span> <span class="string">'%T'</span><span class="operator">,</span>
+        <span class="string">locale</span>    <span class="operator">=&gt;</span> <span class="string">'en_AU'</span><span class="operator">,</span>
+        <span class="string">time_zone</span> <span class="operator">=&gt;</span> <span class="string">'Australia/Melbourne'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$strp</span><span class="operator">-&gt;</span><span class="variable">parse_datetime</span><span class="operator">(</span><span class="string">'23:16:42'</span><span class="operator">);</span>
+    
+    <span class="variable">$strp</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span><span class="variable">$dt</span><span class="operator">);</span>
+    
+    <span class="comment"># 23:16:42</span>
+    
+    <span class="comment"># Croak when things go wrong:</span>
+    <span class="keyword">my</span> <span class="variable">$strp</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Strptime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">pattern</span>   <span class="operator">=&gt;</span> <span class="string">'%T'</span><span class="operator">,</span>
+        <span class="string">locale</span>    <span class="operator">=&gt;</span> <span class="string">'en_AU'</span><span class="operator">,</span>
+        <span class="string">time_zone</span> <span class="operator">=&gt;</span> <span class="string">'Australia/Melbourne'</span><span class="operator">,</span>
+        <span class="string">on_error</span>  <span class="operator">=&gt;</span> <span class="string">'croak'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># Do something else when things go wrong:</span>
+    <span class="keyword">my</span> <span class="variable">$strp</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Strptime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">pattern</span>   <span class="operator">=&gt;</span> <span class="string">'%T'</span><span class="operator">,</span>
+        <span class="string">locale</span>    <span class="operator">=&gt;</span> <span class="string">'en_AU'</span><span class="operator">,</span>
+        <span class="string">time_zone</span> <span class="operator">=&gt;</span> <span class="string">'Australia/Melbourne'</span><span class="operator">,</span>
+        <span class="string">on_error</span>  <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">phone_police</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module implements most of <code>strptime(3)</code>, the POSIX function that is the reverse of <code>strftime(3)</code>, for <code>DateTime</code>. While <code>strftime</code> takes a <code>DateTime</code> and a pattern and returns a string, <code>strptime</code> takes a string and a pattern and returns the <code>DateTime</code> object associated.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class offers the following methods.</p>
+
+<h2 id="DateTime::Format::Strptime-new-args">DateTime::Format::Strptime-&gt;new(%args)</h2>
+
+<p>This methods creates a new object. It accepts the following arguments:</p>
+
+<ul>
+
+<li><p>pattern</p>
+
+<p>This is the pattern to use for parsing. This is required.</p>
+
+</li>
+<li><p>strict</p>
+
+<p>This is a boolean which disables or enables strict matching mode.</p>
+
+<p>By default, this module turns your pattern into a regex that will match anywhere in a string. So given the pattern <code>%Y%m%d%H%M%S</code> it will match a string like <code>20161214233712Z</code>. However, this also means that a this pattern will match <b>any</b> string that contains 14 or more numbers! This behavior can be very surprising.</p>
+
+<p>If you enable strict mode, then the generated regex is wrapped in boundary checks of the form <code>/(?:\A|\b)...(?:\b|\z_/)</code>. These checks ensure that the pattern will only match when at the beginning or end of a string, or when it is separated by other text with a word boundary (<code>\w</code> versus <code>\W</code>).</p>
+
+<p>By default, strict mode is off. This is done for backwards compatibility. Future releases may turn it on by default, as it produces less surprising behavior in many cases.</p>
+
+<p>Because the default may change in the future, <b>you are strongly encouraged to explicitly set this when constructing all <code>DateTime::Format::Strptime</code> objects</b>.</p>
+
+</li>
+<li><p>time_zone</p>
+
+<p>The default time zone to use for objects returned from parsing.</p>
+
+</li>
+<li><p>zone_map</p>
+
+<p>Some time zone abbreviations are ambiguous (e.g. PST, EST, EDT). By default, the parser will die when it parses an ambiguous abbreviation. You may specify a <code>zone_map</code> parameter as a hashref to map zone abbreviations however you like:</p>
+
+<pre><code>    <span class="string">zone_map</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">PST</span> <span class="operator">=&gt;</span> <span class="string">'-0800'</span><span class="operator">,</span> <span class="string">EST</span> <span class="operator">=&gt;</span> <span class="string">'-0600'</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Note that you can also override non-ambiguous mappings if you want to as well.</p>
+
+</li>
+<li><p>locale</p>
+
+<p>The locale to use for objects returned from parsing.</p>
+
+</li>
+<li><p>on_error</p>
+
+<p>This can be one of <code>&#39;undef&#39;</code> (the string, not an <code>undef</code>), &#39;croak&#39;, or a subroutine reference.</p>
+
+<ul>
+
+<li><p>&#39;undef&#39;</p>
+
+<p>This is the default behavior. The module will return <code>undef</code> on errors. The error can be accessed using the <code>$object-&gt;errmsg</code> method. This is the ideal behaviour for interactive use where a user might provide an illegal pattern or a date that doesn&#39;t match the pattern.</p>
+
+</li>
+<li><p>&#39;croak&#39;</p>
+
+<p>The module will croak with an error message on errors.</p>
+
+</li>
+<li><p>sub{...} or \&amp;subname</p>
+
+<p>When given a code ref, the module will call that sub on errors. The sub receives two parameters: the object and the error message.</p>
+
+<p>If your sub does not die, then the formatter will continue on as if <code>on_error</code> was <code>&#39;undef&#39;</code>.</p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<h2 id="strptime-parse_datetime-string">$strptime-&gt;parse_datetime($string)</h2>
+
+<p>Given a string in the pattern specified in the constructor, this method will return a new <code>DateTime</code> object.</p>
+
+<p>If given a string that doesn&#39;t match the pattern, the formatter will croak or return undef, depending on the setting of <code>on_error</code> in the constructor.</p>
+
+<h2 id="strptime-format_datetime-datetime">$strptime-&gt;format_datetime($datetime)</h2>
+
+<p>Given a <code>DateTime</code> object, this methods returns a string formatted in the object&#39;s format. This method is synonymous with <code>DateTime</code>&#39;s strftime method.</p>
+
+<h2 id="strptime-locale">$strptime-&gt;locale</h2>
+
+<p>This method returns the locale passed to the object&#39;s constructor.</p>
+
+<h2 id="strptime-pattern">$strptime-&gt;pattern</h2>
+
+<p>This method returns the pattern passed to the object&#39;s constructor.</p>
+
+<h2 id="strptime-time_zone">$strptime-&gt;time_zone</h2>
+
+<p>This method returns the time zone passed to the object&#39;s constructor.</p>
+
+<h2 id="strptime-errmsg">$strptime-&gt;errmsg</h2>
+
+<p>If the on_error behavior of the object is &#39;undef&#39;, you can retrieve error messages with this method so you can work out why things went wrong.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>These subs are available as optional exports.</p>
+
+<h2 id="strptime-strptime_pattern-string">strptime( $strptime_pattern, $string )</h2>
+
+<p>Given a pattern and a string this function will return a new <code>DateTime</code> object.</p>
+
+<h2 id="strftime-strftime_pattern-datetime">strftime( $strftime_pattern, $datetime )</h2>
+
+<p>Given a pattern and a <code>DateTime</code> object this function will return a formatted string.</p>
+
+<h1 id="STRPTIME-PATTERN-TOKENS">STRPTIME PATTERN TOKENS</h1>
+
+<p>The following tokens are allowed in the pattern string for strptime (parse_datetime):</p>
+
+<ul>
+
+<li><p>%%</p>
+
+<p>The % character.</p>
+
+</li>
+<li><p>%a or %A</p>
+
+<p>The weekday name according to the given locale, in abbreviated form or the full name.</p>
+
+</li>
+<li><p>%b or %B or %h</p>
+
+<p>The month name according to the given locale, in abbreviated form or the full name.</p>
+
+</li>
+<li><p>%c</p>
+
+<p>The datetime format according to the given locale.</p>
+
+</li>
+<li><p>%C</p>
+
+<p>The century number (0-99).</p>
+
+</li>
+<li><p>%d or %e</p>
+
+<p>The day of month (01-31). This will parse single digit numbers as well.</p>
+
+</li>
+<li><p>%D</p>
+
+<p>Equivalent to %m/%d/%y. (This is the American style date, very confusing to non-Americans, especially since %d/%m/%y is widely used in Europe. The ISO 8601 standard pattern is %F.)</p>
+
+</li>
+<li><p>%F</p>
+
+<p>Equivalent to %Y-%m-%d. (This is the ISO style date)</p>
+
+</li>
+<li><p>%g</p>
+
+<p>The year corresponding to the ISO week number, but without the century (0-99).</p>
+
+</li>
+<li><p>%G</p>
+
+<p>The 4-digit year corresponding to the ISO week number.</p>
+
+</li>
+<li><p>%H</p>
+
+<p>The hour (00-23). This will parse single digit numbers as well.</p>
+
+</li>
+<li><p>%I</p>
+
+<p>The hour on a 12-hour clock (1-12).</p>
+
+</li>
+<li><p>%j</p>
+
+<p>The day number in the year (1-366).</p>
+
+</li>
+<li><p>%m</p>
+
+<p>The month number (01-12). This will parse single digit numbers as well.</p>
+
+</li>
+<li><p>%M</p>
+
+<p>The minute (00-59). This will parse single digit numbers as well.</p>
+
+</li>
+<li><p>%n</p>
+
+<p>Arbitrary whitespace.</p>
+
+</li>
+<li><p>%N</p>
+
+<p>Nanoseconds. For other sub-second values use <code>%[number]N</code>.</p>
+
+</li>
+<li><p>%p or %P</p>
+
+<p>The equivalent of AM or PM according to the locale in use. See <a href="../../../lib/DateTime/Locale.html">DateTime::Locale</a>.</p>
+
+</li>
+<li><p>%r</p>
+
+<p>Equivalent to %I:%M:%S %p.</p>
+
+</li>
+<li><p>%R</p>
+
+<p>Equivalent to %H:%M.</p>
+
+</li>
+<li><p>%s</p>
+
+<p>Number of seconds since the Epoch.</p>
+
+</li>
+<li><p>%S</p>
+
+<p>The second (0-60; 60 may occur for leap seconds. See <a href="../../../lib/DateTime/LeapSecond.html">DateTime::LeapSecond</a>).</p>
+
+</li>
+<li><p>%t</p>
+
+<p>Arbitrary whitespace.</p>
+
+</li>
+<li><p>%T</p>
+
+<p>Equivalent to %H:%M:%S.</p>
+
+</li>
+<li><p>%U</p>
+
+<p>The week number with Sunday the first day of the week (0-53). The first Sunday of January is the first day of week 1.</p>
+
+</li>
+<li><p>%u</p>
+
+<p>The weekday number (1-7) with Monday = 1. This is the <code>DateTime</code> standard.</p>
+
+</li>
+<li><p>%w</p>
+
+<p>The weekday number (0-6) with Sunday = 0.</p>
+
+</li>
+<li><p>%W</p>
+
+<p>The week number with Monday the first day of the week (0-53). The first Monday of January is the first day of week 1.</p>
+
+</li>
+<li><p>%x</p>
+
+<p>The date format according to the given locale.</p>
+
+</li>
+<li><p>%X</p>
+
+<p>The time format according to the given locale.</p>
+
+</li>
+<li><p>%y</p>
+
+<p>The year within century (0-99). When a century is not otherwise specified (with a value for %C), values in the range 69-99 refer to years in the twentieth century (1969-1999); values in the range 00-68 refer to years in the twenty-first century (2000-2068).</p>
+
+</li>
+<li><p>%Y</p>
+
+<p>A 4-digit year, including century (for example, 1991).</p>
+
+</li>
+<li><p>%z</p>
+
+<p>An RFC-822/ISO 8601 standard time zone specification. (For example +1100) [See note below]</p>
+
+</li>
+<li><p>%Z</p>
+
+<p>The timezone name. (For example EST -- which is ambiguous) [See note below]</p>
+
+</li>
+<li><p>%O</p>
+
+<p>This extended token allows the use of Olson Time Zone names to appear in parsed strings. <b>NOTE</b>: This pattern cannot be passed to <code>DateTime</code>&#39;s <code>strftime()</code> method, but can be passed to <code>format_datetime()</code>.</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR-EMERITUS">AUTHOR EMERITUS</h1>
+
+<p>This module was created by Rick Measham.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><code>datetime@perl.org</code> mailing list.</p>
+
+<p>http://datetime.perl.org/</p>
+
+<p><a href="../../../lib/pods/perl.html">perl</a>, <a href="../../../lib/DateTime.html">DateTime</a>, <a href="../../../lib/DateTime/TimeZone.html">DateTime::TimeZone</a>, <a href="../../../lib/DateTime/Locale.html">DateTime::Locale</a></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-datetime-format-strptime@rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/DateTime-Format-Strptime/issues">https://github.com/houseabsolute/DateTime-Format-Strptime/issues</a>.</p>
+
+<p>There is a mailing list available for users of this distribution, <a href="mailto:datetime@perl.org">mailto:datetime@perl.org</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for DateTime-Format-Strptime can be found at <a href="https://github.com/houseabsolute/DateTime-Format-Strptime">https://github.com/houseabsolute/DateTime-Format-Strptime</a>.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Rick Measham &lt;rickm@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Christian Hansen &lt;chansen@cpan.org&gt;</p>
+
+</li>
+<li><p>D. Ilmari Manns&aring;ker &lt;ilmari.mannsaker@net-a-porter.com&gt;</p>
+
+</li>
+<li><p>key-amb &lt;yasutake.kiyoshi@gmail.com&gt;</p>
+
+</li>
+<li><p>Mohammad S Anwar &lt;mohammad.anwar@yahoo.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2015 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

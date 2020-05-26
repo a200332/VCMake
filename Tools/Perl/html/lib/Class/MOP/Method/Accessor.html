@@ -1,0 +1,167 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::MOP::Method::Accessor - Method Meta Object for accessors</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Class::MOP::Method::Accessor</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$reader</span> <span class="operator">=</span> <span class="variable">Class::MOP::Method::Accessor</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">attribute</span>     <span class="operator">=&gt;</span> <span class="variable">$attribute</span><span class="operator">,</span>
+        <span class="string">is_inline</span>     <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="string">accessor_type</span> <span class="operator">=&gt;</span> <span class="string">'reader'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">$reader</span><span class="operator">-&gt;</span><span class="variable">body</span><span class="operator">-&gt;</span><span class="variable">execute</span><span class="operator">(</span><span class="variable">$instance</span><span class="operator">);</span> <span class="comment"># call the reader method</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a subclass of <code>Class::MOP::Method</code> which is used by <code>Class::MOP::Attribute</code> to generate accessor code. It handles generation of readers, writers, predicates and clearers. For each type of method, it can either create a subroutine reference, or actually inline code by generating a string and <code>eval</code>&#39;ing it.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="Class::MOP::Method::Accessor-new-options"><b>Class::MOP::Method::Accessor-&gt;new(%options)</b></dt>
+<dd>
+
+<p>This returns a new <code>Class::MOP::Method::Accessor</code> based on the <code>%options</code> provided.</p>
+
+<ul>
+
+<li><p>attribute</p>
+
+<p>This is the <code>Class::MOP::Attribute</code> for which accessors are being generated. This option is required.</p>
+
+</li>
+<li><p>accessor_type</p>
+
+<p>This is a string which should be one of &quot;reader&quot;, &quot;writer&quot;, &quot;accessor&quot;, &quot;predicate&quot;, or &quot;clearer&quot;. This is the type of method being generated. This option is required.</p>
+
+</li>
+<li><p>is_inline</p>
+
+<p>This indicates whether or not the accessor should be inlined. This defaults to false.</p>
+
+</li>
+<li><p>name</p>
+
+<p>The method name (without a package name). This is required.</p>
+
+</li>
+<li><p>package_name</p>
+
+<p>The package name for the method. This is required.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="metamethod-accessor_type"><b>$metamethod-&gt;accessor_type</b></dt>
+<dd>
+
+<p>Returns the accessor type which was passed to <code>new</code>.</p>
+
+</dd>
+<dt id="metamethod-is_inline"><b>$metamethod-&gt;is_inline</b></dt>
+<dd>
+
+<p>Returns a boolean indicating whether or not the accessor is inlined.</p>
+
+</dd>
+<dt id="metamethod-associated_attribute"><b>$metamethod-&gt;associated_attribute</b></dt>
+<dd>
+
+<p>This returns the <a href="../../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a> object which was passed to <code>new</code>.</p>
+
+</dd>
+<dt id="metamethod-body"><b>$metamethod-&gt;body</b></dt>
+<dd>
+
+<p>The method itself is <i>generated</i> when the accessor object is constructed.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

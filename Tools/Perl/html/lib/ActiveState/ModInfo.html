@@ -1,0 +1,177 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::ModInfo - Queries about installed perl modules</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">ActiveState::ModInfo</span> <span class="string">qw(list_modules find_module)</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The following functions are provided:</p>
+
+<dl>
+
+<dt id="path-find_inc-fname">$path = find_inc( $fname )</dt>
+<dd>
+
+</dd>
+<dt id="path-find_inc-fname-inc">$path = find_inc( $fname, \@inc )</dt>
+<dd>
+
+<p>Returns the full path to the given $fname, or <code>undef</code> if not found.</p>
+
+</dd>
+<dt id="path-find_module-mod">$path = find_module( $mod )</dt>
+<dd>
+
+</dd>
+<dt id="path-find_module-mod-inc">$path = find_module( $mod, \@inc )</dt>
+<dd>
+
+<p>Returns the full path to the given module, or <code>undef</code> if not found.</p>
+
+</dd>
+<dt id="mod-fixup_module_case-mod-opts">$mod = fixup_module_case( $mod, %opts )</dt>
+<dd>
+
+<p>Will for instance change &quot;html::parser&quot; into &quot;HTML::Parser&quot;. If multiple mappings are possible return $mod unchanged. The $mod is also returned unchanged if the module can&#39;t be located.</p>
+
+<p>The following options are recognized:</p>
+
+<dl>
+
+<dt id="inc-list"><code>inc</code> =&gt; \@list</dt>
+<dd>
+
+<p>A list of directories to search for modules. If not provided it defaults to all the @INC.</p>
+
+</dd>
+<dt id="prefix_only-bool"><code>prefix_only</code> =&gt; $bool</dt>
+<dd>
+
+<p>If true assume $mod to just be a namespace. Will just look for matching directory names, not an actual <i>.pm</i> file.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="mod-fname2mod-fname">$mod = fname2mod( $fname )</dt>
+<dd>
+
+<p>Convert an fname to a module module name. The function might return <code>undef</code> if the given $fname does not represent a perl module.</p>
+
+</dd>
+<dt id="modules-list_modules-opt">%modules = list_modules( %opt )</dt>
+<dd>
+
+<p>This function will locate all modules (.pm files) and return a list of module-name/file-location pairs.</p>
+
+<p>The following options are recognized:</p>
+
+<dl>
+
+<dt id="inc-list1"><code>inc</code> =&gt; \@list</dt>
+<dd>
+
+<p>A list of directories to search for modules. If not provided it defaults to all the @INC entries that point inside the perl installation directory ($Config{prefix}).</p>
+
+</dd>
+<dt id="maxdepth-n"><code>maxdepth</code> =&gt; $n</dt>
+<dd>
+
+<p>When to give up when traversing directories, i.e. how many &quot;::&quot;s to allow in the module name. The default is 6. A value of 0 indicate no limit.</p>
+
+</dd>
+<dt id="allowdup-bool"><code>allowdup</code> =&gt; $bool</dt>
+<dd>
+
+<p>If true return all occurrences or any given module. If this option is false or not provided, only the first occurrence of any given module when traversing <code>inc</code> will be returned. This should also be the module that perl would pick up if @INC as the given <code>inc</code>.</p>
+
+</dd>
+<dt id="namespace-ns"><code>namespace</code> =&gt; $ns</dt>
+<dd>
+
+<p>Only modules in the given namespace is returned. If $ns ends with &quot;::&quot; only submodules of the given namespace is returned.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="fname-mod2fname-mod">$fname = mod2fname( $mod )</dt>
+<dd>
+
+<p>Convert a module name to an fname.</p>
+
+</dd>
+<dt id="fh-open_inc-fname">$fh = open_inc( $fname )</dt>
+<dd>
+
+</dd>
+<dt id="fh-open_inc-fname-inc">$fh = open_inc( $fname, \@inc )</dt>
+<dd>
+
+<p>Returns an opened file handle for the given fname, or <code>undef</code> if not found. Slightly more efficient than using the standard open() function on the path returned by find_inc(), but otherwise just the same. The file is opened in read-only mode.</p>
+
+</dd>
+<dt id="fh-open_module-mod">$fh = open_module( $mod )</dt>
+<dd>
+
+</dd>
+<dt id="fh-open_module-mod-inc">$fh = open_module( $mod, \@inc )</dt>
+<dd>
+
+<p>Returns an opened file handle for the given module, or <code>undef</code> if not found.</p>
+
+</dd>
+<dt id="vers-parse_version-filename">$vers = parse_version( $filename )</dt>
+<dd>
+
+<p>Return the $VERSION of a module using the official ExtUtils::MakeMaker algorithm. This is a slightly modified copy of the MakeMaker function. The main difference is that it returns a real <code>undef</code> if no version number is found and do it without producing any warning.</p>
+
+</dd>
+<dt id="module-vers-module_version-filename">($module, $vers) = module_version( $filename )</dt>
+<dd>
+
+<p>Return the module name and its version number from a file.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>none.</p>
+
+
+</body>
+
+</html>
+
+

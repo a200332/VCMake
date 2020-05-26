@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Mozilla::CA - Mozilla&#39;s CA cert bundle in PEM format</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">IO::Socket::SSL</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Mozilla::CA</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$host</span> <span class="operator">=</span> <span class="string">"www.paypal.com"</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$client</span> <span class="operator">=</span> <span class="variable">IO::Socket::SSL</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">PeerHost</span> <span class="operator">=&gt;</span> <span class="string">"</span><span class="variable">$host</span><span class="string">:443"</span><span class="operator">,</span>
+        <span class="string">SSL_verify_mode</span> <span class="operator">=&gt;</span> <span class="number">0x02</span><span class="operator">,</span>
+        <span class="string">SSL_ca_file</span> <span class="operator">=&gt;</span> <span class="variable">Mozilla::CA::SSL_ca_file</span><span class="operator">(),</span>
+    <span class="operator">)</span>
+        <span class="operator">||</span> <span class="keyword">die</span> <span class="string">"Can't connect: $@"</span><span class="operator">;</span>
+    
+    <span class="variable">$client</span><span class="operator">-&gt;</span><span class="variable">verify_hostname</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">,</span> <span class="string">"http"</span><span class="operator">)</span>
+        <span class="operator">||</span> <span class="keyword">die</span> <span class="string">"hostname verification failure"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Mozilla::CA provides a copy of Mozilla&#39;s bundle of Certificate Authority certificates in a form that can be consumed by modules and libraries based on OpenSSL.</p>
+
+<p>The module provide a single function:</p>
+
+<dl>
+
+<dt id="SSL_ca_file">SSL_ca_file()</dt>
+<dd>
+
+<p>Returns the absolute path to the Mozilla&#39;s CA cert bundle PEM file.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="http://curl.haxx.se/docs/caextract.html">http://curl.haxx.se/docs/caextract.html</a></p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>For the bundled Mozilla CA PEM file the following applies:</p>
+
+<ul>
+
+<p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.</p>
+
+</ul>
+
+<p>The Mozilla::CA distribution itself is available under the same license.</p>
+
+
+</body>
+
+</html>
+
+

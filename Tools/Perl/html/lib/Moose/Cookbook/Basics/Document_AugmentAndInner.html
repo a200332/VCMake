@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONCLUSION">CONCLUSION</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Cookbook::Basics::Document_AugmentAndInner - The augment modifier, which turns normal method overriding &quot;inside-out&quot;</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Document::Page</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'body'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span> <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="string">''</span><span class="operator">}</span> <span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> create </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">open_page</span><span class="operator">;</span>
+      <span class="variable">inner</span><span class="operator">();</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">close_page</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> append_body </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$appendage</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">body</span><span class="operator">(</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">body</span> <span class="operator">.</span> <span class="variable">$appendage</span> <span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> open_page  </span><span class="operator">{</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">append_body</span><span class="operator">(</span><span class="string">'&lt;page&gt;'</span><span class="operator">)</span> <span class="operator">}</span>
+  <span class="keyword">sub</span><span class="variable"> close_page </span><span class="operator">{</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">append_body</span><span class="operator">(</span><span class="string">'&lt;/page&gt;'</span><span class="operator">)</span> <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">Document::PageWithHeadersAndFooters</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Document::Page'</span><span class="operator">;</span>
+  
+  <span class="variable">augment</span> <span class="string">'create'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">create_header</span><span class="operator">;</span>
+      <span class="variable">inner</span><span class="operator">();</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">create_footer</span><span class="operator">;</span>
+  <span class="operator">};</span>
+  
+  <span class="keyword">sub</span><span class="variable"> create_header </span><span class="operator">{</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">append_body</span><span class="operator">(</span><span class="string">'&lt;header/&gt;'</span><span class="operator">)</span> <span class="operator">}</span>
+  <span class="keyword">sub</span><span class="variable"> create_footer </span><span class="operator">{</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">append_body</span><span class="operator">(</span><span class="string">'&lt;footer/&gt;'</span><span class="operator">)</span> <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">TPSReport</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Document::PageWithHeadersAndFooters'</span><span class="operator">;</span>
+  
+  <span class="variable">augment</span> <span class="string">'create'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">create_tps_report</span><span class="operator">;</span>
+      <span class="variable">inner</span><span class="operator">();</span>
+  <span class="operator">};</span>
+  
+  <span class="keyword">sub</span><span class="variable"> create_tps_report </span><span class="operator">{</span>
+      <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">append_body</span><span class="operator">(</span><span class="string">'&lt;report type="tps"/&gt;'</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># &lt;page&gt;&lt;header/&gt;&lt;report type="tps"/&gt;&lt;footer/&gt;&lt;/page&gt;</span>
+  <span class="keyword">my</span> <span class="variable">$report_xml</span> <span class="operator">=</span> <span class="variable">TPSReport</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">-&gt;</span><span class="variable">create</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This recipe shows how the <code>augment</code> method modifier works. This modifier reverses the normal subclass to parent method resolution order. With an <code>augment</code> modifier the <i>least</i> specific method is called first. Each successive call to <code>inner</code> descends the inheritance tree, ending at the most specific subclass.</p>
+
+<p>The <code>augment</code> modifier lets you design a parent class that can be extended in a specific way. The parent provides generic wrapper functionality, and the subclasses fill in the details.</p>
+
+<p>In the example above, we&#39;ve created a set of document classes, with the most specific being the <code>TPSReport</code> class.</p>
+
+<p>We start with the least specific class, <code>Document::Page</code>. Its create method contains a call to <code>inner()</code>:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> create </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">open_page</span><span class="operator">;</span>
+      <span class="variable">inner</span><span class="operator">();</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">close_page</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>inner</code> function is exported by <code>Moose</code>, and is like <code>super</code> for augmented methods. When <code>inner</code> is called, Moose finds the next method in the chain, which is the <code>augment</code> modifier in <code>Document::PageWithHeadersAndFooters</code>. You&#39;ll note that we can call <code>inner</code> in our modifier:</p>
+
+<pre><code>  <span class="variable">augment</span> <span class="string">'create'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">create_header</span><span class="operator">;</span>
+      <span class="variable">inner</span><span class="operator">();</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">create_footer</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>This finds the next most specific modifier, in the <code>TPSReport</code> class.</p>
+
+<p>Finally, in the <code>TPSReport</code> class, the chain comes to an end:</p>
+
+<pre><code>  <span class="variable">augment</span> <span class="string">'create'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">create_tps_report</span><span class="operator">;</span>
+      <span class="variable">inner</span><span class="operator">();</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>We do call the <code>inner</code> function one more time, but since there is no more specific subclass, this is a no-op. Making this call means we can easily subclass <code>TPSReport</code> in the future.</p>
+
+<h1 id="CONCLUSION">CONCLUSION</h1>
+
+<p>The <code>augment</code> modifier is a powerful tool for creating a set of nested wrappers. It&#39;s not something you will need often, but when you do, it is very handy.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

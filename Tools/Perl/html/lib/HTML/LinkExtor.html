@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTML::LinkExtor - Extract links from an HTML document</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">require</span> <span class="variable">HTML::LinkExtor</span><span class="operator">;</span>
+ <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">HTML::LinkExtor</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\&amp;</span><span class="variable">cb</span><span class="operator">,</span> <span class="string">"http://www.perl.org/"</span><span class="operator">);</span>
+ <span class="keyword">sub</span><span class="variable"> cb </span><span class="operator">{</span>
+     <span class="keyword">my</span><span class="operator">(</span><span class="variable">$tag</span><span class="operator">,</span> <span class="variable">%links</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+     <span class="keyword">print</span> <span class="string">"</span><span class="variable">$tag</span><span class="string"> @{[%links]}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">parse_file</span><span class="operator">(</span><span class="string">"index.html"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><i>HTML::LinkExtor</i> is an HTML parser that extracts links from an HTML document. The <i>HTML::LinkExtor</i> is a subclass of <i>HTML::Parser</i>. This means that the document should be given to the parser by calling the $p-&gt;parse() or $p-&gt;parse_file() methods.</p>
+
+<dl>
+
+<dt id="p-HTML::LinkExtor-new">$p = HTML::LinkExtor-&gt;new</dt>
+<dd>
+
+</dd>
+<dt id="p-HTML::LinkExtor-new-callback">$p = HTML::LinkExtor-&gt;new( $callback )</dt>
+<dd>
+
+</dd>
+<dt id="p-HTML::LinkExtor-new-callback-base">$p = HTML::LinkExtor-&gt;new( $callback, $base )</dt>
+<dd>
+
+<p>The constructor takes two optional arguments. The first is a reference to a callback routine. It will be called as links are found. If a callback is not provided, then links are just accumulated internally and can be retrieved by calling the $p-&gt;links() method.</p>
+
+<p>The $base argument is an optional base URL used to absolutize all URLs found. You need to have the <i>URI</i> module installed if you provide $base.</p>
+
+<p>The callback is called with the lowercase tag name as first argument, and then all link attributes as separate key/value pairs. All non-link attributes are removed.</p>
+
+</dd>
+<dt id="p-links">$p-&gt;links</dt>
+<dd>
+
+<p>Returns a list of all links found in the document. The returned values will be anonymous arrays with the following elements:</p>
+
+<pre><code>  [$tag, $attr =&gt; $url1, $attr2 =&gt; $url2,...]</code></pre>
+
+<p>The $p-&gt;links method will also truncate the internal link list. This means that if the method is called twice without any parsing between them the second call will return an empty list.</p>
+
+<p>Also note that $p-&gt;links will always be empty if a callback routine was provided when the <i>HTML::LinkExtor</i> was created.</p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<p>This is an example showing how you can extract links from a document received using LWP:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">LWP::UserAgent</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">HTML::LinkExtor</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">URI::URL</span><span class="operator">;</span>
+  
+  <span class="variable">$url</span> <span class="operator">=</span> <span class="string">"http://www.perl.org/"</span><span class="operator">;</span>  <span class="comment"># for instance</span>
+  <span class="variable">$ua</span> <span class="operator">=</span> <span class="variable">LWP::UserAgent</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  
+  <span class="comment"># Set up a callback that collect image links</span>
+  <span class="keyword">my</span> <span class="variable">@imgs</span> <span class="operator">=</span> <span class="operator">();</span>
+  <span class="keyword">sub</span><span class="variable"> callback </span><span class="operator">{</span>
+     <span class="keyword">my</span><span class="operator">(</span><span class="variable">$tag</span><span class="operator">,</span> <span class="variable">%attr</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+     <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">$tag</span> <span class="keyword">ne</span> <span class="string">'img'</span><span class="operator">;</span>  <span class="comment"># we only look closer at &lt;img ...&gt;</span>
+     <span class="keyword">push</span><span class="operator">(</span><span class="variable">@imgs</span><span class="operator">,</span> <span class="keyword">values</span> <span class="variable">%attr</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># Make the parser.  Unfortunately, we don't know the base yet</span>
+  <span class="comment"># (it might be different from $url)</span>
+  <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">HTML::LinkExtor</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\&amp;</span><span class="variable">callback</span><span class="operator">);</span>
+  
+  <span class="comment"># Request document and parse it as it arrives</span>
+  <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">request</span><span class="operator">(</span><span class="variable">HTTP::Request</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">GET</span> <span class="operator">=&gt;</span> <span class="variable">$url</span><span class="operator">),</span>
+                      <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">)});</span>
+  
+  <span class="comment"># Expand all image URLs to absolute ones</span>
+  <span class="keyword">my</span> <span class="variable">$base</span> <span class="operator">=</span> <span class="variable">$res</span><span class="operator">-&gt;</span><span class="variable">base</span><span class="operator">;</span>
+  <span class="variable">@imgs</span> <span class="operator">=</span> <span class="keyword">map</span> <span class="operator">{</span> <span class="variable">$_</span> <span class="operator">=</span> <span class="variable">url</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">,</span> <span class="variable">$base</span><span class="operator">)-&gt;</span><span class="variable">abs</span><span class="operator">;</span> <span class="operator">}</span> <span class="variable">@imgs</span><span class="operator">;</span>
+  
+  <span class="comment"># Print them out</span>
+  <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">"\n"</span><span class="operator">,</span> <span class="variable">@imgs</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/HTML/Parser.html">HTML::Parser</a>, <a href="../../lib/HTML/Tagset.html">HTML::Tagset</a>, <a href="../../lib/LWP.html">LWP</a>, <a href="../../lib/URI/URL.html">URI::URL</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 1996-2001 Gisle Aas.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

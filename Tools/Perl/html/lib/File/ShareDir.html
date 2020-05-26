@@ -1,0 +1,215 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Using-Data-in-your-Module">Using Data in your Module</a></li>
+    </ul>
+  </li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#dist_dir">dist_dir</a></li>
+      <li><a href="#module_dir">module_dir</a></li>
+      <li><a href="#dist_file">dist_file</a></li>
+      <li><a href="#module_file">module_file</a></li>
+      <li><a href="#class_file">class_file</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>File::ShareDir - Locate per-dist and per-module shared files</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">File::ShareDir</span> <span class="string">':ALL'</span><span class="operator">;</span>
+  
+  <span class="comment"># Where are distribution-level shared data files kept</span>
+  <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">dist_dir</span><span class="operator">(</span><span class="string">'File-ShareDir'</span><span class="operator">);</span>
+  
+  <span class="comment"># Where are module-level shared data files kept</span>
+  <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">module_dir</span><span class="operator">(</span><span class="string">'File::ShareDir'</span><span class="operator">);</span>
+  
+  <span class="comment"># Find a specific file in our dist/module shared dir</span>
+  <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">dist_file</span><span class="operator">(</span>  <span class="string">'File-ShareDir'</span><span class="operator">,</span>  <span class="string">'file/name.txt'</span><span class="operator">);</span>
+  <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">module_file</span><span class="operator">(</span><span class="string">'File::ShareDir'</span><span class="operator">,</span> <span class="string">'file/name.txt'</span><span class="operator">);</span>
+  
+  <span class="comment"># Like module_file, but search up the inheritance tree</span>
+  <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">class_file</span><span class="operator">(</span> <span class="string">'Foo::Bar'</span><span class="operator">,</span> <span class="string">'file/name.txt'</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The intent of <a href="../../lib/File/ShareDir.html">File::ShareDir</a> is to provide a companion to <a href="../../lib/Class/Inspector.html">Class::Inspector</a> and <a href="../../lib/File/HomeDir.html">File::HomeDir</a>, modules that take a process that is well-known by advanced Perl developers but gets a little tricky, and make it more available to the larger Perl community.</p>
+
+<p>Quite often you want or need your Perl module (CPAN or otherwise) to have access to a large amount of read-only data that is stored on the file-system at run-time.</p>
+
+<p>On a linux-like system, this would be in a place such as /usr/share, however Perl runs on a wide variety of different systems, and so the use of any one location is unreliable.</p>
+
+<p>Perl provides a little-known method for doing this, but almost nobody is aware that it exists. As a result, module authors often go through some very strange ways to make the data available to their code.</p>
+
+<p>The most common of these is to dump the data out to an enormous Perl data structure and save it into the module itself. The result are enormous multi-megabyte .pm files that chew up a lot of memory needlessly.</p>
+
+<p>Another method is to put the data &quot;file&quot; after the __DATA__ compiler tag and limit yourself to access as a filehandle.</p>
+
+<p>The problem to solve is really quite simple.</p>
+
+<pre><code>  1. Write the data files to the system at install time.
+  
+  2. Know where you put them at run-time.</code></pre>
+
+<p>Perl&#39;s install system creates an &quot;auto&quot; directory for both every distribution and for every module file.</p>
+
+<p>These are used by a couple of different auto-loading systems to store code fragments generated at install time, and various other modules written by the Perl &quot;ancient masters&quot;.</p>
+
+<p>But the same mechanism is available to any dist or module to store any sort of data.</p>
+
+<h2 id="Using-Data-in-your-Module">Using Data in your Module</h2>
+
+<p><code>File::ShareDir</code> forms one half of a two part solution.</p>
+
+<p>Once the files have been installed to the correct directory, you can use <code>File::ShareDir</code> to find your files again after the installation.</p>
+
+<p>For the installation half of the solution, see <a>Module::Install</a> and its <code>install_share</code> directive.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<p><code>File::ShareDir</code> provides four functions for locating files and directories.</p>
+
+<p>For greater maintainability, none of these are exported by default and you are expected to name the ones you want at use-time, or provide the <code>&#39;:ALL&#39;</code> tag. All of the following are equivalent.</p>
+
+<pre><code>  <span class="comment"># Load but don't import, and then call directly</span>
+  <span class="keyword">use</span> <span class="variable">File::ShareDir</span><span class="operator">;</span>
+  <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">File::ShareDir::dist_dir</span><span class="operator">(</span><span class="string">'My-Dist'</span><span class="operator">);</span>
+  
+  <span class="comment"># Import a single function</span>
+  <span class="keyword">use</span> <span class="variable">File::ShareDir</span> <span class="string">'dist_dir'</span><span class="operator">;</span>
+  <span class="variable">dist_dir</span><span class="operator">(</span><span class="string">'My-Dist'</span><span class="operator">);</span>
+  
+  <span class="comment"># Import all the functions</span>
+  <span class="keyword">use</span> <span class="variable">File::ShareDir</span> <span class="string">':ALL'</span><span class="operator">;</span>
+  <span class="variable">dist_dir</span><span class="operator">(</span><span class="string">'My-Dist'</span><span class="operator">);</span>
+</code></pre>
+
+<p>All of the functions will check for you that the dir/file actually exists, and that you have read permissions, or they will throw an exception.</p>
+
+<h2 id="dist_dir">dist_dir</h2>
+
+<pre><code>  <span class="comment"># Get a distribution's shared files directory</span>
+  <span class="keyword">my</span> <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">dist_dir</span><span class="operator">(</span><span class="string">'My-Distribution'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>dist_dir</code> function takes a single parameter of the name of an installed (CPAN or otherwise) distribution, and locates the shared data directory created at install time for it.</p>
+
+<p>Returns the directory path as a string, or dies if it cannot be located or is not readable.</p>
+
+<h2 id="module_dir">module_dir</h2>
+
+<pre><code>  <span class="comment"># Get a module's shared files directory</span>
+  <span class="keyword">my</span> <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">module_dir</span><span class="operator">(</span><span class="string">'My::Module'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>module_dir</code> function takes a single parameter of the name of an installed (CPAN or otherwise) module, and locates the shared data directory created at install time for it.</p>
+
+<p>In order to find the directory, the module <b>must</b> be loaded when calling this function.</p>
+
+<p>Returns the directory path as a string, or dies if it cannot be located or is not readable.</p>
+
+<h2 id="dist_file">dist_file</h2>
+
+<pre><code>  <span class="comment"># Find a file in our distribution shared dir</span>
+  <span class="keyword">my</span> <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">dist_file</span><span class="operator">(</span><span class="string">'My-Distribution'</span><span class="operator">,</span> <span class="string">'file/name.txt'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>dist_file</code> function takes two params of the distribution name and file name, locates the dist dir, and then finds the file within it, verifying that the file actually exists, and that it is readable.</p>
+
+<p>The filename should be a relative path in the format of your local filesystem. It will simply added to the directory using <a href="../../lib/File/Spec.html">File::Spec</a>&#39;s <code>catfile</code> method.</p>
+
+<p>Returns the file path as a string, or dies if the file or the dist&#39;s directory cannot be located, or the file is not readable.</p>
+
+<h2 id="module_file">module_file</h2>
+
+<pre><code>  <span class="comment"># Find a file in our module shared dir</span>
+  <span class="keyword">my</span> <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">module_file</span><span class="operator">(</span><span class="string">'My::Module'</span><span class="operator">,</span> <span class="string">'file/name.txt'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>module_file</code> function takes two params of the module name and file name. It locates the module dir, and then finds the file within it, verifying that the file actually exists, and that it is readable.</p>
+
+<p>In order to find the directory, the module <b>must</b> be loaded when calling this function.</p>
+
+<p>The filename should be a relative path in the format of your local filesystem. It will simply added to the directory using <a href="../../lib/File/Spec.html">File::Spec</a>&#39;s <code>catfile</code> method.</p>
+
+<p>Returns the file path as a string, or dies if the file or the dist&#39;s directory cannot be located, or the file is not readable.</p>
+
+<h2 id="class_file">class_file</h2>
+
+<pre><code>  <span class="comment"># Find a file in our module shared dir, or in our parent class</span>
+  <span class="keyword">my</span> <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">class_file</span><span class="operator">(</span><span class="string">'My::Module'</span><span class="operator">,</span> <span class="string">'file/name.txt'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>module_file</code> function takes two params of the module name and file name. It locates the module dir, and then finds the file within it, verifying that the file actually exists, and that it is readable.</p>
+
+<p>In order to find the directory, the module <b>must</b> be loaded when calling this function.</p>
+
+<p>The filename should be a relative path in the format of your local filesystem. It will simply added to the directory using <a href="../../lib/File/Spec.html">File::Spec</a>&#39;s <code>catfile</code> method.</p>
+
+<p>If the file is NOT found for that module, <code>class_file</code> will scan up the module&#39;s @ISA tree, looking for the file in all of the parent classes.</p>
+
+<p>This allows you to, in effect, &quot;subclass&quot; shared files.</p>
+
+<p>Returns the file path as a string, or dies if the file or the dist&#39;s directory cannot be located, or the file is not readable.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs should always be submitted via the CPAN bug tracker</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-ShareDir">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-ShareDir</a></p>
+
+<p>For other issues, contact the maintainer.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>File::ShareDir::Install</a>, <a href="../../lib/File/HomeDir.html">File::HomeDir</a>, <a>Module::Install</a>, <a>Module::Install::Share</a>, <a>File::ShareDir::PAR</a>, <a>Dist::Zilla::Plugin::ShareDir</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2005 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

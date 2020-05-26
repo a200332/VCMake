@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Exceptions">Exceptions</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ValuesAndExpressions::RequireInterpolationOfMetachars - Warns that you might have used single quotes when you really wanted double-quotes.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This policy warns you if you use single-quotes or <code>q//</code> with a string that has unescaped metacharacters that may need interpolation. Its hard to know for sure if a string really should be interpolated without looking into the symbol table. This policy just makes an educated guess by looking for metacharacters and sigils which usually indicate that the string should be interpolated.</p>
+
+<h2 id="Exceptions">Exceptions</h2>
+
+<ul>
+
+<li><p>Variable names to <code>use vars</code>:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">vars</span> <span class="string">'$x'</span><span class="operator">;</span>          <span class="comment"># ok</span>
+    <span class="keyword">use</span> <span class="variable">vars</span> <span class="operator">(</span><span class="string">'$y'</span><span class="operator">,</span> <span class="string">'$z'</span><span class="operator">);</span>  <span class="comment"># ok</span>
+    <span class="keyword">use</span> <span class="variable">vars</span> <span class="string">qw&lt; $a $b &gt;</span><span class="operator">;</span>   <span class="comment"># ok</span>
+</code></pre>
+
+</li>
+<li><p>Things that look like e-mail addresses:</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="string">'john@foo.com'</span><span class="operator">;</span>           <span class="comment"># ok</span>
+    <span class="variable">$address</span> <span class="operator">=</span> <span class="string">'suzy.bar@baz.net'</span><span class="operator">;</span>  <span class="comment"># ok</span>
+</code></pre>
+
+</li>
+</ul>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>The <code>rcs_keywords</code> option allows you to stop this policy from complaining about things that look like RCS variables, for example, in deriving values for <code>$VERSION</code> variables.</p>
+
+<p>For example, if you&#39;ve got code like</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="operator">(</span><span class="variable">$VERSION</span><span class="operator">)</span> <span class="operator">=</span> <span class="operator">(</span><span class="string">q&lt;$Revision$&gt;</span> <span class="operator">=~</span> <span class="regex">m/(\d+)/mx</span><span class="operator">);</span>
+</code></pre>
+
+<p>You can specify</p>
+
+<pre><code>    [ValuesAndExpressions::RequireInterpolationOfMetachars]
+    rcs_keywords = Revision</code></pre>
+
+<p>in your <i>.perlcriticrc</i> to provide an exemption.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>Perl&#39;s own <code>warnings</code> pragma also warns you about this.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../../lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitInterpolationOfLiterals.html">Perl::Critic::Policy::ValuesAndExpressions::ProhibitInterpolationOfLiterals</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

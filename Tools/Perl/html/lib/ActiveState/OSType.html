@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::OSType - Constants for platform specific conditional code</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">ActiveState::OSType</span> <span class="string">qw(IS_WIN32)</span><span class="operator">;</span>
+  
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">IS_WIN32</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="comment"># do windows specific code</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span> <span class="operator">{</span>
+     <span class="comment"># do other code</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module exports the constants <code>IS_WIN32</code>, <code>IS_DARWIN</code> and <code>IS_UNIX</code>. These constants can be used to wrap conditional code for specific platforms. Using these constants instead of testing $^O directly allow perl to eliminate unused branches of the code at compile time. Thus</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">IS_WIN32</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>is exactly the same as</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$^O</span> <span class="keyword">eq</span> <span class="string">"MSWin32"</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>but the first form looks better and the whole block is eliminated at compile time if not running on a windows machine. The test:</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">IS_UNIX</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>is currently the same as</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$^O</span> <span class="keyword">ne</span> <span class="string">"MSWin32"</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>but this might change in the future if this module is made to support systems other than Windows and Unix. There is no simple $^O test that can determine if the OS is Unix.</p>
+
+
+</body>
+
+</html>
+
+

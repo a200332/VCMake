@@ -1,0 +1,169 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Compare::Base - Base class for comparison classes.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>All comparison classes for Test2::Compare should inherit from this base class.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Test2::Compare::MyCheck</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Test2::Compare::Base'</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Test2::Util::HashBase</span> <span class="string">qw/stuff/</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> name </span><span class="operator">{</span> <span class="string">'STUFF'</span> <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> operator </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$got</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="string">'eq'</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> verify </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$params</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="comment"># Always check if $got exists! This method must return false if no</span>
+        <span class="comment"># value at all was received.</span>
+        <span class="keyword">return</span> <span class="number">0</span> <span class="keyword">unless</span> <span class="variable">$params</span><span class="operator">{</span><span class="string">exists</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$got</span> <span class="operator">=</span> <span class="variable">$params</span><span class="operator">{</span><span class="string">got</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="comment"># Returns true if both values match. This includes undef, 0, and other</span>
+        <span class="comment"># false-y values!</span>
+        <span class="keyword">return</span> <span class="variable">$got</span> <span class="keyword">eq</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">stuff</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>Some of these must be overridden, others can be.</p>
+
+<dl>
+
+<dt id="dclass-check-delta_class">$dclass = $check-&gt;delta_class</dt>
+<dd>
+
+<p>Returns the delta subclass that should be used. By default <a href="../../../lib/Test2/Compare/Delta.html">Test2::Compare::Delta</a> is used.</p>
+
+</dd>
+<dt id="deltas-check-deltas-id-id-exists-bool-got-got-convert-convert-seen-seen">@deltas = $check-&gt;deltas(id =&gt; $id, exists =&gt; $bool, got =&gt; $got, convert =&gt; \&amp;convert, seen =&gt; \%seen)</dt>
+<dd>
+
+<p>Should return child deltas.</p>
+
+</dd>
+<dt id="lines-check-got_lines-got">@lines = $check-&gt;got_lines($got)</dt>
+<dd>
+
+<p>This is your chance to provide line numbers for errors in the <code>$got</code> structure.</p>
+
+</dd>
+<dt id="op-check-operator">$op = $check-&gt;operator()</dt>
+<dd>
+
+</dd>
+<dt id="op-check-operator-got">$op = $check-&gt;operator($got)</dt>
+<dd>
+
+<p>Returns the operator that was used to compare the check with the received data in <code>$got</code>. If there was no value for got then there will be no arguments, undef will only be an argument if undef was seen in <code>$got</code>. This is how you can tell the difference between a missing value and an undefined one.</p>
+
+</dd>
+<dt id="bool-check-verify-id-id-exists-bool-got-got-convert-convert-seen-seen">$bool = $check-&gt;verify(id =&gt; $id, exists =&gt; $bool, got =&gt; $got, convert =&gt; \&amp;convert, seen =&gt; \%seen)</dt>
+<dd>
+
+<p>Return true if there is a shallow match, that is both items are arrayrefs, both items are the same string or same number, etc. This should not recurse, as deep checks are done in <code>$check-&gt;deltas()</code>.</p>
+
+</dd>
+<dt id="name-check-name">$name = $check-&gt;name</dt>
+<dd>
+
+<p>Get the name of the check.</p>
+
+</dd>
+<dt id="display-check-render">$display = $check-&gt;render</dt>
+<dd>
+
+<p>What should be displayed in a table for this check, usually the name or value.</p>
+
+</dd>
+<dt id="delta-check-run-id-id-exists-bool-got-got-convert-convert-seen-seen">$delta = $check-&gt;run(id =&gt; $id, exists =&gt; $bool, got =&gt; $got, convert =&gt; \&amp;convert, seen =&gt; \%seen)</dt>
+<dd>
+
+<p>This is where the checking is done, first a shallow check using <code>$check-&gt;verify</code>, then checking <code>$check-&gt;deltas()</code>. <code>\%seen</code> is used to prevent cycles.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

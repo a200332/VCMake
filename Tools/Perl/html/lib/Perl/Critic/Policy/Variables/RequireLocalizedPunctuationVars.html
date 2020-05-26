@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Variables::RequireLocalizedPunctuationVars - Magic variables should be assigned as &quot;local&quot;.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Punctuation variables (and their English.pm equivalents) are global variables. Messing with globals is dangerous in a complex program as it can lead to very subtle and hard to fix bugs. If you must change a magic variable in a non-trivial program, do it in a local scope.</p>
+
+<p>For example, to slurp a filehandle into a scalar, it&#39;s common to set the record separator to undef instead of a newline. If you choose to do this (instead of using <a href="../../../../../lib/Path/Tiny.html">Path::Tiny</a>!) then be sure to localize the global and change it for as short a time as possible.</p>
+
+<pre><code>    <span class="comment"># BAD:</span>
+    <span class="variable">$/</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$content</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">$fh</span><span class="operator">&gt;;</span>
+    
+    <span class="comment"># BETTER:</span>
+    <span class="keyword">my</span> <span class="variable">$content</span><span class="operator">;</span>
+    <span class="operator">{</span>
+        <span class="keyword">local</span> <span class="variable">$/</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span>
+        <span class="variable">$content</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">$fh</span><span class="operator">&gt;;</span>
+    <span class="operator">}</span>
+    
+    <span class="comment"># A popular idiom:</span>
+    <span class="keyword">my</span> <span class="variable">$content</span> <span class="operator">=</span> <span class="keyword">do</span> <span class="operator">{</span> <span class="keyword">local</span> <span class="variable">$/</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span> <span class="operator">&lt;</span><span class="variable">$fh</span><span class="operator">&gt;</span> <span class="operator">};</span>
+</code></pre>
+
+<p>This policy also allows the use of <code>my</code>. Perl prevents using <code>my</code> with &quot;proper&quot; punctuation variables, but allows <code>$a</code>, <code>@ARGV</code>, the names declared by <a href="../../../../../lib/English.html">English</a>, etc. This is not a good coding practice, however it is not the concern of this specific policy to complain about that.</p>
+
+<p>There are exemptions for <code>$_</code> and <code>@_</code>, and the English equivalent <code>$ARG</code>.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>You can configure your own exemptions using the <code>allow</code> option:</p>
+
+<pre><code>    [Variables::RequireLocalizedPunctuationVars]
+    allow = @ARGV $ARGV</code></pre>
+
+<p>These are added to the default exemptions.</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>Initial development of this policy was supported by a grant from the Perl Foundation.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2007-2011 Chris Dolan. Many rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,106 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>If a regexp match fails, then any capture variables (<code>$1</code>, <code>$2</code>, ...) will be unaffected. They will retain whatever old values they may have had. Therefore it&#39;s important to check the return value of a match before using those variables.</p>
+
+<pre><code>    <span class="string">'12312123'</span> <span class="operator">=~</span> <span class="regex">/(2)/</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$1</span><span class="operator">;</span>    <span class="comment"># Prints 2</span>
+    <span class="string">'123123123'</span> <span class="operator">=~</span> <span class="regex">/(X)/</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$1</span><span class="operator">;</span>    <span class="comment"># Prints 2, because $1 has not changed.</span>
+</code></pre>
+
+<p>Note that because the values of <code>$1</code> etc will be unaffected, you cannot determine if a match succeeded by checking to see if the capture variables have values.</p>
+
+<pre><code>    <span class="comment"># WRONG</span>
+    <span class="variable">$str</span> <span class="operator">=~</span> <span class="regex">/foo(.+)/</span><span class="operator">;</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$1</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">"I found </span><span class="variable">$1</span><span class="string"> after 'foo'"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This policy checks that the previous regexp for which the capture variable is in-scope is either in a conditional or causes an exception or other control transfer (i.e. <code>next</code>, <code>last</code>, <code>redo</code>, <code>return</code>, or sometimes <code>goto</code>) if the match fails.</p>
+
+<p>A <code>goto</code> is only accepted by this policy if it is a co-routine call (i.e. <code>goto &amp;foo</code>) or a <code>goto LABEL</code> where the label does not fall between the <code>goto</code> and the capture variable in the scope of the <code>goto</code>. A computed <code>goto</code> (i.e. something like <code><span class="keyword">goto</span> <span class="operator">(</span><span class="string">qw{foo bar baz}</span><span class="operator">)</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span>
+</code>) is not accepted by this policy because its target can not be statically determined.</p>
+
+<p>This policy does not check whether that conditional is actually testing a regexp result, nor does it check whether a regexp actually has a capture in it. Those checks are too hard.</p>
+
+<p>This policy also does not check arbitrarily complex conditionals guarding regexp results, for pretty much the same reason. Simple things like</p>
+
+<pre><code> <span class="regex">m/(foo)/</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"No foo!"</span><span class="operator">;</span>
+ <span class="keyword">die</span> <span class="string">"No foo!"</span> <span class="keyword">unless</span> <span class="regex">m/(foo)/</span><span class="operator">;</span>
+</code></pre>
+
+<p>will be handled, but something like</p>
+
+<pre><code> <span class="regex">m/(foo)/</span> <span class="keyword">or</span> <span class="keyword">do</span> <span class="operator">{</span>
+   <span class="operator">...</span> <span class="variable">lots</span> <span class="variable">of</span> <span class="variable">complicated</span> <span class="variable">calculations</span> <span class="variable">here</span> <span class="operator">...</span>
+   <span class="keyword">die</span> <span class="string">"No foo!"</span><span class="operator">;</span>
+ <span class="operator">};</span>
+</code></pre>
+
+<p>are beyond its scope.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>By default, this policy considers <code>die</code>, <code>croak</code>, and <code>confess</code> to throw exceptions. If you have additional subroutines or methods that may be used in lieu of one of these, you can configure them in your perlcriticrc as follows:</p>
+
+<pre><code> [RegularExpressions::ProhibitCaptureWithoutTest]
+ exception_source = my_exception_generator</code></pre>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>This policy does not recognize named capture variables. Yet.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2006-2017 Chris Dolan.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

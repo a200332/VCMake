@@ -1,0 +1,180 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#conflicts1">conflicts</a></li>
+      <li><a href="#dist1">dist</a></li>
+      <li><a href="#check_conflicts">check_conflicts</a></li>
+      <li><a href="#calculate_conflicts">calculate_conflicts</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Dist::CheckConflicts - declare version conflicts for your dist</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.11</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Dist::CheckConflicts</span>
+        <span class="operator">-</span><span class="string">dist</span> <span class="operator">=&gt;</span> <span class="string">'Class-MOP'</span><span class="operator">,</span>
+        <span class="string">-conflicts</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">'Moose'</span>                <span class="operator">=&gt;</span> <span class="string">'1.14'</span><span class="operator">,</span>
+            <span class="string">'namespace::autoclean'</span> <span class="operator">=&gt;</span> <span class="string">'0.08'</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">-also</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">'Package::Stash::Conflicts'</span><span class="operator">,</span>
+        <span class="operator">]</span><span class="operator">;</span>
+    
+    <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">check_conflicts</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>One shortcoming of the CPAN clients that currently exist is that they have no way of specifying conflicting downstream dependencies of modules. This module attempts to work around this issue by allowing you to specify conflicting versions of modules separately, and deal with them after the module is done installing.</p>
+
+<p>For instance, say you have a module <code>Foo</code>, and some other module <code>Bar</code> uses <code>Foo</code>. If <code>Foo</code> were to change its API in a non-backwards-compatible way, this would cause <code>Bar</code> to break until it is updated to use the new API. <code>Foo</code> can&#39;t just depend on the fixed version of <code>Bar</code>, because this will cause a circular dependency (because <code>Bar</code> is already depending on <code>Foo</code>), and this doesn&#39;t express intent properly anyway - <code>Foo</code> doesn&#39;t use <code>Bar</code> at all. The ideal solution would be for there to be a way to specify conflicting versions of modules in a way that would let CPAN clients update conflicting modules automatically after an existing module is upgraded, but until that happens, this module will allow users to do this manually.</p>
+
+<p>This module accepts a hash of options passed to its <code>use</code> statement, with these keys being valid:</p>
+
+<dl>
+
+<dt id="conflicts">-conflicts</dt>
+<dd>
+
+<p>A hashref of conflict specifications, where keys are module names, and values are the last broken version - any version greater than the specified version should work.</p>
+
+</dd>
+<dt id="also">-also</dt>
+<dd>
+
+<p>Additional modules to get conflicts from (potentially recursively). This should generally be a list of modules which use Dist::CheckConflicts, which correspond to the dists that your dist depends on. (In an ideal world, this would be intuited directly from your dependency list, but the dependency list isn&#39;t available outside of build time).</p>
+
+</dd>
+<dt id="dist">-dist</dt>
+<dd>
+
+<p>The name of the distribution, to make the error message from check_conflicts more user-friendly.</p>
+
+</dd>
+</dl>
+
+<p>The methods listed below are exported by this module into the module that uses it, so you should call these methods on your module, not Dist::CheckConflicts.</p>
+
+<p>As an example, this command line can be used to update your modules, after installing the <code>Foo</code> dist (assuming that <code>Foo::Conflicts</code> is the module in the <code>Foo</code> dist which uses Dist::CheckConflicts):</p>
+
+<pre><code>    <span class="variable">perl</span> <span class="operator">-</span><span class="variable">MFoo::Conflicts</span> <span class="keyword">-e</span><span class="string">'print "$_\n"
+        for map { $_-&gt;{package} } Foo::Conflicts-&gt;calculate_conflicts'</span> <span class="operator">|</span> <span class="variable">cpanm</span>
+</code></pre>
+
+<p>As an added bonus, loading your conflicts module will provide warnings at runtime if conflicting modules are detected (regardless of whether they are loaded before or afterwards).</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="conflicts1">conflicts</h2>
+
+<p>Returns the conflict specification (the <code>-conflicts</code> parameter to <code>import()</code>), as a hash.</p>
+
+<h2 id="dist1">dist</h2>
+
+<p>Returns the dist name (either as specified by the <code>-dist</code> parameter to <code>import()</code>, or the package name which <code>use</code>d this module).</p>
+
+<h2 id="check_conflicts">check_conflicts</h2>
+
+<p>Examine the modules that are currently installed, and throw an exception with useful information if any modules are at versions which conflict with the dist.</p>
+
+<h2 id="calculate_conflicts">calculate_conflicts</h2>
+
+<p>Examine the modules that are currently installed, and return a list of modules which conflict with the dist. The modules will be returned as a list of hashrefs, each containing <code>package</code>, <code>installed</code>, and <code>required</code> keys.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>No known bugs.</p>
+
+<p>Please report any bugs to GitHub Issues at <a href="https://github.com/doy/dist-checkconflicts/issues">https://github.com/doy/dist-checkconflicts/issues</a>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Module::Install::CheckConflicts</a></p>
+
+<p><a>Dist::Zilla::Plugin::Conflicts</a></p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find this documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Dist::CheckConflicts</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>MetaCPAN</p>
+
+<p><a href="https://metacpan.org/release/Dist-CheckConflicts">https://metacpan.org/release/Dist-CheckConflicts</a></p>
+
+</li>
+<li><p>Github</p>
+
+<p><a href="https://github.com/doy/dist-checkconflicts">https://github.com/doy/dist-checkconflicts</a></p>
+
+</li>
+<li><p>RT: CPAN&#39;s request tracker</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-CheckConflicts">http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-CheckConflicts</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/d/Dist-CheckConflicts">http://cpanratings.perl.org/d/Dist-CheckConflicts</a></p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2014 by Jesse Luehrs.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

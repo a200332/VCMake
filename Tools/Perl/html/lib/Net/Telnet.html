@@ -1,0 +1,1773 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#What-To-Know-Before-Using">What To Know Before Using</a></li>
+      <li><a href="#Debugging">Debugging</a></li>
+      <li><a href="#Style-of-Named-Parameters">Style of Named Parameters</a></li>
+      <li><a href="#Connecting-to-a-Remote-MS-Windows-Machine">Connecting to a Remote MS-Windows Machine</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Net::Telnet - interact with TELNET port or other TCP ports</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p><code><span class="keyword">use</span> <span class="variable">Net::Telnet</span> <span class="operator">();</span>
+</code></p>
+
+<p>see METHODS or EXAMPLES sections below</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Net::Telnet allows you to make client connections to a TCP port and do network I/O, especially to a port using the TELNET protocol. Simple I/O methods such as print, get, and getline are provided. More sophisticated interactive features are provided because connecting to a TELNET port ultimately means communicating with a program designed for human interaction. These interactive features include the ability to specify a time-out and to wait for patterns to appear in the input stream, such as the prompt from a shell. IPv6 support is available when using perl 5.14 or later (see <code>family()</code>.</p>
+
+<p>Other reasons to use this module than strictly with a TELNET port are:</p>
+
+<ul>
+
+<li><p>You&#39;re not familiar with sockets and you want a simple way to make client connections to TCP services.</p>
+
+</li>
+<li><p>You want to be able to specify your own time-out while connecting, reading, or writing.</p>
+
+</li>
+<li><p>You&#39;re communicating with an interactive program at the other end of some socket or pipe and you want to wait for certain patterns to appear.</p>
+
+</li>
+</ul>
+
+<p>Here&#39;s an example that prints who&#39;s logged-on to a remote host. In addition to a username and password, you must also know the user&#39;s shell prompt, which for this example is <code>&quot;bash$ &quot;</code></p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Net::Telnet</span> <span class="operator">();</span>
+    <span class="variable">$t</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="string">Timeout</span> <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">,</span>
+                          <span class="string">Prompt</span> <span class="operator">=&gt;</span> <span class="string">'/bash\$ $/'</span><span class="operator">);</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">login</span><span class="operator">(</span><span class="variable">$username</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">);</span>
+    <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">"who"</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">@lines</span><span class="operator">;</span>
+</code></pre>
+
+<p>See the <b>EXAMPLES</b> section below for more examples.</p>
+
+<p>Usage questions should be directed to the perlmonks.org discussion group. Bugs can be viewed or reported at cpan.org on the Net::Telnet page.</p>
+
+<h2 id="What-To-Know-Before-Using">What To Know Before Using</h2>
+
+<ul>
+
+<li><p>All output is flushed while all input is buffered. Each object contains its own input buffer.</p>
+
+</li>
+<li><p>The output record separator for <code>print()</code> and <code>cmd()</code> is set to <code>&quot;\n&quot;</code> by default, so that you don&#39;t have to append all your commands with a newline. To avoid printing a trailing <code>&quot;\n&quot;</code> use <code>put()</code> or set the <i>output_record_separator</i> to <code>&quot;&quot;</code>.</p>
+
+</li>
+<li><p>The methods <code>login()</code> and <code>cmd()</code> use the <i>prompt</i> setting in the object to determine when a login or remote command is complete. Those methods will fail with a time-out if you don&#39;t set the prompt correctly.</p>
+
+</li>
+<li><p>Use a combination of <code>print()</code> and <code>waitfor()</code> as an alternative to <code>login()</code> or <code>cmd()</code> when they don&#39;t do what you want.</p>
+
+</li>
+<li><p>Errors such as timing-out are handled according to the error mode action. The default action is to print an error message to standard error and have the program die. See the <code>errmode()</code> method for more information.</p>
+
+</li>
+<li><p>When constructing the match operator argument for <code>prompt()</code> or <code>waitfor()</code>, always use single quotes instead of double quotes to avoid unexpected backslash interpretation (e.g. <code>&#39;/bash\$ $/&#39;</code>). If you&#39;re constructing a DOS like file path, you&#39;ll need to use four backslashes to represent one (e.g. <code>&#39;/c:\\\\users\\\\bill&gt;$/i&#39;</code>).</p>
+
+<p>Of course don&#39;t forget about regexp metacharacters like <code>.</code>, <code>[</code>, or <code>$</code>. You&#39;ll only need a single backslash to quote them. The anchor metacharacters <code>^</code> and <code>$</code> refer to positions in the input buffer. To avoid matching characters read that look like a prompt, it&#39;s a good idea to end your prompt pattern with the <code>$</code> anchor. That way the prompt will only match if it&#39;s the last thing read.</p>
+
+</li>
+<li><p>In the input stream, each sequence of <i>carriage return</i> and <i>line feed</i> (i.e. <code>&quot;\015\012&quot;</code> or CR LF) is converted to <code>&quot;\n&quot;</code>. In the output stream, each occurrence of <code>&quot;\n&quot;</code> is converted to a sequence of CR LF. See <code>binmode()</code> to change the behavior. TCP protocols typically use the ASCII sequence, carriage return and line feed to designate a newline.</p>
+
+</li>
+<li><p>Timing-out while making a connection is disabled for machines that don&#39;t support the <code>alarm()</code> function. Most notably these include MS-Windows machines.</p>
+
+</li>
+<li><p>You&#39;ll need to be running at least Perl version 5.002 to use this module. This module does not require any libraries that don&#39;t already come with a standard Perl distribution.</p>
+
+<p>If you have the IO:: libraries installed (they come standard with perl5.004 and later) then IO::Socket::INET is used as a base class, otherwise FileHandle is used.</p>
+
+</li>
+</ul>
+
+<h2 id="Debugging">Debugging</h2>
+
+<p>The typical usage bug causes a time-out error because you&#39;ve made incorrect assumptions about what the remote side actually sends. The easiest way to reconcile what the remote side sends with your expectations is to use <code>input_log()</code> or <code>dump_log()</code>.</p>
+
+<p><code>dump_log()</code> allows you to see the data being sent from the remote side before any translation is done, while <code>input_log()</code> shows you the results after translation. The translation includes converting end of line characters, removing and responding to TELNET protocol commands in the data stream.</p>
+
+<h2 id="Style-of-Named-Parameters">Style of Named Parameters</h2>
+
+<p>Two different styles of named parameters are supported. This document only shows the IO:: style:</p>
+
+<pre><code>    <span class="variable">Net::Telnet</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">Timeout</span> <span class="operator">=&gt;</span> <span class="number">20</span><span class="operator">);</span>
+</code></pre>
+
+<p>however the dash-option style is also allowed:</p>
+
+<pre><code>    <span class="variable">Net::Telnet</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">-timeout</span> <span class="operator">=&gt;</span> <span class="number">20</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="Connecting-to-a-Remote-MS-Windows-Machine">Connecting to a Remote MS-Windows Machine</h2>
+
+<p>By default MS-Windows doesn&#39;t come with a TELNET server. However third party TELNET servers are available. Unfortunately many of these servers falsely claim to be a TELNET server. This is especially true of the so-called &quot;Microsoft Telnet Server&quot; that comes installed with some newer versions MS-Windows.</p>
+
+<p>When a TELNET server first accepts a connection, it must use the ASCII control characters carriage-return and line-feed to start a new line (see RFC854). A server like the &quot;Microsoft Telnet Server&quot; that doesn&#39;t do this, isn&#39;t a TELNET server. These servers send ANSI terminal escape sequences to position to a column on a subsequent line and to even position while writing characters that are adjacent to each other. Worse, when sending output these servers resend previously sent command output in a misguided attempt to display an entire terminal screen.</p>
+
+<p>Connecting Net::Telnet to one of these false TELNET servers makes your job of parsing command output very difficult. It&#39;s better to replace a false TELNET server with a real TELNET server. The better TELNET servers for MS-Windows allow you to avoid the ANSI escapes by turning off something some of them call <i>console mode</i>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>In the calling sequences below, square brackets <b>[]</b> represent optional parameters.</p>
+
+<dl>
+
+<dt id="new---create-a-new-Net::Telnet-object"><b>new</b> - create a new Net::Telnet object</dt>
+<dd>
+
+<pre><code>    <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="operator">[</span><span class="variable">$host</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Cmd_remove_mode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Dump_Log</span>   <span class="operator">=&gt;</span> <span class="variable">$filename</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Family</span>     <span class="operator">=&gt;</span> <span class="variable">$family</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Fhopen</span>     <span class="operator">=&gt;</span> <span class="variable">$filehandle</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Host</span>       <span class="operator">=&gt;</span> <span class="variable">$host</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Input_log</span>  <span class="operator">=&gt;</span> <span class="variable">$file</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Input_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Localfamily</span> <span class="operator">=&gt;</span> <span class="variable">$family</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Localhost</span>   <span class="operator">=&gt;</span> <span class="variable">$host</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Max_buffer_length</span> <span class="operator">=&gt;</span> <span class="variable">$len</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Ofs</span>        <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Option_log</span> <span class="operator">=&gt;</span> <span class="variable">$file</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Ors</span>        <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Output_field_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Output_log</span> <span class="operator">=&gt;</span> <span class="variable">$file</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Output_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Port</span>       <span class="operator">=&gt;</span> <span class="variable">$port</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Prompt</span>     <span class="operator">=&gt;</span> <span class="variable">$matchop</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Rs</span>         <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This is the constructor for Net::Telnet objects. A new object is returned on success, the error mode action is performed on failure - see <code>errmode()</code>. The optional arguments are short-cuts to methods of the same name.</p>
+
+<p>If the <i>$host</i> argument is given then the object is opened by connecting to TCP <i>$port</i> on <i>$host</i>. Also see <code>open()</code>. The new object returned is given the following defaults in the absence of corresponding named parameters:</p>
+
+<ul>
+
+<li><p>The default <i>Host</i> is <code>&quot;localhost&quot;</code></p>
+
+</li>
+<li><p>The default <i>Port</i> is <code>23</code></p>
+
+</li>
+<li><p>The default <i>Family</i> is <code>&quot;ipv4&quot;</code></p>
+
+</li>
+<li><p>The default <i>Prompt</i> is <code>&#39;/[\$%#&gt;] $/&#39;</code></p>
+
+</li>
+<li><p>The default <i>Timeout</i> is <code>10</code></p>
+
+</li>
+<li><p>The default <i>Errmode</i> is <code>&quot;die&quot;</code></p>
+
+</li>
+<li><p>The default <i>Output_record_separator</i> is <code>&quot;\n&quot;</code>. Note that <i>Ors</i> is synonymous with <i>Output_record_separator</i>.</p>
+
+</li>
+<li><p>The default <i>Input_record_separator</i> is <code>&quot;\n&quot;</code>. Note that <i>Rs</i> is synonymous with <i>Input_record_separator</i>.</p>
+
+</li>
+<li><p>The default <i>Binmode</i> is <code>0</code>, which means do newline translation.</p>
+
+</li>
+<li><p>The default <i>Telnetmode</i> is <code>1</code>, which means respond to TELNET commands in the data stream.</p>
+
+</li>
+<li><p>The default <i>Cmd_remove_mode</i> is <code>&quot;auto&quot;</code></p>
+
+</li>
+<li><p>The defaults for <i>Dump_log</i>, <i>Input_log</i>, <i>Option_log</i>, and <i>Output_log</i> are <code>&quot;&quot;</code>, which means that logging is turned-off.</p>
+
+</li>
+<li><p>The default <i>Max_buffer_length</i> is <code>1048576</code> bytes, i.e. 1 MiB.</p>
+
+</li>
+<li><p>The default <i>Output_field_separator</i> is <code>&quot;&quot;</code>. Note that <i>Ofs</i> is synonymous with <i>Output_field_separator</i>.</p>
+
+</li>
+<li><p>The default <i>Localhost</i> is <code>&quot;&quot;</code></p>
+
+</li>
+<li><p>The default <i>Localfamily</i> is <code>&quot;ipv4&quot;</code></p>
+
+</li>
+</ul>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="binmode---toggle-newline-translation"><b>binmode</b> - toggle newline translation</dt>
+<dd>
+
+<pre><code>    <span class="variable">$mode</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">binmode</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">binmode</span><span class="operator">(</span><span class="variable">$mode</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method controls whether or not sequences of carriage returns and line feeds (CR LF or more specifically <code>&quot;\015\012&quot;</code>) are translated. By default they are translated (i.e. binmode is <code>0</code>).</p>
+
+<p>If no argument is given, the current mode is returned.</p>
+
+<p>If <i>$mode</i> is <code>1</code> then binmode is <i>on</i> and newline translation is not done.</p>
+
+<p>If <i>$mode</i> is <code>0</code> then binmode is <i>off</i> and newline translation is done. In the input stream, each sequence of CR LF is converted to <code>&quot;\n&quot;</code> and in the output stream, each occurrence of <code>&quot;\n&quot;</code> is converted to a sequence of CR LF.</p>
+
+<p>Note that input is always buffered. Changing binmode doesn&#39;t effect what&#39;s already been read into the buffer. Output is not buffered and changing binmode will have an immediate effect.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="break---send-TELNET-break-character"><b>break</b> - send TELNET break character</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">break</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method sends the TELNET break character. This character is provided because it&#39;s a signal outside the ASCII character set which is currently given local meaning within many systems. It&#39;s intended to indicate that the Break Key or the Attention Key was hit.</p>
+
+<p>This method returns <code>1</code> on success, or performs the error mode action on failure.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="buffer---scalar-reference-to-objects-input-buffer"><b>buffer</b> - scalar reference to object&#39;s input buffer</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ref</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">buffer</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns a scalar reference to the input buffer for <i>$obj</i>. Data in the input buffer is data that has been read from the remote side but has yet to be read by the user. Modifications to the input buffer are returned by a subsequent read.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="buffer_empty---discard-all-data-in-objects-input-buffer"><b>buffer_empty</b> - discard all data in object&#39;s input buffer</dt>
+<dd>
+
+<pre><code>    <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">buffer_empty</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method removes all data in the input buffer for <i>$obj</i>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="close---close-object"><b>close</b> - close object</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">close</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method closes the socket, file, or pipe associated with the object. It always returns a value of <code>1</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="cmd---issue-command-and-retrieve-output"><b>cmd</b> - issue command and retrieve output</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">String</span>   <span class="operator">=&gt;</span> <span class="variable">$string</span><span class="operator">,</span>
+                    <span class="operator">[</span><span class="string">Output</span>  <span class="operator">=&gt;</span> <span class="variable">$ref</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Cmd_remove_mode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Errmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Input_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Ors</span>     <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Output_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Prompt</span>  <span class="operator">=&gt;</span> <span class="variable">$match</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Rs</span>      <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Timeout</span> <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="variable">@output</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+    <span class="variable">@output</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">String</span>   <span class="operator">=&gt;</span> <span class="variable">$string</span><span class="operator">,</span>
+                        <span class="operator">[</span><span class="string">Output</span>  <span class="operator">=&gt;</span> <span class="variable">$ref</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Cmd_remove_mode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Errmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Input_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Ors</span>     <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Output_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Prompt</span>  <span class="operator">=&gt;</span> <span class="variable">$match</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Rs</span>      <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Timeout</span> <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method sends the command <i>$string</i>, and reads the characters sent back by the command up until and including the matching prompt. It&#39;s assumed that the program to which you&#39;re sending is some kind of command prompting interpreter such as a shell.</p>
+
+<p>The command <i>$string</i> is automatically appended with the output_record_separator, by default it is <code>&quot;\n&quot;</code>. This is similar to someone typing a command and hitting the return key. Set the output_record_separator to change this behavior.</p>
+
+<p>In a scalar context, the characters read from the remote side are discarded and <code>1</code> is returned on success. On time-out, eof, or other failures, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>In a list context, just the output generated by the command is returned, one line per element. In other words, all the characters in between the echoed back command string and the prompt are returned. If the command happens to return no output, a list containing one element, the empty string is returned. This is so the list will indicate true in a boolean context. On time-out, eof, or other failures, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>The characters that matched the prompt may be retrieved using <code>last_prompt()</code>.</p>
+
+<p>Many command interpreters echo back the command sent. In most situations, this method removes the first line returned from the remote side (i.e. the echoed back command). See <code>cmd_remove_mode()</code> for more control over this feature.</p>
+
+<p>Use <code>dump_log()</code> to debug when this method keeps timing-out and you don&#39;t think it should.</p>
+
+<p>Consider using a combination of <code>print()</code> and <code>waitfor()</code> as an alternative to this method when it doesn&#39;t do what you want, e.g. the command you send prompts for input.</p>
+
+<p>The <i>Output</i> named parameter provides an alternative method of receiving command output. If you pass a scalar reference, all the output (even if it contains multiple lines) is returned in the referenced scalar. If you pass an array or hash reference, the lines of output are returned in the referenced array or hash. You can use <code>input_record_separator()</code> to change the notion of what separates a line.</p>
+
+<p>Optional named parameters are provided to override the current settings of cmd_remove_mode, errmode, input_record_separator, ors, output_record_separator, prompt, rs, and timeout. Rs is synonymous with input_record_separator and ors is synonymous with output_record_separator.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="cmd_remove_mode---toggle-removal-of-echoed-commands"><b>cmd_remove_mode</b> - toggle removal of echoed commands</dt>
+<dd>
+
+<pre><code>    <span class="variable">$mode</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd_remove_mode</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd_remove_mode</span><span class="operator">(</span><span class="variable">$mode</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method controls how to deal with echoed back commands in the output returned by cmd(). Typically, when you send a command to the remote side, the first line of output returned is the command echoed back. Use this mode to remove the first line of output normally returned by cmd().</p>
+
+<p>If no argument is given, the current mode is returned.</p>
+
+<p>If <i>$mode</i> is <code>0</code> then the command output returned from cmd() has no lines removed. If <i>$mode</i> is a positive integer, then the first <i>$mode</i> lines of command output are stripped.</p>
+
+<p>By default, <i>$mode</i> is set to <code>&quot;auto&quot;</code>. Auto means that whether or not the first line of command output is stripped, depends on whether or not the remote side offered to echo. By default, Net::Telnet always accepts an offer to echo by the remote side. You can change the default to reject such an offer using <code>option_accept()</code>.</p>
+
+<p>A warning is printed to STDERR when attempting to set this attribute to something that is not <code>&quot;auto&quot;</code> or a non-negative integer.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="dump_log---log-all-I-O-in-dump-format"><b>dump_log</b> - log all I/O in dump format</dt>
+<dd>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">dump_log</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">dump_log</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">dump_log</span><span class="operator">(</span><span class="variable">$filename</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method starts or stops dump format logging of all the object&#39;s input and output. The dump format shows the blocks read and written in a hexadecimal and printable character format. This method is useful when debugging, however you might want to first try <code>input_log()</code> as it&#39;s more readable.</p>
+
+<p>If no argument is given, the log filehandle is returned. A returned empty string indicates logging is off.</p>
+
+<p>To stop logging, use an empty string as an argument. The stopped filehandle is not closed.</p>
+
+<p>If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the filename is opened for logging and a filehandle to it is returned. If the filehandle is not already opened or the filename can&#39;t be opened for writing, the error mode action is performed.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="eof---end-of-file-indicator"><b>eof</b> - end of file indicator</dt>
+<dd>
+
+<pre><code>    <span class="variable">$eof</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">eof</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns <code>1</code> if end of file has been read, otherwise it returns an empty string. Because the input is buffered this isn&#39;t the same thing as <i>$obj</i> has closed. In other words <i>$obj</i> can be closed but there still can be stuff in the buffer to be read. Under this condition you can still read but you won&#39;t be able to write.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="errmode---define-action-to-be-performed-on-error"><b>errmode</b> - define action to be performed on error</dt>
+<dd>
+
+<pre><code>    <span class="variable">$mode</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">errmode</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">errmode</span><span class="operator">(</span><span class="variable">$mode</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method gets or sets the action used when errors are encountered using the object. The first calling sequence returns the current error mode. The second calling sequence sets it to <i>$mode</i> and returns the previous mode. Valid values for <i>$mode</i> are <code>&quot;die&quot;</code> (the default), <code>&quot;return&quot;</code>, a <i>coderef</i>, or an <i>arrayref</i>.</p>
+
+<p>When mode is <code>&quot;die&quot;</code> and an error is encountered using the object, then an error message is printed to standard error and the program dies.</p>
+
+<p>When mode is <code>&quot;return&quot;</code> then the method generating the error places an error message in the object and returns an undefined value in a scalar context and an empty list in list context. The error message may be obtained using <code>errmsg()</code>.</p>
+
+<p>When mode is a <i>coderef</i>, then when an error is encountered <i>coderef</i> is called with the error message as its first argument. Using this mode you may have your own subroutine handle errors. If <i>coderef</i> itself returns then the method generating the error returns undefined or an empty list depending on context.</p>
+
+<p>When mode is an <i>arrayref</i>, the first element of the array must be a <i>coderef</i>. Any elements that follow are the arguments to <i>coderef</i>. When an error is encountered, the <i>coderef</i> is called with its arguments. Using this mode you may have your own subroutine handle errors. If the <i>coderef</i> itself returns then the method generating the error returns undefined or an empty list depending on context.</p>
+
+<p>A warning is printed to STDERR when attempting to set this attribute to something that is not <code>&quot;die&quot;</code>, <code>&quot;return&quot;</code>, a <i>coderef</i>, or an <i>arrayref</i> whose first element isn&#39;t a <i>coderef</i>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="errmsg---most-recent-error-message"><b>errmsg</b> - most recent error message</dt>
+<dd>
+
+<pre><code>    <span class="variable">$msg</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">errmsg</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">errmsg</span><span class="operator">(</span><span class="variable">@msgs</span><span class="operator">);</span>
+</code></pre>
+
+<p>The first calling sequence returns the error message associated with the object. The empty string is returned if no error has been encountered yet. The second calling sequence sets the error message for the object to the concatenation of <i>@msgs</i> and returns the previous error message. Normally, error messages are set internally by a method when an error is encountered.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="error---perform-the-error-mode-action"><b>error</b> - perform the error mode action</dt>
+<dd>
+
+<pre><code>    <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">(</span><span class="variable">@msgs</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method concatenates <i>@msgs</i> into a string and places it in the object as the error message. Also see <code>errmsg()</code>. It then performs the error mode action. Also see <code>errmode()</code>.</p>
+
+<p>If the error mode doesn&#39;t cause the program to die, then an undefined value or an empty list is returned depending on the context.</p>
+
+<p>This method is primarily used by this class or a sub-class to perform the user requested action when an error is encountered.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="family---IP-address-family-for-remote-host"><b>family</b> - IP address family for remote host</dt>
+<dd>
+
+<pre><code>    <span class="variable">$family</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">family</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span>   <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">family</span><span class="operator">(</span><span class="variable">$family</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates which IP address family <code>host()</code> refers to, i.e. IPv4 or IPv6. IPv6 support is available when using perl 5.14 or later. With no argument it returns the current value set in the object. With an argument it sets the current address family to <i>$family</i> and returns the previous address family. Valid values are <code>&quot;ipv4&quot;</code>, <code>&quot;ipv6&quot;</code>, or <code>&quot;any&quot;</code>. When <code>&quot;any&quot;</code>, the <code>host()</code> can be a hostname or IP address for either IPv4 or IPv6. After connecting, you can use <code>sockfamily()</code> to determine which IP address family was used.</p>
+
+<p>The default value is <code>&quot;ipv4&quot;</code>.</p>
+
+<p>The error mode action is performed when attempting to set this attribute to something that isn&#39;t <code>&quot;ipv4&quot;</code>, <code>&quot;ipv6&quot;</code>, or <code>&quot;any&quot;</code>. It is also performed when attempting to set it to <code>&quot;ipv6&quot;</code> when the Socket module is less than version 1.94 or IPv6 is not supported in the OS as indicated by Socket::AF_INET6 not being defined.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="fhopen---use-already-open-filehandle-for-I-O"><b>fhopen</b> - use already open filehandle for I/O</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">fhopen</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method associates the open filehandle <i>$fh</i> with <i>$obj</i> for further I/O. Filehandle <i>$fh</i> must already be opened.</p>
+
+<p>Suppose you want to use the features of this module to do I/O to something other than a TCP port, for example STDIN or a filehandle opened to read from a process. Instead of opening the object for I/O to a TCP port by using <code>open()</code> or <code>new()</code>, call this method instead.</p>
+
+<p>The value <code>1</code> is returned success, the error mode action is performed on failure.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="get---read-block-of-data"><b>get</b> - read block of data</dt>
+<dd>
+
+<pre><code>    <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span><span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                      <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                      <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                      <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method reads a block of data from the object and returns it along with any buffered data. If no buffered data is available to return, it will wait for data to read using the timeout specified in the object. You can override that timeout using <i>$secs</i>. Also see <code>timeout()</code>. If buffered data is available to return, it also checks for a block of data that can be immediately read.</p>
+
+<p>On eof an undefined value is returned. On time-out or other failures, the error mode action is performed. To distinguish between eof or an error occurring when the error mode is not set to <code>&quot;die&quot;</code>, use <code>eof()</code>.</p>
+
+<p>Optional named parameters are provided to override the current settings of binmode, errmode, telnetmode, and timeout.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="getline---read-next-line"><b>getline</b> - read next line</dt>
+<dd>
+
+<pre><code>    <span class="variable">$line</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">getline</span><span class="operator">(</span><span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                          <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                          <span class="operator">[</span><span class="string">Input_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                          <span class="operator">[</span><span class="string">Rs</span>         <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                          <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                          <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method reads and returns the next line of data from the object. You can use <code>input_record_separator()</code> to change the notion of what separates a line. The default is <code>&quot;\n&quot;</code>. If a line isn&#39;t immediately available, this method blocks waiting for a line or a time-out.</p>
+
+<p>On eof an undefined value is returned. On time-out or other failures, the error mode action is performed. To distinguish between eof or an error occurring when the error mode is not set to <code>&quot;die&quot;</code>, use <code>eof()</code>.</p>
+
+<p>Optional named parameters are provided to override the current settings of binmode, errmode, input_record_separator, rs, telnetmode, and timeout. Rs is synonymous with input_record_separator.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="getlines---read-next-lines"><b>getlines</b> - read next lines</dt>
+<dd>
+
+<pre><code>    <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">getlines</span><span class="operator">(</span><span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Input_record_separator</span> <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Rs</span>         <span class="operator">=&gt;</span> <span class="variable">$chars</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">All</span>        <span class="operator">=&gt;</span> <span class="variable">$boolean</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method reads and returns all the lines of data from the object until end of file is read. You can use <code>input_record_separator()</code> to change the notion of what separates a line. The default is <code>&quot;\n&quot;</code>. A time-out error occurs if all the lines can&#39;t be read within the time-out interval. See <code>timeout()</code>.</p>
+
+<p>The behavior of this method was changed in version 3.03. Prior to version 3.03 this method returned just the lines available from the next read. To get that old behavior, use the optional named parameter <i>All</i> and set <i>$boolean</i> to <code>&quot;&quot;</code> or <code>0</code>.</p>
+
+<p>If only eof is read then an empty list is returned. On time-out or other failures, the error mode action is performed. Use <code>eof()</code> to distinguish between reading only eof or an error occurring when the error mode is not set to <code>&quot;die&quot;</code>.</p>
+
+<p>Optional named parameters are provided to override the current settings of binmode, errmode, input_record_separator, rs, telnetmode, and timeout. Rs is synonymous with input_record_separator.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="host---name-or-IP-address-of-remote-host"><b>host</b> - name or IP address of remote host</dt>
+<dd>
+
+<pre><code>    <span class="variable">$host</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">host</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">host</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the remote host for <code>open()</code>. It is either a hostname or an IP address. With no argument it returns the current value set in the object. With an argument it sets the current host name to <i>$host</i> and returns the previous value. Use <code>family()</code> to control which IP address family, IPv4 or IPv6, host refers to.</p>
+
+<p>The default value is <code>&quot;localhost&quot;</code>. It may also be set by <code>open()</code> or <code>new()</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="input_log---log-all-input"><b>input_log</b> - log all input</dt>
+<dd>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">input_log</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">input_log</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">input_log</span><span class="operator">(</span><span class="variable">$filename</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method starts or stops logging of input. This is useful when debugging. Also see <code>dump_log()</code>. Because most command interpreters echo back commands received, it&#39;s likely all your output will also be in this log. Note that input logging occurs after newline translation. See <code>binmode()</code> for details on newline translation.</p>
+
+<p>If no argument is given, the log filehandle is returned. A returned empty string indicates logging is off.</p>
+
+<p>To stop logging, use an empty string as an argument. The stopped filehandle is not closed.</p>
+
+<p>If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the filename is opened for logging and a filehandle to it is returned. If the filehandle is not already opened or the filename can&#39;t be opened for writing, the error mode action is performed.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="input_record_separator---input-line-delimiter"><b>input_record_separator</b> - input line delimiter</dt>
+<dd>
+
+<pre><code>    <span class="variable">$chars</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">input_record_separator</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">input_record_separator</span><span class="operator">(</span><span class="variable">$chars</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the line delimiter for input. It&#39;s used with <code>getline()</code>, <code>getlines()</code>, and <code>cmd()</code> to determine lines in the input.</p>
+
+<p>With no argument this method returns the current input record separator set in the object. With an argument it sets the input record separator to <i>$chars</i> and returns the previous value. Note that <i>$chars</i> must have length.</p>
+
+<p>A warning is printed to STDERR when attempting to set this attribute to a string with no length.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="last_prompt---last-prompt-read"><b>last_prompt</b> - last prompt read</dt>
+<dd>
+
+<pre><code>    <span class="variable">$string</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">last_prompt</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">last_prompt</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+</code></pre>
+
+<p>With no argument this method returns the last prompt read by cmd() or login(). See <code>prompt()</code>. With an argument it sets the last prompt read to <i>$string</i> and returns the previous value. Normally, only internal methods set the last prompt.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="lastline---last-line-read"><b>lastline</b> - last line read</dt>
+<dd>
+
+<pre><code>    <span class="variable">$line</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">(</span><span class="variable">$line</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method retrieves the last line read from the object. This may be a useful error message when the remote side abnormally closes the connection. Typically the remote side will print an error message before closing.</p>
+
+<p>With no argument this method returns the last line read from the object. With an argument it sets the last line read to <i>$line</i> and returns the previous value. Normally, only internal methods set the last line.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="localfamily---IP-address-family-for-local-host"><b>localfamily</b> - IP address family for local host</dt>
+<dd>
+
+<pre><code>    <span class="variable">$localfamily</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">localfamily</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span>   <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">localfamily</span><span class="operator">(</span><span class="variable">$family</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates which IP address family <code>localhost()</code> refers to, i.e. IPv4 or IPv6. IPv6 support is available when using perl 5.14 or later. With no argument it returns the current value set in the object. With an argument it sets the current local address family to <i>$family</i> and returns the previous address family. Valid values are <code>&quot;ipv4&quot;</code>, <code>&quot;ipv6&quot;</code>, or <code>&quot;any&quot;</code>. When <code>&quot;any&quot;</code>, the <code>localhost()</code> can be a hostname or IP address for either IPv4 or IPv6.</p>
+
+<p>The default value is <code>&quot;ipv4&quot;</code>.</p>
+
+<p>The error mode action is performed when attempting to set this attribute to something that isn&#39;t <code>&quot;ipv4&quot;</code>, <code>&quot;ipv6&quot;</code>, or <code>&quot;any&quot;</code>. It is also performed when attempting to set it to <code>&quot;ipv6&quot;</code> when the Socket module is less than version 1.94 or IPv6 is not supported in the OS as indicated by Socket::AF_INET6 not being defined.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="localhost---bind-local-socket-to-a-specific-network-interface"><b>localhost</b> - bind local socket to a specific network interface</dt>
+<dd>
+
+<pre><code>    <span class="variable">$localhost</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">localhost</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">localhost</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the local socket IP address for <code>open()</code>. It is either a hostname, an IP address, or a null string (i.e. <code>&quot;&quot;</code>). A null string disables this feature.</p>
+
+<p>Normally the OS picks which local network interface to use. This method is useful when the local machine has more than one network interface and you want to bind to a specific one. With no argument it returns the current value set in the object. With an argument it sets the current local host name to <i>$host</i> and returns the previous value. Use <code>localfamily()</code> to control which IP address family, IPv4 or IPv6, local host refers to.</p>
+
+<p>The default value is <code>&quot;&quot;</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="login---perform-standard-login"><b>login</b> - perform standard login</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">login</span><span class="operator">(</span><span class="variable">$username</span><span class="operator">,</span> <span class="variable">$password</span><span class="operator">);</span>
+    
+    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">login</span><span class="operator">(</span><span class="string">Name</span>     <span class="operator">=&gt;</span> <span class="variable">$username</span><span class="operator">,</span>
+                      <span class="string">Password</span> <span class="operator">=&gt;</span> <span class="variable">$password</span><span class="operator">,</span>
+                      <span class="operator">[</span><span class="string">Errmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                      <span class="operator">[</span><span class="string">Prompt</span>  <span class="operator">=&gt;</span> <span class="variable">$match</span><span class="operator">,</span><span class="operator">]</span>
+                      <span class="operator">[</span><span class="string">Timeout</span> <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method performs a standard login by waiting for a login prompt and responding with <i>$username</i>, then waiting for the password prompt and responding with <i>$password</i>, and then waiting for the command interpreter prompt. If any of those prompts sent by the remote side don&#39;t match what&#39;s expected, this method will time-out, unless timeout is turned off.</p>
+
+<p>Login prompt must match either of these case insensitive patterns:</p>
+
+<pre><code>    /login[: ]*$/i
+    /username[: ]*$/i</code></pre>
+
+<p>Password prompt must match this case insensitive pattern:</p>
+
+<pre><code>    /password[: ]*$/i</code></pre>
+
+<p>The command interpreter prompt must match the current setting of prompt. See <code>prompt()</code>.</p>
+
+<p>Use <code>dump_log()</code> to debug when this method keeps timing-out and you don&#39;t think it should.</p>
+
+<p>Consider using a combination of <code>print()</code> and <code>waitfor()</code> as an alternative to this method when it doesn&#39;t do what you want, e.g. the remote host doesn&#39;t prompt for a username.</p>
+
+<p>On success, <code>1</code> is returned. On time out, eof, or other failures, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>Optional named parameters are provided to override the current settings of errmode, prompt, and timeout.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="max_buffer_length---maximum-size-of-input-buffer"><b>max_buffer_length</b> - maximum size of input buffer</dt>
+<dd>
+
+<pre><code>    <span class="variable">$len</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">max_buffer_length</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">max_buffer_length</span><span class="operator">(</span><span class="variable">$len</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the maximum size of the input buffer. An error is generated when a read causes the buffer to exceed this limit. The default value is 1,048,576 bytes (1 MiB). The input buffer can grow much larger than the block size when you continuously read using <code>getline()</code> or <code>waitfor()</code> and the data stream contains no newlines or matching waitfor patterns.</p>
+
+<p>With no argument, this method returns the current maximum buffer length set in the object. With an argument it sets the maximum buffer length to <i>$len</i> and returns the previous value. Values of <i>$len</i> smaller than 512 will be adjusted to 512.</p>
+
+<p>A warning is printed to STDERR when attempting to set this attribute to something that isn&#39;t a positive integer.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="ofs---field-separator-for-print"><b>ofs</b> - field separator for print</dt>
+<dd>
+
+<pre><code>    <span class="variable">$chars</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">ofs</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">ofs</span><span class="operator">(</span><span class="variable">$chars</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method is synonymous with <code>output_field_separator()</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="open---connect-to-port-on-remote-host"><b>open</b> - connect to port on remote host</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+    
+    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="operator">[</span><span class="string">Host</span>        <span class="operator">=&gt;</span> <span class="variable">$host</span><span class="operator">,</span><span class="operator">]</span>
+                     <span class="operator">[</span><span class="string">Port</span>        <span class="operator">=&gt;</span> <span class="variable">$port</span><span class="operator">,</span><span class="operator">]</span>
+                     <span class="operator">[</span><span class="string">Family</span>      <span class="operator">=&gt;</span> <span class="variable">$family</span><span class="operator">,</span><span class="operator">]</span>
+                     <span class="operator">[</span><span class="string">Errmode</span>     <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                     <span class="operator">[</span><span class="string">Timeout</span>     <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span>
+                     <span class="operator">[</span><span class="string">Localhost</span>   <span class="operator">=&gt;</span> <span class="variable">$host</span><span class="operator">,</span><span class="operator">]</span>
+                     <span class="operator">[</span><span class="string">Localfamily</span> <span class="operator">=&gt;</span> <span class="variable">$family</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method opens a TCP connection to <i>$port</i> on <i>$host</i> for the IP address <i>$family</i>. If any of those arguments are missing then the current attribute value for the object is used. Specifing <i>Host</i> sets that attribute for the object. Specifing any of the other optional named parameters overrides the current setting.</p>
+
+<p>The default IP address family is <code>&quot;ipv4&quot;</code>. <i>$family</i> may be set to <code>&quot;ipv4&quot;</code>, <code>&quot;ipv6&quot;</code>, or <code>&quot;any&quot;</code>. See <code>family()</code> for more details.</p>
+
+<p><i>Localhost</i> is used to bind to a specific local network interface.</p>
+
+<p>If the object is already open, it is closed before attempting a connection.</p>
+
+<p>On success <code>1</code> is returned. On time-out or other connection failures, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>Time-outs don&#39;t work for this method on machines that don&#39;t implement SIGALRM - most notably MS-Windows machines. For those machines, an error is returned when the system reaches its own time-out while trying to connect.</p>
+
+<p>A side effect of this method is to reset the alarm interval associated with SIGALRM.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="option_accept---indicate-willingness-to-accept-a-TELNET-option"><b>option_accept</b> - indicate willingness to accept a TELNET option</dt>
+<dd>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_accept</span><span class="operator">(</span><span class="operator">[</span><span class="string">Do</span>   <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                              <span class="operator">[</span><span class="string">Dont</span> <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                              <span class="operator">[</span><span class="string">Will</span> <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                              <span class="operator">[</span><span class="string">Wont</span> <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method is used to indicate whether to accept or reject an offer to enable a TELNET option made by the remote side. If you&#39;re using <i>Do</i> or <i>Will</i> to indicate a willingness to enable, then a notification callback must have already been defined by a prior call to <code>option_callback()</code>. See <code>option_callback()</code> for details on receiving enable/disable notification of a TELNET option.</p>
+
+<p>You can give multiple <i>Do</i>, <i>Dont</i>, <i>Will</i>, or <i>Wont</i> arguments for different TELNET options in the same call to this method.</p>
+
+<p>The following example describes the meaning of the named parameters. A TELNET option, such as <code>TELOPT_ECHO</code> used below, is an integer constant that you can import from Net::Telnet. See the source in file Telnet.pm for the complete list.</p>
+
+<ul>
+
+<li><p><i>Do</i> =&gt; <code>TELOPT_ECHO</code></p>
+
+<ul>
+
+<li><p>we&#39;ll accept an offer to enable the echo option on the local side</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>Dont</i> =&gt; <code>TELOPT_ECHO</code></p>
+
+<ul>
+
+<li><p>we&#39;ll reject an offer to enable the echo option on the local side</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>Will</i> =&gt; <code>TELOPT_ECHO</code></p>
+
+<ul>
+
+<li><p>we&#39;ll accept an offer to enable the echo option on the remote side</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>Wont</i> =&gt; <code>TELOPT_ECHO</code></p>
+
+<ul>
+
+<li><p>we&#39;ll reject an offer to enable the echo option on the remote side</p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+</dd>
+<dt id=""></dt>
+<dd>
+
+<p>Use <code>option_send()</code> to send a request to the remote side to enable or disable a particular TELNET option.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="option_callback---define-the-option-negotiation-callback"><b>option_callback</b> - define the option negotiation callback</dt>
+<dd>
+
+<pre><code>    <span class="variable">$coderef</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_callback</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_callback</span><span class="operator">(</span><span class="variable">$coderef</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method defines the callback subroutine that is called when a TELNET option is enabled or disabled. Once defined, the <i>option_callback</i> may not be undefined. However, calling this method with a different <i>$coderef</i> changes it.</p>
+
+<p>A warning is printed to STDERR when attempting to set this attribute to something that isn&#39;t a coderef.</p>
+
+<p>Here are the circumstances that invoke <i>$coderef</i>:</p>
+
+<ul>
+
+<li><p>An option becomes enabled because the remote side requested an enable and <code>option_accept()</code> had been used to arrange that it be accepted.</p>
+
+</li>
+<li><p>The remote side arbitrarily decides to disable an option that is currently enabled. Note that Net::Telnet always accepts a request to disable from the remote side.</p>
+
+</li>
+<li><p><code>option_send()</code> was used to send a request to enable or disable an option and the response from the remote side has just been received. Note, that if a request to enable is rejected then <i>$coderef</i> is still invoked even though the option didn&#39;t change.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="1"></dt>
+<dd>
+
+<p>Here are the arguments passed to <i>&amp;$coderef</i>:</p>
+
+<pre><code>    <span class="operator">&amp;</span><span class="variable">$coderef</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">,</span> <span class="variable">$option</span><span class="operator">,</span> <span class="variable">$is_remote</span><span class="operator">,</span>
+              <span class="variable">$is_enabled</span><span class="operator">,</span> <span class="variable">$was_enabled</span><span class="operator">,</span> <span class="variable">$buf_position</span><span class="operator">);</span>
+</code></pre>
+
+<ul>
+
+<li><p>1. <i>$obj</i> is the Net::Telnet object</p>
+
+</li>
+<li><p>2. <i>$option</i> is the TELNET option. Net::Telnet exports constants for the various TELNET options which just equate to an integer.</p>
+
+</li>
+<li><p>3. <i>$is_remote</i> is a boolean indicating for which side the option applies.</p>
+
+</li>
+<li><p>4. <i>$is_enabled</i> is a boolean indicating the option is enabled or disabled</p>
+
+</li>
+<li><p>5. <i>$was_enabled</i> is a boolean indicating the option was previously enabled or disabled</p>
+
+</li>
+<li><p>6. <i>$buf_position</i> is an integer indicating the position in the object&#39;s input buffer where the option takes effect. See <code>buffer()</code> to access the object&#39;s input buffer.</p>
+
+</li>
+</ul>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="option_log---log-all-TELNET-options-sent-or-received"><b>option_log</b> - log all TELNET options sent or received</dt>
+<dd>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_log</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_log</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_log</span><span class="operator">(</span><span class="variable">$filename</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method starts or stops logging of all TELNET options being sent or received. This is useful for debugging when you send options via <code>option_send()</code> or you arrange to accept option requests from the remote side via <code>option_accept()</code>. Also see <code>dump_log()</code>.</p>
+
+<p>If no argument is given, the log filehandle is returned. An empty string indicates logging is off.</p>
+
+<p>To stop logging, use an empty string as an argument. The stopped filehandle is not closed.</p>
+
+<p>If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the filename is opened for logging and a filehandle to it is returned. If the filehandle is not already opened or the filename can&#39;t be opened for writing, the error mode action is performed.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="option_send---send-TELNET-option-negotiation-request"><b>option_send</b> - send TELNET option negotiation request</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_send</span><span class="operator">(</span><span class="operator">[</span><span class="string">Do</span>    <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Dont</span>  <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Will</span>  <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Wont</span>  <span class="operator">=&gt;</span> <span class="variable">$telopt</span><span class="operator">,</span><span class="operator">]</span>
+                            <span class="operator">[</span><span class="string">Async</span> <span class="operator">=&gt;</span> <span class="variable">$boolean</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method is not yet implemented. Look for it in a future version.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="option_state---get-current-state-of-a-TELNET-option"><b>option_state</b> - get current state of a TELNET option</dt>
+<dd>
+
+<pre><code>    <span class="variable">$hashref</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">option_state</span><span class="operator">(</span><span class="variable">$telopt</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method returns a hashref containing a copy of the current state of TELNET option <i>$telopt</i>.</p>
+
+<p>Here are the values returned in the hash:</p>
+
+<ul>
+
+<li><p><i>$hashref</i>-&gt;{remote_enabled}</p>
+
+<ul>
+
+<li><p>boolean that indicates if the option is enabled on the remote side.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>$hashref</i>-&gt;{remote_enable_ok}</p>
+
+<ul>
+
+<li><p>boolean that indicates if it&#39;s ok to accept an offer to enable this option on the remote side.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>$hashref</i>-&gt;{remote_state}</p>
+
+<ul>
+
+<li><p>string used to hold the internal state of option negotiation for this option on the remote side.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>$hashref</i>-&gt;{local_enabled}</p>
+
+<ul>
+
+<li><p>boolean that indicates if the option is enabled on the local side.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>$hashref</i>-&gt;{local_enable_ok}</p>
+
+<ul>
+
+<li><p>boolean that indicates if it&#39;s ok to accept an offer to enable this option on the local side.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p><i>$hashref</i>-&gt;{local_state}</p>
+
+<ul>
+
+<li><p>string used to hold the internal state of option negotiation for this option on the local side.</p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="ors---output-line-delimiter"><b>ors</b> - output line delimiter</dt>
+<dd>
+
+<pre><code>    <span class="variable">$chars</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">ors</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">ors</span><span class="operator">(</span><span class="variable">$chars</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method is synonymous with <code>output_record_separator()</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="output_field_separator---field-separator-for-print"><b>output_field_separator</b> - field separator for print</dt>
+<dd>
+
+<pre><code>    <span class="variable">$chars</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_field_separator</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_field_separator</span><span class="operator">(</span><span class="variable">$chars</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the output field separator for <code>print()</code>. Ordinarily the print method simply prints out the comma separated fields you specify. Set this to specify what&#39;s printed between fields.</p>
+
+<p>With no argument this method returns the current output field separator set in the object. With an argument it sets the output field separator to <i>$chars</i> and returns the previous value.</p>
+
+<p>By default it&#39;s set to an empty string.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="output_log---log-all-output"><b>output_log</b> - log all output</dt>
+<dd>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_log</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_log</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_log</span><span class="operator">(</span><span class="variable">$filename</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method starts or stops logging of output. This is useful when debugging. Also see <code>dump_log()</code>. Because most command interpreters echo back commands received, it&#39;s likely all your output would also be in an input log. See <code>input_log()</code>. Note that output logging occurs before newline translation. See <code>binmode()</code> for details on newline translation.</p>
+
+<p>If no argument is given, the log filehandle is returned. A returned empty string indicates logging is off.</p>
+
+<p>To stop logging, use an empty string as an argument. The stopped filehandle is not closed.</p>
+
+<p>If an open filehandle is given, it is used for logging and returned. Otherwise, the argument is assumed to be the name of a file, the filename is opened for logging and a filehandle to it is returned. If the filehandle is not already opened or the filename can&#39;t be opened for writing, the error mode action is performed.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="output_record_separator---output-line-delimiter"><b>output_record_separator</b> - output line delimiter</dt>
+<dd>
+
+<pre><code>    <span class="variable">$chars</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_record_separator</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">output_record_separator</span><span class="operator">(</span><span class="variable">$chars</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the output line delimiter for <code>print()</code> and <code>cmd()</code>. Set this to specify what&#39;s printed at the end of <code>print()</code> and <code>cmd()</code>.</p>
+
+<p>The output record separator is set to <code>&quot;\n&quot;</code> by default, so there&#39;s no need to append all your commands with a newline. To avoid printing the output_record_separator use <code>put()</code> or set the output_record_separator to an empty string.</p>
+
+<p>With no argument this method returns the current output record separator set in the object. With an argument it sets the output record separator to <i>$chars</i> and returns the previous value.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="peerhost---IP-address-of-the-other-end-of-the-socket-connection"><b>peerhost</b> - IP address of the other end of the socket connection</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ipaddr</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">peerhost</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns a string which is the IPv4 or IPv6 address the remote socket is bound to (i.e. it is the IP address of <code>host()</code>). It returns <code>&quot;&quot;</code> when not connected.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="peerport---TCP-port-of-the-other-end-of-the-socket-connection"><b>peerport</b> - TCP port of the other end of the socket connection</dt>
+<dd>
+
+<pre><code>    <span class="variable">$port</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">peerport</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns the port number which the remote socket is bound to. It is the same as the <code>port()</code> number when connected. It returns <code>&quot;&quot;</code> when not connected.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="port---remote-port"><b>port</b> - remote port</dt>
+<dd>
+
+<pre><code>    <span class="variable">$port</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">port</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">port</span><span class="operator">(</span><span class="variable">$port</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method designates the remote TCP port for <code>open()</code>. With no argument this method returns the current port number. With an argument it sets the current port number to <i>$port</i> and returns the previous port. If <i>$port</i> is a TCP service name, then it&#39;s first converted to a port number using the perl function <code>getservbyname()</code>.</p>
+
+<p>The default value is <code>23</code>.</p>
+
+<p>The error mode action is performed when attempting to set this attribute to something that is not a positive integer or a valid TCP service name.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="print---write-to-object"><b>print</b> - write to object</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">@list</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method writes <i>@list</i> followed by the <i>output_record_separator</i> to the open object and returns <code>1</code> if all data was successfully written. On time-out or other failures, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>By default, the <code>output_record_separator()</code> is set to <code>&quot;\n&quot;</code> so all your commands automatically end with a newline. In most cases your output is being read by a command interpreter which won&#39;t accept a command until newline is read. This is similar to someone typing a command and hitting the return key. To avoid printing a trailing <code>&quot;\n&quot;</code> use <code>put()</code> instead or set the output_record_separator to an empty string.</p>
+
+<p>On failure, it&#39;s possible that some data was written. If you choose to try and recover from a print timing-out, use <code>print_length()</code> to determine how much was written before the error occurred.</p>
+
+<p>You may also use the output field separator to print a string between the list elements. See <code>output_field_separator()</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="print_length---number-of-bytes-written-by-print"><b>print_length</b> - number of bytes written by print</dt>
+<dd>
+
+<pre><code>    <span class="variable">$num</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">print_length</span><span class="operator">;</span>
+</code></pre>
+
+<p>This returns the number of bytes successfully written by the most recent <code>print()</code> or <code>put()</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="prompt---pattern-to-match-a-prompt"><b>prompt</b> - pattern to match a prompt</dt>
+<dd>
+
+<pre><code>    <span class="variable">$matchop</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">prompt</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">prompt</span><span class="operator">(</span><span class="variable">$matchop</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method sets the pattern used to find a prompt in the input stream. It must be a string representing a valid perl pattern match operator. The methods <code>login()</code> and <code>cmd()</code> try to read until matching the prompt. They will fail with a time-out error if the pattern you&#39;ve chosen doesn&#39;t match what the remote side sends.</p>
+
+<p>With no argument this method returns the prompt set in the object. With an argument it sets the prompt to <i>$matchop</i> and returns the previous value.</p>
+
+<p>The default prompt is <code>&#39;/[\$%#&gt;] $/&#39;</code></p>
+
+<p>Always use single quotes, instead of double quotes, to construct <i>$matchop</i> (e.g. <code>&#39;/bash\$ $/&#39;</code>). If you&#39;re constructing a DOS like file path, you&#39;ll need to use four backslashes to represent one (e.g. <code>&#39;/c:\\\\users\\\\bill&gt;$/i&#39;</code>).</p>
+
+<p>Of course don&#39;t forget about regexp metacharacters like <code>.</code>, <code>[</code>, or <code>$</code>. You&#39;ll only need a single backslash to quote them. The anchor metacharacters <code>^</code> and <code>$</code> refer to positions in the input buffer.</p>
+
+<p>The error mode action is performed when attempting to set this attribute with a match operator missing its opening delimiter.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="put---write-to-object"><b>put</b> - write to object</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+    
+    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span><span class="string">String</span>      <span class="operator">=&gt;</span> <span class="variable">$string</span><span class="operator">,</span>
+                    <span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                    <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method writes <i>$string</i> to the opened object and returns <code>1</code> if all data was successfully written. This method is like <code>print()</code> except that it doesn&#39;t write the trailing output_record_separator (&quot;\n&quot; by default). On time-out or other failures, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>On failure, it&#39;s possible that some data was written. If you choose to try and recover from a put timing-out, use <code>print_length()</code> to determine how much was written before the error occurred.</p>
+
+<p>Optional named parameters are provided to override the current settings of binmode, errmode, telnetmode, and timeout.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="rs---input-line-delimiter"><b>rs</b> - input line delimiter</dt>
+<dd>
+
+<pre><code>    <span class="variable">$chars</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">rs</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">rs</span><span class="operator">(</span><span class="variable">$chars</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method is synonymous with <code>input_record_separator()</code>.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="sockfamily---IP-address-family-of-connected-local-socket"><b>sockfamily</b> - IP address family of connected local socket</dt>
+<dd>
+
+<pre><code>    <span class="variable">$sockfamily</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">sockfamily</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns which IP address family <code>open()</code> used to successfully connect. It is most useful when the requested address <code>family()</code> for <code>open()</code> was <code>&quot;any&quot;</code>. Values returned may be <code>&quot;ipv4&quot;</code>, <code>&quot;ipv6&quot;</code>, or <code>&quot;&quot;</code> (when not connected).</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="sockhost---IP-address-of-this-end-of-the-socket-connection"><b>sockhost</b> - IP address of this end of the socket connection</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ipaddr</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">sockhost</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns a string which is the IPv4 or IPv6 address the local socket is bound to. It returns <code>&quot;&quot;</code> when not connected.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="sockport---TCP-port-of-this-end-of-the-socket-connection"><b>sockport</b> - TCP port of this end of the socket connection</dt>
+<dd>
+
+<pre><code>    <span class="variable">$port</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">sockport</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns the port number which the local socket is bound to. It returns <code>&quot;&quot;</code> when not connected.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="telnetmode---turn-off-on-telnet-command-interpretation"><b>telnetmode</b> - turn off/on telnet command interpretation</dt>
+<dd>
+
+<pre><code>    <span class="variable">$mode</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">telnetmode</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">telnetmode</span><span class="operator">(</span><span class="variable">$mode</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method controls whether or not TELNET commands in the data stream are recognized and handled. The TELNET protocol uses certain character sequences sent in the data stream to control the session. If the port you&#39;re connecting to isn&#39;t using the TELNET protocol, then you should turn this mode off. The default is <i>on</i>.</p>
+
+<p>If no argument is given, the current mode is returned.</p>
+
+<p>If <i>$mode</i> is <code>0</code> then telnet mode is off. If <i>$mode</i> is <code>1</code> then telnet mode is on.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="timed_out---time-out-indicator"><b>timed_out</b> - time-out indicator</dt>
+<dd>
+
+<pre><code>    <span class="variable">$boolean</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">timed_out</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">timed_out</span><span class="operator">(</span><span class="variable">$boolean</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method indicates if a previous read, write, or open method timed-out. Remember that timing-out is itself an error. To be able to invoke <code>timed_out()</code> after a time-out error, you&#39;d have to change the default error mode to something other than <code>&quot;die&quot;</code>. See <code>errmode()</code>.</p>
+
+<p>With no argument this method returns <code>1</code> if the previous method timed-out. With an argument it sets the indicator. Normally, only internal methods set this indicator.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="timeout---I-O-time-out-interval"><b>timeout</b> - I/O time-out interval</dt>
+<dd>
+
+<pre><code>    <span class="variable">$secs</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">timeout</span><span class="operator">;</span>
+    
+    <span class="variable">$prev</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">timeout</span><span class="operator">(</span><span class="variable">$secs</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method sets the timeout interval used when performing I/O or connecting to a port. When a method doesn&#39;t complete within the timeout interval then it&#39;s an error and the error mode action is performed.</p>
+
+<p>A timeout may be expressed as a relative or absolute value. If <i>$secs</i> is greater than or equal to the time the program started, as determined by $^T, then it&#39;s an absolute time value for when time-out occurs. The perl function <code>time()</code> may be used to obtain an absolute time value. For a relative time-out value less than $^T, time-out happens <i>$secs</i> from when the method begins.</p>
+
+<p>If <i>$secs</i> is <code>0</code> then time-out occurs if the data cannot be immediately read or written. Use the undefined value to turn off timing-out completely.</p>
+
+<p>With no argument this method returns the timeout set in the object. With an argument it sets the timeout to <i>$secs</i> and returns the previous value. The default timeout value is <code>10</code> seconds.</p>
+
+<p>A warning is printed to STDERR when attempting to set this attribute to something that is not an <code>undef</code> or a non-negative integer.</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="waitfor---wait-for-pattern-in-the-input"><b>waitfor</b> - wait for pattern in the input</dt>
+<dd>
+
+<pre><code>    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="variable">$matchop</span><span class="operator">);</span>
+    <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="operator">[</span><span class="string">Match</span>      <span class="operator">=&gt;</span> <span class="variable">$matchop</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">String</span>     <span class="operator">=&gt;</span> <span class="variable">$string</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                        <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+    
+    <span class="operator">(</span><span class="variable">$prematch</span><span class="operator">,</span> <span class="variable">$match</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="variable">$matchop</span><span class="operator">);</span>
+    <span class="operator">(</span><span class="variable">$prematch</span><span class="operator">,</span> <span class="variable">$match</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="operator">[</span><span class="string">Match</span>      <span class="operator">=&gt;</span> <span class="variable">$matchop</span><span class="operator">,</span><span class="operator">]</span>
+                                        <span class="operator">[</span><span class="string">String</span>     <span class="operator">=&gt;</span> <span class="variable">$string</span><span class="operator">,</span><span class="operator">]</span>
+                                        <span class="operator">[</span><span class="string">Binmode</span>    <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                                        <span class="operator">[</span><span class="string">Errmode</span>    <span class="operator">=&gt;</span> <span class="variable">$errmode</span><span class="operator">,</span><span class="operator">]</span>
+                                        <span class="operator">[</span><span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="variable">$mode</span><span class="operator">,</span><span class="operator">]</span>
+                                        <span class="operator">[</span><span class="string">Timeout</span>    <span class="operator">=&gt;</span> <span class="variable">$secs</span><span class="operator">,</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method reads until a pattern match or string is found in the input stream. All the characters before and including the match are removed from the input stream.</p>
+
+<p>In a list context the characters before the match and the matched characters are returned in <i>$prematch</i> and <i>$match</i>. In a scalar context, the matched characters and all characters before it are discarded and <code>1</code> is returned on success. On time-out, eof, or other failures, for both list and scalar context, the error mode action is performed. See <code>errmode()</code>.</p>
+
+<p>You can specify more than one pattern or string by simply providing multiple <i>Match</i> and/or <i>String</i> named parameters. A <i>$matchop</i> must be a string representing a valid Perl pattern match operator. The <i>$string</i> is just a substring to find in the input stream.</p>
+
+<p>Use <code>dump_log()</code> to debug when this method keeps timing-out and you don&#39;t think it should.</p>
+
+<p>An optional named parameter is provided to override the current setting of timeout.</p>
+
+<p>To avoid unexpected backslash interpretation, always use single quotes instead of double quotes to construct a match operator argument for <code>prompt()</code> and <code>waitfor()</code> (e.g. <code>&#39;/bash\$ $/&#39;</code>). If you&#39;re constructing a DOS like file path, you&#39;ll need to use four backslashes to represent one (e.g. <code>&#39;/c:\\\\users\\\\bill&gt;$/i&#39;</code>).</p>
+
+<p>Of course don&#39;t forget about regexp metacharacters like <code>.</code>, <code>[</code>, or <code>$</code>. You&#39;ll only need a single backslash to quote them. The anchor metacharacters <code>^</code> and <code>$</code> refer to positions in the input buffer.</p>
+
+<p>Optional named parameters are provided to override the current settings of binmode, errmode, telnetmode, and timeout.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="RFC-854">RFC 854</dt>
+<dd>
+
+<p><span style="white-space: nowrap;">TELNET Protocol Specification</span></p>
+
+<p><span style="white-space: nowrap;">http://tools.ietf.org/html/rfc854</span></p>
+
+</dd>
+<dt id="RFC-1143">RFC 1143</dt>
+<dd>
+
+<p><span style="white-space: nowrap;">Q Method of Implementing TELNET Option Negotiation</span></p>
+
+<p><span style="white-space: nowrap;">http://tools.ietf.org/html/rfc1143</span></p>
+
+</dd>
+<dt id="TELNET-Option-Assignments">TELNET Option Assignments</dt>
+<dd>
+
+<p><span style="white-space: nowrap;">http://www.iana.org/assignments/telnet-options</span></p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>Setting <code>prompt()</code> to match a user&#39;s shell prompt can be tricky. This example logs in without knowing the shell prompt and then sets it to match <code>prompt()</code>. It requires /usr/bin/env and /bin/sh on the remote host.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$host</span> <span class="operator">=</span> <span class="string">'your_destination_host_here'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$user</span> <span class="operator">=</span> <span class="string">'your_username_here'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$passwd</span> <span class="operator">=</span> <span class="string">'your_password_here'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$t</span><span class="operator">,</span> <span class="variable">@output</span><span class="operator">);</span>
+    
+    <span class="comment">## Create a Net::Telnet object.</span>
+    <span class="keyword">use</span> <span class="variable">Net::Telnet</span> <span class="operator">();</span>
+    <span class="variable">$t</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="string">Timeout</span>  <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">);</span>
+    
+    <span class="comment">## Connect and login.</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+    
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">'/login: ?$/i'</span><span class="operator">);</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">$user</span><span class="operator">);</span>
+    
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">'/password: ?$/i'</span><span class="operator">);</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">$passwd</span><span class="operator">);</span>
+    
+    <span class="comment">## Switch to a known shell, using a known prompt.</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">prompt</span><span class="operator">(</span><span class="string">'/&lt;xPROMPTx&gt; $/'</span><span class="operator">);</span>
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">errmode</span><span class="operator">(</span><span class="string">"return"</span><span class="operator">);</span>
+    
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">"exec /usr/bin/env 'PS1=&lt;xPROMPTx&gt; ' /bin/sh -i"</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"login failed to remote host </span><span class="variable">$host</span><span class="string">"</span><span class="operator">;</span>
+    
+    <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">errmode</span><span class="operator">(</span><span class="string">"die"</span><span class="operator">);</span>
+    
+    <span class="comment">## Now you can do cmd() to your heart's content.</span>
+    <span class="variable">@output</span> <span class="operator">=</span> <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">"uname -a"</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">@output</span><span class="operator">;</span>
+    
+    <span class="keyword">exit</span><span class="operator">;</span>
+</code></pre>
+
+<p>Usually you want the remote TERM environment variable to be set to something like &quot;dumb&quot; so you don&#39;t read escape sequences meant to be interpreted by a display terminal. It is best to set it via <code>cmd()</code>, or via <code>waitfor()</code> and <code>print()</code>. It is also possible to negotiate the terminal type via telnet. Here is how to do that.</p>
+
+<pre><code>    <span class="comment">## Module import.</span>
+    <span class="keyword">use</span> <span class="variable">Net::Telnet</span> <span class="string">qw(TELNET_IAC TELNET_SB TELNET_SE TELOPT_TTYPE)</span><span class="operator">;</span>
+    
+    <span class="comment">## Global variables.</span>
+    <span class="keyword">my</span> <span class="variable">$Term</span><span class="operator">;</span>
+    
+    <span class="comment">## Main program.</span>
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$host</span> <span class="operator">=</span> <span class="string">"your_destination_host_here"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$user</span> <span class="operator">=</span> <span class="string">"your_username_here"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$passwd</span> <span class="operator">=</span> <span class="string">"your_password_here"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$prompt</span> <span class="operator">=</span> <span class="string">'/bash\$ $/'</span><span class="operator">;</span>  <span class="comment"># your regexp for shell prompt here</span>
+        <span class="keyword">my</span> <span class="variable">$t</span><span class="operator">;</span>
+    
+        <span class="variable">$t</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="string">Prompt</span> <span class="operator">=&gt;</span> <span class="variable">$prompt</span><span class="operator">);</span>
+    
+        <span class="comment">## Set up callbacks to negotiate terminal type.</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">option_callback</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{});</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">suboption_callback</span><span class="operator">(\&amp;</span><span class="variable">subopt_callback</span><span class="operator">);</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">option_accept</span><span class="operator">(</span><span class="string">Do</span> <span class="operator">=&gt;</span> <span class="variable">TELOPT_TTYPE</span><span class="operator">);</span>
+    
+        <span class="comment">## Login and print value of TERM.</span>
+        <span class="variable">$Term</span> <span class="operator">=</span> <span class="string">"dumb"</span><span class="operator">;</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">login</span><span class="operator">(</span><span class="variable">$user</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">'hostname'</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="string">"TERM="</span><span class="operator">,</span> <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">'echo $TERM'</span><span class="operator">);</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">close</span><span class="operator">;</span>
+    
+        <span class="keyword">exit</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end main program</span>
+    
+    <span class="keyword">sub</span><span class="variable"> subopt_callback </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$t</span><span class="operator">,</span> <span class="variable">$option</span><span class="operator">,</span> <span class="variable">$parameters</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$telcmd</span><span class="operator">;</span>
+    
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$option</span> <span class="operator">==</span> <span class="variable">TELOPT_TTYPE</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">$telcmd</span> <span class="operator">=</span> <span class="keyword">pack</span><span class="operator">(</span><span class="string">"C4 A* C2"</span><span class="operator">,</span> <span class="variable">TELNET_IAC</span><span class="operator">,</span> <span class="variable">TELNET_SB</span><span class="operator">,</span> <span class="variable">TELOPT_TTYPE</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span>
+                           <span class="variable">$Term</span><span class="operator">,</span> <span class="variable">TELNET_IAC</span><span class="operator">,</span> <span class="variable">TELNET_SE</span><span class="operator">);</span>
+            <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">put</span><span class="operator">(</span><span class="string">String</span> <span class="operator">=&gt;</span> <span class="variable">$telcmd</span><span class="operator">,</span>
+                    <span class="string">Telnetmode</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    
+        <span class="number">1</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end sub subopt_callback</span>
+</code></pre>
+
+<p>You can also use Net::Telnet to interact with local programs. This example changes a user&#39;s login password. It introduces the <code>spawn()</code> subroutine to start a program and associate a filehandle with its standard I/O. Because the passwd program always prompts for passwords on its controlling terminal, the IO::Pty module is used to create a new pseudo terminal for use by passwd. The Net::Telnet object reads and writes to that pseudo terminal. To use the code below, substitute &quot;changeme&quot; with the actual old and new passwords.</p>
+
+<p>## Main program. { my ($pty, $passwd); my $oldpw = &quot;changeme&quot;; my $newpw = &quot;changeme&quot;;</p>
+
+<pre><code>    <span class="comment">## Start passwd program.</span>
+    <span class="variable">$pty</span> <span class="operator">=</span> <span class="variable">spawn</span><span class="operator">(</span><span class="string">"passwd"</span><span class="operator">);</span>
+    
+    <span class="comment">## Create a Net::Telnet object to perform I/O on passwd's tty.</span>
+    <span class="keyword">use</span> <span class="variable">Net::Telnet</span><span class="operator">;</span>
+    <span class="variable">$passwd</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="string">-fhopen</span> <span class="operator">=&gt;</span> <span class="variable">$pty</span><span class="operator">,</span>
+                               <span class="string">-timeout</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span>
+                               <span class="string">-output_record_separator</span> <span class="operator">=&gt;</span> <span class="string">"\r"</span><span class="operator">,</span>
+                               <span class="string">-telnetmode</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+                               <span class="string">-cmd_remove_mode</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">errmode</span><span class="operator">(</span><span class="string">"return"</span><span class="operator">);</span>
+    
+    <span class="comment">## Send existing password.</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">'/password: ?$/i'</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"no old password prompt: "</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">$oldpw</span><span class="operator">);</span>
+    
+    <span class="comment">## Send new password.</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">'/new (\w+\s)?password: ?$/i'</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"bad old password: "</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">$newpw</span><span class="operator">);</span>
+    
+    <span class="comment">## Send new password verification.</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">'/new (\w+\s)?password: ?$/i'</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"bad new password: "</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">$newpw</span><span class="operator">);</span>
+    
+    <span class="comment">## Display success or failure.</span>
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">'/(changed|updated)/'</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"bad new password: "</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+    
+    <span class="variable">$passwd</span><span class="operator">-&gt;</span><span class="variable">close</span><span class="operator">;</span>
+    <span class="keyword">exit</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end main program</span>
+</code></pre>
+
+<p>sub spawn { my (@cmd) = @_; my ($pid, $pty, $tty, $tty_fd);</p>
+
+<pre><code>    <span class="comment">## Create a new pseudo terminal.</span>
+    <span class="keyword">use</span> <span class="variable">IO::Pty</span> <span class="operator">();</span>
+    <span class="variable">$pty</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">IO::Pty</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+    
+    <span class="comment">## Execute the program in another process.</span>
+    <span class="keyword">unless</span> <span class="operator">(</span><span class="variable">$pid</span> <span class="operator">=</span> <span class="keyword">fork</span><span class="operator">)</span> <span class="operator">{</span>  <span class="comment"># child process</span>
+        <span class="keyword">die</span> <span class="string">"problem spawning program: $!\n"</span> <span class="keyword">unless</span> <span class="keyword">defined</span> <span class="variable">$pid</span><span class="operator">;</span>
+    
+        <span class="comment">## Disassociate process from its controlling terminal.</span>
+        <span class="keyword">use</span> <span class="variable">POSIX</span> <span class="operator">();</span>
+        <span class="variable">POSIX::setsid</span><span class="operator">()</span>
+            <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"setsid failed: $!"</span><span class="operator">;</span>
+    
+        <span class="comment">## Associate process with a new controlling terminal.</span>
+        <span class="variable">$pty</span><span class="operator">-&gt;</span><span class="variable">make_slave_controlling_terminal</span><span class="operator">;</span>
+        <span class="variable">$tty</span> <span class="operator">=</span> <span class="variable">$pty</span><span class="operator">-&gt;</span><span class="variable">slave</span><span class="operator">;</span>
+        <span class="variable">$tty_fd</span> <span class="operator">=</span> <span class="variable">$tty</span><span class="operator">-&gt;</span><span class="variable">fileno</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">$pty</span><span class="operator">;</span>
+    
+        <span class="comment">## Make standard I/O use the new controlling terminal.</span>
+        <span class="keyword">open</span> <span class="variable">STDIN</span><span class="operator">,</span> <span class="string">"&lt;&amp;</span><span class="variable">$tty_fd</span><span class="string">"</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+        <span class="keyword">open</span> <span class="variable">STDOUT</span><span class="operator">,</span> <span class="string">"&gt;&amp;</span><span class="variable">$tty_fd</span><span class="string">"</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+        <span class="keyword">open</span> <span class="variable">STDERR</span><span class="operator">,</span> <span class="string">"&gt;&amp;STDOUT"</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">$tty</span><span class="operator">;</span>
+    
+        <span class="comment">## Execute requested program.</span>
+        <span class="keyword">exec</span> <span class="variable">@cmd</span>
+            <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"problem executing </span><span class="variable">$cmd</span><span class="string">[0]\n"</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end child process</span>
+    
+    <span class="variable">$pty</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end sub spawn</span>
+</code></pre>
+
+<p>Here is an example that uses the openssh program to connect to a remote host. It uses the <code>spawn()</code> subroutine, from the password changing example above, to start the ssh program and then read and write to it via a Net::Telnet object. This example turns off ssh host key checking, which reduces your ability to know when someone on the network is impersonating the remote host. To use the code below, substitute &quot;changeme&quot; with the actual host, user, password, and command prompt.</p>
+
+<pre><code>    <span class="comment">## Main program.</span>
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$host</span> <span class="operator">=</span> <span class="string">"changeme"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$user</span> <span class="operator">=</span> <span class="string">"changeme"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$passwd</span> <span class="operator">=</span> <span class="string">"changeme"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$prompt</span> <span class="operator">=</span> <span class="string">'/changeme\$ $/'</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$buf</span><span class="operator">,</span> <span class="variable">$match</span><span class="operator">,</span> <span class="variable">$pty</span><span class="operator">,</span> <span class="variable">$ssh</span><span class="operator">,</span> <span class="variable">@lines</span><span class="operator">);</span>
+    
+        <span class="comment">## Start ssh program.</span>
+        <span class="variable">$pty</span> <span class="operator">=</span> <span class="variable">spawn</span><span class="operator">(</span><span class="string">"ssh"</span><span class="operator">,</span>
+                     <span class="string">"-l"</span><span class="operator">,</span> <span class="variable">$user</span><span class="operator">,</span>
+                     <span class="string">"-e"</span><span class="operator">,</span> <span class="string">"none"</span><span class="operator">,</span>
+                     <span class="string">"-F"</span><span class="operator">,</span> <span class="string">"/dev/null"</span><span class="operator">,</span>
+                     <span class="string">"-o"</span><span class="operator">,</span> <span class="string">"PreferredAuthentications=password"</span><span class="operator">,</span>
+                     <span class="string">"-o"</span><span class="operator">,</span> <span class="string">"NumberOfPasswordPrompts=1"</span><span class="operator">,</span>
+                     <span class="string">"-o"</span><span class="operator">,</span> <span class="string">"StrictHostKeyChecking=no"</span><span class="operator">,</span>
+                     <span class="string">"-o"</span><span class="operator">,</span> <span class="string">"UserKnownHostsFile=/dev/null"</span><span class="operator">,</span>
+                     <span class="variable">$host</span><span class="operator">);</span>
+    
+        <span class="comment">## Create a Net::Telnet object to perform I/O on ssh's tty.</span>
+        <span class="keyword">use</span> <span class="variable">Net::Telnet</span><span class="operator">;</span>
+        <span class="variable">$ssh</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="string">-fhopen</span> <span class="operator">=&gt;</span> <span class="variable">$pty</span><span class="operator">,</span>
+                                <span class="string">-prompt</span> <span class="operator">=&gt;</span> <span class="variable">$prompt</span><span class="operator">,</span>
+                                <span class="string">-telnetmode</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+                                <span class="string">-output_record_separator</span> <span class="operator">=&gt;</span> <span class="string">"\r"</span><span class="operator">,</span>
+                                <span class="string">-cmd_remove_mode</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    
+        <span class="comment">## Wait for the password prompt and send password.</span>
+        <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">-match</span> <span class="operator">=&gt;</span> <span class="string">'/password: ?$/i'</span><span class="operator">,</span>
+                      <span class="string">-errmode</span> <span class="operator">=&gt;</span> <span class="string">"return"</span><span class="operator">)</span>
+            <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"problem connecting to \"</span><span class="variable">$host</span><span class="string">\": "</span><span class="operator">,</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">lastline</span><span class="operator">;</span>
+        <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="variable">$passwd</span><span class="operator">);</span>
+    
+        <span class="comment">## Wait for the shell prompt.</span>
+        <span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="variable">$match</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">waitfor</span><span class="operator">(</span><span class="string">-match</span> <span class="operator">=&gt;</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">prompt</span><span class="operator">,</span>
+                                        <span class="string">-match</span> <span class="operator">=&gt;</span> <span class="string">'/^Permission denied/m'</span><span class="operator">,</span>
+                                        <span class="string">-errmode</span> <span class="operator">=&gt;</span> <span class="string">"return"</span><span class="operator">)</span>
+            <span class="keyword">or</span> <span class="keyword">return</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">(</span><span class="string">"login failed: expected shell prompt "</span><span class="operator">,</span>
+                                  <span class="string">"doesn't match actual\n"</span><span class="operator">);</span>
+        <span class="keyword">return</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">(</span><span class="string">"login failed: bad login-name or password\n"</span><span class="operator">)</span>
+            <span class="keyword">if</span> <span class="variable">$match</span> <span class="operator">=~</span> <span class="regex">/^Permission denied/m</span><span class="operator">;</span>
+    
+        <span class="comment">## Run commands on remote host.</span>
+        <span class="keyword">print</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">"hostname"</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">"uptime"</span><span class="operator">);</span>
+    
+        <span class="variable">$ssh</span><span class="operator">-&gt;</span><span class="variable">close</span><span class="operator">;</span>
+        <span class="keyword">exit</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end main program</span>
+</code></pre>
+
+<p>Some shells have a rather restrictive 255 character line limit. If you run into this problem, here is an example for sending lines longer than 254 as a sequence of shorter lines.</p>
+
+<pre><code>    <span class="comment">## Main program.</span>
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$host</span> <span class="operator">=</span> <span class="string">"changeme"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$user</span> <span class="operator">=</span> <span class="string">"changeme"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$passwd</span> <span class="operator">=</span> <span class="string">"changeme"</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$prompt</span> <span class="operator">=</span> <span class="string">'/changeme\$ $/'</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$cmd</span> <span class="operator">=</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">""</span><span class="operator">,</span> <span class="string">"echo "</span><span class="operator">,</span>
+                       <span class="string">"11111111112222222222333333333344444444445555555555"</span><span class="operator">,</span>
+                       <span class="string">"66666666667777777777888888888899999999990000000000"</span><span class="operator">,</span>
+                       <span class="string">"11111111112222222222333333333344444444445555555555"</span><span class="operator">,</span>
+                       <span class="string">"66666666667777777777888888888899999999990000000000"</span><span class="operator">,</span>
+                       <span class="string">"11111111112222222222333333333344444444445555555555"</span><span class="operator">,</span>
+                       <span class="string">"66666666667777777777888888888899999999990000000000"</span><span class="operator">);</span>
+    
+        <span class="keyword">use</span> <span class="variable">Net::Telnet</span> <span class="operator">();</span>
+        <span class="keyword">my</span> <span class="variable">$t</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Net::Telnet</span> <span class="operator">(</span><span class="string">-prompt</span> <span class="operator">=&gt;</span> <span class="variable">$prompt</span><span class="operator">);</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">open</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">);</span>
+        <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">login</span><span class="operator">(</span><span class="variable">$user</span><span class="operator">,</span> <span class="variable">$passwd</span><span class="operator">);</span>
+    
+        <span class="keyword">my</span> <span class="variable">@output</span> <span class="operator">=</span> <span class="variable">cmd_unixlong</span><span class="operator">(</span><span class="variable">$t</span><span class="operator">,</span> <span class="variable">$cmd</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="variable">@output</span><span class="operator">;</span>
+    
+        <span class="keyword">exit</span><span class="operator">;</span>
+    <span class="operator">}</span> <span class="comment"># end main program</span>
+    
+    <span class="keyword">sub</span><span class="variable"> cmd_unixlong </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$obj</span><span class="operator">,</span> <span class="variable">$cmd</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$line</span><span class="operator">,</span> <span class="variable">$pos</span><span class="operator">);</span>
+        <span class="keyword">my</span> <span class="variable">$max_tty_line</span> <span class="operator">=</span> <span class="number">254</span><span class="operator">;</span>
+    
+        <span class="comment">## Start a Bourne shell.</span>
+        <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">-string</span> <span class="operator">=&gt;</span> <span class="string">"/usr/bin/env "</span> <span class="operator">.</span>
+                  <span class="string">"'PS1=&lt;xPROMPTx&gt; ' 'PS2=&lt;xPROMPTx&gt; ' /bin/sh -i"</span><span class="operator">,</span>
+                  <span class="string">-prompt</span> <span class="operator">=&gt;</span> <span class="string">'/&lt;xPROMPTx&gt; $/'</span><span class="operator">)</span>
+            <span class="keyword">or</span> <span class="keyword">return</span><span class="operator">;</span>
+    
+        <span class="comment">## Break-up the one large command line and send as shorter lines.</span>
+        <span class="variable">$pos</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+        <span class="keyword">while</span> <span class="operator">(</span><span class="number">1</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">$line</span> <span class="operator">=</span> <span class="keyword">substr</span> <span class="variable">$cmd</span><span class="operator">,</span> <span class="variable">$pos</span><span class="operator">,</span> <span class="variable">$max_tty_line</span><span class="operator">;</span>
+            <span class="variable">$pos</span> <span class="operator">+=</span> <span class="keyword">length</span> <span class="variable">$line</span><span class="operator">;</span>
+            <span class="keyword">last</span> <span class="keyword">unless</span> <span class="variable">$pos</span> <span class="operator">&lt;</span> <span class="keyword">length</span> <span class="variable">$cmd</span><span class="operator">;</span>
+    
+            <span class="comment">## Send the line with continuation char.</span>
+            <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">-string</span> <span class="operator">=&gt;</span> <span class="string">"</span><span class="variable">$line</span><span class="string">\\"</span><span class="operator">,</span>
+                      <span class="string">-prompt</span> <span class="operator">=&gt;</span> <span class="string">'/&lt;xPROMPTx&gt; $/'</span><span class="operator">)</span>
+                <span class="keyword">or</span> <span class="keyword">return</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    
+        <span class="comment">## Send the last line and return the output.</span>
+        <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">cmd</span><span class="operator">(</span><span class="string">"</span><span class="variable">$line</span><span class="string"> ; exit"</span><span class="operator">);</span>
+    <span class="operator">}</span> <span class="comment"># end sub cmd_unixlong</span>
+</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jay Rogers &lt;jay@rgrs.com&gt;</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>Dave Martin, Dave Cardosi</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 1997, 2000, 2002, 2013 by Jay Rogers. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-5169">Around line 5169:</dt>
+<dd>
+
+<p>Expected text after =item, not a bullet</p>
+
+</dd>
+<dt id="Around-line-5217">Around line 5217:</dt>
+<dd>
+
+<p>Expected text after =item, not a bullet</p>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#WHERE-IS-THE-DATA-STORED">WHERE IS THE DATA STORED?</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#META-KEY-RESTRICTIONS">META-KEY RESTRICTIONS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Util::ExternalMeta - Allow third party tools to safely attach meta-data to your instances.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package lets you define a clear, and consistent way to allow third party tools to attach meta-data to your instances. If your object consumes this package, and imports its methods, then third party meta-data has a safe place to live.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">My::Object</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Test2::Util::ExternalMeta</span> <span class="string">qw/meta get_meta set_meta delete_meta/</span><span class="operator">;</span>
+    
+    <span class="operator">...</span>
+</code></pre>
+
+<p>Now to use it:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$inst</span> <span class="operator">=</span> <span class="variable">My::Object</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    
+    <span class="variable">$inst</span><span class="operator">-&gt;</span><span class="variable">set_meta</span><span class="operator">(</span><span class="string">foo</span> <span class="operator">=&gt;</span> <span class="string">'bar'</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$val</span> <span class="operator">=</span> <span class="variable">$inst</span><span class="operator">-&gt;</span><span class="variable">get_meta</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="WHERE-IS-THE-DATA-STORED">WHERE IS THE DATA STORED?</h1>
+
+<p>This package assumes your instances are blessed hashrefs, it will not work if that is not true. It will store all meta-data in the <code>_meta</code> key on your objects hash. If your object makes use of the <code>_meta</code> key in its underlying hash, then there is a conflict and you cannot use this package.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<dl>
+
+<dt id="val-obj-meta-key">$val = $obj-&gt;meta($key)</dt>
+<dd>
+
+</dd>
+<dt id="val-obj-meta-key-default">$val = $obj-&gt;meta($key, $default)</dt>
+<dd>
+
+<p>This will get the value for a specified meta <code>$key</code>. Normally this will return <code>undef</code> when there is no value for the <code>$key</code>, however you can specify a <code>$default</code> value to set when no value is already set.</p>
+
+</dd>
+<dt id="val-obj-get_meta-key">$val = $obj-&gt;get_meta($key)</dt>
+<dd>
+
+<p>This will get the value for a specified meta <code>$key</code>. This does not have the <code>$default</code> overhead that <code>meta()</code> does.</p>
+
+</dd>
+<dt id="val-obj-delete_meta-key">$val = $obj-&gt;delete_meta($key)</dt>
+<dd>
+
+<p>This will remove the value of a specified meta <code>$key</code>. The old <code>$val</code> will be returned.</p>
+
+</dd>
+<dt id="obj-set_meta-key-val">$obj-&gt;set_meta($key, $val)</dt>
+<dd>
+
+<p>Set the value of a specified meta <code>$key</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="META-KEY-RESTRICTIONS">META-KEY RESTRICTIONS</h1>
+
+<p>Meta keys must be defined, and must be true when used as a boolean. Keys may not be references. You are free to stringify a reference <code>&quot;$ref&quot;</code> for use as a key, but this package will not stringify it for you.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

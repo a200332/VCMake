@@ -1,0 +1,203 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#NOTE">NOTE</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#total_capacity">total_capacity</a></li>
+      <li><a href="#capacity">capacity</a></li>
+      <li><a href="#drop">drop</a></li>
+      <li><a href="#prune">prune</a></li>
+      <li><a href="#get_types">get_types</a></li>
+      <li><a href="#get_connections">get_connections</a></li>
+    </ul>
+  </li>
+  <li><a href="#PROTOCOL-METHODS">PROTOCOL METHODS</a>
+    <ul>
+      <li><a href="#deposit">deposit</a></li>
+      <li><a href="#withdraw">withdraw</a></li>
+    </ul>
+  </li>
+  <li><a href="#INTERNAL-METHODS">INTERNAL METHODS</a>
+    <ul>
+      <li><a href="#enforce_limits">enforce_limits</a></li>
+      <li><a href="#dropping">dropping</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUBCLASSING">SUBCLASSING</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>LWP::ConnCache - Connection cache manager</p>
+
+<h1 id="NOTE">NOTE</h1>
+
+<p>This module is experimental. Details of its interface is likely to change in the future.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">LWP::ConnCache</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$cache</span> <span class="operator">=</span> <span class="variable">LWP::ConnCache</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">deposit</span><span class="operator">(</span><span class="variable">$type</span><span class="operator">,</span> <span class="variable">$key</span><span class="operator">,</span> <span class="variable">$sock</span><span class="operator">);</span>
+ <span class="variable">$sock</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">withdraw</span><span class="operator">(</span><span class="variable">$type</span><span class="operator">,</span> <span class="variable">$key</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>LWP::ConnCache</code> class is the standard connection cache manager for <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>The following basic methods are provided:</p>
+
+<h2 id="new">new</h2>
+
+<pre><code>    my $cache = LWP::ConnCache-&gt;new( %options )</code></pre>
+
+<p>This method constructs a new <a href="../../lib/LWP/ConnCache.html">LWP::ConnCache</a> object. The only option currently accepted is <code>total_capacity</code>. If specified it initialize the <a href="../../lib/LWP/ConnCache.html#total_capacity">&quot;total_capacity&quot; in LWP::ConnCache</a> option. It defaults to <code>1</code>.</p>
+
+<h2 id="total_capacity">total_capacity</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$cap</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">total_capacity</span><span class="operator">;</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">total_capacity</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span> <span class="comment"># drop all immediately</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">total_capacity</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span> <span class="comment"># no limit</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">total_capacity</span><span class="operator">(</span><span class="variable">$number</span><span class="operator">);</span>
+</code></pre>
+
+<p>Get/sets the number of connection that will be cached. Connections will start to be dropped when this limit is reached. If set to <code>0</code>, then all connections are immediately dropped. If set to <code>undef</code>, then there is no limit.</p>
+
+<h2 id="capacity">capacity</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$http_capacity</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">capacity</span><span class="operator">(</span><span class="string">'http'</span><span class="operator">);</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">capacity</span><span class="operator">(</span><span class="string">'http'</span><span class="operator">,</span> <span class="number">2</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Get/set a limit for the number of connections of the specified type that can be cached. The first parameter is a short string like &quot;http&quot; or &quot;ftp&quot;.</p>
+
+<h2 id="drop">drop</h2>
+
+<pre><code>    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">drop</span><span class="operator">();</span> <span class="comment"># Drop ALL connections</span>
+    <span class="comment"># which is just a synonym for:</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">drop</span><span class="operator">(</span><span class="keyword">sub</span><span class="operator">{</span><span class="number">1</span><span class="operator">});</span> <span class="comment"># Drop ALL connections</span>
+    <span class="comment"># drop all connections older than 22 seconds and add a reason for it!</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">drop</span><span class="operator">(</span><span class="number">22</span><span class="operator">,</span> <span class="string">"Older than 22 secs dropped"</span><span class="operator">);</span>
+    <span class="comment"># which is just a synonym for:</span>
+    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">drop</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$conn</span><span class="operator">,</span> <span class="variable">$type</span><span class="operator">,</span> <span class="variable">$key</span><span class="operator">,</span> <span class="variable">$deposit_time</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$deposit_time</span> <span class="operator">&lt;</span> <span class="number">22</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="comment"># true values drop the connection</span>
+            <span class="keyword">return</span> <span class="number">1</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="comment"># false values don't drop the connection</span>
+        <span class="keyword">return</span> <span class="number">0</span><span class="operator">;</span>
+    <span class="operator">},</span> <span class="string">"Older than 22 secs dropped"</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Drop connections by some criteria. The $checker argument is a subroutine that is called for each connection. If the routine returns a TRUE value then the connection is dropped. The routine is called with ($conn, $type, $key, $deposit_time) as arguments.</p>
+
+<p>Shortcuts: If the $checker argument is absent (or <code>undef</code>) all cached connections are dropped. If the $checker is a number then all connections untouched that the given number of seconds or more are dropped. If $checker is a string then all connections of the given type are dropped.</p>
+
+<p>The <code>reason</code> is passed on to the <a href="../../lib/LWP/ConnCache.html#dropped">&quot;dropped&quot; in LWP::ConnCache</a> method.</p>
+
+<h2 id="prune">prune</h2>
+
+<pre><code>    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">prune</span><span class="operator">();</span>
+</code></pre>
+
+<p>Calling this method will drop all connections that are dead. This is tested by calling the <a href="../../lib/LWP/ConnCache.html#ping">&quot;ping&quot; in LWP::ConnCache</a> method on the connections. If the <a href="../../lib/LWP/ConnCache.html#ping">&quot;ping&quot; in LWP::ConnCache</a> method exists and returns a false value, then the connection is dropped.</p>
+
+<h2 id="get_types">get_types</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@types</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">get_types</span><span class="operator">();</span>
+</code></pre>
+
+<p>This returns all the <code>type</code> fields used for the currently cached connections.</p>
+
+<h2 id="get_connections">get_connections</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@conns</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">get_connections</span><span class="operator">();</span> <span class="comment"># all connections</span>
+    <span class="keyword">my</span> <span class="variable">@conns</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">get_connections</span><span class="operator">(</span><span class="string">'http'</span><span class="operator">);</span> <span class="comment"># connections for http</span>
+</code></pre>
+
+<p>This returns all connection objects of the specified type. If no type is specified then all connections are returned. In scalar context the number of cached connections of the specified type is returned.</p>
+
+<h1 id="PROTOCOL-METHODS">PROTOCOL METHODS</h1>
+
+<p>The following methods are called by low-level protocol modules to try to save away connections and to get them back.</p>
+
+<h2 id="deposit">deposit</h2>
+
+<pre><code>    <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">deposit</span><span class="operator">(</span><span class="variable">$type</span><span class="operator">,</span> <span class="variable">$key</span><span class="operator">,</span> <span class="variable">$conn</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method adds a new connection to the cache. As a result, other already cached connections might be dropped. Multiple connections with the same type/key might be added.</p>
+
+<h2 id="withdraw">withdraw</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$conn</span> <span class="operator">=</span> <span class="variable">$cache</span><span class="operator">-&gt;</span><span class="variable">withdraw</span><span class="operator">(</span><span class="variable">$type</span><span class="operator">,</span> <span class="variable">$key</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method tries to fetch back a connection that was previously deposited. If no cached connection with the specified $type/$key is found, then <code>undef</code> is returned. There is not guarantee that a deposited connection can be withdrawn, as the cache manger is free to drop connections at any time.</p>
+
+<h1 id="INTERNAL-METHODS">INTERNAL METHODS</h1>
+
+<p>The following methods are called internally. Subclasses might want to override them.</p>
+
+<h2 id="enforce_limits">enforce_limits</h2>
+
+<pre><code>    $conn-&gt;enforce_limits([$type])</code></pre>
+
+<p>This method is called with after a new connection is added (deposited) in the cache or capacity limits are adjusted. The default implementation drops connections until the specified capacity limits are not exceeded.</p>
+
+<h2 id="dropping">dropping</h2>
+
+<pre><code>    $conn-&gt;dropping($conn_record, $reason)</code></pre>
+
+<p>This method is called when a connection is dropped. The record belonging to the dropped connection is passed as the first argument and a string describing the reason for the drop is passed as the second argument. The default implementation makes some noise if the <code>$LWP::ConnCache::DEBUG</code> variable is set and nothing more.</p>
+
+<h1 id="SUBCLASSING">SUBCLASSING</h1>
+
+<p>For specialized cache policy it makes sense to subclass <code>LWP::ConnCache</code> and perhaps override the <a href="../../lib/LWP/ConnCache.html#deposit">&quot;deposit&quot; in LWP::ConnCache</a>, <a href="../../lib/LWP/ConnCache.html#enforce_limits">&quot;enforce_limits&quot; in LWP::ConnCache</a>, and <a href="../../lib/LWP/ConnCache.html#dropping">&quot;dropping&quot; in LWP::ConnCache</a> methods.</p>
+
+<p>The object itself is a hash. Keys prefixed with <code>cc_</code> are reserved for the base class.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001 Gisle Aas.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

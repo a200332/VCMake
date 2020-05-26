@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Encode::Guess -- Guesses encoding from data</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># if you are sure $data won't contain anything bogus</span>
+  
+  <span class="keyword">use</span> <span class="variable">Encode</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Encode::Guess</span> <span class="string">qw/euc-jp shiftjis 7bit-jis/</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">decode</span><span class="operator">(</span><span class="string">"Guess"</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">encode</span><span class="operator">(</span><span class="string">"Guess"</span><span class="operator">,</span> <span class="variable">$utf8</span><span class="operator">);</span>   <span class="comment"># this doesn't work!</span>
+  
+  <span class="comment"># more elaborate way</span>
+  <span class="keyword">use</span> <span class="variable">Encode::Guess</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$enc</span> <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="string">qw/euc-jp shiftjis 7bit-jis/</span><span class="operator">);</span>
+  <span class="keyword">ref</span><span class="operator">(</span><span class="variable">$enc</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't guess: </span><span class="variable">$enc</span><span class="string">"</span><span class="operator">;</span> <span class="comment"># trap error this way</span>
+  <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">$enc</span><span class="operator">-&gt;</span><span class="variable">decode</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+  <span class="comment"># or</span>
+  <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">decode</span><span class="operator">(</span><span class="variable">$enc</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">)</span>
+</code></pre>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<p>Encode::Guess enables you to guess in what encoding a given data is encoded, or at least tries to.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>By default, it checks only ascii, utf8 and UTF-16/32 with BOM.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Encode::Guess</span><span class="operator">;</span> <span class="comment"># ascii/utf8/BOMed UTF</span>
+</code></pre>
+
+<p>To use it more practically, you have to give the names of encodings to check (<i>suspects</i> as follows). The name of suspects can either be canonical names or aliases.</p>
+
+<p>CAVEAT: Unlike UTF-(16|32), BOM in utf8 is NOT AUTOMATICALLY STRIPPED.</p>
+
+<pre><code> <span class="comment"># tries all major Japanese Encodings as well</span>
+  <span class="keyword">use</span> <span class="variable">Encode::Guess</span> <span class="string">qw/euc-jp shiftjis 7bit-jis/</span><span class="operator">;</span>
+</code></pre>
+
+<p>If the <code>$Encode::Guess::NoUTFAutoGuess</code> variable is set to a true value, no heuristics will be applied to UTF8/16/32, and the result will be limited to the suspects and <code>ascii</code>.</p>
+
+<dl>
+
+<dt id="Encode::Guess-set_suspects">Encode::Guess-&gt;set_suspects</dt>
+<dd>
+
+<p>You can also change the internal suspects list via <code>set_suspects</code> method.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Encode::Guess</span><span class="operator">;</span>
+  <span class="variable">Encode::Guess</span><span class="operator">-&gt;</span><span class="variable">set_suspects</span><span class="operator">(</span><span class="string">qw/euc-jp shiftjis 7bit-jis/</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Encode::Guess-add_suspects">Encode::Guess-&gt;add_suspects</dt>
+<dd>
+
+<p>Or you can use <code>add_suspects</code> method. The difference is that <code>set_suspects</code> flushes the current suspects list while <code>add_suspects</code> adds.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Encode::Guess</span><span class="operator">;</span>
+  <span class="variable">Encode::Guess</span><span class="operator">-&gt;</span><span class="variable">add_suspects</span><span class="operator">(</span><span class="string">qw/euc-jp shiftjis 7bit-jis/</span><span class="operator">);</span>
+  <span class="comment"># now the suspects are euc-jp,shiftjis,7bit-jis, AND</span>
+  <span class="comment"># euc-kr,euc-cn, and big5-eten</span>
+  <span class="variable">Encode::Guess</span><span class="operator">-&gt;</span><span class="variable">add_suspects</span><span class="operator">(</span><span class="string">qw/euc-kr euc-cn big5-eten/</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Encode::decode-Guess">Encode::decode(&quot;Guess&quot; ...)</dt>
+<dd>
+
+<p>When you are content with suspects list, you can now</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">Encode::decode</span><span class="operator">(</span><span class="string">"Guess"</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Encode::Guess-guess-data">Encode::Guess-&gt;guess($data)</dt>
+<dd>
+
+<p>But it will croak if:</p>
+
+<ul>
+
+<li><p>Two or more suspects remain</p>
+
+</li>
+<li><p>No suspects left</p>
+
+</li>
+</ul>
+
+<p>So you should instead try this;</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">Encode::Guess</span><span class="operator">-&gt;</span><span class="variable">guess</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>On success, $decoder is an object that is documented in <a href="../../lib/Encode/Encoding.html">Encode::Encoding</a>. So you can now do this;</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">$decoder</span><span class="operator">-&gt;</span><span class="variable">decode</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>On failure, $decoder now contains an error message so the whole thing would be as follows;</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">Encode::Guess</span><span class="operator">-&gt;</span><span class="variable">guess</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+  <span class="keyword">die</span> <span class="variable">$decoder</span> <span class="keyword">unless</span> <span class="keyword">ref</span><span class="operator">(</span><span class="variable">$decoder</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">$decoder</span><span class="operator">-&gt;</span><span class="variable">decode</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="guess_encoding-data-list-of-suspects">guess_encoding($data, [, <i>list of suspects</i>])</dt>
+<dd>
+
+<p>You can also try <code>guess_encoding</code> function which is exported by default. It takes $data to check and it also takes the list of suspects by option. The optional suspect list is <i>not reflected</i> to the internal suspects list.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="string">qw/euc-jp euc-kr euc-cn/</span><span class="operator">);</span>
+  <span class="keyword">die</span> <span class="variable">$decoder</span> <span class="keyword">unless</span> <span class="keyword">ref</span><span class="operator">(</span><span class="variable">$decoder</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$utf8</span> <span class="operator">=</span> <span class="variable">$decoder</span><span class="operator">-&gt;</span><span class="variable">decode</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+  <span class="comment"># check only ascii, utf8 and UTF-(16|32) with BOM</span>
+  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<ul>
+
+<li><p>Because of the algorithm used, ISO-8859 series and other single-byte encodings do not work well unless either one of ISO-8859 is the only one suspect (besides ascii and utf8).</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Encode::Guess</span><span class="operator">;</span>
+  <span class="comment"># perhaps ok</span>
+  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="string">'latin1'</span><span class="operator">);</span>
+  <span class="comment"># definitely NOT ok</span>
+  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="string">qw/latin1 greek/</span><span class="operator">);</span>
+</code></pre>
+
+<p>The reason is that Encode::Guess guesses encoding by trial and error. It first splits $data into lines and tries to decode the line for each suspect. It keeps it going until all but one encoding is eliminated out of suspects list. ISO-8859 series is just too successful for most cases (because it fills almost all code points in \x00-\xff).</p>
+
+</li>
+<li><p>Do not mix national standard encodings and the corresponding vendor encodings.</p>
+
+<pre><code>  <span class="comment"># a very bad idea</span>
+  <span class="keyword">my</span> <span class="variable">$decoder</span>
+     <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="string">qw/shiftjis MacJapanese cp932/</span><span class="operator">);</span>
+</code></pre>
+
+<p>The reason is that vendor encoding is usually a superset of national standard so it becomes too ambiguous for most cases.</p>
+
+</li>
+<li><p>On the other hand, mixing various national standard encodings automagically works unless $data is too short to allow for guessing.</p>
+
+<pre><code> <span class="comment"># This is ok if $data is long enough</span>
+ <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span>  
+  <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="string">qw/euc-cn
+                           euc-jp shiftjis 7bit-jis
+                           euc-kr
+                           big5-eten/</span><span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>DO NOT PUT TOO MANY SUSPECTS! Don&#39;t you try something like this!</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$decoder</span> <span class="operator">=</span> <span class="variable">guess_encoding</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> 
+                               <span class="variable">Encode</span><span class="operator">-&gt;</span><span class="variable">encodings</span><span class="operator">(</span><span class="string">":all"</span><span class="operator">));</span>
+</code></pre>
+
+</li>
+</ul>
+
+<p>It is, after all, just a guess. You should alway be explicit when it comes to encodings. But there are some, especially Japanese, environment that guess-coding is a must. Use this module with care.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>Encode::Guess does not work on EBCDIC platforms.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/Encode.html">Encode</a>, <a href="../../lib/Encode/Encoding.html">Encode::Encoding</a></p>
+
+
+</body>
+
+</html>
+
+

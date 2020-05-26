@@ -1,0 +1,116 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#DEFAULTS">DEFAULTS</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Documentation::RequirePodSections - Organize your POD into the customary sections.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This Policy requires your POD to contain certain <code>=head1</code> sections. If the file doesn&#39;t contain any POD at all, then this Policy does not apply. Tools like <a>Module::Starter</a> make it really easy to ensure that every module has the same documentation framework, and they can save you lots of keystrokes.</p>
+
+<h1 id="DEFAULTS">DEFAULTS</h1>
+
+<p>Different POD sections are required, depending on whether the file is a library or program (which is determined by the presence or absence of a perl shebang line).</p>
+
+<pre><code>                Default Required POD Sections
+
+    Perl Libraries                     Perl Programs
+    -----------------------------      ---------------------
+    NAME                               NAME
+    VERSION
+    SYNOPSIS                           USAGE
+    DESCRIPTION                        DESCRIPTION
+    SUBROUTINES/METHODS                REQUIRED ARGUMENTS
+                                       OPTIONS
+    DIAGNOSTICS                        DIAGNOSTICS
+                                       EXIT STATUS
+    CONFIGURATION AND ENVIRONMENT      CONFIGURATION
+    DEPENDENCIES                       DEPENDENCIES
+    INCOMPATIBILITIES                  INCOMPATIBILITIES
+    BUGS AND LIMITATIONS               BUGS AND LIMITATIONS
+    AUTHOR                             AUTHOR
+    LICENSE AND COPYRIGHT              LICENSE AND COPYRIGHT</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>The default sections above are derived from Damian Conway&#39;s <i>Perl Best Practices</i> book. Since the book has been published, Conway has released <a>Module::Starter::PBP</a>, which has different names for some of the sections, and adds some more. Also, the book and module use Australian spelling, while the authors of this module have previously used American spelling. To sort this all out, there are a couple of options that can be used: <code>source</code> and <code>language</code>.</p>
+
+<p>The <code>source</code> option has two generic values, <code>book</code> and <code>module_starter_pbp</code>, and two version-specific values, <code>book_first_edition</code> and <code>module_starter_pbp_0_0_3</code>. Currently, the generic values map to the corresponding version-specific values, but may change as new versions of the book and module are released, so use these if you want to keep up with the latest and greatest. If you want things to remain stable, use the version-specific values.</p>
+
+<p>The <code>language</code> option has a default, unnamed value but also accepts values of <code>en_AU</code> and <code>en_US</code>. The reason the unnamed value exists is because the default values for programs don&#39;t actually match the book, even taking spelling into account, i.e. <code>CONFIGURATION</code> instead of <code>CONFIGURATION AND ENVIRONMENT</code>, the removal of <code>VERSION</code>, and the addition of <code>EXIT STATUS</code>. To get precisely the sections as specified in the book, put the following in your <i>.perlcriticrc</i> file:</p>
+
+<pre><code>    [Documentation::RequirePodSections]
+    source   = book_first_edition
+    language = en_AU</code></pre>
+
+<p>If you want to use</p>
+
+<pre><code>    [Documentation::RequirePodSections]
+    source   = module_starter_pbp
+    language = en_US</code></pre>
+
+<p>you will need to modify your <i>~/.module-starter/PBP/Module.pm</i> template because it is generated using Australian spelling.</p>
+
+<p>Presently, the difference between <code>en_AU</code> and <code>en_US</code> is in how the word &quot;licence&quot; is spelled.</p>
+
+<p>The sections required for modules and programs can be independently customized, overriding any values for <code>source</code> and <code>language</code>, by giving values for <code>script_sections</code> and <code>lib_sections</code> of a string of pipe-delimited required POD section names. An example of entries in a <i>.perlcriticrc</i> file:</p>
+
+<pre><code>    [Documentation::RequirePodSections]
+    lib_sections    = NAME | SYNOPSIS | BUGS AND LIMITATIONS | AUTHOR
+    script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR</code></pre>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>Currently, this Policy does not look for the required POD sections below the <code>=head1</code> level. Also, it does not require the sections to appear in any particular order.</p>
+
+<p>This Policy applies to the entire document, but can be disabled for a particular document by a <code><span class="comment">## no critic (RequirePodSections)</span>
+</code> annotation anywhere between the beginning of the document and the first POD section containing a <code>=head1</code>, the <code>__END__</code> (if any), or the <code>__DATA__</code> (if any), whichever comes first.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2006-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module</p>
+
+
+</body>
+
+</html>
+
+

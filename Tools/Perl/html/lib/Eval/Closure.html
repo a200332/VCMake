@@ -1,0 +1,190 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#eval_closure-args">eval_closure(%args)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Eval::Closure - safely and cleanly create closures via string eval</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.14</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Eval::Closure</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="variable">eval_closure</span><span class="operator">(</span>
+      <span class="string">source</span>      <span class="operator">=&gt;</span> <span class="string">'sub { $foo++ }'</span><span class="operator">,</span>
+      <span class="string">environment</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">'$foo'</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="number">1</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">warn</span> <span class="variable">$code</span><span class="operator">-&gt;();</span> <span class="comment"># 1</span>
+  <span class="keyword">warn</span> <span class="variable">$code</span><span class="operator">-&gt;();</span> <span class="comment"># 2</span>
+  
+  <span class="keyword">my</span> <span class="variable">$code2</span> <span class="operator">=</span> <span class="variable">eval_closure</span><span class="operator">(</span>
+      <span class="string">source</span> <span class="operator">=&gt;</span> <span class="string">'sub { $code-&gt;() }'</span><span class="operator">,</span>
+  <span class="operator">);</span> <span class="comment"># dies, $code isn't in scope</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>String eval is often used for dynamic code generation. For instance, <code>Moose</code> uses it heavily, to generate inlined versions of accessors and constructors, which speeds code up at runtime by a significant amount. String eval is not without its issues however - it&#39;s difficult to control the scope it&#39;s used in (which determines which variables are in scope inside the eval), and it&#39;s easy to miss compilation errors, since eval catches them and sticks them in $@ instead.</p>
+
+<p>This module attempts to solve these problems. It provides an <code>eval_closure</code> function, which evals a string in a clean environment, other than a fixed list of specified variables. Compilation errors are rethrown automatically.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="eval_closure-args">eval_closure(%args)</h2>
+
+<p>This function provides the main functionality of this module. It is exported by default. It takes a hash of parameters, with these keys being valid:</p>
+
+<dl>
+
+<dt id="source">source</dt>
+<dd>
+
+<p>The string to be evaled. It should end by returning a code reference. It can access any variable declared in the <code>environment</code> parameter (and only those variables). It can be either a string, or an arrayref of lines (which will be joined with newlines to produce the string).</p>
+
+</dd>
+<dt id="environment">environment</dt>
+<dd>
+
+<p>The environment to provide to the eval. This should be a hashref, mapping variable names (including sigils) to references of the appropriate type. For instance, a valid value for environment would be <code><span class="operator">{</span> <span class="string">'@foo'</span> <span class="operator">=&gt;</span> <span class="operator">[]</span> <span class="operator">}</span>
+</code> (which would allow the generated function to use an array named <code>@foo</code>). Generally, this is used to allow the generated function to access externally defined variables (so you would pass in a reference to a variable that already exists).</p>
+
+<p>In perl 5.18 and greater, the environment hash can contain variables with a sigil of <code>&amp;</code>. This will create a lexical sub in the evaluated code (see <a href="../../lib/feature.html#The-lexical_subs-feature">&quot;The &#39;lexical_subs&#39; feature&quot; in feature</a>). Using a <code>&amp;</code> sigil on perl versions before lexical subs were available will throw an error.</p>
+
+</dd>
+<dt id="alias">alias</dt>
+<dd>
+
+<p>If set to true, the coderef returned closes over the variables referenced in the environment hashref. (This feature requires <a>Devel::LexAlias</a>.) If set to false, the coderef closes over a <i>shallow copy</i> of the variables.</p>
+
+<p>If this argument is omitted, Eval::Closure will currently assume false, but this assumption may change in a future version.</p>
+
+</dd>
+<dt id="description">description</dt>
+<dd>
+
+<p>This lets you provide a bit more information in backtraces. Normally, when a function that was generated through string eval is called, that stack frame will show up as &quot;(eval n)&quot;, where &#39;n&#39; is a sequential identifier for every string eval that has happened so far in the program. Passing a <code>description</code> parameter lets you override that to something more useful (for instance, <a href="../../lib/Moose.html">Moose</a> overrides the description for accessors to something like &quot;accessor foo at MyClass.pm, line 123&quot;).</p>
+
+</dd>
+<dt id="line">line</dt>
+<dd>
+
+<p>This lets you override the particular line number that appears in backtraces, much like the <code>description</code> option. The default is 1.</p>
+
+</dd>
+<dt id="terse_error">terse_error</dt>
+<dd>
+
+<p>Normally, this function appends the source code that failed to compile, and prepends some explanatory text. Setting this option to true suppresses that behavior so you get only the compilation error that Perl actually reported.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>No known bugs.</p>
+
+<p>Please report any bugs to GitHub Issues at <a href="https://github.com/doy/eval-closure/issues">https://github.com/doy/eval-closure/issues</a>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<ul>
+
+<li><p><a href="../../lib/Class/MOP/Method/Accessor.html">Class::MOP::Method::Accessor</a></p>
+
+<p>This module is a factoring out of code that used to live here</p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find this documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Eval::Closure</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>MetaCPAN</p>
+
+<p><a href="https://metacpan.org/release/Eval-Closure">https://metacpan.org/release/Eval-Closure</a></p>
+
+</li>
+<li><p>Github</p>
+
+<p><a href="https://github.com/doy/eval-closure">https://github.com/doy/eval-closure</a></p>
+
+</li>
+<li><p>RT: CPAN&#39;s request tracker</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Eval-Closure">http://rt.cpan.org/NoAuth/Bugs.html?Dist=Eval-Closure</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/d/Eval-Closure">http://cpanratings.perl.org/d/Eval-Closure</a></p>
+
+</li>
+</ul>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>Based on code from <a href="../../lib/Class/MOP/Method/Accessor.html">Class::MOP::Method::Accessor</a>, by Stevan Little and the Moose Cabal.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2016 by Jesse Luehrs.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

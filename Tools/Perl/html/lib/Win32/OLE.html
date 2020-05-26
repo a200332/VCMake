@@ -1,0 +1,778 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Methods">Methods</a></li>
+      <li><a href="#Object-methods-and-properties">Object methods and properties</a></li>
+      <li><a href="#Functions">Functions</a></li>
+      <li><a href="#Overloading">Overloading</a></li>
+      <li><a href="#Events">Events</a></li>
+      <li><a href="#Module-Options">Module Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#NOTES">NOTES</a>
+    <ul>
+      <li><a href="#Hints-for-Microsoft-Office-automation">Hints for Microsoft Office automation</a></li>
+      <li><a href="#Incompatibilities">Incompatibilities</a></li>
+      <li><a href="#Bugs-and-Limitations">Bugs and Limitations</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::OLE - OLE Automation extensions</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="variable">$ex</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"oops\n"</span><span class="operator">;</span>
+    <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Amethod</span><span class="operator">(</span><span class="string">"arg"</span><span class="operator">)-&gt;</span><span class="variable">Bmethod</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Property'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"foo"</span><span class="operator">;</span>
+    <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Cmethod</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span><span class="keyword">undef</span><span class="operator">,</span><span class="variable">$Arg3</span><span class="operator">);</span>
+    <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Dmethod</span><span class="operator">(</span><span class="variable">$RequiredArg1</span><span class="operator">,</span> <span class="operator">{</span><span class="string">NamedArg1</span> <span class="operator">=&gt;</span> <span class="variable">$Value1</span><span class="operator">,</span> <span class="string">NamedArg2</span> <span class="operator">=&gt;</span> <span class="variable">$Value2</span><span class="operator">}</span><span class="operator">);</span>
+    
+    <span class="variable">$wd</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">GetObject</span><span class="operator">(</span><span class="string">"D:\\Data\\Message.doc"</span><span class="operator">);</span>
+    <span class="variable">$xl</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">GetActiveObject</span><span class="operator">(</span><span class="string">"Excel.Application"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides an interface to OLE Automation from Perl. OLE Automation brings VisualBasic like scripting capabilities and offers powerful extensibility and the ability to control many Win32 applications from Perl scripts.</p>
+
+<p>The Win32::OLE module uses the IDispatch interface exclusively. It is not possible to access a custom OLE interface. OLE events and OCX&#39;s are currently not supported.</p>
+
+<p>Actually, that&#39;s no longer strictly true. This module now contains <b>ALPHA</b> level support for OLE events. This is largely untested and the specific interface might still change in the future.</p>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="Win32::OLE-new-PROGID-DESTRUCTOR">Win32::OLE-&gt;new(PROGID[, DESTRUCTOR])</dt>
+<dd>
+
+<p>The new() class method starts a new instance of an OLE Automation object. It returns a reference to this object or <code>undef</code> if the creation failed.</p>
+
+<p>The PROGID argument must be either the OLE <i>program id</i> or the <i>class id</i> of the required application. The optional DESTRUCTOR specifies a DESTROY-like method. This can be either a CODE reference or a string containing an OLE method name. It can be used to cleanly terminate OLE applications in case the Perl program dies.</p>
+
+<p>To create an object via DCOM on a remote server you can use an array reference in place of PROGID. The referenced array must contain the machine name and the <i>program id</i> or <i>class id</i>. For example:</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">[</span><span class="string">'my.machine.com'</span><span class="operator">,</span> <span class="string">'Program.Id'</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>If the PROGID is a <i>program id</i> then Win32::OLE will try to resolve the corresponding <i>class id</i> locally. If the <i>program id</i> is not registered locally then the remote registry is queried. This will only succeed if the local process has read access to the remote registry. The safest (and fastest) method is to specify the <code>class id</code> directly.</p>
+
+</dd>
+<dt id="Win32::OLE-EnumAllObjects-CALLBACK">Win32::OLE-&gt;EnumAllObjects([CALLBACK])</dt>
+<dd>
+
+<p>This class method returns the number Win32::OLE objects currently in existence. It will call the optional CALLBACK function for each of these objects:</p>
+
+<pre><code>        <span class="variable">$Count</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">EnumAllObjects</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$Object</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$Class</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">QueryObjectType</span><span class="operator">(</span><span class="variable">$Object</span><span class="operator">);</span>
+            <span class="keyword">printf</span> <span class="string">"# Object=%s Class=%s\n"</span><span class="operator">,</span> <span class="variable">$Object</span><span class="operator">,</span> <span class="variable">$Class</span><span class="operator">;</span>
+        <span class="operator">});</span>
+</code></pre>
+
+<p>The EnumAllObjects() method is primarily a debugging tool. It can be used e.g. in an END block to check if all external connections have been properly destroyed.</p>
+
+</dd>
+<dt id="Win32::OLE-FreeUnusedLibraries">Win32::OLE-&gt;FreeUnusedLibraries()</dt>
+<dd>
+
+<p>The FreeUnusedLibraries() class method unloads all unused OLE resources. These are the libraries of those classes of which all existing objects have been destroyed. The unloading of object libraries is really only important for long running processes that might instantiate a huge number of <b>different</b> objects over time.</p>
+
+<p>Be aware that objects implemented in Visual Basic have a buggy implementation of this functionality: They pretend to be unloadable while they are actually still running their cleanup code. Unloading the DLL at that moment typically produces an access violation. The probability for this problem can be reduced by calling the SpinMessageLoop() method and sleep()ing for a few seconds.</p>
+
+</dd>
+<dt id="Win32::OLE-GetActiveObject-CLASS-DESTRUCTOR">Win32::OLE-&gt;GetActiveObject(CLASS[, DESTRUCTOR])</dt>
+<dd>
+
+<p>The GetActiveObject() class method returns an OLE reference to a running instance of the specified OLE automation server. It returns <code>undef</code> if the server is not currently active. It will croak if the class is not even registered. The optional DESTRUCTOR method takes either a method name or a code reference. It is executed when the last reference to this object goes away. It is generally considered rude to stop applications that you did not start yourself.</p>
+
+</dd>
+<dt id="Win32::OLE-GetObject-MONIKER-DESTRUCTOR">Win32::OLE-&gt;GetObject(MONIKER[, DESTRUCTOR])</dt>
+<dd>
+
+<p>The GetObject() class method returns an OLE reference to the specified object. The object is specified by a pathname optionally followed by additional item subcomponent separated by exclamation marks &#39;!&#39;. The optional DESTRUCTOR argument has the same semantics as the DESTRUCTOR in new() or GetActiveObject().</p>
+
+</dd>
+<dt id="Win32::OLE-Initialize-COINIT">Win32::OLE-&gt;Initialize([COINIT])</dt>
+<dd>
+
+<p>The Initialize() class method can be used to specify an alternative apartment model for the Perl thread. It must be called <b>before</b> the first OLE object is created. If the <code>Win32::OLE::Const</code> module is used then the call to the Initialize() method must be made from a BEGIN block before the first <code>use</code> statement for the <code>Win32::OLE::Const</code> module.</p>
+
+<p>Valid values for COINIT are:</p>
+
+<pre><code>  Win32::OLE::COINIT_APARTMENTTHREADED  - single threaded
+  Win32::OLE::COINIT_MULTITHREADED      - the default
+  Win32::OLE::COINIT_OLEINITIALIZE      - single threaded, additional OLE stuff</code></pre>
+
+<p>COINIT_OLEINITIALIZE is sometimes needed when an OLE object uses additional OLE compound document technologies not available from the normal COM subsystem (for example MAPI.Session seems to require it). Both COINIT_OLEINITIALIZE and COINIT_APARTMENTTHREADED create a hidden top level window and a message queue for the Perl process. This may create problems with other application, because Perl normally doesn&#39;t process its message queue. This means programs using synchronous communication between applications (such as DDE initiation), may hang until Perl makes another OLE method call/property access or terminates. This applies to InstallShield setups and many things started to shell associations. Please try to utilize the <code>Win32::OLE-&gt;SpinMessageLoop</code> and <code>Win32::OLE-&gt;Uninitialize</code> methods if you can not use the default COINIT_MULTITHREADED model.</p>
+
+</dd>
+<dt id="OBJECT-Invoke-METHOD-ARGS">OBJECT-&gt;Invoke(METHOD[, ARGS])</dt>
+<dd>
+
+<p>The Invoke() object method is an alternate way to invoke OLE methods. It is normally equivalent to <code>$OBJECT-&gt;METHOD(@ARGS)</code>. This function must be used if the METHOD name contains characters not valid in a Perl variable name (like foreign language characters). It can also be used to invoke the default method of an object even if the default method has not been given a name in the type library. In this case use &lt;undef&gt; or <code>&#39;&#39;</code> as the method name. To invoke an OLE objects native Invoke() method (if such a thing exists), please use:</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="variable">Invoke</span><span class="operator">(</span><span class="string">'Invoke'</span><span class="operator">,</span> <span class="variable">@Args</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::OLE-LastError">Win32::OLE-&gt;LastError()</dt>
+<dd>
+
+<p>The LastError() class method returns the last recorded OLE error. This is a dual value like the <code>$!</code> variable: in a numeric context it returns the error number and in a string context it returns the error message. The error number is a signed HRESULT value. Please use the <a>HRESULT(ERROR)</a> function to convert an unsigned hexadecimal constant to a signed HRESULT.</p>
+
+<p>The last OLE error is automatically reset by a successful OLE call. The numeric value can also explicitly be set by a call (which will discard the string value):</p>
+
+<pre><code>        <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">LastError</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="OBJECT-LetProperty-NAME-ARGS-VALUE">OBJECT-&gt;LetProperty(NAME,ARGS,VALUE)</dt>
+<dd>
+
+<p>In Win32::OLE property assignment using the hash syntax is equivalent to the Visual Basic <code>Set</code> syntax (<i>by reference</i> assignment):</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Property</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$OtherObject</span><span class="operator">;</span>
+</code></pre>
+
+<p>corresponds to this Visual Basic statement:</p>
+
+<pre><code>        Set Object.Property = OtherObject</code></pre>
+
+<p>To get the <i>by value</i> treatment of the Visual Basic <code>Let</code> statement</p>
+
+<pre><code>        Object.Property = OtherObject</code></pre>
+
+<p>you have to use the LetProperty() object method in Perl:</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="variable">LetProperty</span><span class="operator">(</span><span class="variable">$Property</span><span class="operator">,</span> <span class="variable">$OtherObject</span><span class="operator">);</span>
+</code></pre>
+
+<p>LetProperty() also supports optional arguments for the property assignment. See <a>OBJECT-</a>SetProperty(NAME,ARGS,VALUE)&gt; for details.</p>
+
+</dd>
+<dt id="Win32::OLE-MessageLoop">Win32::OLE-&gt;MessageLoop()</dt>
+<dd>
+
+<p>The MessageLoop() class method will run a standard Windows message loop, dispatching messages until the QuitMessageLoop() class method is called. It is used to wait for OLE events.</p>
+
+</dd>
+<dt id="Win32::OLE-Option-OPTION">Win32::OLE-&gt;Option(OPTION)</dt>
+<dd>
+
+<p>The Option() class method can be used to inspect and modify <a href="#Module-Options">&quot;Module Options&quot;</a>. The single argument form retrieves the value of an option:</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$CP</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Option</span><span class="operator">(</span><span class="string">'CP'</span><span class="operator">);</span>
+</code></pre>
+
+<p>A single call can be used to set multiple options simultaneously:</p>
+
+<pre><code>        <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Option</span><span class="operator">(</span><span class="string">CP</span> <span class="operator">=&gt;</span> <span class="variable">CP_ACP</span><span class="operator">,</span> <span class="string">Warn</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::OLE-QueryObjectType-OBJECT">Win32::OLE-&gt;QueryObjectType(OBJECT)</dt>
+<dd>
+
+<p>The QueryObjectType() class method returns a list of the type library name and the objects class name. In a scalar context it returns the class name only. It returns <code>undef</code> when the type information is not available.</p>
+
+</dd>
+<dt id="Win32::OLE-QuitMessageLoop">Win32::OLE-&gt;QuitMessageLoop()</dt>
+<dd>
+
+<p>The QuitMessageLoop() class method posts a (user-level) &quot;Quit&quot; message to the current threads message loop. QuitMessageLoop() is typically called from an event handler. The MessageLoop() class method will return when it receives this &quot;Quit&quot; method.</p>
+
+</dd>
+<dt id="OBJECT-SetProperty-NAME-ARGS-VALUE">OBJECT-&gt;SetProperty(NAME,ARGS,VALUE)</dt>
+<dd>
+
+<p>The SetProperty() method allows to modify properties with arguments, which is not supported by the hash syntax. The hash form</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Property</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$Value</span><span class="operator">;</span>
+</code></pre>
+
+<p>is equivalent to</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="variable">SetProperty</span><span class="operator">(</span><span class="string">'Property'</span><span class="operator">,</span> <span class="variable">$Value</span><span class="operator">);</span>
+</code></pre>
+
+<p>Arguments must be specified between the property name and the new value:</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="variable">SetProperty</span><span class="operator">(</span><span class="string">'Property'</span><span class="operator">,</span> <span class="variable">@Args</span><span class="operator">,</span> <span class="variable">$Value</span><span class="operator">);</span>
+</code></pre>
+
+<p>It is not possible to use &quot;named argument&quot; syntax with this function because the new value must be the last argument to SetProperty().</p>
+
+<p>This method hides any native OLE object method called SetProperty(). The native method will still be available through the Invoke() method:</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="variable">Invoke</span><span class="operator">(</span><span class="string">'SetProperty'</span><span class="operator">,</span> <span class="variable">@Args</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::OLE-SpinMessageLoop">Win32::OLE-&gt;SpinMessageLoop</dt>
+<dd>
+
+<p>This class method retrieves all pending messages from the message queue and dispatches them to their respective window procedures. Calling this method is only necessary when not using the COINIT_MULTITHREADED model. All OLE method calls and property accesses automatically process the message queue.</p>
+
+</dd>
+<dt id="Win32::OLE-Uninitialize">Win32::OLE-&gt;Uninitialize</dt>
+<dd>
+
+<p>The Uninitialize() class method uninitializes the OLE subsystem. It also destroys the hidden top level window created by OLE for single threaded apartments. All OLE objects will become invalid after this call! It is possible to call the Initialize() class method again with a different apartment model after shutting down OLE with Uninitialize().</p>
+
+</dd>
+<dt id="Win32::OLE-WithEvents-OBJECT-HANDLER-INTERFACE">Win32::OLE-&gt;WithEvents(OBJECT[, HANDLER[, INTERFACE]])</dt>
+<dd>
+
+<p>This class method enables and disables the firing of events by the specified OBJECT. If no HANDLER is specified, then events are disconnected. For some objects Win32::OLE is not able to automatically determine the correct event interface. In this case the INTERFACE argument must contain either the COCLASS name of the OBJECT or the name of the event DISPATCH interface. Please read the <a>Events</a> section below for detailed explanation of the Win32::OLE event support.</p>
+
+</dd>
+</dl>
+
+<p>Whenever Perl does not find a method name in the Win32::OLE package it is automatically used as the name of an OLE method and this method call is dispatched to the OLE server.</p>
+
+<p>There is one special hack built into the module: If a method or property name could not be resolved with the OLE object, then the default method of the object is called with the method name as its first parameter. So</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$Sheet</span> <span class="operator">=</span> <span class="variable">$Worksheets</span><span class="operator">-&gt;</span><span class="variable">Table1</span><span class="operator">;</span>
+        <span class="keyword">or</span>
+        <span class="keyword">my</span> <span class="variable">$Sheet</span> <span class="operator">=</span> <span class="variable">$Worksheets</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Table1</span><span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>is resolved as</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$Sheet</span> <span class="operator">=</span> <span class="variable">$Worksheet</span><span class="operator">-&gt;</span><span class="variable">Item</span><span class="operator">(</span><span class="string">'Table1'</span><span class="operator">);</span>
+</code></pre>
+
+<p>provided that the $Worksheets object does not have a <code>Table1</code> method or property. This hack has been introduced to call the default method of collections which did not name the method in their type library. The recommended way to call the &quot;unnamed&quot; default method is:</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$Sheet</span> <span class="operator">=</span> <span class="variable">$Worksheets</span><span class="operator">-&gt;</span><span class="variable">Invoke</span><span class="operator">(</span><span class="string">''</span><span class="operator">,</span> <span class="string">'Table1'</span><span class="operator">);</span>
+</code></pre>
+
+<p>This special hack is disabled under <code><span class="keyword">use</span> <span class="variable">strict</span> <span class="string">'subs'</span><span class="operator">;</span>
+</code>.</p>
+
+<h2 id="Object-methods-and-properties">Object methods and properties</h2>
+
+<p>The object returned by the new() method can be used to invoke methods or retrieve properties in the same fashion as described in the documentation for the particular OLE class (eg. Microsoft Excel documentation describes the object hierarchy along with the properties and methods exposed for OLE access).</p>
+
+<p>Optional parameters on method calls can be omitted by using <code>undef</code> as a placeholder. A better way is to use named arguments, as the order of optional parameters may change in later versions of the OLE server application. Named parameters can be specified in a reference to a hash as the last parameter to a method call.</p>
+
+<p>Properties can be retrieved or set using hash syntax, while methods can be invoked with the usual perl method call syntax. The <code>keys</code> and <code>each</code> functions can be used to enumerate an object&#39;s properties. Beware that a property is not always writable or even readable (sometimes raising exceptions when read while being undefined).</p>
+
+<p>If a method or property returns an embedded OLE object, method and property access can be chained as shown in the examples below.</p>
+
+<h2 id="Functions">Functions</h2>
+
+<p>The following functions are not exported by default.</p>
+
+<dl>
+
+<dt id="HRESULT-ERROR">HRESULT(ERROR)</dt>
+<dd>
+
+<p>The HRESULT() function converts an unsigned number into a signed HRESULT error value as used by OLE internally. This is necessary because Perl treats all hexadecimal constants as unsigned. To check if the last OLE function returned &quot;Member not found&quot; (0x80020003) you can write:</p>
+
+<pre><code>        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">LastError</span> <span class="operator">==</span> <span class="variable">HRESULT</span><span class="operator">(</span><span class="number">0x80020003</span><span class="operator">))</span> <span class="operator">{</span>
+            <span class="comment"># your error recovery here</span>
+        <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="in-COLLECTION">in(COLLECTION)</dt>
+<dd>
+
+<p>If COLLECTION is an OLE collection object then <code>in $COLLECTION</code> returns a list of all members of the collection. This is a shortcut for <code>Win32::OLE::Enum-&gt;All($COLLECTION)</code>. It is most commonly used in a <code>foreach</code> loop:</p>
+
+<pre><code>        <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">(</span><span class="variable">in</span> <span class="variable">$collection</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="comment"># do something with $value here</span>
+        <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="valof-OBJECT">valof(OBJECT)</dt>
+<dd>
+
+<p>Normal assignment of Perl OLE objects creates just another reference to the OLE object. The valof() function explictly dereferences the object (through the default method) and returns the value of the object.</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$RefOf</span> <span class="operator">=</span> <span class="variable">$Object</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ValOf</span> <span class="operator">=</span> <span class="variable">valof</span> <span class="variable">$Object</span><span class="operator">;</span>
+        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Value</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$NewValue</span><span class="operator">;</span>
+</code></pre>
+
+<p>Now $ValOf still contains the old value whereas $RefOf would resolve to the $NewValue because it is still a reference to $Object.</p>
+
+<p>The valof() function can also be used to convert Win32::OLE::Variant objects to Perl values.</p>
+
+</dd>
+<dt id="with-OBJECT-PROPERTYNAME-VALUE">with(OBJECT, PROPERTYNAME =&gt; VALUE, ...)</dt>
+<dd>
+
+<p>This function provides a concise way to set the values of multiple properties of an object. It iterates over its arguments doing <code><span class="variable">$OBJECT</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">PROPERTYNAME</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$VALUE</span>
+</code> on each trailing pair.</p>
+
+</dd>
+</dl>
+
+<h2 id="Overloading">Overloading</h2>
+
+<p>The Win32::OLE objects can be overloaded to automatically convert to their values whenever they are used in a bool, numeric or string context. This is not enabled by default. You have to request it through the OVERLOAD pseudoexport:</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::OLE</span> <span class="string">qw(in valof with OVERLOAD)</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can still get the original string representation of an object (<code>Win32::OLE=0xDEADBEEF</code>), e.g. for debugging, by using the <code>overload::StrVal()</code> method:</p>
+
+<pre><code>        <span class="keyword">print</span> <span class="variable">overload::StrVal</span><span class="operator">(</span><span class="variable">$object</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Please note that <code>OVERLOAD</code> is a global setting. If any module enables Win32::OLE overloading then it&#39;s active everywhere.</p>
+
+<h2 id="Events">Events</h2>
+
+<p>The Win32::OLE module now contains <b>ALPHA</b> level event support. This support is only available when Perl is running in a single threaded apartment. This can most easily be assured by using the <code>EVENTS</code> pseudo-import:</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::OLE</span> <span class="string">qw(EVENTS)</span><span class="operator">;</span>
+</code></pre>
+
+<p>which implicitly does something like:</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::OLE</span><span class="operator">;</span>
+        <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Initialize</span><span class="operator">(</span><span class="variable">Win32::OLE::COINIT_OLEINITIALIZE</span><span class="operator">);</span>
+</code></pre>
+
+<p>The current interface to OLE events should be considered experimental and is subject to change. It works as expected for normal OLE applications, but OLE control events often don&#39;t seem to work yet.</p>
+
+<p>Events must be enabled explicitly for an OLE object through the Win32::OLE-&gt;WithEvents() class method. The Win32::OLE module uses the IProvideClassInfo2 interface to determine the default event source of the object. If this interface is not supported, then the user must specify the name of the event source explicitly in the WithEvents() method call. It is also possible to specify the class name of the object as the third parameter. In this case Win32::OLE will try to look up the default source interface for this COCLASS.</p>
+
+<p>The HANDLER argument to Win32::OLE-&gt;WithEvents() can either be a CODE reference or a package name. In the first case, all events will invoke this particular function. The first two arguments to this function will be the OBJECT itself and the name of the event. The remaining arguments will be event specific.</p>
+
+<pre><code>        <span class="keyword">sub</span><span class="variable"> Event </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$Obj</span><span class="operator">,</span><span class="variable">$Event</span><span class="operator">,</span><span class="variable">@Args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="keyword">print</span> <span class="string">"Event triggered: '</span><span class="variable">$Event</span><span class="string">'\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">WithEvents</span><span class="operator">(</span><span class="variable">$Obj</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">Event</span><span class="operator">);</span>
+</code></pre>
+
+<p>Alternatively the HANDLER argument can specify a package name. When the OBJECT fires an event, Win32::OLE will try to find a function of the same name as the event in this package. This function will be called with the OBJECT as the first argument followed again by the event specific parameters:</p>
+
+<pre><code>        <span class="keyword">package</span> <span class="variable">MyEvents</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> EventName1 </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$Obj</span><span class="operator">,</span><span class="variable">@Args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="keyword">print</span> <span class="string">"EventName1 event triggered\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        
+        <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+        <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">WithEvents</span><span class="operator">(</span><span class="variable">$Obj</span><span class="operator">,</span> <span class="string">'MyEvents'</span><span class="operator">,</span> <span class="string">'IEventInterface'</span><span class="operator">);</span>
+</code></pre>
+
+<p>If Win32::OLE doesn&#39;t find a function with the name of the event then nothing happens.</p>
+
+<p>Event parameters passed <i>by reference</i> are handled specially. They are not converted to the corresponding Perl datatype but passed as Win32::OLE::Variant objects. You can assign a new value to these objects with the help of the Put() method. This value will be passed back to the object when the event function returns:</p>
+
+<pre><code>        <span class="keyword">package</span> <span class="variable">MyEvents</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="variable"> BeforeClose </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span><span class="variable">$Cancel</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="variable">$Cancel</span><span class="operator">-&gt;</span><span class="variable">Put</span><span class="operator">(</span><span class="number">1</span><span class="operator">)</span> <span class="keyword">unless</span> <span class="variable">$MayClose</span><span class="operator">;</span>
+        <span class="operator">}</span>
+</code></pre>
+
+<p>Direct assignment to $Cancel would have no effect on the original value and would therefore not command the object to abort the closing action.</p>
+
+<h2 id="Module-Options">Module Options</h2>
+
+<p>The following module options can be accessed and modified with the <code>Win32::OLE-&gt;Option</code> class method. In earlier versions of the Win32::OLE module these options were manipulated directly as class variables. This practice is now deprecated.</p>
+
+<dl>
+
+<dt id="CP">CP</dt>
+<dd>
+
+<p>This variable is used to determine the codepage used by all translations between Perl strings and Unicode strings used by the OLE interface. The default value is CP_ACP, which is the default ANSI codepage. Other possible values are CP_OEMCP, CP_MACCP, CP_UTF7 and CP_UTF8. These constants are not exported by default.</p>
+
+</dd>
+<dt id="LCID">LCID</dt>
+<dd>
+
+<p>This variable controls the locale identifier used for all OLE calls. It is set to LOCALE_NEUTRAL by default. Please check the <a href="../../lib/Win32/OLE/NLS.html">Win32::OLE::NLS</a> module for other locale related information.</p>
+
+</dd>
+<dt id="Variant">Variant</dt>
+<dd>
+
+<p>This options controls how method calls and property accessors return values of type VT_CY and VT_DECIMAL are being returned. By default VT_CY values are turned into strings and VT_DECIMAL values into floating point numbers. If the <code>Variant</code> option is enabled, these values are returned as Win32::OLE::Variant objects, just like VT_DATE and VT_ERROR values. If the Win32::OLE::Variant module is also loaded, then all values should still behave as before in string and in numeric context.</p>
+
+<p>The only reason that the <code>Variant</code> behavior is not the default is that this is an incompatible change that might break existing programs.</p>
+
+</dd>
+<dt id="Warn">Warn</dt>
+<dd>
+
+<p>This variable determines the behavior of the Win32::OLE module when an error happens. Valid values are:</p>
+
+<pre><code>        0       Ignore error, return undef
+        1       Carp::carp if $^W is set (-w option)
+        2       always Carp::carp
+        3       Carp::croak</code></pre>
+
+<p>The error number and message (without Carp line/module info) are available through the <code>Win32::OLE-&gt;LastError</code> class method.</p>
+
+<p>Alternatively the Warn option can be set to a CODE reference. E.g.</p>
+
+<pre><code>    <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Option</span><span class="operator">(</span><span class="string">Warn</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">);</span>
+</code></pre>
+
+<p>is equivalent to</p>
+
+<pre><code>    <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Option</span><span class="operator">(</span><span class="string">Warn</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">Carp::croak</span><span class="operator">);</span>
+</code></pre>
+
+<p>This can even be used to emulate the VisualBasic <code>On Error Goto Label</code> construct:</p>
+
+<pre><code>    <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Option</span><span class="operator">(</span><span class="string">Warn</span> <span class="operator">=&gt;</span>  <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="keyword">goto</span> <span class="variable">CheckError</span><span class="operator">});</span>
+    <span class="comment"># ... your normal OLE code here ...</span>
+    
+      <span class="variable">CheckError</span><span class="operator">:</span>
+    <span class="comment"># ... your error handling code here ...</span>
+</code></pre>
+
+</dd>
+<dt id="NewEnum">_NewEnum</dt>
+<dd>
+
+<p>This option enables additional enumeration support for collection objects. When the <code>_NewEnum</code> option is set, all collections will receive one additional property: <code>_NewEnum</code>. The value of this property will be a reference to an array containing all the elements of the collection. This option can be useful when used in conjunction with an automatic tree traversal program, like <code>Data::Dumper</code> or an object tree browser. The value of this option should be either 1 (enabled) or 0 (disabled, default).</p>
+
+<pre><code>    <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">Option</span><span class="operator">(</span><span class="string">_NewEnum</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    <span class="comment"># ...</span>
+    <span class="keyword">my</span> <span class="variable">@sheets</span> <span class="operator">=</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$Excel</span><span class="operator">-&gt;</span><span class="variable">Worksheets</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_NewEnum</span><span class="operator">}}</span><span class="operator">;</span>
+</code></pre>
+
+<p>In normal application code, this would be better written as:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::OLE</span> <span class="string">qw(in)</span><span class="operator">;</span>
+    <span class="comment"># ...</span>
+    <span class="keyword">my</span> <span class="variable">@sheets</span> <span class="operator">=</span> <span class="variable">in</span> <span class="variable">$Excel</span><span class="operator">-&gt;</span><span class="variable">Worksheets</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="Unique">_Unique</dt>
+<dd>
+
+<p>The <code>_Unique</code> options guarantees that Win32::OLE will maintain a one-to-one mapping between Win32::OLE objects and the native COM/OLE objects. Without this option, you can query the same property twice and get two different Win32::OLE objects for the same underlying COM object.</p>
+
+<p>Using a unique proxy makes life easier for tree traversal algorithms to recognize they already visited a particular node. This option comes at a price: Win32::OLE has to maintain a global hash of all outstanding objects and their corresponding proxies. Identity checks on COM objects can also be expensive if the objects reside out-of-process or even on a different computer. Therefore this option is off by default unless the program is being run in the debugger.</p>
+
+<p>Unfortunately, this option doesn&#39;t always help. Some programs will return new COM objects for even the same property when asked for it multiple times (especially for collections). In this case, there is nothing Win32::OLE can do to detect that these objects are in fact identical (because they aren&#39;t at the COM level).</p>
+
+<p>The <code>_Unique</code> option can be set to either 1 (enabled) or 0 (disabled, default).</p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>Here is a simple Microsoft Excel application.</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::OLE</span><span class="operator">;</span>
+        
+        <span class="comment"># use existing instance if Excel is already running</span>
+        <span class="keyword">eval</span> <span class="operator">{</span><span class="variable">$ex</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">GetActiveObject</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">)};</span>
+        <span class="keyword">die</span> <span class="string">"Excel not installed"</span> <span class="keyword">if</span> <span class="variable">$@</span><span class="operator">;</span>
+        <span class="keyword">unless</span> <span class="operator">(</span><span class="keyword">defined</span> <span class="variable">$ex</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">$ex</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">Quit</span><span class="operator">;})</span>
+                    <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Oops, cannot start Excel"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        
+        <span class="comment"># get a new workbook</span>
+        <span class="variable">$book</span> <span class="operator">=</span> <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Workbooks</span><span class="operator">-&gt;</span><span class="variable">Add</span><span class="operator">;</span>
+        
+        <span class="comment"># write to a particular cell</span>
+        <span class="variable">$sheet</span> <span class="operator">=</span> <span class="variable">$book</span><span class="operator">-&gt;</span><span class="variable">Worksheets</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+        <span class="variable">$sheet</span><span class="operator">-&gt;</span><span class="variable">Cells</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span><span class="number">1</span><span class="operator">)-&gt;</span><span class="operator">{</span><span class="string">Value</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"foo"</span><span class="operator">;</span>
+        
+        <span class="comment"># write a 2 rows by 3 columns range</span>
+        <span class="variable">$sheet</span><span class="operator">-&gt;</span><span class="variable">Range</span><span class="operator">(</span><span class="string">"A8:C9"</span><span class="operator">)-&gt;</span><span class="operator">{</span><span class="string">Value</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[[</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="string">'Xyzzy'</span><span class="operator">,</span> <span class="string">'Plugh'</span> <span class="operator">]</span><span class="operator">,</span>
+                                           <span class="operator">[</span> <span class="number">42</span><span class="operator">,</span>    <span class="string">'Perl'</span><span class="operator">,</span>  <span class="number">3.1415</span>  <span class="operator">]]</span><span class="operator">;</span>
+        
+        <span class="comment"># print "XyzzyPerl"</span>
+        <span class="variable">$array</span> <span class="operator">=</span> <span class="variable">$sheet</span><span class="operator">-&gt;</span><span class="variable">Range</span><span class="operator">(</span><span class="string">"A8:C9"</span><span class="operator">)-&gt;</span><span class="operator">{</span><span class="string">Value</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">for</span> <span class="operator">(</span><span class="variable">@$array</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">for</span> <span class="operator">(</span><span class="variable">@$_</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="keyword">print</span> <span class="keyword">defined</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="operator">?</span> <span class="string">"</span><span class="variable">$_</span><span class="string">|"</span> <span class="operator">:</span> <span class="string">"&lt;undef&gt;|"</span><span class="operator">;</span>
+            <span class="operator">}</span>
+            <span class="keyword">print</span> <span class="string">"\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        
+        <span class="comment"># save and exit</span>
+        <span class="variable">$book</span><span class="operator">-&gt;</span><span class="variable">SaveAs</span><span class="operator">(</span> <span class="string">'test.xls'</span> <span class="operator">);</span>
+        <span class="keyword">undef</span> <span class="variable">$book</span><span class="operator">;</span>
+        <span class="keyword">undef</span> <span class="variable">$ex</span><span class="operator">;</span>
+</code></pre>
+
+<p>Please note the destructor specified on the Win32::OLE-&gt;new method. It ensures that Excel will shutdown properly even if the Perl program dies. Otherwise there could be a process leak if your application dies after having opened an OLE instance of Excel. It is the responsibility of the module user to make sure that all OLE objects are cleaned up properly!</p>
+
+<p>Here is an example of using Variant data types.</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::OLE</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Win32::OLE::Variant</span><span class="operator">;</span>
+        <span class="variable">$ex</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">OleQuit</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"oops\n"</span><span class="operator">;</span>
+        <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Visible</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+        <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Workbooks</span><span class="operator">-&gt;</span><span class="variable">Add</span><span class="operator">;</span>
+        <span class="comment"># should generate a warning under -w</span>
+        <span class="variable">$ovR8</span> <span class="operator">=</span> <span class="variable">Variant</span><span class="operator">(</span><span class="variable">VT_R8</span><span class="operator">,</span> <span class="string">"3 is a good number"</span><span class="operator">);</span>
+        <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Range</span><span class="operator">(</span><span class="string">"A1"</span><span class="operator">)-&gt;</span><span class="operator">{</span><span class="string">Value</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$ovR8</span><span class="operator">;</span>
+        <span class="variable">$ex</span><span class="operator">-&gt;</span><span class="variable">Range</span><span class="operator">(</span><span class="string">"A2"</span><span class="operator">)-&gt;</span><span class="operator">{</span><span class="string">Value</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">Variant</span><span class="operator">(</span><span class="variable">VT_DATE</span><span class="operator">,</span> <span class="string">'Jan 1,1970'</span><span class="operator">);</span>
+        
+        <span class="keyword">sub</span><span class="variable"> OleQuit </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">Quit</span><span class="operator">;</span>
+        <span class="operator">}</span>
+</code></pre>
+
+<p>The above will put value &quot;3&quot; in cell A1 rather than the string &quot;3 is a good number&quot;. Cell A2 will contain the date.</p>
+
+<p>Similarly, to invoke a method with some binary data, you can do the following:</p>
+
+<pre><code>        <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">Method</span><span class="operator">(</span> <span class="variable">Variant</span><span class="operator">(</span><span class="variable">VT_UI1</span><span class="operator">,</span> <span class="string">"foo\000b\001a\002r"</span><span class="operator">)</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Here is a wrapper class that basically delegates everything but new() and DESTROY(). The wrapper class shown here is another way to properly shut down connections if your application is liable to die without proper cleanup. Your own wrappers will probably do something more specific to the particular OLE object you may be dealing with, like overriding the methods that you may wish to enhance with your own.</p>
+
+<pre><code>        <span class="keyword">package</span> <span class="variable">Excel</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Win32::OLE</span><span class="operator">;</span>
+        
+        <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="operator">{}</span><span class="operator">;</span>
+            <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$s</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Ex</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">))</span> <span class="operator">{</span>
+                <span class="keyword">return</span> <span class="keyword">bless</span> <span class="variable">$s</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="operator">}</span>
+            <span class="keyword">return</span> <span class="keyword">undef</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        
+        <span class="keyword">sub</span><span class="variable"> DESTROY </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">exists</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Ex</span><span class="operator">}</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="keyword">print</span> <span class="string">"# closing connection\n"</span><span class="operator">;</span>
+                <span class="variable">$s</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Ex</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="variable">Quit</span><span class="operator">;</span>
+                <span class="keyword">return</span> <span class="keyword">undef</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">}</span>
+        
+        <span class="keyword">sub</span><span class="variable"> AUTOLOAD </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="variable">$AUTOLOAD</span> <span class="operator">=~</span> <span class="regex">s/^.*:://</span><span class="operator">;</span>
+            <span class="variable">$s</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Ex</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="variable">$AUTOLOAD</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+        <span class="operator">}</span>
+        
+        <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>The above module can be used just like Win32::OLE, except that it takes care of closing connections in case of abnormal exits. Note that the effect of this specific example can be easier accomplished using the optional destructor argument of Win32::OLE::new:</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$Excel</span> <span class="operator">=</span> <span class="variable">Win32::OLE</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">Quit</span><span class="operator">;});</span>
+</code></pre>
+
+<p>Note that the delegation shown in the earlier example is not the same as true subclassing with respect to further inheritance of method calls in your specialized object. See <a href="../../lib/pods/perlobj.html">perlobj</a>, <a href="../../lib/pods/perltoot.html">perltoot</a> and <a href="../../lib/pods/perlbot.html">perlbot</a> for details. True subclassing (available by setting <code>@ISA</code>) is also feasible, as the following example demonstrates:</p>
+
+<pre><code>        <span class="comment">#</span>
+        <span class="comment"># Add error reporting to Win32::OLE</span>
+        <span class="comment">#</span>
+        
+        <span class="keyword">package</span> <span class="variable">Win32::OLE::Strict</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Carp</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Win32::OLE</span><span class="operator">;</span>
+        
+        <span class="keyword">use</span> <span class="variable">strict</span> <span class="string">qw(vars)</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">vars</span> <span class="string">qw($AUTOLOAD @ISA)</span><span class="operator">;</span>
+        <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">qw(Win32::OLE)</span><span class="operator">;</span>
+        
+        <span class="keyword">sub</span><span class="variable"> AUTOLOAD </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="variable">$AUTOLOAD</span> <span class="operator">=~</span> <span class="regex">s/^.*:://</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$meth</span> <span class="operator">=</span> <span class="variable">$AUTOLOAD</span><span class="operator">;</span>
+            <span class="variable">$AUTOLOAD</span> <span class="operator">=</span> <span class="string">"SUPER::"</span> <span class="operator">.</span> <span class="variable">$AUTOLOAD</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$retval</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">$AUTOLOAD</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+            <span class="keyword">unless</span> <span class="operator">(</span><span class="keyword">defined</span><span class="operator">(</span><span class="variable">$retval</span><span class="operator">)</span> <span class="operator">||</span> <span class="variable">$AUTOLOAD</span> <span class="keyword">eq</span> <span class="string">'DESTROY'</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="keyword">my</span> <span class="variable">$err</span> <span class="operator">=</span> <span class="variable">Win32::OLE::LastError</span><span class="operator">();</span>
+                <span class="variable">croak</span><span class="operator">(</span><span class="keyword">sprintf</span><span class="operator">(</span><span class="string">"</span><span class="variable">$meth</span><span class="string"> returned OLE error 0x%08x"</span><span class="operator">,</span><span class="variable">$err</span><span class="operator">))</span>
+                  <span class="keyword">if</span> <span class="variable">$err</span><span class="operator">;</span>
+            <span class="operator">}</span>
+            <span class="keyword">return</span> <span class="variable">$retval</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        
+        <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>This package inherits the constructor new() from the Win32::OLE package. It is important to note that you cannot later rebless a Win32::OLE object as some information about the package is cached by the object. Always invoke the new() constructor through the right package!</p>
+
+<p>Here&#39;s how the above class will be used:</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::OLE::Strict</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$Excel</span> <span class="operator">=</span> <span class="variable">Win32::OLE::Strict</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Excel.Application'</span><span class="operator">,</span> <span class="string">'Quit'</span><span class="operator">);</span>
+        <span class="keyword">my</span> <span class="variable">$Books</span> <span class="operator">=</span> <span class="variable">$Excel</span><span class="operator">-&gt;</span><span class="variable">Workbooks</span><span class="operator">;</span>
+        <span class="variable">$Books</span><span class="operator">-&gt;</span><span class="variable">UnknownMethod</span><span class="operator">(</span><span class="number">42</span><span class="operator">);</span>
+</code></pre>
+
+<p>In the sample above the call to UnknownMethod() will be caught with</p>
+
+<pre><code>        UnknownMethod returned OLE error 0x80020009 at test.pl line 5</code></pre>
+
+<p>because the Workbooks object inherits the class <code>Win32::OLE::Strict</code> from the <code>$Excel</code> object.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<h2 id="Hints-for-Microsoft-Office-automation">Hints for Microsoft Office automation</h2>
+
+<dl>
+
+<dt id="Documentation">Documentation</dt>
+<dd>
+
+<p>The object model for the Office applications is defined in the Visual Basic reference guides for the various applications. These are typically not installed by default during the standard installation. They can be added later by rerunning the setup program with the custom install option.</p>
+
+</dd>
+<dt id="Class-Method-and-Property-names">Class, Method and Property names</dt>
+<dd>
+
+<p>The names have been changed between different versions of Office. For example <code>Application</code> was a method in Office 95 and is a property in Office97. Therefore it will not show up in the list of property names <code>keys %$object</code> when querying an Office 95 object.</p>
+
+<p>The class names are not always identical to the method/property names producing the object. E.g. the <code>Workbook</code> method returns an object of type <code>Workbook</code> in Office 95 and <code>_Workbook</code> in Office 97.</p>
+
+</dd>
+<dt id="Moniker-GetObject-support">Moniker (GetObject support)</dt>
+<dd>
+
+<p>Office applications seem to implement file monikers only. For example it seems to be impossible to retrieve a specific worksheet object through <code>GetObject(&quot;File.XLS!Sheet&quot;)</code>. Furthermore, in Excel 95 the moniker starts a Worksheet object and in Excel 97 it returns a Workbook object. You can use either the Win32::OLE::QueryObjectType class method or the $object-&gt;{Version} property to write portable code.</p>
+
+</dd>
+<dt id="Enumeration-of-collection-objects">Enumeration of collection objects</dt>
+<dd>
+
+<p>Enumerations seem to be incompletely implemented. Office 95 application don&#39;t seem to support neither the Reset() nor the Clone() methods. The Clone() method is still unimplemented in Office 97. A single walk through the collection similar to Visual Basics <code>for each</code> construct does work however.</p>
+
+</dd>
+<dt id="Localization">Localization</dt>
+<dd>
+
+<p>Starting with Office 97 Microsoft has changed the localized class, method and property names back into English. Note that string, date and currency arguments are still subject to locale specific interpretation. Perl uses the system default locale for all OLE transaction whereas Visual Basic uses a type library specific locale. A Visual Basic script would use &quot;R1C1&quot; in string arguments to specify relative references. A Perl script running on a German language Windows would have to use &quot;Z1S1&quot;. Set the LCID module option to an English locale to write portable scripts. This variable should not be changed after creating the OLE objects; some methods seem to randomly fail if the locale is changed on the fly.</p>
+
+</dd>
+<dt id="SaveAs-method-in-Word-97-doesnt-work">SaveAs method in Word 97 doesn&#39;t work</dt>
+<dd>
+
+<p>This is an known bug in Word 97. Search the MS knowledge base for Word / Foxpro incompatibility. That problem applies to the Perl OLE interface as well. A workaround is to use the WordBasic compatibility object. It doesn&#39;t support all the options of the native method though.</p>
+
+<pre><code>    <span class="variable">$Word</span><span class="operator">-&gt;</span><span class="variable">WordBasic</span><span class="operator">-&gt;</span><span class="variable">FileSaveAs</span><span class="operator">(</span><span class="variable">$file</span><span class="operator">);</span>
+</code></pre>
+
+<p>The problem seems to be fixed by applying the Office 97 Service Release 1.</p>
+
+</dd>
+<dt id="Randomly-failing-method-calls">Randomly failing method calls</dt>
+<dd>
+
+<p>It seems like modifying objects that are not selected/activated is sometimes fragile. Most of these problems go away if the chart/sheet/document is selected or activated before being manipulated (just like an interactive user would automatically do it).</p>
+
+</dd>
+</dl>
+
+<h2 id="Incompatibilities">Incompatibilities</h2>
+
+<p>There are some incompatibilities with the version distributed by Activeware (as of build 306).</p>
+
+<ol>
+
+<li><p>The package name has changed from &quot;OLE&quot; to &quot;Win32::OLE&quot;.</p>
+
+</li>
+<li><p>All functions of the form &quot;Win32::OLEFoo&quot; are now &quot;Win32::OLE::Foo&quot;, though the old names are temporarily accommodated. Win32::OLECreateObject() was changed to Win32::OLE::CreateObject(), and is now called Win32::OLE::new() bowing to established convention for naming constructors. The old names should be considered deprecated, and will be removed in the next version.</p>
+
+</li>
+<li><p>Package &quot;OLE::Variant&quot; is now &quot;Win32::OLE::Variant&quot;.</p>
+
+</li>
+<li><p>The Variant function is new, and is exported by default. So are all the VT_XXX type constants.</p>
+
+</li>
+<li><p>The support for collection objects has been moved into the package Win32::OLE::Enum. The <code>keys %$object</code> method is now used to enumerate the properties of the object.</p>
+
+</li>
+</ol>
+
+<h2 id="Bugs-and-Limitations">Bugs and Limitations</h2>
+
+<ul>
+
+<li><p>To invoke a native OLE method with the same name as one of the Win32::OLE methods (<code>Dispatch</code>, <code>Invoke</code>, <code>SetProperty</code>, <code>DESTROY</code>, etc.), you have to use the <code>Invoke</code> method:</p>
+
+<pre><code>        <span class="variable">$Object</span><span class="operator">-&gt;</span><span class="variable">Invoke</span><span class="operator">(</span><span class="string">'Dispatch'</span><span class="operator">,</span> <span class="variable">@AdditionalArgs</span><span class="operator">);</span>
+</code></pre>
+
+<p>The same is true for names exported by the Exporter or the Dynaloader modules, e.g.: <code>export</code>, <code>export_to_level</code>, <code>import</code>, <code>_push_tags</code>, <code>export_tags</code>, <code>export_ok_tags</code>, <code>export_fail</code>, <code>require_version</code>, <code>dl_load_flags</code>, <code>croak</code>, <code>bootstrap</code>, <code>dl_findfile</code>, <code>dl_expandspec</code>, <code>dl_find_symbol_anywhere</code>, <code>dl_load_file</code>, <code>dl_find_symbol</code>, <code>dl_undef_symbols</code>, <code>dl_install_xsub</code> and <code>dl_error</code>.</p>
+
+</li>
+</ul>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>The documentation for <a href="../../lib/Win32/OLE/Const.html">Win32::OLE::Const</a>, <a href="../../lib/Win32/OLE/Enum.html">Win32::OLE::Enum</a>, <a href="../../lib/Win32/OLE/NLS.html">Win32::OLE::NLS</a> and <a href="../../lib/Win32/OLE/Variant.html">Win32::OLE::Variant</a> contains additional information about OLE support for Perl on Win32.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Originally put together by the kind people at Hip and Activeware.</p>
+
+<p>Gurusamy Sarathy &lt;gsar@cpan.org&gt; subsequently fixed several major bugs, memory leaks, and reliability problems, along with some redesign of the code.</p>
+
+<p>Jan Dubois &lt;jand@activestate.com&gt; pitched in with yet more massive redesign, added support for named parameters, and other significant enhancements. He&#39;s been hacking on it ever since.</p>
+
+<p>Please send questions about problems with this module to the Perl-Win32-Users mailinglist at ActiveState.com. The mailinglist charter requests that you put an [OLE] tag somewhere on the subject line (for OLE related questions only, of course).</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<pre><code>    (c) 1995 Microsoft Corporation. All rights reserved.
+    Developed by ActiveWare Internet Corp., now known as
+    ActiveState Tool Corp., http://www.ActiveState.com
+
+    Other modifications Copyright (c) 1997-2006 by Gurusamy Sarathy
+    &lt;gsar@cpan.org&gt; and Jan Dubois &lt;jand@activestate.com&gt;
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the README file.</code></pre>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.1712 14 May 2014</p>
+
+
+</body>
+
+</html>
+
+

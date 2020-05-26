@@ -1,0 +1,220 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Tuning-the-Sereal::Encoder">Tuning the Sereal::Encoder</a></li>
+      <li><a href="#General-Considerations">General Considerations</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-CONTACT-AND-SUPPORT">BUGS, CONTACT AND SUPPORT</a></li>
+  <li><a href="#AUTHORS-AND-CONTRIBUTORS">AUTHORS AND CONTRIBUTORS</a></li>
+  <li><a href="#ACKNOWLEDGMENT">ACKNOWLEDGMENT</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sereal::Performance - Getting the most out of the Perl-Sereal implementation</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># This is different from the standard module synopsis in</span>
+  <span class="comment"># that it chooses performance over ease-of-use.</span>
+  <span class="comment"># Think twice before micro-optimizing your Sereal usage.</span>
+  <span class="comment"># Usually, Sereal is a lot faster than most of one's code,</span>
+  <span class="comment"># so unless you are doing bulk encoding/decoding, you are</span>
+  <span class="comment"># better off optimizing for maintainability.</span>
+  
+  <span class="keyword">use</span> <span class="variable">Sereal</span> <span class="string">qw(sereal_encode_with_object
+                sereal_decode_with_object)</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$enc</span> <span class="operator">=</span> <span class="variable">Sereal::Encoder</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="keyword">my</span> <span class="variable">$dec</span> <span class="operator">=</span> <span class="variable">Sereal::Decoder</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  
+  <span class="keyword">my</span> <span class="variable">$big_data_structure</span> <span class="operator">=</span> <span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$srldoc</span> <span class="operator">=</span> <span class="variable">sereal_encode_with_object</span><span class="operator">(</span><span class="variable">$enc</span><span class="operator">,</span> <span class="variable">$big_data_structure</span><span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$and_back</span> <span class="operator">=</span> <span class="variable">sereal_decode_with_object</span><span class="operator">(</span><span class="variable">$dec</span><span class="operator">,</span> <span class="variable">$srldoc</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Using Sereal in the way that is optimally performant for your use case can make quite a significant difference in performance. Broadly speaking, there are two classes of tweaks you can do: choosing the right options during encoding (sometimes incurring trade-offs in output size) and calling the Sereal encode/decode functions in the most efficient way.</p>
+
+<p>If you are not yet using re-usable <a href="../../lib/Sereal/Encoder.html">Sereal::Encoder</a> and <a href="../../lib/Sereal/Decoder.html">Sereal::Decoder</a> objects, then read no further. By switching from the <code>encode_sereal</code> and <code>decode_sereal</code> functions to either the OO interface or the advanced functional interface, you will get a noticeable speed boost as encoder and decoder structures can be reused. This is particularly significant for the encoder, which can re-use its output buffer. In some cases, such a warmed-up encoder can avoid most memory allocations.</p>
+
+<p><b>I repeat, if you care about performance, then do not use the <code>encode_sereal</code> and <code>decode_sereal</code> interface.</b></p>
+
+<p>The exact performance in time and space depends heavily on the data structure to be (de-)serialized. Often there is a trade-off between space and time. If in doubt, do your own testing and most importantly <b>ALWAYS TEST WITH REAL DATA</b>. If you care purely about speed at the expense of output size, you can use the <code>no_shared_hashkeys</code> option for a small speed-up, see below. If you need smaller output at the cost of higher CPU load and more memory used during encoding/decoding, try the <code>dedupe_strings</code> option and enable Snappy compression.</p>
+
+<p>For ready-made comparison scripts, see the <i>author_tools/bench.pl</i> and <i>author_tools/dbench.pl</i> programs that are part of this distribution. Suffice to say that this library is easily competitive in both time and space efficiency with the best alternatives.</p>
+
+<p>If switching to the OO interface is not enough, you may consider switching to the advanced functional interface that avoids method lookup overhead, and by inlining as custom Perl OPs, may also avoid some of the Perl function call overhead (Perl 5.14 and up). This additional speed-up is only a constant-offset, avoiding said method/function call, rather than speeding up encoding itself and so will be most significant if you are working with very small data sets.</p>
+
+<p><code>sereal_encode_with_object</code> and <code>sereal_decode_with_object</code> are optionally exported from the <a href="../../lib/Sereal.html">Sereal</a> module (or <code>Sereal::Encoder</code> and <code>Sereal::Decoder</code> respectively). They work the same as the object-oriented interface except that they are invoked differently:</p>
+
+<pre><code>  <span class="variable">$srl_doc</span> <span class="operator">=</span> <span class="variable">$encoder</span><span class="operator">-&gt;</span><span class="variable">encode</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>becomes</p>
+
+<pre><code>  <span class="variable">$srl_doc</span> <span class="operator">=</span> <span class="variable">sereal_encode_with_object</span><span class="operator">(</span><span class="variable">$encoder</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>and</p>
+
+<pre><code>  <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$decoder</span><span class="operator">-&gt;</span><span class="variable">decode</span><span class="operator">(</span><span class="variable">$srl_doc</span><span class="operator">);</span>
+</code></pre>
+
+<p>becomes</p>
+
+<pre><code>  <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">sereal_decode_with_object</span><span class="operator">(</span><span class="variable">$decoder</span><span class="operator">,</span> <span class="variable">$srl_doc</span><span class="operator">);</span>
+</code></pre>
+
+<p>On Perl versions before 5.14, this will be marginally faster than the OO interface as it avoids method lookup. This should rarely matter. On Perl versions starting from 5.14, the function call to <code>sereal_encode_with_object</code> or <code>sereal_decode_with_object</code> will also be replaced with a custom Perl OP, thus avoiding most of the function call overhead as well.</p>
+
+<h2 id="Tuning-the-Sereal::Encoder">Tuning the <code>Sereal::Encoder</code></h2>
+
+<p>Several of the <code>Sereal::Encoder</code> options add or remove useful behaviour and some of them come at a runtime performance cost.</p>
+
+<dl>
+
+<dt id="no_shared_hashkeys"><code>no_shared_hashkeys</code></dt>
+<dd>
+
+<p>By default, Sereal will emit a &quot;repetition&quot; marker for hash keys that were already previously encountered. Depending on your data structure, this can save quite a bit of space in the generated document. Consider, for example, encoding an array of many objects of the same class. But it may not save anything if you don&#39;t have a lot of repeated hash keys or don&#39;t even encode any hashes to begin with.</p>
+
+<p>In those cases, you can turn this feature off with the <code>no_shared_hashkeys</code> option for a small but measurable speed-up.</p>
+
+</dd>
+<dt id="dedupe_strings"><code>dedupe_strings</code></dt>
+<dd>
+
+<p>If set, this option will apply the de-duplication logic to all strings that is only applied to hash keys by default. This can be quite expensive in both memory and performance. The same is true for <code>aliased_dedupe_strings</code>.</p>
+
+</dd>
+<dt id="snappy-and-snappy_incr"><code>snappy</code> and <code>snappy_incr</code></dt>
+<dd>
+
+<p>Enabling Snappy compression can (but doesn&#39;t have to) make your Sereal documents significantly smaller. How effective this compression is for you depends entirely on the nature of your data. Snappy compression is designed to be very fast. The additional space savings are very often worth the small overhead.</p>
+
+</dd>
+<dt id="freeze_callbacks"><code>freeze_callbacks</code></dt>
+<dd>
+
+<p>Using custom Perl <code>FREEZE</code> callbacks is very expensive. If enabled, the encoder has to do a method lookup at least once per class of an object being serialized. If a <code>FREEZE</code> hook actually exists, calling it will be even more expensive. If you care about ultimate performance, use with care.</p>
+
+</dd>
+<dt id="sort_keys"><code>sort_keys</code></dt>
+<dd>
+
+<p>This option forces the encoder to always <code>sort</code> the entries in a hash by its keys before writing them to the Sereal document. This can be somewhat expensive for large hashes.</p>
+
+</dd>
+</dl>
+
+<h2 id="General-Considerations">General Considerations</h2>
+
+<p>Perl variables (scalars specifically) can, at the same time, hold multiple representations of the same data. If you create and integer and use it as a string, it will be cached in its string form. Sereal attempts to detect the most compact of these representations for encoding, but can not always succeed. For example, if a data structure was previously also traversed by certain other serialization modules (such as <a href="../../lib/Storable.html">Storable</a>), then the scalars in the structure may have been irrevocably upgraded to a more complex (and bigger) type. This is only an issue in crude benchmarks. So if you plan to benchmark serialization, take care not to re-use the test data structure between serializers for results that do not depend on the order of operations.</p>
+
+<h1 id="BUGS-CONTACT-AND-SUPPORT">BUGS, CONTACT AND SUPPORT</h1>
+
+<p>For reporting bugs, please use the github bug tracker at <a href="http://github.com/Sereal/Sereal/issues">http://github.com/Sereal/Sereal/issues</a>.</p>
+
+<p>For support and discussion of Sereal, there are two Google Groups:</p>
+
+<p>Announcements around Sereal (extremely low volume): <a href="https://groups.google.com/forum/?fromgroups#!forum/sereal-announce">https://groups.google.com/forum/?fromgroups#!forum/sereal-announce</a></p>
+
+<p>Sereal development list: <a href="https://groups.google.com/forum/?fromgroups#!forum/sereal-dev">https://groups.google.com/forum/?fromgroups#!forum/sereal-dev</a></p>
+
+<h1 id="AUTHORS-AND-CONTRIBUTORS">AUTHORS AND CONTRIBUTORS</h1>
+
+<p>Yves Orton &lt;demerphq@gmail.com&gt;</p>
+
+<p>Damian Gryski</p>
+
+<p>Steffen Mueller &lt;smueller@cpan.org&gt;</p>
+
+<p>Rafa&euml;l Garcia-Suarez</p>
+
+<p>&AElig;var Arnfj&ouml;r&eth; Bjarmason &lt;avar@cpan.org&gt;</p>
+
+<p>Tim Bunce</p>
+
+<p>Daniel Dragan &lt;bulkdd@cpan.org&gt; (Windows support and bugfixes)</p>
+
+<p>Zefram</p>
+
+<p>Some inspiration and code was taken from Marc Lehmann&#39;s excellent JSON::XS module due to obvious overlap in problem domain.</p>
+
+<h1 id="ACKNOWLEDGMENT">ACKNOWLEDGMENT</h1>
+
+<p>This module was originally developed for Booking.com. With approval from Booking.com, this module was generalized and published on CPAN, for which the authors would like to express their gratitude.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2012, 2013, 2014 by Steffen Mueller Copyright (C) 2012, 2013, 2014 by Yves Orton</p>
+
+<p>The license for the code in this distribution is the following, with the exceptions listed below:</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>Except portions taken from Marc Lehmann&#39;s code for the JSON::XS module, which is licensed under the same terms as this module. (Many thanks to Marc for inspiration, and code.)</p>
+
+<p>Also except the code for Snappy compression library, whose license is reproduced below and which, to the best of our knowledge, is compatible with this module&#39;s license. The license for the enclosed Snappy code is:</p>
+
+<pre><code>  Copyright 2011, Google Inc.
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+    * Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
+  distribution.
+    * Neither the name of Google Inc. nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre>
+
+
+</body>
+
+</html>
+
+

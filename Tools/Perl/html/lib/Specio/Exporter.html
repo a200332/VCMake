@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ADDITIONAL-EXPORTS">ADDITIONAL EXPORTS</a></li>
+  <li><a href="#COMBINING-LIBRARIES-WITH-Specio::Subs">COMBINING LIBRARIES WITH Specio::Subs</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Exporter - Base class for type libraries</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyApp::Type::Library</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">'Specio::Exporter'</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+    
+    <span class="variable">declare</span><span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+    
+    <span class="comment"># more types here</span>
+    
+    <span class="keyword">package</span> <span class="variable">MyApp::Foo</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">MyApp::Type::Library</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Inheriting from this package makes your package a type exporter. By default, types defined in a package are never visible outside of the package. When you inherit from this package, all the types you define internally become available via exports.</p>
+
+<p>The exported types are available through the importing package&#39;s <code>t</code> subroutine.</p>
+
+<p>By default, types your package imports are not re-exported:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::Type::Library</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">'Specio::Exporter'</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span><span class="operator">;</span>
+</code></pre>
+
+<p>In this case, the types provided by <a href="../../lib/Specio/Library/Builtins.html">Specio::Library::Builtins</a> are not exported to packages which <code>use MyApp::Type::Library</code>.</p>
+
+<p>You can explicitly ask for types to be re-exported:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::Type::Library</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">'Specio::Exporter'</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span> <span class="operator">-</span><span class="variable">reexport</span><span class="operator">;</span>
+</code></pre>
+
+<p>In this case, packages which <code>use MyApp::Type::Library</code> will get all the types from <a href="../../lib/Specio/Library/Builtins.html">Specio::Library::Builtins</a> as well as any types defined in <code>MyApp::Type::Library</code>.</p>
+
+<h1 id="ADDITIONAL-EXPORTS">ADDITIONAL EXPORTS</h1>
+
+<p>If you want to export some additional subroutines from a package which has <code>Specio::Exporter</code> as its parent, define a sub named <code>_also_export</code>. This sub should return a <i>list</i> of subroutines defined in your package that should also be exported. These subs will be exported unconditionally to any package that uses your package.</p>
+
+<h1 id="COMBINING-LIBRARIES-WITH-Specio::Subs">COMBINING LIBRARIES WITH <a href="../../lib/Specio/Subs.html">Specio::Subs</a></h1>
+
+<p>You can combine loading libraries with subroutine generation using <a href="../../lib/Specio/Subs.html">Specio::Subs</a> by using <code>_also_export</code> and <code>Specio::Subs::subs_installed_into</code>:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">My::Library</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">My::Library::Internal</span> <span class="operator">-</span><span class="variable">reexport</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span> <span class="operator">-</span><span class="variable">reexport</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Subs</span> <span class="string">qw( My::Library::Internal Specio::Library::Builtins )</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> _also_export </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="variable">Specio::Subs::subs_installed_into</span><span class="operator">(</span><span class="keyword">__PACKAGE__</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

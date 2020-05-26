@@ -1,0 +1,315 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ROUTINES">ROUTINES</a></li>
+  <li><a href="#SEMI-PRIVATE-ROUTINES">SEMI-PRIVATE ROUTINES</a></li>
+  <li><a href="#KNOWN-BUGS-AND-LIMITATIONS">KNOWN BUGS AND LIMITATIONS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Locale::Codes::API - a description of the callable function in each module</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Although there are several modules in the <b>Locale-Codes</b> distribution, all of them (as of version 3.10) use exactly the same API. As a matter of fact, each of the main callable modules are just wrappers around a central module which does all the real work.</p>
+
+<h1 id="ROUTINES">ROUTINES</h1>
+
+<p>In order to maintain the documentation for the modules consistently, the functions are all documented here, rather than in the documentation for the separate modules.</p>
+
+<p>The name of the function depends on the module. For example, every module contains a function <code>code2XXX</code> where XXX refers to the type of data. The values of XXX are described in the following table:</p>
+
+<pre><code>   XXX       MODULE
+
+   country   Locale::Codes::Country
+   language  Locale::Codes::Language
+   currency  Locale::Codes::Currency
+   script    Locale::Codes::Script
+   langext   Locale::Codes::LangExt
+   langvar   Locale::Codes::LangVar
+   langfam   Locale::Codes::LangFam</code></pre>
+
+<p>So, the <a href="../../../lib/Locale/Country.html">Locale::Country</a> module contains the function <code>code2country</code>, the <a href="../../../lib/Locale/Language.html">Locale::Language</a> module contains the function <code>code2language</code>, etc.</p>
+
+<p>In all of the functions below, <b>CODE</b> refers to a code for one element in the code set. For example, in the two-letter country codes from ISO 3166-1, the code &#39;fi&#39; is used to refer to the country Finland. <b>CODE</b> is always case insensitive when passed in as an argument, so &#39;fi&#39;, &#39;FI&#39;, and &#39;Fi&#39; would all be equivalent arguments. When <b>CODE</b> is returned from an argument, it will always be in the case as used in the standard.</p>
+
+<p><b>CODESET</b> refers to a constant specified in the documentation for each module to label the various code sets. For example, in the <a href="../../../lib/Locale/Language.html">Locale::Language</a> module, <b>CODESET</b> could be LOCALE_CODE_ALPHA_2 or LOCALE_CODE_ALPHA_3 (among others). Most functions have a default one, so they do not need to be specified. So the following calls are valid:</p>
+
+<pre><code>   <span class="variable">code2country</span><span class="operator">(</span><span class="string">"fi"</span><span class="operator">);</span>
+   <span class="variable">code2country</span><span class="operator">(</span><span class="string">"fi"</span><span class="operator">,</span><span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+   <span class="variable">code2country</span><span class="operator">(</span><span class="string">"fin"</span><span class="operator">,</span><span class="variable">LOCALE_CODE_ALPHA_3</span><span class="operator">);</span>
+</code></pre>
+
+<p>Since LOCALE_CODE_ALPHA_2 is the default code set, the first two are identical.</p>
+
+<dl>
+
+<dt id="code2XXX-CODE-CODESET-retired"><b>code2XXX ( CODE [,CODESET] [,&#39;retired&#39;] )</b></dt>
+<dd>
+
+<p>These functions take a code and returns a string which contains the name of the element identified. If the code is not a valid code in the <b>CODESET</b> specified then <code>undef</code> will be returned.</p>
+
+<p>The name of the element is the name as specified in the standard, and as a result, different variations of an element name may be returned for different values of <b>CODESET</b>.</p>
+
+<p>For example, the alpha-2 country code set defines the two-letter code &quot;bo&quot; to be &quot;Bolivia, Plurinational State of&quot;, whereas the alpha-3 code set defines the code &#39;bol&#39; to be the country &quot;Bolivia (Plurinational State of)&quot;. So:</p>
+
+<pre><code>   <span class="variable">code2country</span><span class="operator">(</span><span class="string">'bo'</span><span class="operator">,</span><span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+      <span class="operator">=&gt;</span> <span class="string">'Bolivia, Plurinational State of'</span>
+   
+   <span class="variable">code2country</span><span class="operator">(</span><span class="string">'bol'</span><span class="operator">,</span><span class="variable">LOCALE_CODE_ALPHA_3</span><span class="operator">);</span>
+      <span class="operator">=&gt;</span> <span class="string">'Bolivia (Plurinational State of)'</span>
+</code></pre>
+
+<p>By default, only active codes will be used, but if the string &#39;retired&#39; is passed in as an argument, both active and retired codes will be examined.</p>
+
+</dd>
+<dt id="XXX2code-NAME-CODESET-retired"><b>XXX2code ( NAME [,CODESET] [,&#39;retired&#39;] )</b></dt>
+<dd>
+
+<p>These functions takes the name of an element (or any of it&#39;s aliases) and returns the code that corresponds to it, if it exists. If <b>NAME</b> could not be identified as the name of one of the elements, then <code>undef</code> will be returned.</p>
+
+<p>The name is not case sensitive. Also, any known variation of a name may be passed in.</p>
+
+<p>For example, even though the country name returned using LOCALE_CODE_ALPHA_2 and LOCALE_CODE_ALPHA_3 country codes for Bolivia is different, either country name may be passed in since for each code set (in addition to the alias &#39;Bolivia&#39;). So:</p>
+
+<pre><code>   <span class="variable">country2code</span><span class="operator">(</span><span class="string">'Bolivia, Plurinational State of'</span><span class="operator">,</span>
+                <span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+      <span class="operator">=&gt;</span> <span class="variable">bo</span>
+   
+   <span class="variable">country2code</span><span class="operator">(</span><span class="string">'Bolivia (Plurinational State of)'</span><span class="operator">,</span>
+                <span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+      <span class="operator">=&gt;</span> <span class="variable">bo</span>
+   
+   <span class="variable">country2code</span><span class="operator">(</span><span class="string">'Bolivia'</span><span class="operator">,</span><span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+      <span class="operator">=&gt;</span> <span class="variable">bo</span>
+</code></pre>
+
+<p>By default, only active names will be used, but if the string &#39;retired&#39; is passed in as an argument, both active and retired names will be examined.</p>
+
+</dd>
+<dt id="XXX_code2code-CODE-CODESET-CODESET2"><b>XXX_code2code ( CODE ,CODESET ,CODESET2 )</b></dt>
+<dd>
+
+<p>These functions takes a code from one code set, and returns the corresponding code from another code set. <b>CODE</b> must exists in the code set specified by <b>CODESET</b> and must have a corresponding code in the code set specified by <b>CODESET2</b> or <code>undef</code> will be returned.</p>
+
+<p>Both <b>CODESET</b> and <b>CODESET2</b> must be explicitly entered.</p>
+
+<pre><code>   <span class="variable">country_code2code</span><span class="operator">(</span><span class="string">'fin'</span><span class="operator">,</span> <span class="variable">LOCALE_CODE_ALPHA_3</span><span class="operator">,</span>
+                     <span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+      <span class="operator">=&gt;</span> <span class="string">'fi'</span>
+</code></pre>
+
+<p>Note that this function does NOT support retired codes.</p>
+
+</dd>
+<dt id="all_XXX_codes-CODESET-retired"><b>all_XXX_codes ( [CODESET] [,&#39;retired&#39;] )</b></dt>
+<dd>
+
+<p>These returns a list of all code in the code set. The codes will be sorted.</p>
+
+<p>By default, only active codes will be returned, but if the string &#39;retired&#39; is passed in as an argument, both active and retired codes will be returned.</p>
+
+</dd>
+<dt id="all_XXX_names-CODESET-retired"><b>all_XXX_names ( [CODESET] [,&#39;retired&#39;] )</b></dt>
+<dd>
+
+<p>These return a list of all elements names for which there is a corresponding code in the specified code set.</p>
+
+<p>The names returned are exactly as they are specified in the standard, and are sorted.</p>
+
+<p>Since not all elements are listed in all code sets, the list of elements may differ depending on the code set specified.</p>
+
+<p>By default, only active names will be returned, but if the string &#39;retired&#39; is passed in as an argument, both active and retired names will be returned.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEMI-PRIVATE-ROUTINES">SEMI-PRIVATE ROUTINES</h1>
+
+<p>Additional semi-private routines which may be used to modify the internal data are also available. Given their status, they aren&#39;t exported, and so need to be called by prefixing the function name with the package name.</p>
+
+<p>These routines do not currently work with retired codes.</p>
+
+<dl>
+
+<dt id="MODULE::rename_XXX-CODE-NEW_NAME-CODESET"><b>MODULE::rename_XXX ( CODE ,NEW_NAME [,CODESET] )</b></dt>
+<dd>
+
+<p>These routines are used to change the official name of an element. At that point, the name returned by the <code>code2XXX</code> routine would be <b>NEW_NAME</b> instead of the name specified in the standard.</p>
+
+<p>The original name will remain as an alias.</p>
+
+<p>For example, the official country name for code &#39;gb&#39; is &#39;United Kingdom&#39;. If you want to change that, you might call:</p>
+
+<pre><code>   <span class="variable">Locale::Codes::Country::rename_country</span><span class="operator">(</span><span class="string">'gb'</span><span class="operator">,</span> <span class="string">'Great Britain'</span><span class="operator">);</span>
+</code></pre>
+
+<p>This means that calling code2country(&#39;gb&#39;) will now return &#39;Great Britain&#39; instead of &#39;United Kingdom&#39;.</p>
+
+<p>If any error occurs, a warning is issued and 0 is returned. An error occurs if <b>CODE</b> doesn&#39;t exist in the specified code set, or if <b>NEW_NAME</b> is already in use but for a different element.</p>
+
+<p>If the routine succeeds, 1 is returned.</p>
+
+</dd>
+<dt id="MODULE::add_XXX-CODE-NAME-CODESET"><b>MODULE::add_XXX ( CODE ,NAME [,CODESET] )</b></dt>
+<dd>
+
+<p>These routines are used to add a new code and name to the data.</p>
+
+<p>Both <b>CODE</b> and <b>NAME</b> must be unused in the data set or an error occurs (though <b>NAME</b> may be used in a different data set).</p>
+
+<p>For example, to create the fictitious country named &quot;Duchy of Grand Fenwick&quot; with codes &quot;gf&quot; and &quot;fen&quot;, use the following:</p>
+
+<pre><code>   <span class="variable">Locale::Codes::Country::add_country</span><span class="operator">(</span><span class="string">"fe"</span><span class="operator">,</span><span class="string">"Duchy of Grand Fenwick"</span><span class="operator">,</span>
+                                <span class="variable">LOCALE_CODE_ALPHA_2</span><span class="operator">);</span>
+   
+   <span class="variable">Locale::Codes::Country::add_country</span><span class="operator">(</span><span class="string">"fen"</span><span class="operator">,</span><span class="string">"Duchy of Grand Fenwick"</span><span class="operator">,</span>
+                                <span class="variable">LOCALE_CODE_ALPHA_3</span><span class="operator">);</span>
+</code></pre>
+
+<p>The return value is 1 on success, 0 on an error.</p>
+
+</dd>
+<dt id="MODULE::delete_XXX-CODE-CODESET"><b>MODULE::delete_XXX ( CODE [,CODESET] )</b></dt>
+<dd>
+
+<p>These routines are used to delete a code from the data.</p>
+
+<p><b>CODE</b> must refer to an existing code in the code set.</p>
+
+<p>The return value is 1 on success, 0 on an error.</p>
+
+</dd>
+<dt id="MODULE::add_XXX_alias-NAME-NEW_NAME"><b>MODULE::add_XXX_alias ( NAME ,NEW_NAME )</b></dt>
+<dd>
+
+<p>These routines are used to add a new alias to the data. They do not alter the return value of the <code>code2XXX</code> function.</p>
+
+<p><b>NAME</b> must be an existing element name, and <b>NEW_NAME</b> must be unused or an error occurs.</p>
+
+<p>The return value is 1 on success, 0 on an error.</p>
+
+</dd>
+<dt id="MODULE::delete_XXX_alias-NAME"><b>MODULE::delete_XXX_alias ( NAME )</b></dt>
+<dd>
+
+<p>These routines are used to delete an alias from the data. Once removed, the element may not be referred to by <b>NAME</b>.</p>
+
+<p><b>NAME</b> must be one of a list of at least two names that may be used to specify an element. If the element may only be referred to by a single name, you&#39;ll need to use the <code>add_XXX_alias</code> function to add a new alias first, or the <code>remove_XXX</code> function to remove the element entirely.</p>
+
+<p>If the alias is used as the name in any code set, one of the other names will be used instead. Predicting exactly which one will be used requires you to know the order in which the standards were read, which is not reliable, so you may want to use the <code>rename_XXX</code> function to force one of the alternate names to be used.</p>
+
+<p>The return value is 1 on success, 0 on an error.</p>
+
+</dd>
+<dt id="MODULE::rename_XXX_code-CODE-NEW_CODE-CODESET"><b>MODULE::rename_XXX_code ( CODE ,NEW_CODE [,CODESET] )</b></dt>
+<dd>
+
+<p>These routines are used to change the official code for an element. At that point, the code returned by the <code>XXX2code</code> routine would be <b>NEW_CODE</b> instead of the code specified in the standard.</p>
+
+<p><b>NEW_CODE</b> may either be a code that is not in use, or it may be an alias for <b>CODE</b> (in which case, <b>CODE</b> becomes and alias and <b>NEW_CODE</b> becomes the &quot;real&quot; code).</p>
+
+<p>The original code is kept as an alias, so that the <code>code2XXX</code> routines will work with either the code from the standard or the new code.</p>
+
+<p>However, the <code>all_XXX_codes</code> routine will only return the codes which are considered &quot;real&quot; (which means that the list of codes will now contain <b>NEW_CODE</b>, but will not contain <b>CODE</b>).</p>
+
+</dd>
+<dt id="MODULE::add_XXX_code_alias-CODE-NEW_CODE-CODESET"><b>MODULE::add_XXX_code_alias ( CODE ,NEW_CODE [,CODESET] )</b></dt>
+<dd>
+
+<p>These routines add an alias for the code. At that point, <b>NEW_CODE</b> and <b>CODE</b> will both work in the <code>code2XXX</code> routines. However, the <code>XXX2code</code> routines will still return the original code.</p>
+
+</dd>
+<dt id="MODULE::delete_XXX_code_alias-CODE-CODESET"><b>MODULE::delete_XXX_code_alias ( CODE [,CODESET] )</b></dt>
+<dd>
+
+<p>These routines delete an alias for the code.</p>
+
+<p>These will only work if <b>CODE</b> is actually an alias. If it is the &quot;real&quot; code, it will not be deleted. You will need to use the <code>rename_XXX_code</code> function to switch the real code with one of the aliases, and then delete the alias.</p>
+
+</dd>
+</dl>
+
+<h1 id="KNOWN-BUGS-AND-LIMITATIONS">KNOWN BUGS AND LIMITATIONS</h1>
+
+<dl>
+
+<dt id="Relationship-between-code-sets"><b>Relationship between code sets</b></dt>
+<dd>
+
+<p>Because each code set uses a slightly different list of elements, and they are not necessarily one-to-one, there may be some confusion about the relationship between codes from different code sets.</p>
+
+<p>For example, ISO 3166 assigns one code to the country &quot;United States Minor Outlying Islands&quot;, but the IANA codes give different codes to different islands (Baker Island, Howland Island, etc.).</p>
+
+<p>This may cause some confusion... I&#39;ve done the best that I could do to minimize it.</p>
+
+</dd>
+<dt id="Non-ASCII-characters-not-supported"><b>Non-ASCII characters not supported</b></dt>
+<dd>
+
+<p>Currently all names must be all ASCII. I plan on relaxing that limitation in the future.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/Locale/Codes.html">Locale::Codes</a></p>
+
+<p><a href="../../../lib/Locale/Codes/Country.html">Locale::Codes::Country</a></p>
+
+<p><a href="../../../lib/Locale/Codes/Language.html">Locale::Codes::Language</a></p>
+
+<p><a href="../../../lib/Locale/Codes/Currency.html">Locale::Codes::Currency</a></p>
+
+<p><a href="../../../lib/Locale/Codes/Script.html">Locale::Codes::Script</a></p>
+
+<p><a href="../../../lib/Locale/Codes/LangExt.html">Locale::Codes::LangExt</a></p>
+
+<p><a href="../../../lib/Locale/Codes/LangVar.html">Locale::Codes::LangVar</a></p>
+
+<p><a href="../../../lib/Locale/Codes/LangFam.html">Locale::Codes::LangFam</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>See Locale::Codes for full author history.</p>
+
+<p>Currently maintained by Sullivan Beck (sbeck@cpan.org).</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<pre><code>   Copyright (c) 1997-2001 Canon Research Centre Europe (CRE).
+   Copyright (c) 2001-2010 Neil Bowers
+   Copyright (c) 2010-2016 Sullivan Beck</code></pre>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

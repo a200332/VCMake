@@ -1,0 +1,587 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#THINGS-THAT-BREAK">THINGS THAT BREAK</a>
+    <ul>
+      <li><a href="#Test::Builder1.5-2-conditionals">Test::Builder1.5/2 conditionals</a>
+        <ul>
+          <li><a href="#The-Problem">The Problem</a></li>
+          <li><a href="#The-Fix">The Fix</a></li>
+        </ul>
+      </li>
+      <li><a href="#Replacing-the-Test::Builder-singleton">Replacing the Test::Builder singleton</a>
+        <ul>
+          <li><a href="#The-Problem1">The Problem</a></li>
+          <li><a href="#The-Fix1">The Fix</a></li>
+        </ul>
+      </li>
+      <li><a href="#Directly-Accessing-Hash-Elements">Directly Accessing Hash Elements</a>
+        <ul>
+          <li><a href="#The-Problem2">The Problem</a></li>
+          <li><a href="#The-Fix2">The Fix</a></li>
+        </ul>
+      </li>
+      <li><a href="#Subtest-indentation">Subtest indentation</a>
+        <ul>
+          <li><a href="#The-Problem3">The Problem</a></li>
+          <li><a href="#The-Fix3">The Fix</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#DISTRIBUTIONS-THAT-BREAK-OR-NEED-TO-BE-UPGRADED">DISTRIBUTIONS THAT BREAK OR NEED TO BE UPGRADED</a>
+    <ul>
+      <li><a href="#WORKS-BUT-TESTS-WILL-FAIL">WORKS BUT TESTS WILL FAIL</a></li>
+      <li><a href="#UPGRADE-SUGGESTED">UPGRADE SUGGESTED</a></li>
+      <li><a href="#NEED-TO-UPGRADE">NEED TO UPGRADE</a></li>
+      <li><a href="#STILL-BROKEN">STILL BROKEN</a></li>
+    </ul>
+  </li>
+  <li><a href="#MAKE-ASSERTIONS---SEND-EVENTS">MAKE ASSERTIONS -&gt; SEND EVENTS</a>
+    <ul>
+      <li><a href="#LEGACY">LEGACY</a></li>
+      <li><a href="#TEST2">TEST2</a></li>
+    </ul>
+  </li>
+  <li><a href="#WRAP-EXISTING-TOOLS">WRAP EXISTING TOOLS</a>
+    <ul>
+      <li><a href="#LEGACY1">LEGACY</a></li>
+      <li><a href="#TEST21">TEST2</a></li>
+    </ul>
+  </li>
+  <li><a href="#USING-UTF8">USING UTF8</a>
+    <ul>
+      <li><a href="#LEGACY2">LEGACY</a></li>
+      <li><a href="#TEST22">TEST2</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS-CONTRIBUTORS-AND-REVIEWERS">AUTHORS, CONTRIBUTORS AND REVIEWERS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINER">MAINTAINER</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Transition - Transition notes when upgrading to Test2</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is where gotchas and breakages related to the Test2 upgrade are documented. The upgrade causes Test::Builder to defer to Test2 under the hood. This transition is mostly transparent, but there are a few cases that can trip you up.</p>
+
+<h1 id="THINGS-THAT-BREAK">THINGS THAT BREAK</h1>
+
+<p>This is the list of scenarios that break with the new internals.</p>
+
+<h2 id="Test::Builder1.5-2-conditionals">Test::Builder1.5/2 conditionals</h2>
+
+<h3 id="The-Problem">The Problem</h3>
+
+<p>a few years back there were two attempts to upgrade/replace Test::Builder. Confusingly these were called Test::Builder2 and Test::Builder1.5, in that order. Many people put conditionals in their code to check the Test::Builder version number and adapt their code accordingly.</p>
+
+<p>The Test::Builder2/1.5 projects both died out. Now the conditional code people added has become a mine field. A vast majority of modules broken by Test2 fall into this category.</p>
+
+<h3 id="The-Fix">The Fix</h3>
+
+<p>The fix is to remove all Test::Builder1.5/2 related code. Either use the legacy Test::Builder API, or use Test2 directly.</p>
+
+<h2 id="Replacing-the-Test::Builder-singleton">Replacing the Test::Builder singleton</h2>
+
+<h3 id="The-Problem1">The Problem</h3>
+
+<p>Some test modules would replace the Test::Builder singleton instance with their own instance or subclass. This was usually done to intercept or modify results as they happened.</p>
+
+<p>The Test::Builder singleton is now a simple compatibility wrapper around Test2. The Test::Builder singleton is no longer the central place for results. Many results bypass the Test::Builder singleton completely, which breaks and behavior intended when replacing the singleton.</p>
+
+<h3 id="The-Fix1">The Fix</h3>
+
+<p>If you simply want to intercept all results instead of letting them go to TAP, you should look at the <a href="../../lib/Test2/API.html">Test2::API</a> docs and read about pushing a new hub onto the hub stack. Replacing the hub temporarily is now the correct way to intercept results.</p>
+
+<p>If your goal is purely monitoring of events use the <code>Test2::Hub-&gt;listen()</code> method exported by Test::More to watch events as they are fired. If you wish to modify results before they go to TAP look at the <code>Test2::Hub-&gt;filter()</code> method.</p>
+
+<h2 id="Directly-Accessing-Hash-Elements">Directly Accessing Hash Elements</h2>
+
+<h3 id="The-Problem2">The Problem</h3>
+
+<p>Some modules look directly at hash keys on the Test::Builder singleton. The problem here is that the Test::Builder singleton no longer holds anything important.</p>
+
+<h3 id="The-Fix2">The Fix</h3>
+
+<p>The fix is to use the API specified in <a href="../../lib/Test2/API.html">Test2::API</a> to look at or modify state as needed.</p>
+
+<h2 id="Subtest-indentation">Subtest indentation</h2>
+
+<h3 id="The-Problem3">The Problem</h3>
+
+<p>An early change, in fact the change that made Test2 an idea, was a change to the indentation of the subtest note. IT was decided it would be more readable to outdent the subtest note instead of having it inline with the subtest:</p>
+
+<pre><code>    # subtest foo
+        ok 1 - blah
+        1..1
+    ok 1 - subtest foo</code></pre>
+
+<p>The old style indented the note:</p>
+
+<pre><code>        # subtest foo
+        ok 1 - blah
+        1..1
+    ok 1 - subtest foo</code></pre>
+
+<p>This breaks tests that do string comparison of TAP output.</p>
+
+<h3 id="The-Fix3">The Fix</h3>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$indent</span> <span class="operator">=</span> <span class="variable">$INC</span><span class="operator">{</span><span class="string">'Test2/API.pm'</span><span class="operator">}</span> <span class="operator">?</span> <span class="string">''</span> <span class="operator">:</span> <span class="string">'    '</span><span class="operator">;</span>
+    
+    <span class="variable">is</span><span class="operator">(</span>
+        <span class="variable">$subtest_output</span><span class="operator">,</span>
+        <span class="string">"${indent}# subtest foo"</span><span class="operator">,</span>
+        <span class="string">"Got subtest note"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>Check if <code><span class="variable">$INC</span><span class="operator">{</span><span class="string">'Test2/API.pm'</span><span class="operator">}</span>
+</code> is set, if it is then no indentation should be expected. If it is not set than the old Test::Builder is in use, indentation should be expected.</p>
+
+<h1 id="DISTRIBUTIONS-THAT-BREAK-OR-NEED-TO-BE-UPGRADED">DISTRIBUTIONS THAT BREAK OR NEED TO BE UPGRADED</h1>
+
+<p>This is a list of cpan modules that have been known to have been broken by the upgrade at one point.</p>
+
+<h2 id="WORKS-BUT-TESTS-WILL-FAIL">WORKS BUT TESTS WILL FAIL</h2>
+
+<p>These modules still function correctly, but their test suites will not pass. If you already have these modules installed then you can continue to use them. If you are trying to install them after upgrading Test::Builder you will need to force installation, or bypass the broken tests.</p>
+
+<dl>
+
+<dt id="Test::DBIx::Class::Schema">Test::DBIx::Class::Schema</dt>
+<dd>
+
+<p>This module has a test that appears to work around a Test::Builder bug. The bug appears to have been fixed by Test2, which means the workaround causes a failure. This can be easily updated, but nobody has done so yet.</p>
+
+<p>Known broken in versions: 1.0.9 and older</p>
+
+</dd>
+<dt id="Test::Kit">Test::Kit</dt>
+<dd>
+
+<p>This actually works fine, but will not install because <a>Test::Aggregate</a> is in the dependency chain.</p>
+
+<p>See the <a>Test::Aggregate</a> info below for additional information.</p>
+
+</dd>
+<dt id="Device::Chip">Device::Chip</dt>
+<dd>
+
+<p>Tests break due to subtest indentation.</p>
+
+<p>Known broken in version 0.07. Apparently works fine in 0.06 though. Patch has been submitted to fix the issue.</p>
+
+</dd>
+</dl>
+
+<h2 id="UPGRADE-SUGGESTED">UPGRADE SUGGESTED</h2>
+
+<p>These are modules that did not break, but had broken test suites that have since been fixed.</p>
+
+<dl>
+
+<dt id="Test::Exception">Test::Exception</dt>
+<dd>
+
+<p>Old versions work fine, but have a minor test name behavior that breaks with Test2. Old versions will no longer install because of this. The latest version on CPAN will install just fine. Upgrading is not required, but is recommended.</p>
+
+<p>Fixed in version: 0.43</p>
+
+</dd>
+<dt id="Data::Peek">Data::Peek</dt>
+<dd>
+
+<p>Some tests depended on <code>$!</code> and <code>$?</code> being modified in subtle ways. A patch was applied to correct things that changed.</p>
+
+<p>The module itself works fine, there is no need to upgrade.</p>
+
+<p>Fixed in version: 0.45</p>
+
+</dd>
+<dt id="circular::require">circular::require</dt>
+<dd>
+
+<p>Some tests were fragile and required base.pm to be loaded at a late stage. Test2 was loading base.pm too early. The tests were updated to fix this.</p>
+
+<p>The module itself never broke, you do not need to upgrade.</p>
+
+<p>Fixed in version: 0.12</p>
+
+</dd>
+<dt id="Test::Module::Used">Test::Module::Used</dt>
+<dd>
+
+<p>A test worked around a now-fixed planning bug. There is no need to upgrade if you have an old version installed. New versions install fine if you want them.</p>
+
+<p>Fixed in version: 0.2.5</p>
+
+</dd>
+<dt id="Test::Moose::More">Test::Moose::More</dt>
+<dd>
+
+<p>Some tests were fragile, but have been fixed. The actual breakage was from the subtest comment indentation change.</p>
+
+<p>No need to upgrade, old versions work fine. Only new versions will install.</p>
+
+<p>Fixed in version: 0.025</p>
+
+</dd>
+<dt id="Test::FITesque">Test::FITesque</dt>
+<dd>
+
+<p>This was broken by a bugfix to how planning is done. The test was updated after the bugfix.</p>
+
+<p>Fixed in version: 0.04</p>
+
+</dd>
+<dt id="autouse">autouse</dt>
+<dd>
+
+<p>A test broke because it depended on Scalar::Util not being loaded. Test2 loads Scalar::Util. The test was updated to load Test2 after checking Scalar::Util&#39;s load status.</p>
+
+<p>There is no need to upgrade if you already have it installed.</p>
+
+<p>Fixed in version: 1.11</p>
+
+</dd>
+</dl>
+
+<h2 id="NEED-TO-UPGRADE">NEED TO UPGRADE</h2>
+
+<dl>
+
+<dt id="Test::SharedFork">Test::SharedFork</dt>
+<dd>
+
+<p>Old versions need to directly access Test::Builder singleton hash elements. The latest version on CPAN will still do this on old Test::Builder, but will defer to <a href="../../lib/Test2/IPC.html">Test2::IPC</a> on Test2.</p>
+
+<p>Fixed in version: 0.35</p>
+
+</dd>
+<dt id="Test::Builder::Clutch">Test::Builder::Clutch</dt>
+<dd>
+
+<p>This works by doing overriding methods on the singleton, and directly accessing hash values on the singleton. A new version has been released that uses the Test2 API to accomplish the same result in a saner way.</p>
+
+<p>Fixed in version: 0.07</p>
+
+</dd>
+<dt id="Test::Dist::VersionSync">Test::Dist::VersionSync</dt>
+<dd>
+
+<p>This had Test::Builder2 conditionals. This was fixed by removing the conditionals.</p>
+
+<p>Fixed in version: 1.1.4</p>
+
+</dd>
+<dt id="Test::Modern">Test::Modern</dt>
+<dd>
+
+<p>This relied on <code>Test::Builder-&gt;_try()</code> which was a private method, documented as something nobody should use. This was fixed by using a different tool.</p>
+
+<p>Fixed in version: 0.012</p>
+
+</dd>
+<dt id="Test::UseAllModules">Test::UseAllModules</dt>
+<dd>
+
+<p>Version 0.14 relied on <code>Test::Builder-&gt;history</code> which was available in Test::Builder 1.5. Versions 0.12 and 0.13 relied on other Test::Builder internals.</p>
+
+<p>Fixed in version: 0.15</p>
+
+</dd>
+<dt id="Test::More::Prefix">Test::More::Prefix</dt>
+<dd>
+
+<p>Worked by applying a role that wrapped <code>Test::Builder-&gt;_print_comment</code>. Fixed by adding an event filter that modifies the message instead when running under Test2.</p>
+
+<p>Fixed in version: 0.007</p>
+
+</dd>
+</dl>
+
+<h2 id="STILL-BROKEN">STILL BROKEN</h2>
+
+<dl>
+
+<dt id="Test::Aggregate">Test::Aggregate</dt>
+<dd>
+
+<p>This distribution directly accesses the hash keys in the <a href="../../lib/Test/Builder.html">Test::Builder</a> singleton. It also approaches the problem from the wrong angle, please consider using <a>Test2::Harness</a> or <a>App::ForkProve</a> which both solve the same problem at the harness level.</p>
+
+<p>Still broken as of version: 0.373</p>
+
+</dd>
+<dt id="Test::Wrapper">Test::Wrapper</dt>
+<dd>
+
+<p>This module directly uses hash keys in the <a href="../../lib/Test/Builder.html">Test::Builder</a> singleton. This module is also obsolete thanks to the benefits of <a href="../../lib/Test2.html">Test2</a>. Use <code>intercept()</code> from <a href="../../lib/Test2/API.html">Test2::API</a> to achieve a similar result.</p>
+
+<p>Still broken as of version: 0.3.0</p>
+
+</dd>
+<dt id="Test::ParallelSubtest">Test::ParallelSubtest</dt>
+<dd>
+
+<p>This module overrides <code>Test::Builder::subtest()</code> and <code>Test::Builder::done_testing()</code>. It also directly accesses hash elements of the singleton. It has not yet been fixed.</p>
+
+<p>Alternatives: <a href="../../lib/Test2/AsyncSubtest.html">Test2::AsyncSubtest</a> and <a href="../../lib/Test2/Workflow.html">Test2::Workflow</a> (not stable).</p>
+
+<p>Still broken as of version: 0.05</p>
+
+</dd>
+<dt id="Test::Pretty">Test::Pretty</dt>
+<dd>
+
+<p>See https://github.com/tokuhirom/Test-Pretty/issues/25</p>
+
+<p>The author admits the module is crazy, and he is awaiting a stable release of something new (Test2) to completely rewrite it in a sane way.</p>
+
+<p>Still broken as of version: 0.32</p>
+
+</dd>
+<dt id="Net::BitTorrent">Net::BitTorrent</dt>
+<dd>
+
+<p>The tests for this module directly access <a href="../../lib/Test/Builder.html">Test::Builder</a> hash keys. Most, if not all of these hash keys have public API methods that could be used instead to avoid the problem.</p>
+
+<p>Still broken in version: 0.052</p>
+
+</dd>
+<dt id="Test::Group">Test::Group</dt>
+<dd>
+
+<p>It monkeypatches Test::Builder, and calls it &quot;black magic&quot; in the code.</p>
+
+<p>Still broken as of version: 0.20</p>
+
+</dd>
+<dt id="Test::Flatten">Test::Flatten</dt>
+<dd>
+
+<p>This modifies the Test::Builder internals in many ways. A better was to accomplish the goal of this module is to write your own subtest function.</p>
+
+<p>Still broken as of version: 0.11</p>
+
+</dd>
+<dt id="Log::Dispatch::Config::TestLog">Log::Dispatch::Config::TestLog</dt>
+<dd>
+
+<p>Modifies Test::Builder internals.</p>
+
+<p>Still broken as of version: 0.02</p>
+
+</dd>
+<dt id="Test::Able">Test::Able</dt>
+<dd>
+
+<p>Modifies Test::Builder internals.</p>
+
+<p>Still broken as of version: 0.11</p>
+
+</dd>
+</dl>
+
+<h1 id="MAKE-ASSERTIONS---SEND-EVENTS">MAKE ASSERTIONS -&gt; SEND EVENTS</h1>
+
+<h2 id="LEGACY">LEGACY</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::Builder</span><span class="operator">;</span>
+    
+    <span class="comment"># A majority of tools out there do this:</span>
+    <span class="comment"># my $TB = Test::Builder-&gt;new;</span>
+    <span class="comment"># This works, but has always been wrong, forcing Test::Builder to implement</span>
+    <span class="comment"># subtests as a horrific hack. It also causes problems for tools that try</span>
+    <span class="comment"># to replace the singleton (also discouraged).</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_ok</span><span class="operator">(</span>$;$<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$TB</span> <span class="operator">=</span> <span class="variable">Test::Builder</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        <span class="variable">$TB</span><span class="operator">-&gt;</span><span class="variable">ok</span><span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_diag</span><span class="operator">(</span>$<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$msg</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$TB</span> <span class="operator">=</span> <span class="variable">Test::Builder</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        <span class="variable">$TB</span><span class="operator">-&gt;</span><span class="variable">diag</span><span class="operator">(</span><span class="variable">$msg</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h2 id="TEST2">TEST2</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context/</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_ok</span><span class="operator">(</span>$;$<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">ok</span><span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">);</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_diag</span><span class="operator">(</span>$<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$msg</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">diag</span><span class="operator">(</span><span class="variable">$msg</span><span class="operator">);</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The context object has API compatible implementations of the following methods:</p>
+
+<dl>
+
+<dt id="ok-bool-name">ok($bool, $name)</dt>
+<dd>
+
+</dd>
+<dt id="diag-messages">diag(@messages)</dt>
+<dd>
+
+</dd>
+<dt id="note-messages">note(@messages)</dt>
+<dd>
+
+</dd>
+<dt id="subtest-name-code">subtest($name, $code)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>If you are looking for helpers with <code>is</code>, <code>like</code>, and others, see <a href="../../lib/Test2/Suite.html">Test2::Suite</a>.</p>
+
+<h1 id="WRAP-EXISTING-TOOLS">WRAP EXISTING TOOLS</h1>
+
+<h2 id="LEGACY1">LEGACY</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::More</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> exclusive_ok </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$bool1</span><span class="operator">,</span> <span class="variable">$bool2</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="comment"># Ensure errors are reported 1 level higher</span>
+        <span class="keyword">local</span> <span class="variable">$Test::Builder::Level</span> <span class="operator">=</span> <span class="variable">$Test::Builder::Level</span> <span class="operator">+</span> <span class="number">1</span><span class="operator">;</span>
+    
+        <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$bool1</span> <span class="operator">||</span> <span class="variable">$bool2</span><span class="operator">;</span>
+        <span class="variable">$ok</span> <span class="operator">&amp;&amp;=</span> <span class="operator">!(</span><span class="variable">$bool1</span> <span class="operator">&amp;&amp;</span> <span class="variable">$bool2</span><span class="operator">);</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="variable">$ok</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">);</span>
+    
+        <span class="keyword">return</span> <span class="variable">$bool</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Every single tool in the chain from this, to <code>ok</code>, to anything <code>ok</code> calls needs to increment the <code>$Level</code> variable. When an error occurs Test::Builder will do a trace to the stack frame determined by <code>$Level</code>, and report that file+line as the one where the error occurred. If you or any other tool you use forgets to set <code>$Level</code> then errors will be reported to the wrong place.</p>
+
+<h2 id="TEST21">TEST2</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::More</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> exclusive_ok </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$bool1</span><span class="operator">,</span> <span class="variable">$bool2</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="comment"># Grab and store the context, even if you do not need to use it</span>
+        <span class="comment"># directly.</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    
+        <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$bool1</span> <span class="operator">||</span> <span class="variable">$bool2</span><span class="operator">;</span>
+        <span class="variable">$ok</span> <span class="operator">&amp;&amp;=</span> <span class="operator">!(</span><span class="variable">$bool1</span> <span class="operator">&amp;&amp;</span> <span class="variable">$bool2</span><span class="operator">);</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="variable">$ok</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">);</span>
+    
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$bool</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Instead of using <code>$Level</code> to perform a backtrace, Test2 uses a context object. In this sample you create a context object and store it. This locks the context (errors report 1 level up from here) for all wrapped tools to find. You do not need to use the context object, but you do need to store it in a variable. Once the sub ends the <code>$ctx</code> variable is destroyed which lets future tools find their own.</p>
+
+<h1 id="USING-UTF8">USING UTF8</h1>
+
+<h2 id="LEGACY2">LEGACY</h2>
+
+<pre><code>    <span class="comment"># Set the mode BEFORE anything loads Test::Builder</span>
+    <span class="keyword">use</span> <span class="keyword">open</span> <span class="string">':std'</span><span class="operator">,</span> <span class="string">':encoding(utf8)'</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Test::More</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or</p>
+
+<pre><code>    <span class="comment"># Modify the filehandles</span>
+    <span class="keyword">my</span> <span class="variable">$builder</span> <span class="operator">=</span> <span class="variable">Test::More</span><span class="operator">-&gt;</span><span class="variable">builder</span><span class="operator">;</span>
+    <span class="keyword">binmode</span> <span class="variable">$builder</span><span class="operator">-&gt;</span><span class="variable">output</span><span class="operator">,</span>         <span class="string">":encoding(utf8)"</span><span class="operator">;</span>
+    <span class="keyword">binmode</span> <span class="variable">$builder</span><span class="operator">-&gt;</span><span class="variable">failure_output</span><span class="operator">,</span> <span class="string">":encoding(utf8)"</span><span class="operator">;</span>
+    <span class="keyword">binmode</span> <span class="variable">$builder</span><span class="operator">-&gt;</span><span class="variable">todo_output</span><span class="operator">,</span>    <span class="string">":encoding(utf8)"</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="TEST22">TEST2</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/test2_stack/</span><span class="operator">;</span>
+    
+    <span class="variable">test2_stack</span><span class="operator">-&gt;</span><span class="variable">top</span><span class="operator">-&gt;</span><span class="variable">format</span><span class="operator">-&gt;</span><span class="variable">encoding</span><span class="operator">(</span><span class="string">'utf8'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Though a much better way is to use the <a href="../../lib/Test2/Plugin/UTF8.html">Test2::Plugin::UTF8</a> plugin, which is part of <a href="../../lib/Test2/Suite.html">Test2::Suite</a>.</p>
+
+<h1 id="AUTHORS-CONTRIBUTORS-AND-REVIEWERS">AUTHORS, CONTRIBUTORS AND REVIEWERS</h1>
+
+<p>The following people have all contributed to this document in some way, even if only for review.</p>
+
+<dl>
+
+<dt id="Chad-Granum-EXODIST-exodist-cpan.org">Chad Granum (EXODIST) &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://www.perl.com/perl/misc/Artistic.html</i></p>
+
+
+</body>
+
+</html>
+
+

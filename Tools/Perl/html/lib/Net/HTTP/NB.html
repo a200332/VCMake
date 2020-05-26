@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Net::HTTP::NB - Non-blocking HTTP client</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 6.17</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Net::HTTP::NB</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="variable">Net::HTTP::NB</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">Host</span> <span class="operator">=&gt;</span> <span class="string">"www.perl.com"</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span> <span class="variable">$@</span><span class="operator">;</span>
+ <span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">write_request</span><span class="operator">(</span><span class="string">GET</span> <span class="operator">=&gt;</span> <span class="string">"/"</span><span class="operator">);</span>
+ 
+ <span class="keyword">use</span> <span class="variable">IO::Select</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$sel</span> <span class="operator">=</span> <span class="variable">IO::Select</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$s</span><span class="operator">);</span>
+ 
+ <span class="variable">READ_HEADER</span><span class="operator">:</span> <span class="operator">{</span>
+    <span class="keyword">die</span> <span class="string">"Header timeout"</span> <span class="keyword">unless</span> <span class="variable">$sel</span><span class="operator">-&gt;</span><span class="variable">can_read</span><span class="operator">(</span><span class="number">10</span><span class="operator">);</span>
+    <span class="keyword">my</span><span class="operator">(</span><span class="variable">$code</span><span class="operator">,</span> <span class="variable">$mess</span><span class="operator">,</span> <span class="variable">%h</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">read_response_headers</span><span class="operator">;</span>
+    <span class="keyword">redo</span> <span class="variable">READ_HEADER</span> <span class="keyword">unless</span> <span class="variable">$code</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="keyword">while</span> <span class="operator">(</span><span class="number">1</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">die</span> <span class="string">"Body timeout"</span> <span class="keyword">unless</span> <span class="variable">$sel</span><span class="operator">-&gt;</span><span class="variable">can_read</span><span class="operator">(</span><span class="number">10</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$buf</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$n</span> <span class="operator">=</span> <span class="variable">$s</span><span class="operator">-&gt;</span><span class="variable">read_entity_body</span><span class="operator">(</span><span class="variable">$buf</span><span class="operator">,</span> <span class="number">1024</span><span class="operator">);</span>
+    <span class="keyword">last</span> <span class="keyword">unless</span> <span class="variable">$n</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$buf</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Same interface as <code>Net::HTTP</code> but it will never try multiple reads when the read_response_headers() or read_entity_body() methods are invoked. This make it possible to multiplex multiple Net::HTTP::NB using select without risk blocking.</p>
+
+<p>If read_response_headers() did not see enough data to complete the headers an empty list is returned.</p>
+
+<p>If read_entity_body() did not see new entity data in its read the value -1 is returned.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/Net/HTTP.html">Net::HTTP</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Gisle Aas &lt;gisle@activestate.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2001-2017 by Gisle Aas.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

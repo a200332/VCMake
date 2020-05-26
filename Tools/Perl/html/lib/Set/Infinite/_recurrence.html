@@ -1,0 +1,164 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#CONSTANTS">CONSTANTS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Set::Infinite::_recurrence - Extends Set::Infinite with recurrence functions</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="variable">$recurrence</span> <span class="operator">=</span> <span class="variable">$base_set</span><span class="operator">-&gt;</span><span class="variable">_recurrence</span> <span class="operator">(</span> <span class="operator">\&amp;</span><span class="keyword">next</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">previous</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is an internal class used by the DateTime::Set module. The API is subject to change.</p>
+
+<p>It provides all functionality provided by Set::Infinite, plus the ability to define recurrences with arbitrary objects, such as dates.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<ul>
+
+<li><p>_recurrence ( \&amp;next, \&amp;previous )</p>
+
+<p>Creates a recurrence set. The set is defined inside a &#39;base set&#39;.</p>
+
+<pre><code>   <span class="variable">$recurrence</span> <span class="operator">=</span> <span class="variable">$base_set</span><span class="operator">-&gt;</span><span class="variable">_recurrence</span> <span class="operator">(</span> <span class="operator">\&amp;</span><span class="keyword">next</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">previous</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The recurrence functions take one argument, and return the &#39;next&#39; or the &#39;previous&#39; occurrence.</p>
+
+<p>Example: defines the set of all &#39;integer numbers&#39;:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Set::Infinite::_recurrence</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">POSIX</span> <span class="string">qw(floor)</span><span class="operator">;</span>
+    
+    <span class="comment"># define the recurrence span</span>
+    <span class="keyword">my</span> <span class="variable">$forever</span> <span class="operator">=</span> <span class="variable">Set::Infinite::_recurrence</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> 
+        <span class="variable">Set::Infinite::_recurrence::NEG_INFINITY</span><span class="operator">,</span> 
+        <span class="variable">Set::Infinite::_recurrence::INFINITY</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$recurrence</span> <span class="operator">=</span> <span class="variable">$forever</span><span class="operator">-&gt;</span><span class="variable">_recurrence</span><span class="operator">(</span>
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>   <span class="comment"># next</span>
+                <span class="variable">floor</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">+</span> <span class="number">1</span> <span class="operator">)</span> 
+            <span class="operator">},</span>   
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>   <span class="comment"># previous</span>
+                <span class="keyword">my</span> <span class="variable">$tmp</span> <span class="operator">=</span> <span class="variable">floor</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">);</span> 
+                <span class="variable">$tmp</span> <span class="operator">&lt;</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">?</span> <span class="variable">$tmp</span> <span class="operator">:</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">-</span> <span class="number">1</span>
+            <span class="operator">},</span>   
+    <span class="operator">);</span>
+    
+    <span class="keyword">print</span> <span class="string">"sample recurrence "</span><span class="operator">,</span>
+          <span class="variable">$recurrence</span><span class="operator">-&gt;</span><span class="variable">intersection</span><span class="operator">(</span> <span class="operator">-</span><span class="number">5</span><span class="operator">,</span> <span class="number">5</span> <span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="comment"># sample recurrence -5,-4,-3,-2,-1,0,1,2,3,4,5</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="number">234.567</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="string">"next occurrence after </span><span class="variable">$x</span><span class="string"> = "</span><span class="operator">,</span>
+              <span class="variable">$recurrence</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">param</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;(</span> <span class="variable">$x</span> <span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>  <span class="comment"># 235</span>
+        <span class="keyword">print</span> <span class="string">"previous occurrence before </span><span class="variable">$x</span><span class="string"> = "</span><span class="operator">,</span>
+              <span class="variable">$recurrence</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">param</span><span class="operator">}[</span><span class="number">2</span><span class="operator">]</span><span class="operator">-&gt;(</span> <span class="variable">$x</span> <span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>  <span class="comment"># 234</span>
+    <span class="operator">}</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="number">234</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="string">"next occurrence after </span><span class="variable">$x</span><span class="string"> = "</span><span class="operator">,</span>
+              <span class="variable">$recurrence</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">param</span><span class="operator">}[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;(</span> <span class="variable">$x</span> <span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>  <span class="comment"># 235</span>
+        <span class="keyword">print</span> <span class="string">"previous occurrence before </span><span class="variable">$x</span><span class="string"> = "</span><span class="operator">,</span>
+              <span class="variable">$recurrence</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">param</span><span class="operator">}[</span><span class="number">2</span><span class="operator">]</span><span class="operator">-&gt;(</span> <span class="variable">$x</span> <span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>  <span class="comment"># 233</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</li>
+<li><p>is_forever</p>
+
+<p>Returns true if the set is a single span, ranging from -Infinity to Infinity.</p>
+
+</li>
+<li><p>_is_recurrence</p>
+
+<p>Returns true if the set is an unbounded recurrence, ranging from -Infinity to Infinity.</p>
+
+</li>
+</ul>
+
+<h1 id="CONSTANTS">CONSTANTS</h1>
+
+<ul>
+
+<li><p>INFINITY</p>
+
+<p>The <code>Infinity</code> value.</p>
+
+</li>
+<li><p>NEG_INFINITY</p>
+
+<p>The <code>-Infinity</code> value.</p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is offered through the <code>datetime@perl.org</code> mailing list.</p>
+
+<p>Please report bugs using rt.cpan.org</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Flavio Soibelmann Glock &lt;fglock@gmail.com&gt;</p>
+
+<p>The recurrence generation algorithm is based on an idea from Dave Rolsky.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2003 Flavio Soibelmann Glock. All rights reserved. This program is free software; you can distribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Set::Infinite</p>
+
+<p>DateTime::Set</p>
+
+<p>For details on the Perl DateTime Suite project please see <a href="http://datetime.perl.org">http://datetime.perl.org</a>.</p>
+
+
+</body>
+
+</html>
+
+

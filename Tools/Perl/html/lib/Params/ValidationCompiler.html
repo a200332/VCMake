@@ -1,0 +1,258 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#validation_for">validation_for(...)</a></li>
+      <li><a href="#source_for">source_for(...)</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Params::ValidationCompiler - Build an optimized subroutine parameter validator once, use it forever</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.26</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Types::Standard</span> <span class="string">qw( Int Str )</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Params::ValidationCompiler</span> <span class="string">qw( validation_for )</span><span class="operator">;</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$validator</span> <span class="operator">=</span> <span class="variable">validation_for</span><span class="operator">(</span>
+            <span class="string">params</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">type</span> <span class="operator">=&gt;</span> <span class="variable">Int</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                    <span class="string">type</span>     <span class="operator">=&gt;</span> <span class="variable">Str</span><span class="operator">,</span>
+                    <span class="string">optional</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+                <span class="string">baz</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                    <span class="string">type</span>    <span class="operator">=&gt;</span> <span class="variable">Int</span><span class="operator">,</span>
+                    <span class="string">default</span> <span class="operator">=&gt;</span> <span class="number">42</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    
+        <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">%args</span> <span class="operator">=</span> <span class="variable">$validator</span><span class="operator">-&gt;(</span><span class="variable">@_</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$validator</span> <span class="operator">=</span> <span class="variable">validation_for</span><span class="operator">(</span>
+            <span class="string">params</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+                <span class="operator">{</span> <span class="string">type</span> <span class="operator">=&gt;</span> <span class="variable">Int</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="operator">{</span>
+                    <span class="string">type</span>     <span class="operator">=&gt;</span> <span class="variable">Str</span><span class="operator">,</span>
+                    <span class="string">optional</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    
+        <span class="keyword">sub</span><span class="variable"> bar </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$int</span><span class="operator">,</span> <span class="variable">$str</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">$validator</span><span class="operator">-&gt;(</span><span class="variable">@_</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$validator</span> <span class="operator">=</span> <span class="variable">validation_for</span><span class="operator">(</span>
+            <span class="string">params</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+                <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">type</span> <span class="operator">=&gt;</span> <span class="variable">Int</span> <span class="operator">}</span><span class="operator">,</span>
+                <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                    <span class="string">type</span>     <span class="operator">=&gt;</span> <span class="variable">Str</span><span class="operator">,</span>
+                    <span class="string">optional</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">]</span><span class="operator">,</span>
+            <span class="string">named_to_list</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    
+        <span class="keyword">sub</span><span class="variable"> baz </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$foo</span><span class="operator">,</span> <span class="variable">$bar</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">$validator</span><span class="operator">-&gt;(</span><span class="variable">@_</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module creates a customized, highly efficient parameter checking subroutine. It can handle named or positional parameters, and can return the parameters as key/value pairs or a list of values.</p>
+
+<p>In addition to type checks, it also supports parameter defaults, optional parameters, and extra &quot;slurpy&quot; parameters.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>This module has two options exports, <code>validation_for</code> and <code>source_for</code>. Both of these subs accept the same options:</p>
+
+<ul>
+
+<li><p>params</p>
+
+<p>An arrayref or hashref containing a parameter specification.</p>
+
+<p>If you pass a hashref then the generated validator sub will expect named parameters. The <code>params</code> value should be a hashref where the parameter names are keys and the specs are the values.</p>
+
+<p>If you pass an arrayref and <code>named_to_list</code> is false, the validator will expect positional params. Each element of the <code>params</code> arrayref should be a parameter spec.</p>
+
+<p>If you pass an arrayref and <code>named_to_list</code> is true, the validator will expect named params, but will return a list of values. In this case the arrayref should contain a <i>list</i> of key/value pairs, where parameter names are the keys and the specs are the values.</p>
+
+<p>Each spec can contain either a boolean or hashref. If the spec is a boolean, this indicates required (true) or optional (false).</p>
+
+<p>The spec hashref accepts the following keys:</p>
+
+<ul>
+
+<li><p>type</p>
+
+<p>A type object. This can be a <a href="../../lib/Moose.html">Moose</a> type (from <a href="../../lib/Moose.html">Moose</a> or <a>MooseX::Types</a>), a <a>Type::Tiny</a> type, or a <a href="../../lib/Specio.html">Specio</a> type.</p>
+
+<p>If the type has coercions, those will always be used.</p>
+
+</li>
+<li><p>default</p>
+
+<p>This can either be a simple (non-reference) scalar or a subroutine reference. The sub ref will be called without any arguments (for now).</p>
+
+</li>
+<li><p>optional</p>
+
+<p>A boolean indicating whether or not the parameter is optional. By default, parameters are required unless you provide a default.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p>slurpy</p>
+
+<p>If this is a simple true value, then the generated subroutine accepts additional arguments not specified in <code>params</code>. By default, extra arguments cause an exception.</p>
+
+<p>You can also pass a type constraint here, in which case all extra arguments must be values of the specified type.</p>
+
+</li>
+<li><p>named_to_list</p>
+
+<p>If this is true, the generated subroutine will expect a list of key-value pairs or a hashref and it will return a list containing only values. The <code>params</code> you pass must be a arrayref of key-value pairs. The order of these pairs determines the order in which values are returned.</p>
+
+<p>You cannot combine <code>slurpy</code> with <code>named_to_list</code> as there is no way to know how to order the extra return values.</p>
+
+</li>
+</ul>
+
+<h2 id="validation_for">validation_for(...)</h2>
+
+<p>This returns a subroutine that implements the specific parameter checking. This subroutine expects to be given the parameters to validate in <code>@_</code>. If all the parameters are valid, it will return the validated parameters (with defaults as appropriate), either as a list of key-value pairs or as a list of just values. If any of the parameters are invalid it will throw an exception.</p>
+
+<p>For validators expected named params, the generated subroutine accepts either a list of key-value pairs or a single hashref. Otherwise the validator expects a list of values.</p>
+
+<p>For now, you must shift off the invocant yourself.</p>
+
+<p>This subroutine accepts the following additional parameters:</p>
+
+<ul>
+
+<li><p>name</p>
+
+<p>If this is given, then the generated subroutine will be named using <a href="../../lib/Sub/Util.html">Sub::Util</a>. This is strongly recommended as it makes it possible to distinguish different check subroutines when profiling or in stack traces.</p>
+
+<p>This name will also be used in some exception messages, even if <a href="../../lib/Sub/Util.html">Sub::Util</a> is not available.</p>
+
+<p>Note that you must install <a href="../../lib/Sub/Util.html">Sub::Util</a> yourself separately, as it is not required by this distribution, in order to avoid requiring a compiler.</p>
+
+</li>
+<li><p>name_is_optional</p>
+
+<p>If this is true, then the name is ignored when <code>Sub::Util</code> is not installed. If this is false, then passing a name when <a href="../../lib/Sub/Util.html">Sub::Util</a> cannot be loaded causes an exception.</p>
+
+<p>This is useful for CPAN modules where you want to set a name if you can, but you do not want to add a prerequisite on <a href="../../lib/Sub/Util.html">Sub::Util</a>.</p>
+
+</li>
+</ul>
+
+<h2 id="source_for">source_for(...)</h2>
+
+<p>This returns a two element list. The first is a string containing the source code for the generated sub. The second is a hashref of &quot;environment&quot; variables to be used when generating the subroutine. These are the arguments that are passed to <a href="../../lib/Eval/Closure.html">Eval::Closure</a>.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Params-ValidationCompiler/issues">https://github.com/houseabsolute/Params-ValidationCompiler/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Params-ValidationCompiler can be found at <a href="https://github.com/houseabsolute/Params-ValidationCompiler">https://github.com/houseabsolute/Params-ValidationCompiler</a>.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Gregory Oschwald &lt;goschwald@maxmind.com&gt;</p>
+
+</li>
+<li><p>Gregory Oschwald &lt;oschwald@gmail.com&gt;</p>
+
+</li>
+<li><p>Tomasz Konojacki &lt;me@xenu.pl&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2016 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

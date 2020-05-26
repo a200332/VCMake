@@ -1,0 +1,493 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#General-Info">General Info</a></li>
+  <li><a href="#Instructions-for-10.7.x-Lion">Instructions for 10.7.x (Lion)</a></li>
+  <li><a href="#Instructions-for-10.6.x-Snow-Leopard">Instructions for 10.6.x (Snow Leopard)</a></li>
+  <li><a href="#Instructions-for-10.2.x-Jaguar">Instructions for 10.2.x (Jaguar)</a></li>
+  <li><a href="#Instructions-for-10.3.x-Panther">Instructions for 10.3.x (Panther)</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::Oracle::Troubleshooting::Macos - Tips and Hints to Troubleshoot DBD::Oracle on MacOs</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.74</p>
+
+<h1 id="General-Info">General Info</h1>
+
+<p>These instructions allow for the compilation and successful testing of DBD::Oracle on MacOS X 10.2.4 and higher, using Oracle 9iR2 DR (Release 9.2.0.1.0) or the 10g Instant Client release (10.1.0.3 at the time of writing).</p>
+
+<p>MacOS X DBD::Oracle has been tested (and used) under Jaguar (10.2.x), Panther (10.3.x), Snow Leopard (10.6.x), Lion (10.7.x). Jaguar comes with a Perl version of 5.6.0., which I can report to work with DBD::Oracle 1.14 and higher once you take certain steps (see below). You may want to install a later perl, e.g., Perl 5.8.x. Please refer to:</p>
+
+<pre><code>        Installing Perl 5.8 on Jaguar
+        http://developer.apple.com/internet/macosx/perl.html</code></pre>
+
+<p>for Perl 5.8.0 installation instructions.</p>
+
+<p>DBD::Oracle is likely to not install out of the box on MacOS X 10.2. nor on 10.3. Manual but different changes will most likely be required on both versions.</p>
+
+<p>The key problem on 10.2. (Jaguar) is a symbol clash (caused by a function poll() named identically) between the IO library in at least Perl 5.6.0 (which is the version that comes with 10.2) and the Oracle client library in 9iR2 developer&#39;s release for MacOS X. The symptom is that your build appears to compile fine but then fails in the link stage. If you are running a (possibly self-installed) version of Perl other than 5.6.0, there&#39;s a chance that you are not affected by the symbol clash. So, try to build first without any special measures, and only resort to the instructions below if your build fails in the link stage with a duplicate symbol error. Note: if it fails to even compile, solve that problem first since it is not due to the symbol clash.</p>
+
+<p>The key problem on 10.3 (Panther) is that the default perl that comes with the system is compiled with multi-threading turned on, which at least with the 9iR2 developer&#39;s release exposes a memory leak. Your DBD::Oracle build will compile, test, and install fine, but if you execute the same prepared statement multiple times, the process will quickly run up hundreds of megabytes of RAM, and depending on how much memory you have it will die sooner or later.</p>
+
+<p>Oracle recently released an &quot;Instant Client&quot; for MacOSX 10.3 (Panther), which as far as I can attest has none of the problems above. Since it is also a very compact download (actually, a series of downloads) I highly recommend you install and use the Instant Client if you are on 10.3 (Panther) and you do not intend to run the Oracle database server on your MacOSX box. See below (Instructions for 10.3.x) for details.</p>
+
+<h1 id="Instructions-for-10.7.x-Lion">Instructions for 10.7.x (Lion)</h1>
+
+<p>Perl on Lion and later is built with 64-bit support, and therefore requires the 64-bit Instant Client. As of this writing, only Instant Client 11.2 (64-bit) actually works. The 64-bit Instant Client 10.2 is <a href="http://only4left.jpiwowar.com/2011/08/instant-client-osx-lion-32-bit-only/">incompatible with Lion</a>. We therefore recommend the 11.2 client. If you must Instant Client 10.2, you may need to recompile Perl with 32-bit support.</p>
+
+<p>Either way, setup and configuration is the same:</p>
+
+<ul>
+
+<li><p>Download and install the basic, sqlplus, and sdk instantclient libraries and install them in a central location, such as <i>/usr/oracle_instantclient</i>. <a href="http://www.oracle.com/technetwork/topics/intel-macsoft-096467.html">Downloads here</a></p>
+
+</li>
+<li><p>Create a symlink from <i>libclntsh.dylib.10.1</i> to <i>libclntsh.dylib</i>:</p>
+
+<pre><code>  cd /usr/oracle_instantclient/
+  ln -s libclntsh.dylib.* libclntsh.dylib
+  ln -s libocci.dylib.* libocci.dylib</code></pre>
+
+</li>
+<li><p>Update your environment to point to the libraries:</p>
+
+<pre><code>  export ORACLE_HOME=/usr/oracle_instantclient
+  export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/oracle_instantclient</code></pre>
+
+</li>
+<li><p>You should now be able to install DBD::Oracle from CPAN:</p>
+
+<pre><code>     cpan DBD::Oracle</code></pre>
+
+</li>
+</ul>
+
+<h1 id="Instructions-for-10.6.x-Snow-Leopard">Instructions for 10.6.x (Snow Leopard)</h1>
+
+<p>These are taken from a stackoverflow answer by &quot;nickisfat&quot; who gave his/her permission for its inclusion here. You can see the original question and answers at http://stackoverflow.com/questions/5964999.</p>
+
+<p>Getting a mac install of perl to play nicely with oracle is a bit of a pain - once it&#39;s running it is fantastic, getting it running is a little frustrating..</p>
+
+<p>The below has worked for me on a few different intel macs, there could well be superfluous steps in there and it is likely not going to be the same for other platforms.</p>
+
+<p>This will require use of shell, the root user and a bit of CPANing - nothing too onerous</p>
+
+<p>First off create a directory for the oracle pap - libraries, instant client etc</p>
+
+<p>sudo mkdir /usr/oracle_instantClient64</p>
+
+<p>Download and extract all 64 bit instant client packages from oracle to the above directory</p>
+
+<p>Create a symlink within that directory for one of the files in there</p>
+
+<p>sudo cd /usr/oracle_instantClient64 sudo ln -s /usr/oracle_instantClient64/libclntsh.dylib.10.1 libclntsh.dylib</p>
+
+<p>The following dir is hardcoded into the oracle instant client - god knows why - so need to create and symlink it</p>
+
+<p>sudo mkdir -p /b/227/rdbms/ sudo cd /b/227/rdbms/ sudo ln -s /usr/oracle_instantClient64/ lib</p>
+
+<p>Need to add a couple of environment variables, so edit /etc/profile and add them so they exist for all users:</p>
+
+<p>export ORACLE_HOME=/usr/oracle_instantClient64 export DYLD_LIBRARY_PATH=/usr/oracle_instantClient64</p>
+
+<p>Now try and install DBD::Oracle through CPAN - this will fail, but it means any dependencies will be downloaded and it retrieves the module for us</p>
+
+<p>sudo perl -MCPAN -e shell install DBD::Oracle</p>
+
+<p>When this fails exit CPAN and head to your .cpan/build dir - if you used automatic config of CPAN it&#39;ll be</p>
+
+<p>cd ~/.cpan/build</p>
+
+<p>if you didn&#39;t auto configure you can find your build directory with the following command in CPAN</p>
+
+<p>o conf build_dir</p>
+
+<p>Once in the build dir look for the DBD::Oracle dir which has just been created (it&#39;ll be called something like DBD-Oracle-1.28-?) and cd into it.</p>
+
+<p>Now we need to switch to the root user. Root isn&#39;t enabled as default in osx - for details on enabling see this post on the apple website</p>
+
+<p>Once logged in as root we need to set the above environment variables for root:</p>
+
+<p>export ORACLE_HOME=/usr/oracle_instantClient64 export DYLD_LIBRARY_PATH=/usr/oracle_instantClient64</p>
+
+<p>Now while still logged in as root we need to run the makefile for the module, then make, then install</p>
+
+<p>perl Makefile.pl make install</p>
+
+<p>Assuming that all worked without error log out of root: we&#39;re DBD&#39;d up! If this didn&#39;t work it&#39;s time to bust out google on whatever errors you&#39;re seeing</p>
+
+<p>Now just to install the DBI module</p>
+
+<p>sudo perl -MCPAN -e shell install DBI</p>
+
+<p>Now you&#39;re all set - enjoy your perly oracley new life</p>
+
+<h1 id="Instructions-for-10.2.x-Jaguar">Instructions for 10.2.x (Jaguar)</h1>
+
+<p>1) Install Oracle exactly per Oracle documentation. If you change install locations, then you&#39;ll need to modify paths accordingly.</p>
+
+<p>2) There are two ways to remedy the symbol clash. Either edit the symbol table of the Oracle client library $ORACLE_HOME/lib/libclntsh.dylib.9.0 such that the symbol _poll is no longer exported. Alternatively, download, patch, and re-install the perl IO modules. I could not successfully repeat the report for the former, but I did succeed by doing the latter. Instructions for both follow nonetheless.</p>
+
+<pre><code>  <span class="number">2</span><span class="variable">a</span><span class="operator">)</span> <span class="variable">SKIP</span> <span class="variable">IF</span> <span class="variable">YOU</span> <span class="variable">WANT</span> <span class="variable">TO</span> <span class="variable">OR</span> <span class="variable">HAVE</span> <span class="variable">SUCCESSFULLY</span> <span class="variable">TRIED</span> <span class="number">2</span><span class="variable">b</span><span class="operator">).</span>  <span class="variable">Make</span> <span class="variable">a</span>
+    <span class="variable">backup</span> <span class="variable">copy</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">$ORACLE_HOME</span><span class="operator">/</span><span class="variable">lib</span><span class="operator">/</span><span class="variable">libclntsh</span><span class="operator">.</span><span class="variable">dylib</span><span class="number">.9</span><span class="operator">.</span><span class="number">0</span> <span class="variable">file</span><span class="operator">,</span> <span class="keyword">or</span>
+    <span class="variable">the</span> <span class="variable">file</span> <span class="variable">this</span> <span class="variable">name</span> <span class="variable">points</span> <span class="variable">to</span><span class="operator">,</span> <span class="variable">since</span> <span class="variable">we're</span> <span class="variable">about</span> <span class="variable">to</span> <span class="variable">modify</span> <span class="variable">that</span>
+    <span class="variable">library</span><span class="operator">.</span>  <span class="variable">Note</span> <span class="variable">that</span> <span class="variable">the</span> <span class="string">".9.0"</span> <span class="variable">suffix</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">file</span> <span class="variable">name</span> <span class="variable">is</span> <span class="variable">version</span>
+    <span class="variable">dependent</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">that</span> <span class="variable">you</span> <span class="variable">want</span> <span class="variable">to</span> <span class="variable">work</span> <span class="variable">with</span> <span class="variable">the</span> <span class="variable">file</span> <span class="variable">pointed</span> <span class="variable">to</span>
+    <span class="variable">through</span> <span class="variable">one</span> <span class="keyword">or</span> <span class="variable">a</span> <span class="variable">series</span> <span class="variable">of</span> <span class="variable">symbolic</span> <span class="variable">links</span> <span class="variable">rather</span> <span class="variable">than</span> <span class="variable">any</span> <span class="variable">of</span> <span class="variable">the</span>
+    <span class="variable">symbolic</span> <span class="variable">links</span> <span class="operator">(</span><span class="variable">e</span><span class="operator">.</span><span class="variable">g</span><span class="operator">.,</span> <span class="variable">one</span> <span class="variable">will</span> <span class="variable">be</span> <span class="variable">called</span> <span class="variable">libclntsh</span><span class="operator">.</span><span class="variable">dylib</span><span class="operator">).</span>
+  
+    <span class="variable">As</span> <span class="variable">user</span> <span class="string">'oracle'</span> <span class="variable">execute</span> <span class="variable">the</span> <span class="variable">following</span> <span class="variable">command</span> <span class="variable">to</span> <span class="variable">fix</span> <span class="variable">namespace</span>
+    <span class="variable">collisions</span> <span class="variable">in</span> <span class="variable">Oracle's</span> <span class="variable">dynamic</span> <span class="variable">libraries</span><span class="operator">.</span>
+  
+    <span class="variable">nmedit</span> <span class="keyword">-R</span> <span class="operator">.</span><span class="regex">/hints/macos</span><span class="variable">_lib</span><span class="operator">.</span><span class="variable">syms</span> <span class="variable">$ORACLE_HOME</span><span class="operator">/</span><span class="variable">lib</span><span class="operator">/</span><span class="variable">libclntsh</span><span class="operator">.</span><span class="variable">dylib</span><span class="number">.9</span><span class="operator">.</span><span class="number">0</span>
+  
+    <span class="operator">***</span> <span class="variable">Recall</span> <span class="variable">the</span> <span class="variable">above</span> <span class="variable">caveats</span> <span class="variable">regarding</span> <span class="variable">the</span> <span class="variable">file</span> <span class="variable">name</span><span class="operator">.</span>
+  
+    <span class="variable">The</span> <span class="variable">problem</span> <span class="variable">with</span> <span class="variable">this</span> <span class="variable">is</span> <span class="variable">that</span> <span class="variable">the</span> <span class="variable">version</span> <span class="variable">of</span> <span class="variable">nm</span> <span class="variable">that</span> <span class="variable">comes</span> <span class="variable">with</span>
+    <span class="variable">Jaguar</span> <span class="variable">doesn't</span> <span class="variable">support</span> <span class="variable">the</span> <span class="keyword">-R</span> <span class="variable">flag</span><span class="operator">.</span> <span class="variable">I'd</span> <span class="variable">be</span> <span class="variable">grateful</span> <span class="variable">to</span> <span class="variable">anyone</span> <span class="variable">who</span>
+    <span class="variable">can</span> <span class="variable">suggest</span> <span class="variable">how</span> <span class="variable">to</span> <span class="variable">edit</span> <span class="variable">the</span> <span class="variable">symbol</span> <span class="variable">table</span> <span class="variable">of</span> <span class="variable">libraries</span> <span class="variable">on</span> <span class="variable">MacOS</span> <span class="variable">X</span><span class="operator">.</span>
+  
+  <span class="number">2</span><span class="variable">b</span><span class="operator">)</span> <span class="variable">SKIP</span> <span class="variable">IF</span> <span class="variable">YOU</span> <span class="variable">WANT</span> <span class="variable">TO</span> <span class="variable">OR</span> <span class="variable">HAVE</span> <span class="variable">SUCCESSFULLY</span> <span class="variable">TRIED</span> <span class="number">2</span><span class="variable">a</span><span class="operator">).</span> <span class="variable">In</span> <span class="variable">this</span>
+    <span class="variable">variant</span><span class="operator">,</span> <span class="variable">we</span> <span class="variable">will</span> <span class="variable">patch</span> <span class="variable">the</span> <span class="variable">Perl</span> <span class="variable">IO</span> <span class="variable">modules</span> <span class="variable">to</span> <span class="variable">change</span> <span class="variable">the</span> <span class="variable">name</span> <span class="variable">of</span>
+    <span class="variable">the</span> <span class="variable">poll</span><span class="operator">()</span> <span class="variable">function</span><span class="operator">,</span> <span class="variable">as</span> <span class="variable">that</span> <span class="variable">is</span> <span class="variable">where</span> <span class="variable">it</span> <span class="variable">is</span> <span class="keyword">defined</span><span class="operator">.</span> <span class="variable">In</span> <span class="variable">this</span> <span class="variable">case</span><span class="operator">,</span>
+    <span class="variable">we</span> <span class="keyword">do</span> <span class="keyword">not</span> <span class="variable">need</span> <span class="variable">to</span> <span class="keyword">do</span> <span class="variable">anything</span> <span class="variable">with</span> <span class="variable">the</span> <span class="variable">Oracle</span> <span class="variable">libraries</span><span class="operator">.</span> <span class="variable">Follow</span>
+    <span class="variable">these</span> <span class="variable">steps</span><span class="operator">:</span>
+  
+    <span class="operator">-</span> <span class="variable">Download</span> <span class="variable">the</span> <span class="variable">module</span> <span class="variable">IO</span> <span class="operator">(</span><span class="variable">IO</span><span class="operator">.</span><span class="variable">pm</span><span class="operator">)</span> <span class="variable">from</span> <span class="variable">CPAN</span> <span class="keyword">and</span> <span class="keyword">unpack</span> <span class="variable">it</span><span class="operator">.</span> <span class="variable">Check</span>
+      <span class="variable">the</span> <span class="variable">documentation</span> <span class="variable">as</span> <span class="variable">to</span> <span class="variable">whether</span> <span class="variable">the</span> <span class="variable">version</span> <span class="variable">is</span> <span class="variable">compatible</span> <span class="variable">with</span>
+      <span class="variable">your</span> <span class="variable">version</span> <span class="variable">of</span> <span class="variable">Perl</span><span class="operator">;</span> <span class="variable">I</span> <span class="variable">used</span> <span class="variable">v1</span><span class="number">.20</span> <span class="variable">with</span> <span class="variable">Perl</span> <span class="number">5.6</span><span class="operator">.</span><span class="number">0</span> <span class="keyword">and</span> <span class="variable">had</span>
+      <span class="variable">success</span><span class="operator">.</span>
+  
+    <span class="operator">-</span> <span class="variable">The</span> <span class="variable">files</span> <span class="variable">IO</span><span class="operator">.</span><span class="variable">xs</span><span class="operator">,</span> <span class="variable">poll</span><span class="operator">.</span><span class="variable">c</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">poll</span><span class="operator">.</span><span class="variable">h</span> <span class="variable">need</span> <span class="variable">to</span> <span class="variable">be</span> <span class="variable">patched</span><span class="operator">.</span> <span class="variable">Apply</span>
+      <span class="variable">the</span> <span class="variable">following</span> <span class="variable">patches</span><span class="operator">,</span> <span class="variable">e</span><span class="operator">.</span><span class="variable">g</span><span class="operator">.,</span> <span class="variable">by</span> <span class="variable">cutting</span> <span class="keyword">and</span> <span class="variable">pasting</span> <span class="variable">the</span> <span class="variable">marked</span>
+      <span class="variable">section</span> <span class="variable">into</span> <span class="variable">a</span> <span class="variable">file</span> <span class="variable">perlio</span><span class="operator">.</span><span class="variable">patch</span> <span class="keyword">and</span> <span class="variable">using</span> <span class="variable">that</span> <span class="variable">file</span> <span class="variable">as</span> <span class="variable">input</span>
+      <span class="keyword">for</span> <span class="variable">patch</span><span class="operator">:</span>
+  
+      <span class="operator">$ </span><span class="variable">patch</span> <span class="operator">-</span><span class="variable">p0</span> <span class="operator">&lt;</span> <span class="variable">perlio</span><span class="operator">.</span><span class="variable">patch</span>
+  
+      <span class="variable">The</span> <span class="variable">patch</span> <span class="variable">will</span> <span class="variable">basically</span> <span class="keyword">rename</span> <span class="variable">the</span> <span class="variable">C</span> <span class="variable">implementation</span> <span class="variable">of</span> <span class="variable">poll</span><span class="operator">()</span>
+      <span class="variable">to</span> <span class="variable">io_poll</span><span class="operator">().</span> <span class="variable">The</span> <span class="variable">other</span> <span class="variable">patches</span> <span class="variable">were</span> <span class="variable">necessary</span> <span class="variable">to</span> <span class="variable">make</span> <span class="variable">v1</span><span class="number">.20</span>
+      <span class="variable">compile</span> <span class="variable">with</span> <span class="variable">Perl</span> <span class="number">5.6</span><span class="operator">.</span><span class="number">0</span><span class="operator">;</span> <span class="variable">they</span> <span class="variable">may</span> <span class="keyword">not</span> <span class="variable">be</span> <span class="variable">necessary</span> <span class="variable">with</span> <span class="variable">other</span>
+      <span class="variable">versions</span> <span class="variable">of</span> <span class="variable">IO</span> <span class="keyword">and</span> <span class="variable">Perl</span><span class="operator">,</span> <span class="variable">respectively</span><span class="operator">.</span>
+  
+        <span class="operator">+=+=+=+=+=+=+=</span> <span class="variable">Cut</span> <span class="variable">after</span> <span class="variable">this</span> <span class="variable">line</span>
+        <span class="variable">diff</span> <span class="keyword">-c</span> <span class="operator">..</span><span class="regex">/IO-orig/IO</span><span class="operator">-</span><span class="number">1.20</span><span class="operator">/</span><span class="variable">IO</span><span class="operator">.</span><span class="variable">xs</span> <span class="operator">.</span><span class="regex">/IO.xs
+        *** ../IO</span><span class="operator">-</span><span class="variable">orig</span><span class="operator">/</span><span class="variable">IO</span><span class="operator">-</span><span class="number">1.20</span><span class="operator">/</span><span class="variable">IO</span><span class="operator">.</span><span class="variable">xs</span>    <span class="variable">Mon</span> <span class="variable">Jul</span> <span class="number">13</span> <span class="number">23</span><span class="operator">:</span><span class="number">36</span><span class="operator">:</span><span class="number">24</span> <span class="number">1998</span>
+        <span class="operator">---</span> <span class="operator">.</span><span class="regex">/IO.xs     Sat May 10 15:20:02 2003
+        ***************
+        *** 205,211 ****
+                ST(0) = sv_2mortal(newSVpv((char*)&amp;pos, sizeof(Fpos_t)));
+            }
+            else {
+        !           ST(0) = &amp;sv_undef;
+                errno = EINVAL;
+            }
+  
+        --- 205,211 ----
+                ST(0) = sv_2mortal(newSVpv((char*)&amp;pos, sizeof(Fpos_t)));
+            }
+            else {
+        !           ST(0) = &amp;PL_sv_undef;
+                errno = EINVAL;
+            }
+  
+        ***************
+        *** 249,255 ****
+                SvREFCNT_dec(gv);   /</span><span class="operator">*</span> <span class="variable">undo</span> <span class="variable">increment</span> <span class="variable">in</span> <span class="variable">newRV</span><span class="operator">()</span> <span class="operator">*/</span>
+            <span class="operator">}</span>
+            <span class="keyword">else</span> <span class="operator">{</span>
+        <span class="operator">!</span>           <span class="variable">ST</span><span class="operator">(</span><span class="number">0</span><span class="operator">)</span> <span class="operator">=</span> <span class="operator">&amp;</span><span class="variable">sv_undef</span><span class="operator">;</span>
+                <span class="variable">SvREFCNT_dec</span><span class="operator">(</span><span class="variable">gv</span><span class="operator">);</span>
+            <span class="operator">}</span>
+  
+        <span class="operator">---</span> <span class="number">249</span><span class="operator">,</span><span class="number">255</span> <span class="operator">----</span>
+                <span class="variable">SvREFCNT_dec</span><span class="operator">(</span><span class="variable">gv</span><span class="operator">);</span>   <span class="regex">/* undo increment in newRV() */</span>
+            <span class="operator">}</span>
+            <span class="keyword">else</span> <span class="operator">{</span>
+        <span class="operator">!</span>           <span class="variable">ST</span><span class="operator">(</span><span class="number">0</span><span class="operator">)</span> <span class="operator">=</span> <span class="operator">&amp;</span><span class="variable">PL_sv_undef</span><span class="operator">;</span>
+                <span class="variable">SvREFCNT_dec</span><span class="operator">(</span><span class="variable">gv</span><span class="operator">);</span>
+            <span class="operator">}</span>
+  
+        <span class="operator">***************</span>
+        <span class="operator">***</span> <span class="number">272</span><span class="operator">,</span><span class="number">278</span> <span class="operator">****</span>
+            <span class="variable">i</span><span class="operator">++;</span>
+            <span class="variable">fds</span><span class="operator">[</span><span class="variable">j</span><span class="operator">]</span><span class="operator">.</span><span class="variable">revents</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">!</span>     <span class="keyword">if</span><span class="operator">((</span><span class="variable">ret</span> <span class="operator">=</span> <span class="variable">poll</span><span class="operator">(</span><span class="variable">fds</span><span class="operator">,</span><span class="variable">nfd</span><span class="operator">,</span><span class="variable">timeout</span><span class="operator">))</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">for</span><span class="operator">(</span><span class="variable">i</span><span class="operator">=</span><span class="number">1</span><span class="operator">,</span> <span class="variable">j</span><span class="operator">=</span><span class="number">0</span> <span class="operator">;</span> <span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">nfd</span> <span class="operator">;</span> <span class="variable">j</span><span class="operator">++)</span> <span class="operator">{</span>
+                <span class="variable">sv_setiv</span><span class="operator">(</span><span class="variable">ST</span><span class="operator">(</span><span class="variable">i</span><span class="operator">),</span> <span class="variable">fds</span><span class="operator">[</span><span class="variable">j</span><span class="operator">]</span><span class="operator">.</span><span class="variable">fd</span><span class="operator">);</span> <span class="variable">i</span><span class="operator">++;</span>
+                <span class="variable">sv_setiv</span><span class="operator">(</span><span class="variable">ST</span><span class="operator">(</span><span class="variable">i</span><span class="operator">),</span> <span class="variable">fds</span><span class="operator">[</span><span class="variable">j</span><span class="operator">]</span><span class="operator">.</span><span class="variable">revents</span><span class="operator">);</span> <span class="variable">i</span><span class="operator">++;</span>
+        <span class="operator">---</span> <span class="number">272</span><span class="operator">,</span><span class="number">278</span> <span class="operator">----</span>
+            <span class="variable">i</span><span class="operator">++;</span>
+            <span class="variable">fds</span><span class="operator">[</span><span class="variable">j</span><span class="operator">]</span><span class="operator">.</span><span class="variable">revents</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">!</span>     <span class="keyword">if</span><span class="operator">((</span><span class="variable">ret</span> <span class="operator">=</span> <span class="variable">io_poll</span><span class="operator">(</span><span class="variable">fds</span><span class="operator">,</span><span class="variable">nfd</span><span class="operator">,</span><span class="variable">timeout</span><span class="operator">))</span> <span class="operator">&gt;=</span> <span class="number">0</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">for</span><span class="operator">(</span><span class="variable">i</span><span class="operator">=</span><span class="number">1</span><span class="operator">,</span> <span class="variable">j</span><span class="operator">=</span><span class="number">0</span> <span class="operator">;</span> <span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">nfd</span> <span class="operator">;</span> <span class="variable">j</span><span class="operator">++)</span> <span class="operator">{</span>
+                <span class="variable">sv_setiv</span><span class="operator">(</span><span class="variable">ST</span><span class="operator">(</span><span class="variable">i</span><span class="operator">),</span> <span class="variable">fds</span><span class="operator">[</span><span class="variable">j</span><span class="operator">]</span><span class="operator">.</span><span class="variable">fd</span><span class="operator">);</span> <span class="variable">i</span><span class="operator">++;</span>
+                <span class="variable">sv_setiv</span><span class="operator">(</span><span class="variable">ST</span><span class="operator">(</span><span class="variable">i</span><span class="operator">),</span> <span class="variable">fds</span><span class="operator">[</span><span class="variable">j</span><span class="operator">]</span><span class="operator">.</span><span class="variable">revents</span><span class="operator">);</span> <span class="variable">i</span><span class="operator">++;</span>
+        <span class="variable">diff</span> <span class="keyword">-c</span> <span class="operator">..</span><span class="regex">/IO-orig/IO</span><span class="operator">-</span><span class="number">1.20</span><span class="operator">/</span><span class="variable">poll</span><span class="operator">.</span><span class="variable">c</span> <span class="operator">.</span><span class="regex">/poll.c
+        *** ../IO</span><span class="operator">-</span><span class="variable">orig</span><span class="operator">/</span><span class="variable">IO</span><span class="operator">-</span><span class="number">1.20</span><span class="operator">/</span><span class="variable">poll</span><span class="operator">.</span><span class="variable">c</span>   <span class="variable">Wed</span> <span class="variable">Mar</span> <span class="number">18</span> <span class="number">21</span><span class="operator">:</span><span class="number">34</span><span class="operator">:</span><span class="number">00</span> <span class="number">1998</span>
+        <span class="operator">---</span> <span class="operator">.</span><span class="regex">/poll.c    Sat May 10 14:28:22 2003
+        ***************
+        *** 35,41 ****
+        # define POLL_EVENTS_MASK (POLL_CAN_READ | POLL_CAN_WRITE | POLL_HAS_EXCP)
+  
+        int
+        ! poll(fds, nfds, timeout)
+        struct pollfd *fds;
+        unsigned long nfds;
+        int timeout;
+        --- 35,41 ----
+        # define POLL_EVENTS_MASK (POLL_CAN_READ | POLL_CAN_WRITE | POLL_HAS_EXCP)
+  
+        int
+        ! io_poll(fds, nfds, timeout)
+        struct pollfd *fds;
+        unsigned long nfds;
+        int timeout;
+        diff -c ../IO</span><span class="operator">-</span><span class="variable">orig</span><span class="operator">/</span><span class="variable">IO</span><span class="operator">-</span><span class="number">1.20</span><span class="operator">/</span><span class="variable">poll</span><span class="operator">.</span><span class="variable">h</span> <span class="operator">.</span><span class="regex">/poll.h
+        *** ../IO</span><span class="operator">-</span><span class="variable">orig</span><span class="operator">/</span><span class="variable">IO</span><span class="operator">-</span><span class="number">1.20</span><span class="operator">/</span><span class="variable">poll</span><span class="operator">.</span><span class="variable">h</span>   <span class="variable">Wed</span> <span class="variable">Apr</span> <span class="number">15</span> <span class="number">20</span><span class="operator">:</span><span class="number">33</span><span class="operator">:</span><span class="number">02</span> <span class="number">1998</span>
+        <span class="operator">---</span> <span class="operator">.</span><span class="regex">/poll.h    Sat May 10 14:29:11 2003
+        ***************
+        *** 44,50 ****
+        #define POLLHUP         0x0010
+        #define POLLNVAL        0x0020
+  
+        ! int poll _((struct pollfd *, unsigned long, int));
+  
+        #ifndef HAS_POLL
+        #  define HAS_POLL
+        --- 44,50 ----
+        #define POLLHUP         0x0010
+        #define POLLNVAL        0x0020
+  
+        ! int io_poll _((struct pollfd *, unsigned long, int));
+  
+        #ifndef HAS_POLL
+        #  define HAS_POLL
+        +=+=+=+=+=+=+= Cut to the previous line
+  
+    - compile and install as you usually would, making sure that
+      existing but conflicting modules get removed:
+  
+      $ perl Makefile.PL
+      $ make
+      $ make test
+      $ make install UNINST=1
+  
+    - You are done. Continue with 3).
+  </span>
+</code></pre>
+
+<p>3) Install the module DBI as per its instructions, if you haven&#39;t already done so.</p>
+
+<p>4) Install the DBD::Oracle module.</p>
+
+<pre><code>      $ perl Makefile.PL
+      $ make
+      $ make test
+      $ make install</code></pre>
+
+<h1 id="Instructions-for-10.3.x-Panther">Instructions for 10.3.x (Panther)</h1>
+
+<p>I highly recommend you install and use the Oracle 10g Instant Client for MacOSX 10.3. Compared to traditional Oracle client installations it is a very compact download, and it has the memory leak problem fixed. As an added benefit, you will be able to seamlessly connect to 10g databases. Even if you do want to run the database server included in the 9iR2 Developer&#39;s Release, I&#39;d still use the Instant Client for compiling OCI applications or drivers like DBD::Oracle.</p>
+
+<p>If you still decide to use the full 9iR2 DR client, and if all you use DBD::Oracle for on MacOSX is development and test scripts that don&#39;t involve running the same query multiple times or many queries within the same perl process, then note that the memory leak will most likely never affect you in a serious way. In this case you may not need to bother and instead just go ahead, build and install DBD::Oracle straightforwardly without any special measures.</p>
+
+<p>That said, here are the details.</p>
+
+<p>0) (If you decided for the 9iR2 DR client, skip to 1.) If you decided to use the 10g Instant Client, make sure you download and install all parts. (Given that this is perl land you may not need the JDBC driver, but why bother sorting out the 25% you may or may not ever need.) Follow the Oracle instructions and copy the contents of each part into the same destination directory. Change to this destination directory and create a symlink lib pointing to &#39;.&#39; (without the quotes):</p>
+
+<pre><code>   <span class="operator">$ </span><span class="variable">cd</span> <span class="operator">&lt;/</span><span class="variable">path</span><span class="operator">/</span><span class="variable">to</span><span class="operator">/</span><span class="keyword">my</span><span class="operator">/</span><span class="variable">oracle</span><span class="operator">/</span><span class="variable">instantclient</span><span class="operator">&gt;</span>
+   <span class="operator">$ </span><span class="variable">ln</span> <span class="keyword">-s</span> <span class="variable">lib</span> <span class="operator">.</span>
+   
+   <span class="variable">Also</span><span class="operator">,</span> <span class="variable">set</span> <span class="variable">the</span> <span class="variable">environment</span> <span class="variable">variable</span> <span class="variable">ORACLE_HOME</span> <span class="variable">to</span> <span class="variable">the</span> <span class="variable">path</span> <span class="variable">to</span> <span class="variable">your</span>
+   <span class="variable">instantclient</span> <span class="variable">destination</span> <span class="variable">directory</span><span class="operator">.</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="variable">needs</span> <span class="variable">it</span><span class="operator">.</span>
+   
+   <span class="variable">Now</span> <span class="keyword">return</span> <span class="variable">to</span> <span class="variable">your</span> <span class="variable">DBD::Oracle</span> <span class="variable">download</span><span class="operator">.</span> <span class="variable">If</span> <span class="variable">the</span> <span class="variable">version</span> <span class="variable">is</span> <span class="number">1.16</span> <span class="keyword">or</span>
+   <span class="variable">less</span> <span class="variable">you</span> <span class="variable">will</span> <span class="variable">need</span> <span class="variable">to</span> <span class="variable">patch</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span><span class="operator">;</span> <span class="variable">in</span> <span class="variable">later</span> <span class="variable">versions</span> <span class="variable">this</span> <span class="variable">may</span>
+   <span class="variable">be</span> <span class="variable">fixed</span> <span class="variable">already</span><span class="operator">.</span> <span class="variable">Apply</span> <span class="variable">the</span> <span class="variable">following</span> <span class="variable">patch</span><span class="operator">,</span> <span class="variable">e</span><span class="operator">.</span><span class="variable">g</span><span class="operator">.,</span> <span class="variable">by</span> <span class="variable">cutting</span> <span class="keyword">and</span>
+   <span class="variable">pasting</span> <span class="variable">into</span> <span class="variable">a</span> <span class="variable">file</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span><span class="operator">.</span><span class="variable">patch</span> <span class="keyword">and</span> <span class="variable">then</span> <span class="variable">executing</span>
+   
+   <span class="operator">$ </span><span class="variable">patch</span> <span class="operator">-</span><span class="variable">p0</span> <span class="operator">&lt;</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span><span class="operator">.</span><span class="variable">patch</span>
+   
+   <span class="variable">Here</span> <span class="variable">is</span> <span class="variable">the</span> <span class="variable">patch</span><span class="operator">:</span>
+   
+    <span class="operator">+=+=+=+=+=+=+=</span> <span class="variable">Cut</span> <span class="variable">after</span> <span class="variable">this</span> <span class="variable">line</span>
+    <span class="operator">***</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span><span class="operator">.</span><span class="variable">orig</span>        <span class="variable">Fri</span> <span class="variable">Oct</span> <span class="number">22</span> <span class="number">02</span><span class="operator">:</span><span class="number">07</span><span class="operator">:</span><span class="number">04</span> <span class="number">2004</span>
+    <span class="operator">---</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span>     <span class="variable">Fri</span> <span class="variable">May</span> <span class="number">13</span> <span class="number">14</span><span class="operator">:</span><span class="number">28</span><span class="operator">:</span><span class="number">53</span> <span class="number">2005</span>
+    <span class="operator">***************</span>
+    <span class="operator">***</span> <span class="number">1252</span><span class="operator">,</span><span class="number">1257</span> <span class="operator">****</span>
+    <span class="operator">---</span> <span class="number">1252</span><span class="operator">,</span><span class="number">1258</span> <span class="operator">----</span>
+        <span class="keyword">print</span> <span class="string">"Found </span><span class="variable">$dir</span><span class="string">/</span><span class="variable">$_</span><span class="string">\n"</span> <span class="keyword">if</span> <span class="variable">$::opt_d</span><span class="operator">;</span>
+        <span class="operator">},</span> <span class="string">"</span><span class="variable">$OH</span><span class="string">/rdbms"</span><span class="operator">,</span>
+            <span class="string">"</span><span class="variable">$OH</span><span class="string">/plsql"</span><span class="operator">,</span> <span class="comment"># oratypes.h sometimes here (eg HPUX 11.23 Itanium Oracle 9.2.0)</span>
+    <span class="operator">+</span>        <span class="string">"</span><span class="variable">$OH</span><span class="string">/sdk"</span><span class="operator">,</span> <span class="comment"># Oracle Instant Client default location (10g)</span>
+        <span class="operator">);</span>
+        <span class="variable">@h_dir</span> <span class="operator">=</span> <span class="keyword">keys</span> <span class="variable">%h_dir</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="string">"Found header files in </span><span class="variable">@h_dir</span><span class="string">.\n"</span> <span class="keyword">if</span> <span class="variable">@h_dir</span><span class="operator">;</span>
+    <span class="operator">***************</span>
+    <span class="operator">***</span> <span class="number">1286</span><span class="operator">,</span><span class="number">1292</span> <span class="operator">****</span>
+    <span class="operator">---</span> <span class="number">1287</span><span class="operator">,</span><span class="number">1297</span> <span class="operator">----</span>
+        <span class="keyword">open</span> <span class="variable">FH</span><span class="operator">,</span> <span class="string">"&gt;define.sql"</span> <span class="keyword">or</span> <span class="keyword">warn</span> <span class="string">"Can't create define.sql: $!"</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">FH</span> <span class="string">"DEFINE _SQLPLUS_RELEASE\nQUIT\n"</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">FH</span><span class="operator">;</span>
+    <span class="operator">+</span>   <span class="comment"># we need to temporarily disable login sql scripts</span>
+    <span class="operator">+</span>   <span class="keyword">my</span> <span class="variable">$sqlpath</span> <span class="operator">=</span> <span class="variable">$ENV</span><span class="operator">{</span><span class="string">SQLPATH</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="operator">+</span>   <span class="keyword">delete</span> <span class="variable">$ENV</span><span class="operator">{</span><span class="string">SQLPATH</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$sqlplus_release</span> <span class="operator">=</span> <span class="string">`</span><span class="variable">$sqlplus_exe</span><span class="string"> -S /nolog \@define.sql 2&gt;&amp;1`</span><span class="operator">;</span>
+    <span class="operator">+</span>   <span class="variable">$ENV</span><span class="operator">{</span><span class="string">SQLPATH</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$sqlpath</span> <span class="keyword">if</span> <span class="variable">$sqlpath</span><span class="operator">;</span>
+        <span class="keyword">unlink</span> <span class="string">"define.sql"</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">$sqlplus_release</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$sqlplus_release</span> <span class="operator">=~</span> <span class="regex">/^DEFINE _SQLPLUS_RELEASE = "(\d?\d)(\d\d)(\d\d)(\d\d)(\d\d)"/</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="operator">+=+=+=+=+=+=+=</span> <span class="variable">Cut</span> <span class="variable">to</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">line</span>
+   
+   <span class="variable">The</span> <span class="variable">first</span> <span class="variable">hunk</span> <span class="variable">allows</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="variable">to</span> <span class="variable">find</span> <span class="variable">the</span> <span class="variable">header</span> <span class="variable">files</span> <span class="variable">which</span>
+   <span class="variable">are</span> <span class="variable">in</span> <span class="variable">a</span> <span class="variable">subdirectory</span> <span class="variable">sdk</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">the</span> <span class="variable">second</span> <span class="variable">temporarily</span> <span class="variable">disables</span> <span class="variable">any</span>
+   <span class="variable">global</span> <span class="keyword">and</span> <span class="keyword">local</span> <span class="variable">login</span><span class="operator">.</span><span class="variable">sql</span> <span class="variable">scripts</span> <span class="variable">which</span> <span class="variable">may</span> <span class="variable">make</span> <span class="variable">the</span> <span class="variable">sqlplus</span> <span class="variable">call</span>
+   <span class="variable">fail</span><span class="operator">.</span> <span class="variable">If</span> <span class="variable">you</span> <span class="variable">don't</span> <span class="variable">have</span> <span class="variable">a</span> <span class="keyword">local</span> <span class="variable">login</span><span class="operator">.</span><span class="variable">sql</span> <span class="variable">script</span> <span class="variable">you</span> <span class="variable">will</span> <span class="variable">most</span>
+   <span class="variable">likely</span> <span class="variable">be</span> <span class="variable">fine</span> <span class="variable">without</span> <span class="variable">the</span> <span class="variable">second</span> <span class="variable">hunk</span><span class="operator">.</span>
+   
+   <span class="variable">Now</span> <span class="variable">run</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="keyword">and</span> <span class="variable">make</span> <span class="variable">sure</span> <span class="variable">you</span> <span class="variable">provide</span> <span class="variable">the</span> <span class="keyword">-l</span> <span class="variable">flag</span><span class="operator">:</span>
+   
+   <span class="operator">$ </span><span class="variable">perl</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="keyword">-l</span>
+   
+   <span class="variable">If</span> <span class="variable">you</span> <span class="variable">receive</span> <span class="variable">some</span> <span class="variable">ugly</span> <span class="variable">error</span> <span class="variable">message</span> <span class="variable">stating</span> <span class="variable">that</span> <span class="variable">some</span> <span class="operator">*.</span><span class="variable">mk</span> <span class="variable">file</span>
+   <span class="variable">couldn't</span> <span class="variable">be</span> <span class="variable">found</span> <span class="variable">you</span> <span class="variable">forgot</span> <span class="variable">to</span> <span class="variable">add</span> <span class="variable">the</span> <span class="keyword">-l</span> <span class="variable">flag</span><span class="operator">.</span>
+   
+   <span class="variable">The</span> <span class="keyword">continue</span> <span class="variable">the</span> <span class="variable">standard</span> <span class="variable">build</span> <span class="variable">process</span> <span class="variable">by</span> <span class="variable">running</span> <span class="variable">make</span><span class="operator">.</span> <span class="variable">In</span>
+   <span class="variable">DBD::Oracle</span> <span class="variable">versions</span> <span class="number">1.16</span> <span class="keyword">and</span> <span class="variable">earlier</span> <span class="variable">this</span> <span class="variable">will</span> <span class="variable">end</span> <span class="variable">in</span> <span class="variable">an</span> <span class="variable">error</span> <span class="variable">due</span>
+   <span class="variable">to</span> <span class="variable">a</span> <span class="variable">failed</span> <span class="variable">execution</span> <span class="variable">of</span> <span class="variable">nmedit</span> <span class="keyword">-R</span><span class="operator">.</span> <span class="variable">Ignore</span> <span class="variable">this</span> <span class="variable">error</span><span class="operator">.</span> <span class="variable">Move</span> <span class="variable">on</span> <span class="variable">to</span>
+   <span class="variable">running</span> <span class="variable">the</span> <span class="variable">tests</span><span class="operator">,</span> <span class="variable">making</span> <span class="variable">sure</span> <span class="variable">the</span> <span class="variable">test</span> <span class="variable">scripts</span> <span class="variable">can</span> <span class="keyword">log</span> <span class="variable">in</span> <span class="variable">to</span> <span class="variable">your</span>
+   <span class="variable">database</span> <span class="operator">(</span><span class="variable">e</span><span class="operator">.</span><span class="variable">g</span><span class="operator">.,</span> <span class="variable">by</span> <span class="variable">setting</span> <span class="variable">ORACLE_USERID</span><span class="operator">).</span> <span class="variable">Note</span> <span class="variable">that</span> <span class="variable">by</span> <span class="keyword">default</span> <span class="variable">the</span>
+   <span class="variable">Instant</span> <span class="variable">Client</span> <span class="variable">does</span> <span class="keyword">not</span> <span class="variable">have</span> <span class="variable">a</span> <span class="variable">network</span><span class="operator">/</span><span class="variable">admin</span><span class="operator">/</span><span class="variable">tnsnames</span><span class="operator">.</span><span class="variable">ora</span>
+   <span class="variable">installed</span><span class="operator">.</span> <span class="variable">Either</span> <span class="variable">install</span> <span class="variable">a</span> <span class="variable">suitable</span> <span class="variable">one</span><span class="operator">,</span> <span class="keyword">or</span> <span class="variable">point</span> <span class="variable">TNS_ADMIN</span> <span class="variable">to</span> <span class="variable">the</span>
+   <span class="variable">directory</span> <span class="variable">where</span> <span class="variable">you</span> <span class="variable">keep</span> <span class="variable">your</span> <span class="variable">tnsnames</span><span class="operator">.</span><span class="variable">ora</span><span class="operator">,</span> <span class="keyword">or</span> <span class="variable">include</span> <span class="variable">the</span> <span class="variable">full</span>
+   <span class="variable">SQLNET</span> <span class="variable">connection</span> <span class="variable">string</span> <span class="variable">in</span> <span class="variable">ORACLE_USERID</span><span class="operator">.</span> <span class="variable">All</span> <span class="variable">three</span> <span class="variable">options</span> <span class="variable">are</span>
+   <span class="variable">documented</span> <span class="variable">by</span> <span class="variable">Oracle</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">README_IC</span><span class="operator">.</span><span class="variable">htm</span> <span class="variable">file</span> <span class="variable">that</span> <span class="variable">comes</span> <span class="variable">with</span> <span class="variable">the</span>
+   <span class="variable">Instant</span> <span class="variable">Client</span><span class="operator">,</span> <span class="variable">so</span> <span class="variable">be</span> <span class="variable">sure</span> <span class="variable">you</span> <span class="keyword">read</span> <span class="variable">it</span> <span class="keyword">if</span> <span class="variable">you</span> <span class="variable">don't</span> <span class="variable">understand</span> <span class="variable">what</span>
+   <span class="variable">I'm</span> <span class="variable">writing</span> <span class="variable">here</span><span class="operator">.</span>
+   
+   <span class="variable">All</span> <span class="variable">tests</span> <span class="variable">should</span> <span class="variable">succeed</span><span class="operator">.</span> <span class="variable">Complete</span> <span class="variable">by</span> <span class="variable">make</span> <span class="variable">install</span><span class="operator">.</span> <span class="variable">You</span> <span class="variable">are</span> <span class="variable">done</span><span class="operator">!</span>
+   <span class="variable">Skip</span> <span class="variable">the</span> <span class="variable">other</span> <span class="variable">steps</span> <span class="variable">below</span><span class="operator">,</span> <span class="variable">they</span> <span class="keyword">do</span> <span class="variable">NOT</span> <span class="variable">apply</span> <span class="variable">to</span> <span class="variable">the</span> <span class="variable">Instant</span>
+   <span class="variable">Client</span><span class="operator">.</span> <span class="operator">(</span><span class="variable">Although</span> <span class="variable">of</span> <span class="variable">course</span> <span class="variable">you</span> <span class="variable">may</span> <span class="variable">still</span> <span class="variable">install</span> <span class="variable">a</span> <span class="variable">later</span> <span class="variable">version</span>
+   <span class="variable">of</span> <span class="variable">perl</span> <span class="keyword">if</span> <span class="variable">you</span> <span class="variable">have</span> <span class="variable">the</span> <span class="variable">need</span><span class="operator">.)</span>
+</code></pre>
+
+<p>1) Until the reason for the memory leak has been found and fixed, you need to remove the condition that exposes it. Apparently, this is multi-threading being enabled in Perl. The Perl 5.8.1RC3 that comes with Panther was compiled with multi-threading enabled, and AFAIK it cannot be turned off at runtime. Note that the problem is independent of whether you run multiple concurrent threads or not.</p>
+
+<pre><code>   Therefore, the solution is to build your own perl. I leave it up to
+   you whether you want to replace the system perl or not. At least
+   Perl 5.8.x comes with instructions as to how to replace the system
+   perl on MacOS X, and what the caveats and risks are. I used 5.8.4,
+   installed in /usr/local, and it worked perfectly fine.
+
+   The key when configuring your custom build of perl is to disable
+   multi-threading (usethreads, useithreads, and usemultiplicity
+   options). More precisely, do not enable them, as they are disabled
+   by default, at least up to version 5.8.5. You can check whether
+   threads are enabled or not by passing -V to ther Perl interpreter:
+
+   $ /path/to/your/perl -V | grep usethreads
+
+   You need to see a line saying, among other things,
+   usethreads=undef. If you see usethreads=define then multi-threading
+   is enabled.</code></pre>
+
+<p>2) If you choose not to replace the system perl, make sure that when you build DBI and DBD::Oracle you provide the full path to your own perl when running Makefile.PL, like so (assuming you installed in /usr/local, which is the default):</p>
+
+<pre><code>   $ /usr/local/bin/perl Makefile.PL
+
+   Also, every time you run a DBD::Oracle script, you must use the
+   full path too, unless your custom-built perl comes before the
+   system perl in the PATH environment. The easiest way to ensure you
+   are using the right perl is to uninstall DBI from the system perl
+   if you did install it under that as well.</code></pre>
+
+<p>3) Continue with 3) as in instructions for Jaguar (making path substitutions for perl as discussed in 2). ======================================================================</p>
+
+<p>If you have any problems then follow the instructions in the README. Please post details of any problems (or changes you needed to make) to dbi-users@perl.org and CC them to brooksch@mac.com on MacOSX specific problems. Rewrite of part of this readme, Panther instructions, and the Perl IO patch is credit to Hilmar Lapp, hlapp at gmx.net.</p>
+
+<p>Earlier and original instructions thanks to: Andy Lester Steve Sapovits Tom Mornini</p>
+
+<p>Date: Tue, 15 Apr 2003 16:02:17 +1000 Subject: Compilation bug in DBI on OSX with threaded Perl 5.8.0 From: Danial Pearce</p>
+
+<p>In regards to a previous message on this list:</p>
+
+<p>http://archive.develooper.com/dbi-users@perl.org/msg16365.html</p>
+
+<p>I have some more info:</p>
+
+<p>I have compiled and installed Perl just fine with threads enabled:</p>
+
+<p>./Configure -de -Dusethreads -Dprefix=/usr make make test sudo make install</p>
+
+<p>I have then successfully installed Apache and mod_perl as well.</p>
+
+<p>When I try to compile and install DBI, I get a bus error, just like the people on this list have previously discussed on the thread above.</p>
+
+<p>If I unpack the DBI, and run perl Makefile.pl, then alter the created Makefile so that it uses gcc2 rather than just &quot;cc&quot; then it compiles, installs and runs just fine.</p>
+
+<p>The issue here is that Apple have just recently release 10.2.4, which updates /usr/bin/{gcc3,gcc2,g++3,g++2} and /usr/bin/cc is a symlink to /usr/bin/gcc3, so compilation of DBI under Apple&#39;s gcc3 does not work. It works find with gcc2 however.</p>
+
+<p>I had the same problem with DBD::Pg, and was able to compile and install that using the same fix.</p>
+
+<p>I am unsure if this is a problem with Apple&#39;s version of gcc, or a problem with the DBI/DBD code itself. Given that all my other open source applications are compiling and installing fine, I am thinking there isn&#39;t anything Apple are going to do about it.</p>
+
+<p>cheers Danial</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Tim Bunce &lt;timb@cpan.org&gt;</p>
+
+</li>
+<li><p>John Scoles &lt;byterock@cpan.org&gt;</p>
+
+</li>
+<li><p>Yanick Champoux &lt;yanick@cpan.org&gt;</p>
+
+</li>
+<li><p>Martin J. Evans &lt;mjevans@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 1994 by Tim Bunce.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

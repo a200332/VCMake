@@ -1,0 +1,409 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#run3-cmd-stdin-stdout-stderr-options">run3($cmd, $stdin, $stdout, $stderr, \%options)</a>
+        <ul>
+          <li><a href="#cmd">$cmd</a></li>
+          <li><a href="#stdin-stdout-stderr">$stdin, $stdout, $stderr</a></li>
+          <li><a href="#options">\%options</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#HOW-IT-WORKS">HOW IT WORKS</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#DEBUGGING">DEBUGGING</a></li>
+  <li><a href="#PROFILING">PROFILING</a></li>
+  <li><a href="#COMPARISON">COMPARISON</a>
+    <ul>
+      <li><a href="#compared-to-system-qx-open-...-open">compared to system(), qx&#39;&#39;, open &quot;...|&quot;, open &quot;|...&quot;</a></li>
+      <li><a href="#compared-to-open2-open3">compared to open2(), open3()</a></li>
+      <li><a href="#compared-to-IPC::Run::run">compared to IPC::Run::run()</a></li>
+    </ul>
+  </li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>IPC::Run3 - run a subprocess with input/ouput redirection</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.048</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">IPC::Run3</span><span class="operator">;</span>    <span class="comment"># Exports run3() by default</span>
+    
+    <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$in</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$out</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$err</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module allows you to run a subprocess and redirect stdin, stdout, and/or stderr to files and perl data structures. It aims to satisfy 99% of the need for using <code>system</code>, <code>qx</code>, and <code>open3</code> with a simple, extremely Perlish API.</p>
+
+<p>Speed, simplicity, and portability are paramount. (That&#39;s speed of Perl code; which is often much slower than the kind of buffered I/O that this module uses to spool input to and output from the child command.)</p>
+
+<h2 id="run3-cmd-stdin-stdout-stderr-options"><code>run3($cmd, $stdin, $stdout, $stderr, \%options)</code></h2>
+
+<p>All parameters after <code>$cmd</code> are optional.</p>
+
+<p>The parameters <code>$stdin</code>, <code>$stdout</code> and <code>$stderr</code> indicate how the child&#39;s corresponding filehandle (<code>STDIN</code>, <code>STDOUT</code> and <code>STDERR</code>, resp.) will be redirected. Because the redirects come last, this allows <code>STDOUT</code> and <code>STDERR</code> to default to the parent&#39;s by just not specifying them -- a common use case.</p>
+
+<p><code>run3</code> throws an exception if the wrapped <code>system</code> call returned -1 or anything went wrong with <code>run3</code>&#39;s processing of filehandles. Otherwise it returns true. It leaves <code>$?</code> intact for inspection of exit and wait status.</p>
+
+<p>Note that a true return value from <code>run3</code> doesn&#39;t mean that the command had a successful exit code. Hence you should always check <code>$?</code>.</p>
+
+<p>See <a href="#options">&quot;%options&quot;</a> for an option to handle the case of <code>system</code> returning -1 yourself.</p>
+
+<h3 id="cmd"><code>$cmd</code></h3>
+
+<p>Usually <code>$cmd</code> will be an ARRAY reference and the child is invoked via</p>
+
+<pre><code>  <span class="keyword">system</span> <span class="variable">@$cmd</span><span class="operator">;</span>
+</code></pre>
+
+<p>But <code>$cmd</code> may also be a string in which case the child is invoked via</p>
+
+<pre><code>  <span class="keyword">system</span> <span class="variable">$cmd</span><span class="operator">;</span>
+</code></pre>
+
+<p>(cf. <a href="../../lib/pods/perlfunc.html#system">&quot;system&quot; in perlfunc</a> for the difference and the pitfalls of using the latter form).</p>
+
+<h3 id="stdin-stdout-stderr"><code>$stdin</code>, <code>$stdout</code>, <code>$stderr</code></h3>
+
+<p>The parameters <code>$stdin</code>, <code>$stdout</code> and <code>$stderr</code> can take one of the following forms:</p>
+
+<dl>
+
+<dt id="undef-or-not-specified-at-all"><code>undef</code> (or not specified at all)</dt>
+<dd>
+
+<p>The child inherits the corresponding filehandle from the parent.</p>
+
+<pre><code>  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="variable">$stdin</span><span class="operator">;</span>                   <span class="comment"># child writes to same STDOUT and STDERR as parent</span>
+  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">;</span>  <span class="comment"># child reads from same STDIN as parent</span>
+</code></pre>
+
+</dd>
+<dt id="undef"><code>\undef</code></dt>
+<dd>
+
+<p>The child&#39;s filehandle is redirected from or to the local equivalent of <code>/dev/null</code> (as returned by <code>File::Spec-&gt;devnull()</code>).</p>
+
+<pre><code>  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">;</span> <span class="comment"># child reads from /dev/null</span>
+</code></pre>
+
+</dd>
+<dt id="a-simple-scalar">a simple scalar</dt>
+<dd>
+
+<p>The parameter is taken to be the name of a file to read from or write to. In the latter case, the file will be opened via</p>
+
+<pre><code>  open FH, &quot;&gt;&quot;, ...</code></pre>
+
+<p>i.e. it is created if it doesn&#39;t exist and truncated otherwise. Note that the file is opened by the parent which will <a href="../../lib/Carp.html#croak">croak</a> in case of failure.</p>
+
+<pre><code>  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="string">"out.txt"</span><span class="operator">;</span>        <span class="comment"># child writes to file "out.txt"</span>
+</code></pre>
+
+</dd>
+<dt id="a-filehandle-either-a-reference-to-a-GLOB-or-an-IO::Handle">a filehandle (either a reference to a GLOB or an <code>IO::Handle</code>)</dt>
+<dd>
+
+<p>The filehandle is inherited by the child.</p>
+
+<pre><code>  <span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">"&gt;"</span><span class="operator">,</span> <span class="string">"out.txt"</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">$fh</span> <span class="string">"prologue\n"</span><span class="operator">;</span>
+  <span class="operator">...</span>
+  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="variable">$fh</span><span class="operator">;</span>              <span class="comment"># child writes to $fh</span>
+  <span class="operator">...</span>
+  <span class="keyword">print</span> <span class="variable">$fh</span> <span class="string">"epilogue\n"</span><span class="operator">;</span>
+  <span class="keyword">close</span> <span class="variable">$fh</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="a-SCALAR-reference">a SCALAR reference</dt>
+<dd>
+
+<p>The referenced scalar is treated as a string to be read from or written to. In the latter case, the previous content of the string is overwritten.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$out</span><span class="operator">;</span>
+  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$out</span><span class="operator">;</span>           <span class="comment"># child writes into string</span>
+  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\&lt;&lt;</span><span class="default">EOF</span><span class="operator">;</span>                  <span class="comment"># child reads from string (can use "here" notation)</span><span class="string">
+  Input
+  to
+  child
+  </span><span class="default">EOF</span>
+</code></pre>
+
+</dd>
+<dt id="an-ARRAY-reference">an ARRAY reference</dt>
+<dd>
+
+<p>For <code>$stdin</code>, the elements of <code>@$stdin</code> are simply spooled to the child.</p>
+
+<p>For <code>$stdout</code> or <code>$stderr</code>, the child&#39;s corresponding file descriptor is read line by line (as determined by the current setting of <code>$/</code>) into <code>@$stdout</code> or <code>@$stderr</code>, resp. The previous content of the array is overwritten.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@lines</span><span class="operator">;</span>
+  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">@lines</span><span class="operator">;</span>         <span class="comment"># child writes into array</span>
+</code></pre>
+
+</dd>
+<dt id="a-CODE-reference">a CODE reference</dt>
+<dd>
+
+<p>For <code>$stdin</code>, <code>&amp;$stdin</code> will be called repeatedly (with no arguments) and the return values are spooled to the child. <code>&amp;$stdin</code> must signal the end of input by returning <code>undef</code>.</p>
+
+<p>For <code>$stdout</code> or <code>$stderr</code>, the child&#39;s corresponding file descriptor is read line by line (as determined by the current setting of <code>$/</code>) and <code>&amp;$stdout</code> or <code>&amp;$stderr</code>, resp., is called with the contents of the line. Note that there&#39;s no end-of-file indication.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> producer </span><span class="operator">{</span>
+    <span class="keyword">return</span> <span class="variable">$i</span> <span class="operator">&lt;</span> <span class="number">10</span> <span class="operator">?</span> <span class="string">"line"</span><span class="operator">.</span><span class="variable">$i</span><span class="operator">++.</span><span class="string">"\n"</span> <span class="operator">:</span> <span class="keyword">undef</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">producer</span><span class="operator">;</span>              <span class="comment"># child reads 10 lines</span>
+</code></pre>
+
+<p>Note that this form of redirecting the child&#39;s I/O doesn&#39;t imply any form of concurrency between parent and child - run3()&#39;s method of operation is the same no matter which form of redirection you specify.</p>
+
+</dd>
+</dl>
+
+<p>If the same value is passed for <code>$stdout</code> and <code>$stderr</code>, then the child will write both <code>STDOUT</code> and <code>STDERR</code> to the same filehandle. In general, this means that</p>
+
+<pre><code>    <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="string">"foo.txt"</span><span class="operator">,</span> <span class="string">"foo.txt"</span><span class="operator">;</span>
+    <span class="variable">run3</span> <span class="operator">\</span><span class="variable">@cmd</span><span class="operator">,</span> <span class="operator">\</span><span class="keyword">undef</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$both</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$both</span><span class="operator">;</span>
+</code></pre>
+
+<p>will DWIM and pass a single file handle to the child for both <code>STDOUT</code> and <code>STDERR</code>, collecting all into file &quot;foo.txt&quot; or <code>$both</code>.</p>
+
+<h3 id="options"><code>\%options</code></h3>
+
+<p>The last parameter, <code>\%options</code>, must be a hash reference if present.</p>
+
+<p>Currently the following keys are supported:</p>
+
+<dl>
+
+<dt id="binmode_stdin-binmode_stdout-binmode_stderr"><code>binmode_stdin</code>, <code>binmode_stdout</code>, <code>binmode_stderr</code></dt>
+<dd>
+
+<p>The value must a &quot;layer&quot; as described in <a href="../../lib/pods/perlfunc.html#binmode">&quot;binmode&quot; in perlfunc</a>. If specified the corresponding parameter <code>$stdin</code>, <code>$stdout</code> or <code>$stderr</code>, resp., operates with the given layer.</p>
+
+<p>For backward compatibility, a true value that doesn&#39;t start with &quot;:&quot; (e.g. a number) is interpreted as &quot;:raw&quot;. If the value is false or not specified, the default is &quot;:crlf&quot; on Windows and &quot;:raw&quot; otherwise.</p>
+
+<p>Don&#39;t expect that values other than the built-in layers &quot;:raw&quot;, &quot;:crlf&quot;, and (on newer Perls) &quot;:bytes&quot;, &quot;:utf8&quot;, &quot;:encoding(...)&quot; will work.</p>
+
+</dd>
+<dt id="append_stdout-append_stderr"><code>append_stdout</code>, <code>append_stderr</code></dt>
+<dd>
+
+<p>If their value is true then the corresponding parameter <code>$stdout</code> or <code>$stderr</code>, resp., will append the child&#39;s output to the existing &quot;contents&quot; of the redirector. This only makes sense if the redirector is a simple scalar (the corresponding file is opened in append mode), a SCALAR reference (the output is appended to the previous contents of the string) or an ARRAY reference (the output is <code>push</code>ed onto the previous contents of the array).</p>
+
+</dd>
+<dt id="return_if_system_error"><code>return_if_system_error</code></dt>
+<dd>
+
+<p>If this is true <code>run3</code> does <b>not</b> throw an exception if <code>system</code> returns -1 (cf. <a href="../../lib/pods/perlfunc.html#system">&quot;system&quot; in perlfunc</a> for possible failure scenarios.), but returns true instead. In this case <code>$?</code> has the value -1 and <code>$!</code> contains the errno of the failing <code>system</code> call.</p>
+
+</dd>
+</dl>
+
+<h1 id="HOW-IT-WORKS">HOW IT WORKS</h1>
+
+<dl>
+
+<dt id="pod-1">(1)</dt>
+<dd>
+
+<p>For each redirector <code>$stdin</code>, <code>$stdout</code>, and <code>$stderr</code>, <code>run3()</code> furnishes a filehandle:</p>
+
+<ul>
+
+<li><p>if the redirector already specifies a filehandle it just uses that</p>
+
+</li>
+<li><p>if the redirector specifies a filename, <code>run3()</code> opens the file in the appropriate mode</p>
+
+</li>
+<li><p>in all other cases, <code>run3()</code> opens a temporary file (using <a href="../../lib/File/Temp.html#tempfile">tempfile</a>)</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="pod-2">(2)</dt>
+<dd>
+
+<p>If <code>run3()</code> opened a temporary file for <code>$stdin</code> in step (1), it writes the data using the specified method (either from a string, an array or returned by a function) to the temporary file and rewinds it.</p>
+
+</dd>
+<dt id="pod-3">(3)</dt>
+<dd>
+
+<p><code>run3()</code> saves the parent&#39;s <code>STDIN</code>, <code>STDOUT</code> and <code>STDERR</code> by duplicating them to new filehandles. It duplicates the filehandles from step (1) to <code>STDIN</code>, <code>STDOUT</code> and <code>STDERR</code>, resp.</p>
+
+</dd>
+<dt id="pod-4">(4)</dt>
+<dd>
+
+<p><code>run3()</code> runs the child by invoking <a href="../../lib/pods/perlfunc.html#system">system</a> with <code>$cmd</code> as specified above.</p>
+
+</dd>
+<dt id="pod-5">(5)</dt>
+<dd>
+
+<p><code>run3()</code> restores the parent&#39;s <code>STDIN</code>, <code>STDOUT</code> and <code>STDERR</code> saved in step (3).</p>
+
+</dd>
+<dt id="pod-6">(6)</dt>
+<dd>
+
+<p>If <code>run3()</code> opened a temporary file for <code>$stdout</code> or <code>$stderr</code> in step (1), it rewinds it and reads back its contents using the specified method (either to a string, an array or by calling a function).</p>
+
+</dd>
+<dt id="pod-7">(7)</dt>
+<dd>
+
+<p><code>run3()</code> closes all filehandles that it opened explicitly in step (1).</p>
+
+</dd>
+</dl>
+
+<p>Note that when using temporary files, <code>run3()</code> tries to amortize the overhead by reusing them (i.e. it keeps them open and rewinds and truncates them before the next operation).</p>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>Often uses intermediate files (determined by File::Temp, and thus by the File::Spec defaults and the TMPDIR env. variable) for speed, portability and simplicity.</p>
+
+<p>Use extreme caution when using <code>run3</code> in a threaded environment if concurrent calls of <code>run3</code> are possible. Most likely, I/O from different invocations will get mixed up. The reason is that in most thread implementations all threads in a process share the same STDIN/STDOUT/STDERR. Known failures are Perl ithreads on Linux and Win32. Note that <code>fork</code> on Win32 is emulated via Win32 threads and hence I/O mix up is possible between forked children here (<code>run3</code> is &quot;fork safe&quot; on Unix, though).</p>
+
+<h1 id="DEBUGGING">DEBUGGING</h1>
+
+<p>To enable debugging use the IPCRUN3DEBUG environment variable to a non-zero integer value:</p>
+
+<pre><code>  $ IPCRUN3DEBUG=1 myapp</code></pre>
+
+<h1 id="PROFILING">PROFILING</h1>
+
+<p>To enable profiling, set IPCRUN3PROFILE to a number to enable emitting profile information to STDERR (1 to get timestamps, 2 to get a summary report at the END of the program, 3 to get mini reports after each run) or to a filename to emit raw data to a file for later analysis.</p>
+
+<h1 id="COMPARISON">COMPARISON</h1>
+
+<p>Here&#39;s how it stacks up to existing APIs:</p>
+
+<h2 id="compared-to-system-qx-open-...-open">compared to <code>system()</code>, <code>qx&#39;&#39;</code>, <code>open &quot;...|&quot;</code>, <code>open &quot;|...&quot;</code></h2>
+
+<ul>
+
+<li><p>better: redirects more than one file descriptor</p>
+
+</li>
+<li><p>better: returns TRUE on success, FALSE on failure</p>
+
+</li>
+<li><p>better: throws an error if problems occur in the parent process (or the pre-exec child)</p>
+
+</li>
+<li><p>better: allows a very perlish interface to Perl data structures and subroutines</p>
+
+</li>
+<li><p>better: allows 1 word invocations to avoid the shell easily:</p>
+
+<pre><code> <span class="variable">run3</span> <span class="operator">[</span><span class="string">"foo"</span><span class="operator">]</span><span class="operator">;</span>  <span class="comment"># does not invoke shell</span>
+</code></pre>
+
+</li>
+<li><p>worse: does not return the exit code, leaves it in $?</p>
+
+</li>
+</ul>
+
+<h2 id="compared-to-open2-open3">compared to <code>open2()</code>, <code>open3()</code></h2>
+
+<ul>
+
+<li><p>better: no lengthy, error prone polling/select loop needed</p>
+
+</li>
+<li><p>better: hides OS dependencies</p>
+
+</li>
+<li><p>better: allows SCALAR, ARRAY, and CODE references to source and sink I/O</p>
+
+</li>
+<li><p>better: I/O parameter order is like <code>open3()</code> (not like <code>open2()</code>).</p>
+
+</li>
+<li><p>worse: does not allow interaction with the subprocess</p>
+
+</li>
+</ul>
+
+<h2 id="compared-to-IPC::Run::run">compared to <a>IPC::Run::run()</a></h2>
+
+<ul>
+
+<li><p>better: smaller, lower overhead, simpler, more portable</p>
+
+</li>
+<li><p>better: no select() loop portability issues</p>
+
+</li>
+<li><p>better: does not fall prey to Perl closure leaks</p>
+
+</li>
+<li><p>worse: does not allow interaction with the subprocess (which IPC::Run::run() allows by redirecting subroutines)</p>
+
+</li>
+<li><p>worse: lacks many features of <code>IPC::Run::run()</code> (filters, pipes, redirects, pty support)</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2003, R. Barrie Slaymaker, Jr., All Rights Reserved</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>You may use this module under the terms of the BSD, Artistic, or GPL licenses, any version.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Barrie Slaymaker &lt;<code>barries@slaysys.com</code>&gt;</p>
+
+<p>Ricardo SIGNES &lt;<code>rjbs@cpan.org</code>&gt; performed routine maintenance since 2010, thanks to help from the following ticket and/or patch submitters: Jody Belka, Roderich Schupp, David Morel, Jeff Lavallee, and anonymous others.</p>
+
+
+</body>
+
+</html>
+
+

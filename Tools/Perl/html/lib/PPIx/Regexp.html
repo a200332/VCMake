@@ -1,0 +1,507 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#NOTICE">NOTICE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#new_from_cache">new_from_cache</a></li>
+      <li><a href="#flush_cache">flush_cache</a></li>
+      <li><a href="#capture_names">capture_names</a></li>
+      <li><a href="#delimiters">delimiters</a></li>
+      <li><a href="#errstr">errstr</a></li>
+      <li><a href="#failures">failures</a></li>
+      <li><a href="#max_capture_number">max_capture_number</a></li>
+      <li><a href="#modifier">modifier</a></li>
+      <li><a href="#modifier_asserted">modifier_asserted</a></li>
+      <li><a href="#regular_expression">regular_expression</a></li>
+      <li><a href="#replacement">replacement</a></li>
+      <li><a href="#source">source</a></li>
+      <li><a href="#type">type</a></li>
+    </ul>
+  </li>
+  <li><a href="#RESTRICTIONS">RESTRICTIONS</a>
+    <ul>
+      <li><a href="#Ambiguous-Syntax">Ambiguous Syntax</a></li>
+      <li><a href="#Changes-in-Syntax">Changes in Syntax</a></li>
+      <li><a href="#Equivocation">Equivocation</a>
+        <ul>
+          <li><a href="#Un-escaped-literal-left-curly-after-literal">Un-escaped literal left curly after literal</a></li>
+        </ul>
+      </li>
+      <li><a href="#Static-Parsing">Static Parsing</a></li>
+      <li><a href="#Non-Standard-Syntax">Non-Standard Syntax</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Regexp - Represent a regular expression of some sort</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">PPIx::Regexp</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'qr{foo}smx'</span> <span class="operator">);</span>
+ <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$re</span> <span class="operator">)</span>
+     <span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>PPIx::Regexp</code> is a <a href="../../lib/PPIx/Regexp/Node.html">PPIx::Regexp::Node</a>.</p>
+
+<p><code>PPIx::Regexp</code> has no descendants.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The purpose of the <i>PPIx-Regexp</i> package is to parse regular expressions in a manner similar to the way the <a href="../../lib/PPI.html">PPI</a> package parses Perl. This class forms the root of the parse tree, playing a role similar to <a href="../../lib/PPI/Document.html">PPI::Document</a>.</p>
+
+<p>This package shares with <a href="../../lib/PPI.html">PPI</a> the property of being round-trip safe. That is,</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$expr</span> <span class="operator">=</span> <span class="string">'s/ ( \d+ ) ( \D+ ) /$2$1/smxg'</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$expr</span> <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">()</span> <span class="keyword">eq</span> <span class="variable">$expr</span> <span class="operator">?</span> <span class="string">"yes\n"</span> <span class="operator">:</span> <span class="string">"no\n"</span>
+</code></pre>
+
+<p>should print &#39;yes&#39; for any valid regular expression.</p>
+
+<p>Navigation is similar to that provided by <a href="../../lib/PPI.html">PPI</a>. That is to say, things like <code>children</code>, <code>find_first</code>, <code>snext_sibling</code> and so on all work pretty much the same way as in <a href="../../lib/PPI.html">PPI</a>.</p>
+
+<p>The class hierarchy is also similar to <a href="../../lib/PPI.html">PPI</a>. Except for some utility classes (the dumper, the lexer, and the tokenizer) all classes are descended from <a href="../../lib/PPIx/Regexp/Element.html">PPIx::Regexp::Element</a>, which provides basic navigation. Tokens are descended from <a href="../../lib/PPIx/Regexp/Token.html">PPIx::Regexp::Token</a>, which provides content. All containers are descended from <a href="../../lib/PPIx/Regexp/Node.html">PPIx::Regexp::Node</a>, which provides for children, and all structure elements are descended from <a href="../../lib/PPIx/Regexp/Structure.html">PPIx::Regexp::Structure</a>, which provides beginning and ending delimiters, and a type.</p>
+
+<p>There are two features of <a href="../../lib/PPI.html">PPI</a> that this package does not provide - mutability and operator overloading. There are no plans for serious mutability, though something like <a href="../../lib/PPI.html">PPI</a>&#39;s <code>prune</code> functionality might be considered. Similarly there are no plans for operator overloading, which appears to the author to represent a performance hit for little tangible gain.</p>
+
+<h1 id="NOTICE">NOTICE</h1>
+
+<p>The use of this class to parse non-regexp quote-like strings was an experiment that I consider failed. Therefore this use is <b>deprecated</b> in favor of <a>PPIx::QuoteLike</a>. Six months after the release of version 0.053, the first use of the <code>parse</code> argument to <a href="#new">new()</a> will result in a warning. Six months after that, all uses of the <code>parse</code> argument will result in a warning. After another six months, the <code>parse</code> argument will become fatal.</p>
+
+<p>The author will attempt to preserve the documented interface, but if the interface needs to change to correct some egregiously bad design or implementation decision, then it will change. Any incompatible changes will go through a deprecation cycle.</p>
+
+<p>The goal of this package is to parse well-formed regular expressions correctly. A secondary goal is not to blow up on ill-formed regular expressions. The correct identification and characterization of ill-formed regular expressions is <b>not</b> a goal of this package, nor is the consistent parsing of ill-formed regular expressions from release to release.</p>
+
+<p>This policy attempts to track features in development releases as well as public releases. However, features added in a development release and then removed before the next production release <b>will not</b> be tracked, and any functionality relating to such features <b>will be removed</b>. The issue here is the potential re-use (with different semantics) of syntax that did not make it into the production release.</p>
+
+<p>From time to time the Perl regular expression engine changes in ways that change the parse of a given regular expression. When these changes occur, <code>PPIx::Regexp</code> will be changed to produce the more modern parse. Known examples of this include:</p>
+
+<dl>
+
+<dt id="no-longer-interpolates-as-of-Perl-5.005-per-perl5005delta"><code>$(</code> no longer interpolates as of Perl 5.005, per <code>perl5005delta</code>.</dt>
+<dd>
+
+<p>Newer Perls seem to parse this as <code><span class="string">qr{$}</span>
+</code> (i.e. and end-of-string or newline assertion) followed by an open parenthesis, and that is what <code>PPIx::Regexp</code> does.</p>
+
+</dd>
+<dt id="and-also-seem-to-parse-as-the-assertion"><code>$)</code> and <code>$|</code> also seem to parse as the <code>$</code> assertion</dt>
+<dd>
+
+<p>followed by the relevant meta-character, though I have no documentation reference for this.</p>
+
+</dd>
+<dt id="and---no-longer-interpolate-as-of-Perl-5.9.4"><code>@+</code> and <code>@-</code> no longer interpolate as of Perl 5.9.4</dt>
+<dd>
+
+<p>per <code>perl594delta</code>. Subsequent Perls treat <code>@+</code> as a quantified literal and <code>@-</code> as two literals, and that is what <code>PPIx::Regexp</code> does. Note that subscripted references to these arrays <b>do</b> interpolate, and are so parsed by <code>PPIx::Regexp</code>.</p>
+
+</dd>
+<dt id="Only-space-and-horizontal-tab-are-whitespace-as-of-Perl-5.23.4">Only space and horizontal tab are whitespace as of Perl 5.23.4</dt>
+<dd>
+
+<p>when inside a bracketed character class inside an extended bracketed character class, per <code>perl5234delta</code>. Formerly any white space character parsed as whitespace. This change in <code>PPIx::Regexp</code> will be reverted if the change in Perl does not make it into Perl 5.24.0.</p>
+
+</dd>
+<dt id="Unescaped-literal-left-curly-brackets">Unescaped literal left curly brackets</dt>
+<dd>
+
+<p>These are being removed in positions where quantifiers are legal, so that they can be used for new functionality. Some of them are gone in 5.25.1, others will be removed in a future version of Perl. In situations where they have been removed, <a href="#perl_version_removed">perl_version_removed()</a> will return the version in which they were removed. When the new functionality appears, the parse produced by this software will reflect the new functionality.</p>
+
+<p><b>NOTE</b> that a literal left curly after a literal character was made an error in Perl 5.25.1, but became a warning again in 5.27.1 due to its use in GNU Autoconf. Whether it will ever become illegal again is not clear to me based on the contents of <i>perl5271delta</i>. At the moment <code>PPIx::Regexp</code> considers this usage to have been removed in 5.25.1, and this will not change based on anything in 5.27.x. But if 5.26.1 comes out allowing this usage, the removal version will become <code>undef</code>. The same will apply to any other usages that were re-allowed in 5.27.1, if I can identify them.</p>
+
+</dd>
+</dl>
+
+<p>There are very probably other examples of this. When they come to light they will be documented as producing the modern parse, and the code modified to produce this parse if necessary.</p>
+
+<p>The functionality that parses string literals (the <code>parse</code> argument to <code>new()</code>) was introduced in version 0.045, but its use is discouraged. The preferred package for string literals is <a>PPIx::QuoteLike</a>, and once I consider that package to be stable the string literal functionality in this package will be put through a deprecation cycle and removed.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provides the following public methods. Methods not documented here are private, and unsupported in the sense that the author reserves the right to change or remove them without notice.</p>
+
+<h2 id="new">new</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'/foo/'</span><span class="operator">);</span>
+</code></pre>
+
+<p>This method instantiates a <code>PPIx::Regexp</code> object from a string, a <a href="../../lib/PPI/Token/QuoteLike/Regexp.html">PPI::Token::QuoteLike::Regexp</a>, a <a href="../../lib/PPI/Token/Regexp/Match.html">PPI::Token::Regexp::Match</a>, or a <a href="../../lib/PPI/Token/Regexp/Substitute.html">PPI::Token::Regexp::Substitute</a>. Honestly, any <a href="../../lib/PPI/Element.html">PPI::Element</a> will work, but only the three Regexp classes mentioned previously are likely to do anything useful.</p>
+
+<p>Whatever form the argument takes, it is assumed to consist entirely of a valid match, substitution, or <code>qr&lt;&gt;</code> string.</p>
+
+<p>Optionally you can pass one or more name/value pairs after the regular expression. The possible options are:</p>
+
+<dl>
+
+<dt id="default_modifiers-array_reference">default_modifiers array_reference</dt>
+<dd>
+
+<p>This option specifies a reference to an array of default modifiers to apply to the regular expression being parsed. Each modifier is specified as a string. Any actual modifiers found supersede the defaults.</p>
+
+<p>When applying the defaults, <code>&#39;?&#39;</code> and <code>&#39;/&#39;</code> are completely ignored, and <code>&#39;^&#39;</code> is ignored unless it occurs at the beginning of the modifier. The first dash (<code>&#39;-&#39;</code>) causes subsequent modifiers to be negated.</p>
+
+<p>So, for example, if you wish to produce a <code>PPIx::Regexp</code> object representing the regular expression in</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">re</span> <span class="string">'/smx'</span><span class="operator">;</span>
+ <span class="operator">{</span>
+    <span class="keyword">no</span> <span class="variable">re</span> <span class="string">'/x'</span><span class="operator">;</span>
+    <span class="regex">m/ foo /</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>you would (after some help from <a href="../../lib/PPI.html">PPI</a> in finding the relevant statements), do something like</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'m/ foo /'</span><span class="operator">,</span>
+     <span class="string">default_modifiers</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'/smx'</span><span class="operator">,</span> <span class="string">'-/x'</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="encoding-name">encoding name</dt>
+<dd>
+
+<p>This option specifies the encoding of the regular expression. This is passed to the tokenizer, which will <code>decode</code> the regular expression string before it tokenizes it. For example:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'/foo/'</span><span class="operator">,</span>
+     <span class="string">encoding</span> <span class="operator">=&gt;</span> <span class="string">'iso-8859-1'</span><span class="operator">,</span>
+ <span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="parse-parse_type">parse parse_type</dt>
+<dd>
+
+<p>This option specifies what kind of parse is to be done. Possible values are <code>&#39;regex&#39;</code>, <code>&#39;string&#39;</code>, or <code>&#39;guess&#39;</code>. Any value but <code>&#39;regex&#39;</code> is experimental.</p>
+
+<p>As it turns out, I consider parsing non-regexp quote-like things with this class to be a failed experiment, and the relevant functionality is being deprecated and removed in favor of <a>PPIx::QuoteLike</a>. See above for details.</p>
+
+<p>If <code>&#39;regex&#39;</code> is specified, the first argument is expected to be a valid regex, and parsed as though it were.</p>
+
+<p>If <code>&#39;string&#39;</code> is specified, the first argument is expected to be a valid string literal and parsed as such. The return is still a <code>PPIx::Regexp</code> object, but the <a href="#regular_expression">regular_expression()</a> and <a href="#modifier">modifier()</a> methods return nothing, and the <a href="#replacement">replacement()</a> method returns the content of the string.</p>
+
+<p>If <code>&#39;guess&#39;</code> is specified, this method will try to guess what the first argument is. If the first argument is a <a href="../../lib/PPI/Element.html">PPI::Element</a>, the guess will reflect the PPI parse. But the guess can be wrong if the first argument is a string representing an unusually-delimited regex. For example, <code>&#39;guess&#39;</code> will parse <code>&quot;foo&quot;</code> as a string, but Perl will parse it as a regex if preceded by a regex binding operator (e.g. <code>$x =~ &quot;foo&quot;</code>), as shown by</p>
+
+<pre><code> perl -MO=Deparse -e &#39;$x =~ &quot;foo&quot;&#39;</code></pre>
+
+<p>which prints</p>
+
+<pre><code> $x =~ /foo/u</code></pre>
+
+<p>under Perl 5.22.0.</p>
+
+<p>The default is <code>&#39;regex&#39;</code>.</p>
+
+</dd>
+<dt id="postderef-boolean">postderef boolean</dt>
+<dd>
+
+<p>This option is passed on to the tokenizer, where it specifies whether postfix dereferences are recognized in interpolations and code. This experimental feature was introduced in Perl 5.19.5.</p>
+
+<p>The default is the value of <code>$PPIx::Regexp::Tokenizer::DEFAULT_POSTDEREF</code>, which is true. When originally introduced this was false, but was documented as becoming true when and if postfix dereferencing became mainstream. The intent to mainstream was announced with Perl 5.23.1, and became official (so to speak) with Perl 5.24.0, so the default became true with <a href="../../lib/PPIx/Regexp.html">PPIx::Regexp</a> 0.049_01.</p>
+
+<p>Note that if <a href="../../lib/PPI.html">PPI</a> starts unconditionally recognizing postfix dereferences, this argument will immediately become ignored, and will be put through a deprecation cycle and removed.</p>
+
+</dd>
+<dt id="strict-boolean">strict boolean</dt>
+<dd>
+
+<p>This option is passed on to the tokenizer and lexer, where it specifies whether the parse should assume <code>use re &#39;strict&#39;</code> is in effect.</p>
+
+<p>The <code>&#39;strict&#39;</code> pragma was introduced in Perl 5.22, and its documentation says that it is experimental, and that there is no commitment to backward compatibility. The same applies to the parse produced when this option is asserted. Also, the usual caveat applies: if <code>use re &#39;strict&#39;</code> ends up being retracted, this option and all related functionality will be also.</p>
+
+<p>Given the nature of <code>use re &#39;strict&#39;</code>, you should expect that if you assert this option, regular expressions that previously parsed without error might no longer do so. If an element ends up being declared an error because this option is set, its <code>perl_version_introduced()</code> will be the Perl version at which <code>use re &#39;strict&#39;</code> started rejecting these elements.</p>
+
+<p>The default is false.</p>
+
+</dd>
+<dt id="trace-number">trace number</dt>
+<dd>
+
+<p>If greater than zero, this option causes trace output from the parse. The author reserves the right to change or eliminate this without notice.</p>
+
+</dd>
+</dl>
+
+<p>Passing optional input other than the above is not an error, but neither is it supported.</p>
+
+<h2 id="new_from_cache">new_from_cache</h2>
+
+<p>This static method wraps <a href="#new">&quot;new&quot;</a> in a caching mechanism. Only one object will be generated for a given <a href="../../lib/PPI/Element.html">PPI::Element</a>, no matter how many times this method is called. Calls after the first for a given <a>PPI::Element</a> simply return the same <code>PPIx::Regexp</code> object.</p>
+
+<p>When the <code>PPIx::Regexp</code> object is returned from cache, the values of the optional arguments are ignored.</p>
+
+<p>Calls to this method with the regular expression in a string rather than a <a href="../../lib/PPI/Element.html">PPI::Element</a> will not be cached.</p>
+
+<p><b>Caveat:</b> This method is provided for code like <a href="../../lib/Perl/Critic.html">Perl::Critic</a> which might instantiate the same object multiple times. The cache will persist until <a href="#flush_cache">&quot;flush_cache&quot;</a> is called.</p>
+
+<h2 id="flush_cache">flush_cache</h2>
+
+<pre><code> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">flush_cache</span><span class="operator">();</span>            <span class="comment"># Remove $re from cache</span>
+ <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">flush_cache</span><span class="operator">();</span>   <span class="comment"># Empty the cache</span>
+</code></pre>
+
+<p>This method flushes the cache used by <a href="#new_from_cache">&quot;new_from_cache&quot;</a>. If called as a static method with no arguments, the entire cache is emptied. Otherwise any objects specified are removed from the cache.</p>
+
+<h2 id="capture_names">capture_names</h2>
+
+<pre><code> <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">(</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">capture_names</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"Capture name '</span><span class="variable">$name</span><span class="string">'\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>This convenience method returns the capture names found in the regular expression.</p>
+
+<p>This method is equivalent to</p>
+
+<pre><code> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">regular_expression</span><span class="operator">()-&gt;</span><span class="variable">capture_names</span><span class="operator">();</span>
+</code></pre>
+
+<p>except that if <code>$self-&gt;regular_expression()</code> returns <code>undef</code> (meaning that something went terribly wrong with the parse) this method will simply return.</p>
+
+<h2 id="delimiters">delimiters</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">"\t"</span><span class="operator">,</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'s/foo/bar/'</span><span class="operator">)-&gt;</span><span class="variable">delimiters</span><span class="operator">());</span>
+ <span class="comment"># prints '//      //'</span>
+</code></pre>
+
+<p>When called in list context, this method returns either one or two strings, depending on whether the parsed expression has a replacement string. In the case of non-bracketed substitutions, the start delimiter of the replacement string is considered to be the same as its finish delimiter, as illustrated by the above example.</p>
+
+<p>When called in scalar context, you get the delimiters of the regular expression; that is, element 0 of the array that is returned in list context.</p>
+
+<p>Optionally, you can pass an index value and the corresponding delimiters will be returned; index 0 represents the regular expression&#39;s delimiters, and index 1 represents the replacement string&#39;s delimiters, which may be undef. For example,</p>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'s{foo}&lt;bar&gt;'</span><span class="operator">)-&gt;</span><span class="variable">delimiters</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+ <span class="comment"># prints '&lt;&gt;'</span>
+</code></pre>
+
+<p>If the object was not initialized with a valid regexp of some sort, the results of this method are undefined.</p>
+
+<h2 id="errstr">errstr</h2>
+
+<p>This static method returns the error string from the most recent attempt to instantiate a <code>PPIx::Regexp</code>. It will be <code>undef</code> if the most recent attempt succeeded.</p>
+
+<h2 id="failures">failures</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="string">"There were "</span><span class="operator">,</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">failures</span><span class="operator">(),</span> <span class="string">" parse failures\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns the number of parse failures. This is a count of the number of unknown tokens plus the number of unterminated structures plus the number of unmatched right brackets of any sort.</p>
+
+<h2 id="max_capture_number">max_capture_number</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="string">"Highest used capture number "</span><span class="operator">,</span>
+     <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">max_capture_number</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This convenience method returns the highest capture number used by the regular expression. If there are no captures, the return will be 0.</p>
+
+<p>This method is equivalent to</p>
+
+<pre><code> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">regular_expression</span><span class="operator">()-&gt;</span><span class="variable">max_capture_number</span><span class="operator">();</span>
+</code></pre>
+
+<p>except that if <code>$self-&gt;regular_expression()</code> returns <code>undef</code> (meaning that something went terribly wrong with the parse) this method will too.</p>
+
+<h2 id="modifier">modifier</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'s/(foo)/${1}bar/smx'</span> <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">modifier</span><span class="operator">()-&gt;</span><span class="variable">content</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="comment"># prints 'smx'.</span>
+</code></pre>
+
+<p>This method retrieves the modifier of the object. This comes from the end of the initializing string or object and will be a <a href="../../lib/PPIx/Regexp/Token/Modifier.html">PPIx::Regexp::Token::Modifier</a>.</p>
+
+<p><b>Note</b> that this object represents the actual modifiers present on the regexp, and does not take into account any that may have been applied by default (i.e. via the <code>default_modifiers</code> argument to <code>new()</code>). For something that takes account of default modifiers, see <a href="#modifier_asserted">modifier_asserted()</a>, below.</p>
+
+<p>In the event of a parse failure, there may not be a modifier present, in which case nothing is returned.</p>
+
+<h2 id="modifier_asserted">modifier_asserted</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'/ . /'</span><span class="operator">,</span>
+     <span class="string">default_modifiers</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'smx'</span> <span class="operator">]</span> <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">modifier_asserted</span><span class="operator">(</span> <span class="string">'x'</span> <span class="operator">)</span> <span class="operator">?</span> <span class="string">"yes\n"</span> <span class="operator">:</span> <span class="string">"no\n"</span><span class="operator">;</span>
+ <span class="comment"># prints 'yes'.</span>
+</code></pre>
+
+<p>This method returns true if the given modifier is asserted for the regexp, whether explicitly or by the modifiers passed in the <code>default_modifiers</code> argument.</p>
+
+<p>Starting with version 0.036_01, if the argument is a single-character modifier followed by an asterisk (intended as a wild card character), the return is the number of times that modifier appears. In this case an exception will be thrown if you specify a multi-character modifier (e.g. <code>&#39;ee*&#39;</code>), or if you specify one of the match semantics modifiers (e.g. <code>&#39;a*&#39;</code>).</p>
+
+<h2 id="regular_expression">regular_expression</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'s/(foo)/${1}bar/smx'</span> <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">regular_expression</span><span class="operator">()-&gt;</span><span class="variable">content</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="comment"># prints '/(foo)/'.</span>
+</code></pre>
+
+<p>This method returns that portion of the object which actually represents a regular expression.</p>
+
+<h2 id="replacement">replacement</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'s/(foo)/${1}bar/smx'</span> <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">replacement</span><span class="operator">()-&gt;</span><span class="variable">content</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="comment"># prints '${1}bar/'.</span>
+</code></pre>
+
+<p>This method returns that portion of the object which represents the replacement string. This will be <code>undef</code> unless the regular expression actually has a replacement string. Delimiters will be included, but there will be no beginning delimiter unless the regular expression was bracketed.</p>
+
+<h2 id="source">source</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$source</span> <span class="operator">=</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">source</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method returns the object or string that was used to instantiate the object.</p>
+
+<h2 id="type">type</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'s/(foo)/${1}bar/smx'</span> <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$re</span><span class="operator">-&gt;</span><span class="variable">type</span><span class="operator">()-&gt;</span><span class="variable">content</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="comment"># prints 's'.</span>
+</code></pre>
+
+<p>This method retrieves the type of the object. This comes from the beginning of the initializing string or object, and will be a <a href="../../lib/PPIx/Regexp/Token/Structure.html">PPIx::Regexp::Token::Structure</a> whose <code>content</code> is one of &#39;s&#39;, &#39;m&#39;, &#39;qr&#39;, or &#39;&#39;.</p>
+
+<h1 id="RESTRICTIONS">RESTRICTIONS</h1>
+
+<p>By the nature of this module, it is never going to get everything right. Many of the known problem areas involve interpolations one way or another.</p>
+
+<h2 id="Ambiguous-Syntax">Ambiguous Syntax</h2>
+
+<p>Perl&#39;s regular expressions contain cases where the syntax is ambiguous. A particularly egregious example is an interpolation followed by square or curly brackets, for example <code>$foo[...]</code>. There is nothing in the syntax to say whether the programmer wanted to interpolate an element of array <code>@foo</code>, or whether he wanted to interpolate scalar <code>$foo</code>, and then follow that interpolation by a character class.</p>
+
+<p>The <i>perlop</i> documentation notes that in this case what Perl does is to guess. That is, it employs various heuristics on the code to try to figure out what the programmer wanted. These heuristics are documented as being undocumented (!) and subject to change without notice.</p>
+
+<p>Given this situation, this module&#39;s chances of duplicating every Perl version&#39;s interpretation of every regular expression are pretty much nil. What it does now is to assume that square brackets containing <b>only</b> an integer or an interpolation represent a subscript; otherwise they represent a character class. Similarly, curly brackets containing <b>only</b> a bareword or an interpolation are a subscript; otherwise they represent a quantifier.</p>
+
+<h2 id="Changes-in-Syntax">Changes in Syntax</h2>
+
+<p>Sometimes the introduction of new syntax changes the way a regular expression is parsed. For example, the <code>\v</code> character class was introduced in Perl 5.9.5. But it did not represent a syntax error prior to that version of Perl, it was simply parsed as <code>v</code>. So</p>
+
+<pre><code> $ perl -le &#39;print &quot;v&quot; =~ m/\v/ ? &quot;yes&quot; : &quot;no&quot;&#39;</code></pre>
+
+<p>prints &quot;yes&quot; under Perl 5.8.9, but &quot;no&quot; under 5.10.0. <code>PPIx::Regexp</code> generally assumes the more modern parse in cases like this.</p>
+
+<h2 id="Equivocation">Equivocation</h2>
+
+<p>Very occasionally, a construction will be removed and then added back -- and then, conceivably, removed again. In this case, the plan is for <a href="../../lib/PPIx/Regexp.html#perl_version_introduced">perl_version_introduced()</a> to return the earliest version in which the construction appeared, and <a>perl_version_removed()</a> to return the version after the last version in which it appeared (whether production or development), or <code>undef</code> if it is in the highest-numbered Perl.</p>
+
+<p>The constructions involved in this are:</p>
+
+<h3 id="Un-escaped-literal-left-curly-after-literal">Un-escaped literal left curly after literal</h3>
+
+<p>That is, something like <code><span class="string">qr&lt;x{&gt;</span>
+</code>.</p>
+
+<p>This was made an error in <code>5.25.1</code>, and it was an error in <code>5.26.0</code>. But it became a warning again in <code>5.27.1</code>. The <i>perl5271delta</i> says it was re-instated because the changes broke GNU Autoconf, and the warning message says it will be removed in Perl <code>5.30</code>.</p>
+
+<p>Accordingly, <a href="../../lib/PPIx/Regexp.html#perl_version_introduced">perl_version_introduced()</a> returns <code>5.0</code>. At the moment <a href="../../lib/PPIx/Regexp.html#perl_version_removed">perl_version_removed()</a> returns <code>&#39;5.025001&#39;</code>, but if this construction warns in Perl <code>5.26.1</code> this will become <code>undef</code>. This is not quite the same as described above, but is consistent with the <a href="#NOTICE">NOTICE</a> near the beginning of this document.</p>
+
+<h2 id="Static-Parsing">Static Parsing</h2>
+
+<p>It is well known that Perl can not be statically parsed. That is, you can not completely parse a piece of Perl code without executing that same code.</p>
+
+<p>Nevertheless, this class is trying to statically parse regular expressions. The main problem with this is that there is no way to know what is being interpolated into the regular expression by an interpolated variable. This is a problem because the interpolated value can change the interpretation of adjacent elements.</p>
+
+<p>This module deals with this by making assumptions about what is in an interpolated variable. These assumptions will not be enumerated here, but in general the principal is to assume the interpolated value does not change the interpretation of the regular expression. For example,</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$foo</span> <span class="operator">=</span> <span class="string">'a-z]'</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="string">qr{[</span><span class="variable">$foo</span><span class="string">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>is fine with the Perl interpreter, but will confuse the dickens out of this module. Similarly and more usefully, something like</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$mods</span> <span class="operator">=</span> <span class="string">'i'</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="string">qr{(?</span><span class="variable">$mods</span><span class="string">:foo)}</span><span class="operator">;</span>
+</code></pre>
+
+<p>or maybe</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$mods</span> <span class="operator">=</span> <span class="string">'i'</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="string">qr{(?</span><span class="variable">$mods</span><span class="string">)</span><span class="variable">$foo</span><span class="string">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>probably sets a modifier of some sort, and that is how this module interprets it. If the interpolation is <b>not</b> about modifiers, this module will get it wrong. Another such semi-benign example is</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$foo</span> <span class="operator">=</span> <span class="variable">$]</span> <span class="operator">&gt;=</span> <span class="number">5.010</span> <span class="operator">?</span> <span class="string">'?&lt;foo&gt;'</span> <span class="operator">:</span> <span class="string">''</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$re</span> <span class="operator">=</span> <span class="string">qr{(</span><span class="variable">$foo</span><span class="string">\w+)}</span><span class="operator">;</span>
+</code></pre>
+
+<p>which will parse, but this module will never realize that it might be looking at a named capture.</p>
+
+<h2 id="Non-Standard-Syntax">Non-Standard Syntax</h2>
+
+<p>There are modules out there that alter the syntax of Perl. If the syntax of a regular expression is altered, this module has no way to understand that it has been altered, much less to adapt to the alteration. The following modules are known to cause problems:</p>
+
+<p><a>Acme::PerlML</a>, which renders Perl as XML.</p>
+
+<p><a>Data::PostfixDeref</a>, which causes Perl to interpret suffixed empty brackets as dereferencing the thing they suffix.</p>
+
+<p><a>Filter::Trigraph</a>, which recognizes ANSI C trigraphs, allowing Perl to be written in the ISO 646 character set.</p>
+
+<p><a>Perl6::Pugs</a>. Enough said.</p>
+
+<p><a>Perl6::Rules</a>, which back-ports some of the Perl 6 regular expression syntax to Perl 5.</p>
+
+<p><a>Regexp::Extended</a>, which extends regular expressions in various ways, some of which seem to conflict with Perl 5.010.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Regexp::Parser</a>, which parses a bare regular expression (without enclosing <code><span class="string">qr{}</span>
+</code>, <code>m//</code>, or whatever) and uses a different navigation model.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is by the author. Please file bug reports at <a href="http://rt.cpan.org">http://rt.cpan.org</a>, or in electronic mail to the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2017 by Thomas R. Wyant, III</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the full text of the licenses in the directory LICENSES.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+
+</body>
+
+</html>
+
+

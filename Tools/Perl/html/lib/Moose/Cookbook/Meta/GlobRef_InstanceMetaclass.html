@@ -1,0 +1,249 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONCLUSION">CONCLUSION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Cookbook::Meta::GlobRef_InstanceMetaclass - Creating a glob reference meta-instance class</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">My::Meta::Instance</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Scalar::Util</span> <span class="string">qw( weaken )</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Symbol</span> <span class="string">qw( gensym )</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> create_instance </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$sym</span> <span class="operator">=</span> <span class="variable">gensym</span><span class="operator">();</span>
+      <span class="keyword">bless</span> <span class="variable">$sym</span><span class="operator">,</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_class_name</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> clone_instance </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$new_sym</span> <span class="operator">=</span> <span class="variable">gensym</span><span class="operator">();</span>
+      <span class="variable">%</span><span class="operator">{</span><span class="operator">*</span><span class="variable">$new_sym</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">%</span><span class="operator">{</span><span class="operator">*</span><span class="variable">$instance</span><span class="operator">}</span><span class="operator">;</span>
+  
+      <span class="keyword">bless</span> <span class="variable">$new_sym</span><span class="operator">,</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_class_name</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> get_slot_value </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="operator">*</span><span class="variable">$instance</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$slot_name</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> set_slot_value </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span><span class="operator">,</span> <span class="variable">$value</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="operator">*</span><span class="variable">$instance</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$slot_name</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$value</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> deinitialize_slot </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">delete</span> <span class="operator">*</span><span class="variable">$instance</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$slot_name</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> is_slot_initialized </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">exists</span> <span class="operator">*</span><span class="variable">$instance</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$slot_name</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> weaken_slot_value </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="variable">weaken</span> <span class="operator">*</span><span class="variable">$instance</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$slot_name</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> inline_create_instance </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$class_variable</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="string">'do { my $sym = Symbol::gensym(); bless $sym, '</span> <span class="operator">.</span> <span class="variable">$class_variable</span> <span class="operator">.</span> <span class="string">' }'</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> inline_slot_access </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="string">'*{'</span> <span class="operator">.</span> <span class="variable">$instance</span> <span class="operator">.</span> <span class="string">'}-&gt;{'</span> <span class="operator">.</span> <span class="variable">$slot_name</span> <span class="operator">.</span> <span class="string">'}'</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">MyApp::User</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="variable">Moose::Util::MetaRole::apply_metaroles</span><span class="operator">(</span>
+      <span class="string">for</span> <span class="operator">=&gt;</span> <span class="keyword">__PACKAGE__</span><span class="operator">,</span>
+      <span class="string">class_metaroles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">instance</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'My::Meta::Instance'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">has</span> <span class="string">'name'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">has</span> <span class="string">'email'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This recipe shows how to build your own meta-instance. The meta instance is the metaclass that creates object instances and helps manages access to attribute slots.</p>
+
+<p>In this example, we&#39;re creating a meta-instance that is based on a glob reference rather than a hash reference. This example is largely based on the Piotr Roszatycki&#39;s <a>MooseX::GlobRef</a> module.</p>
+
+<p>Our extension is a role which will be applied to <a href="../../../../lib/Moose/Meta/Instance.html">Moose::Meta::Instance</a>, which creates hash reference based objects. We need to override all the methods which make assumptions about the object&#39;s data structure.</p>
+
+<p>The first method we override is <code>create_instance</code>:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> create_instance </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$sym</span> <span class="operator">=</span> <span class="variable">gensym</span><span class="operator">();</span>
+      <span class="keyword">bless</span> <span class="variable">$sym</span><span class="operator">,</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_class_name</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>This returns an glob reference which has been blessed into our meta-instance&#39;s associated class.</p>
+
+<p>We also override <code>clone_instance</code> to create a new array reference:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> clone_instance </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$new_sym</span> <span class="operator">=</span> <span class="variable">gensym</span><span class="operator">();</span>
+      <span class="variable">%</span><span class="operator">{</span><span class="operator">*</span><span class="variable">$new_sym</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">%</span><span class="operator">{</span><span class="operator">*</span><span class="variable">$instance</span><span class="operator">}</span><span class="operator">;</span>
+  
+      <span class="keyword">bless</span> <span class="variable">$new_sym</span><span class="operator">,</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_class_name</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>After that, we have a series of methods which mediate access to the object&#39;s slots (attributes are stored in &quot;slots&quot;). In the default instance class, these expect the object to be a hash reference, but we need to change this to expect a glob reference instead.</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> get_slot_value </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="operator">*</span><span class="variable">$instance</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$slot_name</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>This level of indirection probably makes our instance class <i>slower</i> than the default. However, when attribute access is inlined, this lookup will be cached:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> inline_slot_access </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$instance</span><span class="operator">,</span> <span class="variable">$slot_name</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="string">'*{'</span> <span class="operator">.</span> <span class="variable">$instance</span> <span class="operator">.</span> <span class="string">'}-&gt;{'</span> <span class="operator">.</span> <span class="variable">$slot_name</span> <span class="operator">.</span> <span class="string">'}'</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The code snippet that the <code>inline_slot_access</code> method returns will get <code>eval</code>&#39;d once per attribute.</p>
+
+<p>Finally, we use this meta-instance in our <code>MyApp::User</code> class:</p>
+
+<pre><code>  <span class="variable">Moose::Util::MetaRole::apply_metaroles</span><span class="operator">(</span>
+      <span class="string">for</span> <span class="operator">=&gt;</span> <span class="keyword">__PACKAGE__</span><span class="operator">,</span>
+      <span class="string">class_metaroles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">instance</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'My::Meta::Instance'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>We actually don&#39;t recommend the use of <a href="../../../../lib/Moose/Util/MetaRole.html">Moose::Util::MetaRole</a> directly in your class in most cases. Typically, this would be provided by a <a href="../../../../lib/Moose/Exporter.html">Moose::Exporter</a>-based module which handles applying the role for you.</p>
+
+<h1 id="CONCLUSION">CONCLUSION</h1>
+
+<p>This recipe shows how to create your own meta-instance class. It&#39;s unlikely that you&#39;ll need to do this yourself, but it&#39;s interesting to take a peek at how Moose works under the hood.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>There are a few meta-instance class extensions on CPAN:</p>
+
+<ul>
+
+<li><p><a>MooseX::Singleton</a></p>
+
+<p>This module extends the instance class in order to ensure that the object is a singleton. The instance it uses is still a blessed hash reference.</p>
+
+</li>
+<li><p><a>MooseX::GlobRef</a></p>
+
+<p>This module makes the instance a blessed glob reference. This lets you use a handle as an object instance.</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

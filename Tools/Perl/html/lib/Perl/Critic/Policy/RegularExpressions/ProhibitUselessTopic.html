@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::RegularExpressions::ProhibitUselessTopic - Don&#39;t use $_ to match against regexes.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>It is not necessary to specify the topic variable <code>$_</code> when matching against a regular expression.</p>
+
+<p>Match or substitution operations are performed against variables, such as:</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">/foo/</span><span class="operator">;</span>
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">s/foo/bar/</span><span class="operator">;</span>
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">tr/a-mn-z/n-za-m/</span><span class="operator">;</span>
+</code></pre>
+
+<p>If a variable is not specified, the match is against <code>$_</code>.</p>
+
+<pre><code>    <span class="comment"># These are identical.</span>
+    <span class="regex">/foo/</span><span class="operator">;</span>
+    <span class="variable">$_</span> <span class="operator">=~</span> <span class="regex">/foo/</span><span class="operator">;</span>
+    
+    <span class="comment"># These are identical.</span>
+    <span class="regex">s/foo/bar/</span><span class="operator">;</span>
+    <span class="variable">$_</span> <span class="operator">=~</span> <span class="regex">s/foo/bar/</span><span class="operator">;</span>
+    
+    <span class="comment"># These are identical.</span>
+    <span class="regex">tr/a-mn-z/n-za-m/</span><span class="operator">;</span>
+    <span class="variable">$_</span> <span class="operator">=~</span> <span class="regex">tr/a-mn-z/n-za-m/</span><span class="operator">;</span>
+</code></pre>
+
+<p>This applies to negative matching as well.</p>
+
+<pre><code>    <span class="comment"># These are identical</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$_</span> <span class="operator">!~</span> <span class="regex">/DEBUG/</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="operator">!</span><span class="regex">/DEBUG ) { ...
+    </span>
+</code></pre>
+
+<p>Including the <code>$_ =~</code> or <code>$_ !~</code> is unnecessary, adds complexity, and is not idiomatic Perl.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andy Lester &lt;andy@petdance.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2013 Andy Lester &lt;andy@petdance.com&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.</p>
+
+
+</body>
+
+</html>
+
+

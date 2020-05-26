@@ -1,0 +1,193 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Other-import-subs">Other import() subs</a></li>
+    </ul>
+  </li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#DONATIONS1">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Package::DeprecationManager - Manage deprecation warnings for your distribution</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.17</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">My::Class</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Package::DeprecationManager</span> <span class="operator">-</span><span class="string">deprecations</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+      <span class="string">'My::Class::foo'</span> <span class="operator">=&gt;</span> <span class="string">'0.02'</span><span class="operator">,</span>
+      <span class="string">'My::Class::bar'</span> <span class="operator">=&gt;</span> <span class="string">'0.05'</span><span class="operator">,</span>
+      <span class="string">'feature-X'</span>      <span class="operator">=&gt;</span> <span class="string">'0.07'</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+      <span class="variable">deprecated</span><span class="operator">(</span> <span class="string">'Do not call foo!'</span> <span class="operator">);</span>
+  
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> bar </span><span class="operator">{</span>
+      <span class="variable">deprecated</span><span class="operator">();</span>
+  
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> baz </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">%args</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+          <span class="variable">deprecated</span><span class="operator">(</span>
+              <span class="string">message</span> <span class="operator">=&gt;</span> <span class="operator">...,</span>
+              <span class="string">feature</span> <span class="operator">=&gt;</span> <span class="string">'feature-X'</span><span class="operator">,</span>
+          <span class="operator">);</span>
+      <span class="operator">}</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">Other::Class</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">My::Class</span> <span class="operator">-</span><span class="string">api_version</span> <span class="operator">=&gt;</span> <span class="string">'0.04'</span><span class="operator">;</span>
+  
+  <span class="variable">My::Class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()-&gt;</span><span class="variable">foo</span><span class="operator">();</span> <span class="comment"># warns</span>
+  <span class="variable">My::Class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()-&gt;</span><span class="variable">bar</span><span class="operator">();</span> <span class="comment"># does not warn</span>
+  <span class="variable">My::Class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()-&gt;</span><span class="variable">bar</span><span class="operator">();</span> <span class="comment"># does not warn again</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module allows you to manage a set of deprecations for one or more modules.</p>
+
+<p>When you import <code>Package::DeprecationManager</code>, you must provide a set of <code>-deprecations</code> as a hash ref. The keys are &quot;feature&quot; names, and the values are the version when that feature was deprecated.</p>
+
+<p>In many cases, you can simply use the fully qualified name of a subroutine or method as the feature name. This works for cases where the whole subroutine is deprecated. However, the feature names can be any string. This is useful if you don&#39;t want to deprecate an entire subroutine, just a certain usage.</p>
+
+<p>You can also provide an optional array reference in the <code>-ignore</code> parameter.</p>
+
+<p>The values to be ignored can be package names or regular expressions (made with <code>qr//</code>). Use this to ignore packages in your distribution that can appear on the call stack when a deprecated feature is used.</p>
+
+<p>As part of the import process, <code>Package::DeprecationManager</code> will export two subroutines into its caller. It provides an <code>import()</code> sub for the caller and a <code>deprecated()</code> sub.</p>
+
+<p>The <code>import()</code> sub allows callers of <i>your</i> class to specify an <code>-api_version</code> parameter. If this is supplied, then deprecation warnings are only issued for deprecations with API versions earlier than the one specified.</p>
+
+<p>You must call the <code>deprecated()</code> sub in each deprecated subroutine. When called, it will issue a warning using <code>Carp::cluck()</code>.</p>
+
+<p>The <code>deprecated()</code> sub can be called in several ways. If you do not pass any arguments, it will generate an appropriate warning message. If you pass a single argument, this is used as the warning message.</p>
+
+<p>Finally, you can call it with named arguments. Currently, the only allowed names are <code>message</code> and <code>feature</code>. The <code>feature</code> argument should correspond to the feature name passed in the <code>-deprecations</code> hash.</p>
+
+<p>If you don&#39;t explicitly specify a feature, the <code>deprecated()</code> sub uses <code>caller()</code> to identify its caller, using its fully qualified subroutine name.</p>
+
+<p>A given deprecation warning is only issued once for a given package. This module tracks this based on both the feature name <i>and</i> the error message itself. This means that if you provide several different error messages for the same feature, all of those errors will appear.</p>
+
+<h2 id="Other-import-subs">Other import() subs</h2>
+
+<p>This module works by installing an <code>import</code> sub in any package that uses it. If that package <i>already</i> has an <code>import</code> sub, then that <code>import</code> will be called after any arguments passed for <code>Package::DeprecationManager</code> are stripped out. You need to define your <code>import</code> sub before you <code>use Package::DeprecationManager</code> to make this work:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">HasExporter</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Exporter</span> <span class="string">qw( import )</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Package::DeprecationManager</span> <span class="operator">-</span><span class="string">deprecations</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+      <span class="string">'HasExporter::foo'</span> <span class="operator">=&gt;</span> <span class="string">'0.02'</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">our</span> <span class="variable">@EXPORT_OK</span> <span class="operator">=</span> <span class="string">qw( some_sub another_sub )</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time, which seems unlikely at best.</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org or use the button on this page: <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a></p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>The idea for this functionality and some of its implementation was originally created as <a href="../../lib/Class/MOP/Deprecated.html">Class::MOP::Deprecated</a> by Goro Fuji.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-package-deprecationmanager@rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<p>Bugs may be submitted through <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Package-DeprecationManager">the RT bug tracker</a> (or <a href="mailto:bug-package-deprecationmanager@rt.cpan.org">bug-package-deprecationmanager@rt.cpan.org</a>).</p>
+
+<p>I am also usually active on IRC as &#39;drolsky&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="DONATIONS1">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Tomas Doran &lt;bobtfish@bobtfish.net&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</h1>
+
+<p>This software is Copyright (c) 2016 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

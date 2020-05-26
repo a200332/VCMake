@@ -1,0 +1,707 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Functions">Functions</a></li>
+      <li><a href="#Locale-Types">Locale Types</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS-COPYRIGHT">AUTHORS/COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::OLE::NLS - OLE National Language Support</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        missing</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides access to the national language support features in the <i>OLENLS.DLL</i>.</p>
+
+<h2 id="Functions">Functions</h2>
+
+<dl>
+
+<dt id="CompareString-LCID-FLAGS-STR1-STR2">CompareString(LCID,FLAGS,STR1,STR2)</dt>
+<dd>
+
+<p>Compare STR1 and STR2 in the LCID locale. FLAGS indicate the character traits to be used or ignored when comparing the two strings.</p>
+
+<pre><code>        NORM_IGNORECASE         Ignore case
+        NORM_IGNOREKANATYPE     Ignore hiragana/katakana character differences
+        NORM_IGNORENONSPACE     Ignore accents, diacritics, and vowel marks
+        NORM_IGNORESYMBOLS      Ignore symbols
+        NORM_IGNOREWIDTH        Ignore character width</code></pre>
+
+<p>Possible return values are:</p>
+
+<pre><code>        0       Function failed
+        1       STR1 is less than STR2
+        2       STR1 is equal to STR2
+        3       STR1 is greater than STR2</code></pre>
+
+<p>Note that you can subtract 2 from the return code to get values comparable to the <code>cmp</code> operator.</p>
+
+</dd>
+<dt id="LCMapString-LCID-FLAGS-STR">LCMapString(LCID,FLAGS,STR)</dt>
+<dd>
+
+<p>LCMapString translates STR using LCID dependent translation. Flags contains a combination of the following options:</p>
+
+<pre><code>        LCMAP_LOWERCASE         Lowercase
+        LCMAP_UPPERCASE         Uppercase
+        LCMAP_HALFWIDTH         Narrow characters
+        LCMAP_FULLWIDTH         Wide characters
+        LCMAP_HIRAGANA          Hiragana
+        LCMAP_KATAKANA          Katakana
+        LCMAP_SORTKEY           Character sort key</code></pre>
+
+<p>The following normalization options can be combined with <code>LCMAP_SORTKEY</code>:</p>
+
+<pre><code>        NORM_IGNORECASE         Ignore case
+        NORM_IGNOREKANATYPE     Ignore hiragana/katakana character differences
+        NORM_IGNORENONSPACE     Ignore accents, diacritics, and vowel marks
+        NORM_IGNORESYMBOLS      Ignore symbols
+        NORM_IGNOREWIDTH        Ignore character width</code></pre>
+
+<p>The return value is the translated string.</p>
+
+</dd>
+<dt id="GetLocaleInfo-LCID-LCTYPE">GetLocaleInfo(LCID,LCTYPE)</dt>
+<dd>
+
+<p>Retrieve locale setting LCTYPE from the locale specified by LCID. Use LOCALE_NOUSEROVERRIDE | LCTYPE to always query the locale database. Otherwise user changes to <code>win.ini</code> through the windows control panel take precedence when retrieving values for the system default locale. See the documentation below for a list of valid LCTYPE values.</p>
+
+<p>The return value is the contents of the requested locale setting.</p>
+
+</dd>
+<dt id="GetStringType-LCID-TYPE-STR">GetStringType(LCID,TYPE,STR)</dt>
+<dd>
+
+<p>Retrieve type information from locale LCID about each character in STR. The requested TYPE can be one of the following 3 levels:</p>
+
+<pre><code>        CT_CTYPE1               ANSI C and POSIX type information
+        CT_CTYPE2               Text layout type information
+        CT_CTYPE3               Text processing type information</code></pre>
+
+<p>The return value is a list of values, each of wich is a bitwise OR of the applicable type bits from the corresponding table below:</p>
+
+<pre><code>        <span class="variable">@ct</span> <span class="operator">=</span> <span class="variable">GetStringType</span><span class="operator">(</span><span class="variable">LOCALE_SYSTEM_DEFAULT</span><span class="operator">,</span> <span class="variable">CT_CTYPE1</span><span class="operator">,</span> <span class="string">"String"</span><span class="operator">);</span>
+</code></pre>
+
+<p>ANSI C and POSIX character type information:</p>
+
+<pre><code>        C1_UPPER                Uppercase
+        C1_LOWER                Lowercase
+        C1_DIGIT                Decimal digits
+        C1_SPACE                Space characters
+        C1_PUNCT                Punctuation
+        C1_CNTRL                Control characters
+        C1_BLANK                Blank characters
+        C1_XDIGIT               Hexadecimal digits
+        C1_ALPHA                Any letter</code></pre>
+
+<p>Text layout type information:</p>
+
+<pre><code>        C2_LEFTTORIGHT          Left to right
+        C2_RIGHTTOLEFT          Right to left
+        C2_EUROPENUMBER         European number, European digit
+        C2_EUROPESEPARATOR      European numeric separator
+        C2_EUROPETERMINATOR     European numeric terminator
+        C2_ARABICNUMBER         Arabic number
+        C2_COMMONSEPARATOR      Common numeric separator
+        C2_BLOCKSEPARATOR       Block separator
+        C2_SEGMENTSEPARATOR     Segment separator
+        C2_WHITESPACE           White space
+        C2_OTHERNEUTRAL         Other neutrals
+        C2_NOTAPPLICABLE        No implicit direction (e.g. ctrl codes)</code></pre>
+
+<p>Text precessing type information:</p>
+
+<pre><code>        C3_NONSPACING           Nonspacing mark
+        C3_DIACRITIC            Diacritic nonspacing mark
+        C3_VOWELMARK            Vowel nonspacing mark
+        C3_SYMBOL               Symbol
+        C3_KATAKANA             Katakana character
+        C3_HIRAGANA             Hiragana character
+        C3_HALFWIDTH            Narrow character
+        C3_FULLWIDTH            Wide character
+        C3_IDEOGRAPH            Ideograph
+        C3_ALPHA                Any letter
+        C3_NOTAPPLICABLE        Not applicable</code></pre>
+
+</dd>
+<dt id="GetSystemDefaultLangID">GetSystemDefaultLangID()</dt>
+<dd>
+
+<p>Returns the system default language identifier.</p>
+
+</dd>
+<dt id="GetSystemDefaultLCID">GetSystemDefaultLCID()</dt>
+<dd>
+
+<p>Returns the system default locale identifier.</p>
+
+</dd>
+<dt id="GetUserDefaultLangID">GetUserDefaultLangID()</dt>
+<dd>
+
+<p>Returns the user default language identifier.</p>
+
+</dd>
+<dt id="GetUserDefaultLCID">GetUserDefaultLCID()</dt>
+<dd>
+
+<p>Returns the user default locale identifier.</p>
+
+</dd>
+<dt id="SendSettingChange">SendSettingChange()</dt>
+<dd>
+
+<p>Sends a WM_SETTINGCHANGE message to all top level windows.</p>
+
+</dd>
+<dt id="SetLocaleInfo-LCID-LCTYPE-LCDATA">SetLocaleInfo(LCID, LCTYPE, LCDATA)</dt>
+<dd>
+
+<p>Changes an item in the user override part of the locale setting LCID. It doesn&#39;t change the system default database. The following LCTYPEs are changeable:</p>
+
+<pre><code>        LOCALE_ICALENDARTYPE    LOCALE_SDATE
+        LOCALE_ICURRDIGITS      LOCALE_SDECIMAL
+        LOCALE_ICURRENCY        LOCALE_SGROUPING
+        LOCALE_IDIGITS          LOCALE_SLIST
+        LOCALE_IFIRSTDAYOFWEEK  LOCALE_SLONGDATE
+        LOCALE_IFIRSTWEEKOFYEAR LOCALE_SMONDECIMALSEP
+        LOCALE_ILZERO           LOCALE_SMONGROUPING
+        LOCALE_IMEASURE         LOCALE_SMONTHOUSANDSEP
+        LOCALE_INEGCURR         LOCALE_SNEGATIVESIGN
+        LOCALE_INEGNUMBER       LOCALE_SPOSITIVESIGN
+        LOCALE_IPAPERSIZE       LOCALE_SSHORTDATE
+        LOCALE_ITIME            LOCALE_STHOUSAND
+        LOCALE_S1159            LOCALE_STIME
+        LOCALE_S2359            LOCALE_STIMEFORMAT
+        LOCALE_SCURRENCY        LOCALE_SYEARMONTH</code></pre>
+
+<p>You have to call SendSettingChange() to activate these changes for subsequent Win32::OLE::Variant object formatting because the OLE subsystem seems to cache locale information.</p>
+
+</dd>
+<dt id="MAKELANGID-LANG-SUBLANG">MAKELANGID(LANG,SUBLANG)</dt>
+<dd>
+
+<p>Creates a language identifier from a primary language and a sublanguage.</p>
+
+</dd>
+<dt id="PRIMARYLANGID-LANGID">PRIMARYLANGID(LANGID)</dt>
+<dd>
+
+<p>Retrieves the primary language from a language identifier.</p>
+
+</dd>
+<dt id="SUBLANGID-LANGID">SUBLANGID(LANGID)</dt>
+<dd>
+
+<p>Retrieves the sublanguage from a language identifier.</p>
+
+</dd>
+<dt id="MAKELCID-LANGID">MAKELCID(LANGID)</dt>
+<dd>
+
+<p>Creates a locale identifies from a language identifier.</p>
+
+</dd>
+<dt id="LANGIDFROMLCID-LCID">LANGIDFROMLCID(LCID)</dt>
+<dd>
+
+<p>Retrieves a language identifier from a locale identifier.</p>
+
+</dd>
+</dl>
+
+<h2 id="Locale-Types">Locale Types</h2>
+
+<dl>
+
+<dt id="LOCALE_ILANGUAGE">LOCALE_ILANGUAGE</dt>
+<dd>
+
+<p>The language identifier (in hex).</p>
+
+</dd>
+<dt id="LOCALE_SLANGUAGE">LOCALE_SLANGUAGE</dt>
+<dd>
+
+<p>The localized name of the language.</p>
+
+</dd>
+<dt id="LOCALE_SENGLANGUAGE">LOCALE_SENGLANGUAGE</dt>
+<dd>
+
+<p>The ISO Standard 639 English name of the language.</p>
+
+</dd>
+<dt id="LOCALE_SABBREVLANGNAME">LOCALE_SABBREVLANGNAME</dt>
+<dd>
+
+<p>The three-letter abbreviated name of the language. The first two letters are from the ISO Standard 639 language name abbreviation. The third letter indicates the sublanguage type.</p>
+
+</dd>
+<dt id="LOCALE_SNATIVELANGNAME">LOCALE_SNATIVELANGNAME</dt>
+<dd>
+
+<p>The native name of the language.</p>
+
+</dd>
+<dt id="LOCALE_ICOUNTRY">LOCALE_ICOUNTRY</dt>
+<dd>
+
+<p>The country code, which is based on international phone codes.</p>
+
+</dd>
+<dt id="LOCALE_SCOUNTRY">LOCALE_SCOUNTRY</dt>
+<dd>
+
+<p>The localized name of the country.</p>
+
+</dd>
+<dt id="LOCALE_SENGCOUNTRY">LOCALE_SENGCOUNTRY</dt>
+<dd>
+
+<p>The English name of the country.</p>
+
+</dd>
+<dt id="LOCALE_SABBREVCTRYNAME">LOCALE_SABBREVCTRYNAME</dt>
+<dd>
+
+<p>The ISO Standard 3166 abbreviated name of the country.</p>
+
+</dd>
+<dt id="LOCALE_SNATIVECTRYNAME">LOCALE_SNATIVECTRYNAME</dt>
+<dd>
+
+<p>The native name of the country.</p>
+
+</dd>
+<dt id="LOCALE_IDEFAULTLANGUAGE">LOCALE_IDEFAULTLANGUAGE</dt>
+<dd>
+
+<p>Language identifier for the principal language spoken in this locale.</p>
+
+</dd>
+<dt id="LOCALE_IDEFAULTCOUNTRY">LOCALE_IDEFAULTCOUNTRY</dt>
+<dd>
+
+<p>Country code for the principal country in this locale.</p>
+
+</dd>
+<dt id="LOCALE_IDEFAULTANSICODEPAGE">LOCALE_IDEFAULTANSICODEPAGE</dt>
+<dd>
+
+<p>The ANSI code page associated with this locale. Format: 4 Unicode decimal digits plus a Unicode null terminator.</p>
+
+<p>XXX This should be translated by GetLocaleInfo. XXX</p>
+
+</dd>
+<dt id="LOCALE_IDEFAULTCODEPAGE">LOCALE_IDEFAULTCODEPAGE</dt>
+<dd>
+
+<p>The OEM code page associated with the country.</p>
+
+</dd>
+<dt id="LOCALE_SLIST">LOCALE_SLIST</dt>
+<dd>
+
+<p>Characters used to separate list items (often a comma).</p>
+
+</dd>
+<dt id="LOCALE_IMEASURE">LOCALE_IMEASURE</dt>
+<dd>
+
+<p>Default measurement system:</p>
+
+<pre><code>        0       metric system (S.I.)
+        1       U.S. system</code></pre>
+
+</dd>
+<dt id="LOCALE_SDECIMAL">LOCALE_SDECIMAL</dt>
+<dd>
+
+<p>Characters used for the decimal separator (often a dot).</p>
+
+</dd>
+<dt id="LOCALE_STHOUSAND">LOCALE_STHOUSAND</dt>
+<dd>
+
+<p>Characters used as the separator between groups of digits left of the decimal.</p>
+
+</dd>
+<dt id="LOCALE_SGROUPING">LOCALE_SGROUPING</dt>
+<dd>
+
+<p>Sizes for each group of digits to the left of the decimal. An explicit size is required for each group. Sizes are separated by semicolons. If the last value is 0, the preceding value is repeated. To group thousands, specify 3;0.</p>
+
+</dd>
+<dt id="LOCALE_IDIGITS">LOCALE_IDIGITS</dt>
+<dd>
+
+<p>The number of fractional digits.</p>
+
+</dd>
+<dt id="LOCALE_ILZERO">LOCALE_ILZERO</dt>
+<dd>
+
+<p>Whether to use leading zeros in decimal fields. A setting of 0 means use no leading zeros; 1 means use leading zeros.</p>
+
+</dd>
+<dt id="LOCALE_SNATIVEDIGITS">LOCALE_SNATIVEDIGITS</dt>
+<dd>
+
+<p>The ten characters that are the native equivalent of the ASCII 0-9.</p>
+
+</dd>
+<dt id="LOCALE_INEGNUMBER">LOCALE_INEGNUMBER</dt>
+<dd>
+
+<p>Negative number mode.</p>
+
+<pre><code>        0       (1.1)
+        1       -1.1
+        2       -1.1
+        3       1.1
+        4       1.1</code></pre>
+
+</dd>
+<dt id="LOCALE_SCURRENCY">LOCALE_SCURRENCY</dt>
+<dd>
+
+<p>The string used as the local monetary symbol.</p>
+
+</dd>
+<dt id="LOCALE_SINTLSYMBOL">LOCALE_SINTLSYMBOL</dt>
+<dd>
+
+<p>Three characters of the International monetary symbol specified in ISO 4217, Codes for the Representation of Currencies and Funds, followed by the character separating this string from the amount.</p>
+
+</dd>
+<dt id="LOCALE_SMONDECIMALSEP">LOCALE_SMONDECIMALSEP</dt>
+<dd>
+
+<p>Characters used for the monetary decimal separators.</p>
+
+</dd>
+<dt id="LOCALE_SMONTHOUSANDSEP">LOCALE_SMONTHOUSANDSEP</dt>
+<dd>
+
+<p>Characters used as monetary separator between groups of digits left of the decimal.</p>
+
+</dd>
+<dt id="LOCALE_SMONGROUPING">LOCALE_SMONGROUPING</dt>
+<dd>
+
+<p>Sizes for each group of monetary digits to the left of the decimal. An explicit size is needed for each group. Sizes are separated by semicolons. If the last value is 0, the preceding value is repeated. To group thousands, specify 3;0.</p>
+
+</dd>
+<dt id="LOCALE_ICURRDIGITS">LOCALE_ICURRDIGITS</dt>
+<dd>
+
+<p>Number of fractional digits for the local monetary format.</p>
+
+</dd>
+<dt id="LOCALE_IINTLCURRDIGITS">LOCALE_IINTLCURRDIGITS</dt>
+<dd>
+
+<p>Number of fractional digits for the international monetary format.</p>
+
+</dd>
+<dt id="LOCALE_ICURRENCY">LOCALE_ICURRENCY</dt>
+<dd>
+
+<p>Positive currency mode.</p>
+
+<pre><code>        0       Prefix, no separation.
+        1       Suffix, no separation.
+        2       Prefix, 1-character separation.
+        3       Suffix, 1-character separation.</code></pre>
+
+</dd>
+<dt id="LOCALE_INEGCURR">LOCALE_INEGCURR</dt>
+<dd>
+
+<p>Negative currency mode.</p>
+
+<pre><code>        0       ($1.1)
+        1       -$1.1
+        2       $-1.1
+        3       $1.1-
+        4       $(1.1$)
+        5       -1.1$
+        6       1.1-$
+        7       1.1$-
+        8       -1.1 $ (space before $)
+        9       -$ 1.1 (space after $)
+        10      1.1 $- (space before $)</code></pre>
+
+</dd>
+<dt id="LOCALE_ICALENDARTYPE">LOCALE_ICALENDARTYPE</dt>
+<dd>
+
+<p>The type of calendar currently in use.</p>
+
+<pre><code>        1       Gregorian (as in U.S.)
+        2       Gregorian (always English strings)
+        3       Era: Year of the Emperor (Japan)
+        4       Era: Year of the Republic of China
+        5       Tangun Era (Korea)</code></pre>
+
+</dd>
+<dt id="LOCALE_IOPTIONALCALENDAR">LOCALE_IOPTIONALCALENDAR</dt>
+<dd>
+
+<p>The additional calendar types available for this LCID. Can be a null-separated list of all valid optional calendars. Value is 0 for &quot;None available&quot; or any of the LOCALE_ICALENDARTYPE settings.</p>
+
+<p>XXX null separated list should be translated by GetLocaleInfo XXX</p>
+
+</dd>
+<dt id="LOCALE_SDATE">LOCALE_SDATE</dt>
+<dd>
+
+<p>Characters used for the date separator.</p>
+
+</dd>
+<dt id="LOCALE_STIME">LOCALE_STIME</dt>
+<dd>
+
+<p>Characters used for the time separator.</p>
+
+</dd>
+<dt id="LOCALE_STIMEFORMAT">LOCALE_STIMEFORMAT</dt>
+<dd>
+
+<p>Time-formatting string.</p>
+
+</dd>
+<dt id="LOCALE_SSHORTDATE">LOCALE_SSHORTDATE</dt>
+<dd>
+
+<p>Short Date_Time formatting strings for this locale.</p>
+
+</dd>
+<dt id="LOCALE_SLONGDATE">LOCALE_SLONGDATE</dt>
+<dd>
+
+<p>Long Date_Time formatting strings for this locale.</p>
+
+</dd>
+<dt id="LOCALE_IDATE">LOCALE_IDATE</dt>
+<dd>
+
+<p>Short Date format-ordering specifier.</p>
+
+<pre><code>        0       Month - Day - Year
+        1       Day - Month - Year
+        2       Year - Month - Day</code></pre>
+
+</dd>
+<dt id="LOCALE_ILDATE">LOCALE_ILDATE</dt>
+<dd>
+
+<p>Long Date format ordering specifier. Value can be any of the valid LOCALE_IDATE settings.</p>
+
+</dd>
+<dt id="LOCALE_ITIME">LOCALE_ITIME</dt>
+<dd>
+
+<p>Time format specifier.</p>
+
+<pre><code>        0       AM/PM 12-hour format.
+        1       24-hour format.</code></pre>
+
+</dd>
+<dt id="LOCALE_ITIMEMARKPOSN">LOCALE_ITIMEMARKPOSN</dt>
+<dd>
+
+<p>Whether the time marker string (AM|PM) precedes or follows the time string. 0 Suffix (9:15 AM). 1 Prefix (AM 9:15).</p>
+
+</dd>
+<dt id="LOCALE_ICENTURY">LOCALE_ICENTURY</dt>
+<dd>
+
+<p>Whether to use full 4-digit century.</p>
+
+<pre><code>        0       Two digit.
+        1       Full century.</code></pre>
+
+</dd>
+<dt id="LOCALE_ITLZERO">LOCALE_ITLZERO</dt>
+<dd>
+
+<p>Whether to use leading zeros in time fields.</p>
+
+<pre><code>        0       No leading zeros.
+        1       Leading zeros for hours.</code></pre>
+
+</dd>
+<dt id="LOCALE_IDAYLZERO">LOCALE_IDAYLZERO</dt>
+<dd>
+
+<p>Whether to use leading zeros in day fields. Values as for LOCALE_ITLZERO.</p>
+
+</dd>
+<dt id="LOCALE_IMONLZERO">LOCALE_IMONLZERO</dt>
+<dd>
+
+<p>Whether to use leading zeros in month fields. Values as for LOCALE_ITLZERO.</p>
+
+</dd>
+<dt id="LOCALE_S1159">LOCALE_S1159</dt>
+<dd>
+
+<p>String for the AM designator.</p>
+
+</dd>
+<dt id="LOCALE_S2359">LOCALE_S2359</dt>
+<dd>
+
+<p>String for the PM designator.</p>
+
+</dd>
+<dt id="LOCALE_IFIRSTWEEKOFYEAR">LOCALE_IFIRSTWEEKOFYEAR</dt>
+<dd>
+
+<p>Specifies which week of the year is considered first.</p>
+
+<pre><code>        0       Week containing 1/1 is the first week of the year.
+        1       First full week following 1/1is the first week of the year.
+        2       First week with at least 4 days is the first week of the year.</code></pre>
+
+</dd>
+<dt id="LOCALE_IFIRSTDAYOFWEEK">LOCALE_IFIRSTDAYOFWEEK</dt>
+<dd>
+
+<p>Specifies the day considered first in the week. Value &quot;0&quot; means SDAYNAME1 and value &quot;6&quot; means SDAYNAME7.</p>
+
+</dd>
+<dt id="LOCALE_SDAYNAME1-..-LOCALE_SDAYNAME7">LOCALE_SDAYNAME1 .. LOCALE_SDAYNAME7</dt>
+<dd>
+
+<p>Long name for Monday .. Sunday.</p>
+
+</dd>
+<dt id="LOCALE_SABBREVDAYNAME1-..-LOCALE_SABBREVDAYNAME7">LOCALE_SABBREVDAYNAME1 .. LOCALE_SABBREVDAYNAME7</dt>
+<dd>
+
+<p>Abbreviated name for Monday .. Sunday.</p>
+
+</dd>
+<dt id="LOCALE_SMONTHNAME1-..-LOCALE_SMONTHNAME12">LOCALE_SMONTHNAME1 .. LOCALE_SMONTHNAME12</dt>
+<dd>
+
+<p>Long name for January .. December.</p>
+
+</dd>
+<dt id="LOCALE_SMONTHNAME13">LOCALE_SMONTHNAME13</dt>
+<dd>
+
+<p>Native name for 13th month, if it exists.</p>
+
+</dd>
+<dt id="LOCALE_SABBREVMONTHNAME1-..-LOCALE_SABBREVMONTHNAME12">LOCALE_SABBREVMONTHNAME1 .. LOCALE_SABBREVMONTHNAME12</dt>
+<dd>
+
+<p>Abbreviated name for January .. December.</p>
+
+</dd>
+<dt id="LOCALE_SABBREVMONTHNAME13">LOCALE_SABBREVMONTHNAME13</dt>
+<dd>
+
+<p>Native abbreviated name for 13th month, if it exists.</p>
+
+</dd>
+<dt id="LOCALE_SPOSITIVESIGN">LOCALE_SPOSITIVESIGN</dt>
+<dd>
+
+<p>String value for the positive sign.</p>
+
+</dd>
+<dt id="LOCALE_SNEGATIVESIGN">LOCALE_SNEGATIVESIGN</dt>
+<dd>
+
+<p>String value for the negative sign.</p>
+
+</dd>
+<dt id="LOCALE_IPOSSIGNPOSN">LOCALE_IPOSSIGNPOSN</dt>
+<dd>
+
+<p>Formatting index for positive values.</p>
+
+<pre><code>        0 Parentheses surround the amount and the monetary symbol.
+        1 The sign string precedes the amount and the monetary symbol.
+        2 The sign string precedes the amount and the monetary symbol.
+        3 The sign string precedes the amount and the monetary symbol.
+        4 The sign string precedes the amount and the monetary symbol.</code></pre>
+
+</dd>
+<dt id="LOCALE_INEGSIGNPOSN">LOCALE_INEGSIGNPOSN</dt>
+<dd>
+
+<p>Formatting index for negative values. Values as for LOCALE_IPOSSIGNPOSN.</p>
+
+</dd>
+<dt id="LOCALE_IPOSSYMPRECEDES">LOCALE_IPOSSYMPRECEDES</dt>
+<dd>
+
+<p>If the monetary symbol precedes, 1. If it succeeds a positive amount, 0.</p>
+
+</dd>
+<dt id="LOCALE_IPOSSEPBYSPACE">LOCALE_IPOSSEPBYSPACE</dt>
+<dd>
+
+<p>If the monetary symbol is separated by a space from a positive amount, 1. Otherwise, 0.</p>
+
+</dd>
+<dt id="LOCALE_INEGSYMPRECEDES">LOCALE_INEGSYMPRECEDES</dt>
+<dd>
+
+<p>If the monetary symbol precedes, 1. If it succeeds a negative amount, 0.</p>
+
+</dd>
+<dt id="LOCALE_INEGSEPBYSPACE">LOCALE_INEGSEPBYSPACE</dt>
+<dd>
+
+<p>If the monetary symbol is separated by a space from a negative amount, 1. Otherwise, 0.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS-COPYRIGHT">AUTHORS/COPYRIGHT</h1>
+
+<p>This module is part of the Win32::OLE distribution.</p>
+
+
+</body>
+
+</html>
+
+

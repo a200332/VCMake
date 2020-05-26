@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#PERFORMANCE">PERFORMANCE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>English - use nice English (or awk) names for ugly punctuation variables</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">English</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">English</span> <span class="string">qw( -no_match_vars )</span> <span class="operator">;</span>  <span class="comment"># Avoids regex performance</span>
+                                        <span class="comment"># penalty in perl 5.16 and</span>
+                                        <span class="comment"># earlier</span>
+    <span class="operator">...</span>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$ERRNO</span> <span class="operator">=~</span> <span class="regex">/denied/</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides aliases for the built-in variables whose names no one seems to like to read. Variables with side-effects which get triggered just by accessing them (like $0) will still be affected.</p>
+
+<p>For those variables that have an <b>awk</b> version, both long and short English alternatives are provided. For example, the <code>$/</code> variable can be referred to either $RS or $INPUT_RECORD_SEPARATOR if you are using the English module.</p>
+
+<p>See <a href="../lib/pods/perlvar.html">perlvar</a> for a complete list of these.</p>
+
+<h1 id="PERFORMANCE">PERFORMANCE</h1>
+
+<p>NOTE: This was fixed in perl 5.20. Mentioning these three variables no longer makes a speed difference. This section still applies if your code is to run on perl 5.18 or earlier.</p>
+
+<p>This module can provoke sizeable inefficiencies for regular expressions, due to unfortunate implementation details. If performance matters in your application and you don&#39;t need $PREMATCH, $MATCH, or $POSTMATCH, try doing</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">English</span> <span class="string">qw( -no_match_vars )</span> <span class="operator">;</span>
+</code></pre>
+
+<p>. <b>It is especially important to do this in modules to avoid penalizing all applications which use them.</b></p>
+
+
+</body>
+
+</html>
+
+

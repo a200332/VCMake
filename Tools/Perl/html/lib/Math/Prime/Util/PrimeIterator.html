@@ -1,0 +1,196 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#value">value</a></li>
+      <li><a href="#next">next</a></li>
+      <li><a href="#prev">prev</a></li>
+      <li><a href="#iterate">iterate</a></li>
+      <li><a href="#rewind">rewind</a></li>
+      <li><a href="#peek">peek</a></li>
+      <li><a href="#tell_i">tell_i</a></li>
+      <li><a href="#pred">pred</a></li>
+      <li><a href="#ith">ith</a></li>
+      <li><a href="#value_to_i_estimate">value_to_i_estimate</a></li>
+      <li><a href="#value_to_i">value_to_i</a></li>
+      <li><a href="#value_to_i_floor">value_to_i_floor</a></li>
+      <li><a href="#value_to_i_ceil">value_to_i_ceil</a></li>
+      <li><a href="#seek_to_i">seek_to_i</a></li>
+      <li><a href="#seek_to_value">seek_to_value</a></li>
+      <li><a href="#i_start-head2-description-head2-values_min-head2-values_max-head2-oeis_anum">i_start =head2 description =head2 values_min =head2 values_max =head2 oeis_anum</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Math::Prime::Util::PrimeIterator - An object iterator for primes</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.69</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Math::Prime::Util::PrimeIterator</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$it</span> <span class="operator">=</span> <span class="variable">Math::Prime::Util::PrimeIterator</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  
+  <span class="comment"># Simple use: return current value and move forward.</span>
+  <span class="keyword">my</span> <span class="variable">$sum</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>  <span class="variable">$sum</span> <span class="operator">+=</span> <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">iterate</span><span class="operator">()</span> <span class="keyword">for</span> <span class="number">1</span><span class="operator">..</span><span class="number">10000</span><span class="operator">;</span>
+  
+  <span class="comment"># Methods</span>
+  <span class="keyword">my</span> <span class="variable">$v</span> <span class="operator">=</span> <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">();</span>     <span class="comment"># Return current value</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">();</span>              <span class="comment"># Move to next prime (returns self)</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">prev</span><span class="operator">();</span>              <span class="comment"># Move to prev prime (returns self)</span>
+  <span class="variable">$v</span> <span class="operator">=</span> <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">iterate</span><span class="operator">();</span>      <span class="comment"># Returns current value; moves to next prime</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">rewind</span><span class="operator">();</span>            <span class="comment"># Resets position to 2</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">rewind</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>          <span class="comment"># Resets position to next_prime($n-1)</span>
+  
+  <span class="comment"># Methods similar to Math::NumSeq, do not change iterator</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">tell_i</span><span class="operator">();</span>            <span class="comment"># Returns the index of the current position</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">pred</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>            <span class="comment"># Returns true if $n is prime</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">ith</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>             <span class="comment"># Returns the $ith prime</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">value_to_i</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>      <span class="comment"># Returns the index of the first prime &gt;= $n</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">value_to_i_estimate</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>  <span class="comment"># Approx index of value $n</span>
+  
+  <span class="comment"># Methods similar to Math::NumSeq, changes iterator</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">seek_to_i</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>       <span class="comment"># Resets position to the $ith prime</span>
+  <span class="variable">$it</span><span class="operator">-&gt;</span><span class="variable">seek_to_value</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>   <span class="comment"># Resets position to next_prime($i-1)</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>An iterator over the primes. <a href="#new">&quot;new&quot;</a> returns an iterator object and takes an optional starting position (the initial value will be the least prime greater than or equal to the argument). BigInt objects will be returned if the value overflows a Perl unsigned integer value.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<p>Creates an iterator object with initial value of 2. If an argument is given, the initial value will be the least prime greater than or equal to the argument.</p>
+
+<h2 id="value">value</h2>
+
+<p>Returns the value at the current position. Will always be a prime. If the value is greater than ~0, it will be a <a href="../../../../lib/Math/BigInt.html">Math::BigInt</a> object.</p>
+
+<h2 id="next">next</h2>
+
+<p>Moves the current position to the next prime. Returns self so calls can be chained.</p>
+
+<h2 id="prev">prev</h2>
+
+<p>Moves the current position to the previous prime, unless the current value is 2, in which case the value remains 2. Returns self so calls can be chained.</p>
+
+<h2 id="iterate">iterate</h2>
+
+<p>Returns the value at the current position and also moves the position to the next prime.</p>
+
+<h2 id="rewind">rewind</h2>
+
+<p>Resets the current position to either 2 or, if given an integer argument, the least prime not less than the argument.</p>
+
+<h2 id="peek">peek</h2>
+
+<p>Returns the value at the next position without moving the iterator.</p>
+
+<h2 id="tell_i">tell_i</h2>
+
+<p>Returns the index of the current position, starting at 1 (corresponding to the value 2). The iterator is unchanged after this call.</p>
+
+<h2 id="pred">pred</h2>
+
+<p>Returns true if the argument is a prime, false otherwise. The iterator is unchanged after this call.</p>
+
+<h2 id="ith">ith</h2>
+
+<p>Returns the i&#39;th prime, where the first prime is 2. The iterator is unchanged after this call.</p>
+
+<h2 id="value_to_i_estimate">value_to_i_estimate</h2>
+
+<p>Returns an estimate of the index corresponding to the argument. That is, given a value <code>n</code>, we expect a prime approximately equal to <code>n</code> to occur at this index.</p>
+
+<p>The estimate is performed using <a href="../../../../lib/Math/Prime/Util.html#prime_count_approx">&quot;prime_count_approx&quot; in Math::Prime::Util</a>, which uses the estimates of Dusart 2010 (or better for small values).</p>
+
+<h2 id="value_to_i">value_to_i</h2>
+
+<p>If the argument is prime, returns the corresponding index, such that:</p>
+
+<pre><code>  ith( value_to_i( $n ) ) == $n</code></pre>
+
+<p>Returns <code>undef</code> if the argument is not prime.</p>
+
+<h2 id="value_to_i_floor">value_to_i_floor</h2>
+
+<h2 id="value_to_i_ceil">value_to_i_ceil</h2>
+
+<p>Returns the index corresponding to the first prime less than or equal to the argument, or greater than or equal to the argument, respectively.</p>
+
+<h2 id="seek_to_i">seek_to_i</h2>
+
+<p>Resets the position to the prime corresponding to the given index.</p>
+
+<h2 id="seek_to_value">seek_to_value</h2>
+
+<p>An alias for <a href="#rewind">&quot;rewind&quot;</a>.</p>
+
+<h2 id="i_start-head2-description-head2-values_min-head2-values_max-head2-oeis_anum">i_start =head2 description =head2 values_min =head2 values_max =head2 oeis_anum</h2>
+
+<p>Methods to match Math::NumSeq::Primes.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a></p>
+
+<p><a href="../../../../lib/Math/Prime/Util.html#forprimes">&quot;forprimes&quot; in Math::Prime::Util</a></p>
+
+<p><a href="../../../../lib/Math/Prime/Util.html#prime_iterator">&quot;prime_iterator&quot; in Math::Prime::Util</a></p>
+
+<p><a href="../../../../lib/Math/Prime/Util.html#prime_iterator_object">&quot;prime_iterator_object&quot; in Math::Prime::Util</a></p>
+
+<p><a href="../../../../lib/Math/Prime/Util/PrimeArray.html">Math::Prime::Util::PrimeArray</a></p>
+
+<p><a>Math::NumSeq::Primes</a></p>
+
+<p><a>List::Gen</a></p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Dana Jacobsen &lt;dana@acm.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2013 by Dana Jacobsen &lt;dana@acm.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

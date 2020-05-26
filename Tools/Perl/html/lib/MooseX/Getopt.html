@@ -1,0 +1,391 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new_with_options-params">new_with_options (%params)</a></li>
+      <li><a href="#ARGV">ARGV</a></li>
+      <li><a href="#extra_argv">extra_argv</a></li>
+      <li><a href="#usage">usage</a></li>
+      <li><a href="#help_flag">help_flag</a></li>
+      <li><a href="#print_usage_text">print_usage_text</a></li>
+      <li><a href="#meta">meta</a></li>
+      <li><a href="#process_argv-params">process_argv (%params)</a></li>
+      <li><a href="#Supported-Type-Constraints">Supported Type Constraints</a></li>
+      <li><a href="#Custom-Type-Constraints">Custom Type Constraints</a></li>
+      <li><a href="#Inferred-Type-Constraints">Inferred Type Constraints</a></li>
+      <li><a href="#More-Customization-Options">More Customization Options</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>MooseX::Getopt - A Moose role for processing command line options</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.71</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment">## In your class</span>
+  <span class="keyword">package</span> <span class="variable">My::App</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">with</span> <span class="string">'MooseX::Getopt'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'out'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span> <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+  <span class="variable">has</span> <span class="string">'in'</span>  <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span> <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+  
+  <span class="comment"># ... rest of the class here</span>
+  
+  <span class="comment">## in your script</span>
+  <span class="comment">#!/usr/bin/perl</span>
+  
+  <span class="keyword">use</span> <span class="variable">My::App</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$app</span> <span class="operator">=</span> <span class="variable">My::App</span><span class="operator">-&gt;</span><span class="variable">new_with_options</span><span class="operator">();</span>
+  <span class="comment"># ... rest of the script here</span>
+  
+  <span class="comment">## on the command line</span>
+  <span class="operator">% </span><span class="variable">perl</span> <span class="variable">my_app_script</span><span class="operator">.</span><span class="variable">pl</span> <span class="operator">-</span><span class="variable">in</span> <span class="variable">file</span><span class="operator">.</span><span class="variable">input</span> <span class="operator">-</span><span class="variable">out</span> <span class="variable">file</span><span class="operator">.</span><span class="keyword">dump</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a role which provides an alternate constructor for creating objects using parameters passed in from the command line.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new_with_options-params"><code>new_with_options (%params)</code></h2>
+
+<p>This method will take a set of default <code>%params</code> and then collect parameters from the command line (possibly overriding those in <code>%params</code>) and then return a newly constructed object.</p>
+
+<p>The special parameter <code>argv</code>, if specified should point to an array reference with an array to use instead of <code>@ARGV</code>.</p>
+
+<p>If <a href="../../lib/Getopt/Long.html#GetOptions">&quot;GetOptions&quot; in Getopt::Long</a> fails (due to invalid arguments), <code>new_with_options</code> will throw an exception.</p>
+
+<p>If <a href="../../lib/Getopt/Long/Descriptive.html">Getopt::Long::Descriptive</a> is installed and any of the following command line parameters are passed, the program will exit with usage information (and the option&#39;s state will be stored in the help_flag attribute). You can add descriptions for each option by including a <b>documentation</b> option for each attribute to document.</p>
+
+<pre><code>  -?
+  --?
+  -h
+  --help
+  --usage</code></pre>
+
+<p>If you have <a href="../../lib/Getopt/Long/Descriptive.html">Getopt::Long::Descriptive</a> the <code>usage</code> parameter is also passed to <code>new</code> as the usage option.</p>
+
+<h2 id="ARGV"><code>ARGV</code></h2>
+
+<p>This accessor contains a reference to a copy of the <code>@ARGV</code> array as it originally existed at the time of <code>new_with_options</code>.</p>
+
+<h2 id="extra_argv"><code>extra_argv</code></h2>
+
+<p>This accessor contains an arrayref of leftover <code>@ARGV</code> elements that <a href="../../lib/Getopt/Long.html">Getopt::Long</a> did not parse. Note that the real <code>@ARGV</code> is left untouched.</p>
+
+<p><b>Important</b>: By default, <a href="../../lib/Getopt/Long.html">Getopt::Long</a> will reject unrecognized <i>options</i> (that is, options that do not correspond with attributes using the <code>Getopt</code> trait). To disable this, and allow options to also be saved in <code>extra_argv</code> (for example to pass along to another class&#39;s <code>new_with_options</code>), you can either enable the <code>pass_through</code> option of <a href="../../lib/Getopt/Long.html">Getopt::Long</a> for your class: <code><span class="keyword">use</span> <span class="variable">Getopt::Long</span> <span class="string">qw(:config pass_through)</span><span class="operator">;</span>
+</code> or specify a value for <a href="../../lib/MooseX/Getopt/GLD.html">MooseX::Getopt::GLD</a>&#39;s <code>getopt_conf</code> parameter.</p>
+
+<h2 id="usage"><code>usage</code></h2>
+
+<p>This accessor contains the <a href="../../lib/Getopt/Long/Descriptive/Usage.html">Getopt::Long::Descriptive::Usage</a> object (if <a href="../../lib/Getopt/Long/Descriptive.html">Getopt::Long::Descriptive</a> is used).</p>
+
+<h2 id="help_flag"><code>help_flag</code></h2>
+
+<p>This accessor contains the boolean state of the --help, --usage and --? options (true if any of these options were passed on the command line).</p>
+
+<h2 id="print_usage_text"><code>print_usage_text</code></h2>
+
+<p>This method is called internally when the <code>help_flag</code> state is true. It prints the text from the <code>usage</code> object (see above) to <code>STDOUT</code> and then the program terminates normally. You can apply a method modification (see <a href="../../lib/Moose/Manual/MethodModifiers.html">Moose::Manual::MethodModifiers</a>) if different behaviour is desired, for example to include additional text.</p>
+
+<h2 id="meta"><code>meta</code></h2>
+
+<p>This returns the role meta object.</p>
+
+<h2 id="process_argv-params"><code>process_argv (%params)</code></h2>
+
+<p>This does most of the work of <code>new_with_options</code>, analyzing the parameters and <code>argv</code>, except for actually calling the constructor. It returns a <a href="../../lib/MooseX/Getopt/ProcessedArgv.html">MooseX::Getopt::ProcessedArgv</a> object. <code>new_with_options</code> uses this method internally, so modifying this method via subclasses/roles will affect <code>new_with_options</code>.</p>
+
+<p>This module attempts to DWIM as much as possible with the command line parameters by introspecting your class&#39;s attributes. It will use the name of your attribute as the command line option, and if there is a type constraint defined, it will configure <a href="../../lib/Getopt/Long.html">Getopt::Long</a> to handle the option accordingly.</p>
+
+<p>You can use the trait <a href="../../lib/MooseX/Getopt/Meta/Attribute/Trait.html">MooseX::Getopt::Meta::Attribute::Trait</a> or the attribute metaclass <a href="../../lib/MooseX/Getopt/Meta/Attribute.html">MooseX::Getopt::Meta::Attribute</a> to get non-default command-line option names and aliases.</p>
+
+<p>You can use the trait <a href="../../lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.html">MooseX::Getopt::Meta::Attribute::Trait::NoGetopt</a> or the attribute metaclass <a href="../../lib/MooseX/Getopt/Meta/Attribute/NoGetopt.html">MooseX::Getopt::Meta::Attribute::NoGetopt</a> to have <code>MooseX::Getopt</code> ignore your attribute in the command-line options.</p>
+
+<p>By default, attributes which start with an underscore are not given command-line argument support, unless the attribute&#39;s metaclass is set to <a href="../../lib/MooseX/Getopt/Meta/Attribute.html">MooseX::Getopt::Meta::Attribute</a>. If you don&#39;t want your accessors to have the leading underscore in their name, you can do this:</p>
+
+<pre><code>  <span class="comment"># for read/write attributes</span>
+  <span class="variable">has</span> <span class="string">'_foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">accessor</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="operator">...);</span>
+  
+  <span class="comment"># or for read-only attributes</span>
+  <span class="variable">has</span> <span class="string">'_bar'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">reader</span> <span class="operator">=&gt;</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="operator">...);</span>
+</code></pre>
+
+<p>This will mean that MooseX::Getopt will not handle a --foo parameter, but your code can still call the <code>foo</code> method.</p>
+
+<p>If your class also uses a configfile-loading role based on <a>MooseX::ConfigFromFile</a>, such as <a>MooseX::SimpleConfig</a>, <a href="../../lib/MooseX/Getopt.html">MooseX::Getopt</a>&#39;s <code>new_with_options</code> will load the configfile specified by the <code>--configfile</code> option (or the default you&#39;ve given for the configfile attribute) for you.</p>
+
+<p>Options specified in multiple places follow the following precedence order: command-line overrides configfile, which overrides explicit new_with_options parameters.</p>
+
+<h2 id="Supported-Type-Constraints">Supported Type Constraints</h2>
+
+<dl>
+
+<dt id="Bool"><i>Bool</i></dt>
+<dd>
+
+<p>A <i>Bool</i> type constraint is set up as a boolean option with <a href="../../lib/Getopt/Long.html">Getopt::Long</a>. So that this attribute description:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'verbose'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Bool'</span><span class="operator">);</span>
+</code></pre>
+
+<p>would translate into <code>verbose!</code> as a <a href="../../lib/Getopt/Long.html">Getopt::Long</a> option descriptor, which would enable the following command line options:</p>
+
+<pre><code>  % my_script.pl --verbose
+  % my_script.pl --noverbose</code></pre>
+
+</dd>
+<dt id="Int-Float-Str"><i>Int</i>, <i>Float</i>, <i>Str</i></dt>
+<dd>
+
+<p>These type constraints are set up as properly typed options with <a href="../../lib/Getopt/Long.html">Getopt::Long</a>, using the <code>=i</code>, <code>=f</code> and <code>=s</code> modifiers as appropriate.</p>
+
+</dd>
+<dt id="ArrayRef"><i>ArrayRef</i></dt>
+<dd>
+
+<p>An <i>ArrayRef</i> type constraint is set up as a multiple value option in <a href="../../lib/Getopt/Long.html">Getopt::Long</a>. So that this attribute description:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'include'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'ArrayRef'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[]</span> <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>would translate into <code>includes=s@</code> as a <a href="../../lib/Getopt/Long.html">Getopt::Long</a> option descriptor, which would enable the following command line options:</p>
+
+<pre><code>  % my_script.pl --include /usr/lib --include /usr/local/lib</code></pre>
+
+</dd>
+<dt id="HashRef"><i>HashRef</i></dt>
+<dd>
+
+<p>A <i>HashRef</i> type constraint is set up as a hash value option in <a href="../../lib/Getopt/Long.html">Getopt::Long</a>. So that this attribute description:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'define'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'HashRef'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">{}</span> <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>would translate into <code>define=s%</code> as a <a href="../../lib/Getopt/Long.html">Getopt::Long</a> option descriptor, which would enable the following command line options:</p>
+
+<pre><code>  % my_script.pl --define os=linux --define vendor=debian</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Custom-Type-Constraints">Custom Type Constraints</h2>
+
+<p>It is possible to create custom type constraint to option spec mappings if you need them. The process is fairly simple (but a little verbose maybe). First you create a custom subtype, like so:</p>
+
+<pre><code>  <span class="variable">subtype</span> <span class="string">'ArrayOfInts'</span>
+      <span class="operator">=&gt;</span> <span class="variable">as</span> <span class="string">'ArrayRef'</span>
+      <span class="operator">=&gt;</span> <span class="variable">where</span> <span class="operator">{</span> <span class="keyword">scalar</span> <span class="operator">(</span><span class="keyword">grep</span> <span class="operator">{</span> <span class="variable">looks_like_number</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="operator">}</span> <span class="variable">@$_</span><span class="operator">)</span>  <span class="operator">};</span>
+</code></pre>
+
+<p>Then you register the mapping, like so:</p>
+
+<pre><code>  <span class="variable">MooseX::Getopt::OptionTypeMap</span><span class="operator">-&gt;</span><span class="variable">add_option_type_to_map</span><span class="operator">(</span>
+      <span class="string">'ArrayOfInts'</span> <span class="operator">=&gt;</span> <span class="string">'=i@'</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Now any attribute declarations using this type constraint will get the custom option spec. So that, this:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'nums'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'ArrayOfInts'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Will translate to the following on the command line:</p>
+
+<pre><code>  % my_script.pl --nums 5 --nums 88 --nums 199</code></pre>
+
+<p>This example is fairly trivial, but more complex validations are easily possible with a little creativity. The trick is balancing the type constraint validations with the <a href="../../lib/Getopt/Long.html">Getopt::Long</a> validations.</p>
+
+<p>Better examples are certainly welcome :)</p>
+
+<h2 id="Inferred-Type-Constraints">Inferred Type Constraints</h2>
+
+<p>If you define a custom subtype which is a subtype of one of the standard <a href="#Supported-Type-Constraints">&quot;Supported Type Constraints&quot;</a> above, and do not explicitly provide custom support as in <a href="#Custom-Type-Constraints">&quot;Custom Type Constraints&quot;</a> above, MooseX::Getopt will treat it like the parent type for Getopt purposes.</p>
+
+<p>For example, if you had the same custom <code>ArrayOfInts</code> subtype from the examples above, but did not add a new custom option type for it to the <code>OptionTypeMap</code>, it would be treated just like a normal <code>ArrayRef</code> type for Getopt purposes (that is, <code>=s@</code>).</p>
+
+<h2 id="More-Customization-Options">More Customization Options</h2>
+
+<p>See <a href="../../lib/Getopt/Long.html#Configuring-Getopt::Long">&quot;Configuring Getopt::Long&quot; in Getopt::Long</a> for many other customizations you can make to how options are parsed. Simply <code>use Getopt::Long qw(:config other_options...)</code> in your class to set these.</p>
+
+<p>Note in particular that the default setting for case sensitivity has changed over time in <a href="../../lib/Getopt/Long/Descriptive.html">Getopt::Long::Descriptive</a>, so if you rely on a particular setting, you should set it explicitly, or enforce the version of <a href="../../lib/Getopt/Long/Descriptive.html">Getopt::Long::Descriptive</a> that you install.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<ul>
+
+<li><p><a>MooseX::Getopt::Usage</a>, an extension to generate man pages, with colour</p>
+
+</li>
+<li><p><a>MooX::Options</a>, similar functionality for <a>Moo</a></p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Getopt">the RT bug tracker</a> (or <a href="mailto:bug-MooseX-Getopt@rt.cpan.org">bug-MooseX-Getopt@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/moose.html">http://lists.perl.org/list/moose.html</a>.</p>
+
+<p>There is also an irc channel available for users of this distribution, at <a href="irc://irc.perl.org/#moose"><code><span class="comment">#moose</span>
+</code> on <code>irc.perl.org</code></a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Stevan Little &lt;stevan@iinteractive.com&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Tomas Doran &lt;bobtfish@bobtfish.net&gt;</p>
+
+</li>
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Yuval Kogman &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Brandon L Black &lt;blblack@gmail.com&gt;</p>
+
+</li>
+<li><p>Shlomi Fish &lt;shlomif@cpan.org&gt;</p>
+
+</li>
+<li><p>Olaf Alders &lt;olaf@wundersolutions.com&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Nelo Onyiah &lt;nelo.onyiah@gmail.com&gt;</p>
+
+</li>
+<li><p>Ryan D Johnson &lt;ryan@innerfence.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Ricardo SIGNES &lt;rjbs@cpan.org&gt;</p>
+
+</li>
+<li><p>&AElig;var Arnfj&ouml;r&eth; Bjarmason &lt;avarab@gmail.com&gt;</p>
+
+</li>
+<li><p>Damien Krotkine &lt;dkrotkine@weborama.com&gt;</p>
+
+</li>
+<li><p>Hinrik &Ouml;rn Sigur&eth;sson &lt;hinrik.sig@gmail.com&gt;</p>
+
+</li>
+<li><p>Jose Luis Martinez &lt;jlmartinez@capside.com&gt;</p>
+
+</li>
+<li><p>Todd Hepler &lt;thepler@employees.org&gt;</p>
+
+</li>
+<li><p>Devin Austin &lt;dhoss@cpan.org&gt;</p>
+
+</li>
+<li><p>Gregory Oschwald &lt;goschwald@maxmind.com&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Gordon Irving &lt;goraxe@goraxe.me.uk&gt;</p>
+
+</li>
+<li><p>Stuart A Johnston &lt;saj_git@thecommune.net&gt;</p>
+
+</li>
+<li><p>Dagfinn Ilmari Manns&aring;ker &lt;ilmari@ilmari.org&gt;</p>
+
+</li>
+<li><p>Shlomi Fish &lt;shlomif@shlomifish.org&gt;</p>
+
+</li>
+<li><p>Jonathan Swartz &lt;swartz@pobox.com&gt;</p>
+
+</li>
+<li><p>John Goulah &lt;jgoulah@cpan.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Justin Hunter &lt;justin.d.hunter@gmail.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2007 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

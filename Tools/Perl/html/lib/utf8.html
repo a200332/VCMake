@@ -1,0 +1,188 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Utility-functions">Utility functions</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>utf8 - Perl pragma to enable/disable UTF-8 (or UTF-EBCDIC) in source code</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">utf8</span><span class="operator">;</span>
+ <span class="keyword">no</span> <span class="variable">utf8</span><span class="operator">;</span>
+ 
+ <span class="comment"># Convert the internal representation of a Perl scalar to/from UTF-8.</span>
+ 
+ <span class="variable">$num_octets</span> <span class="operator">=</span> <span class="variable">utf8::upgrade</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+ <span class="variable">$success</span>    <span class="operator">=</span> <span class="variable">utf8::downgrade</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">[</span><span class="operator">,</span> <span class="variable">$fail_ok</span><span class="operator">]</span><span class="operator">);</span>
+ 
+ <span class="comment"># Change each character of a Perl scalar to/from a series of</span>
+ <span class="comment"># characters that represent the UTF-8 bytes of each original character.</span>
+ 
+ <span class="variable">utf8::encode</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>  <span class="comment"># "\x{100}"  becomes "\xc4\x80"</span>
+ <span class="variable">utf8::decode</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>  <span class="comment"># "\xc4\x80" becomes "\x{100}"</span>
+ 
+ <span class="comment"># Convert a code point from the platform native character set to</span>
+ <span class="comment"># Unicode, and vice-versa.</span>
+ <span class="variable">$unicode</span> <span class="operator">=</span> <span class="variable">utf8::native_to_unicode</span><span class="operator">(</span><span class="keyword">ord</span><span class="operator">(</span><span class="string">'A'</span><span class="operator">));</span> <span class="comment"># returns 65 on both</span>
+                                               <span class="comment"># ASCII and EBCDIC</span>
+                                               <span class="comment"># platforms</span>
+ <span class="variable">$native</span> <span class="operator">=</span> <span class="variable">utf8::unicode_to_native</span><span class="operator">(</span><span class="number">65</span><span class="operator">);</span>        <span class="comment"># returns 65 on ASCII</span>
+                                               <span class="comment"># platforms; 193 on</span>
+                                               <span class="comment"># EBCDIC</span>
+ 
+ <span class="variable">$flag</span> <span class="operator">=</span> <span class="variable">utf8::is_utf8</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span> <span class="comment"># since Perl 5.8.1</span>
+ <span class="variable">$flag</span> <span class="operator">=</span> <span class="variable">utf8::valid</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>use utf8</code> pragma tells the Perl parser to allow UTF-8 in the program text in the current lexical scope. The <code>no utf8</code> pragma tells Perl to switch back to treating the source text as literal bytes in the current lexical scope. (On EBCDIC platforms, technically it is allowing UTF-EBCDIC, and not UTF-8, but this distinction is academic, so in this document the term UTF-8 is used to mean both).</p>
+
+<p><b>Do not use this pragma for anything else than telling Perl that your script is written in UTF-8.</b> The utility functions described below are directly usable without <code><span class="keyword">use</span> <span class="variable">utf8</span><span class="operator">;</span>
+</code>.</p>
+
+<p>Because it is not possible to reliably tell UTF-8 from native 8 bit encodings, you need either a Byte Order Mark at the beginning of your source code, or <code><span class="keyword">use</span> <span class="variable">utf8</span><span class="operator">;</span>
+</code>, to instruct perl.</p>
+
+<p>When UTF-8 becomes the standard source format, this pragma will effectively become a no-op.</p>
+
+<p>See also the effects of the <code>-C</code> switch and its cousin, the <code>PERL_UNICODE</code> environment variable, in <a href="../lib/pods/perlrun.html">perlrun</a>.</p>
+
+<p>Enabling the <code>utf8</code> pragma has the following effect:</p>
+
+<ul>
+
+<li><p>Bytes in the source text that are not in the ASCII character set will be treated as being part of a literal UTF-8 sequence. This includes most literals such as identifier names, string constants, and constant regular expression patterns.</p>
+
+</li>
+</ul>
+
+<p>Note that if you have non-ASCII, non-UTF-8 bytes in your script (for example embedded Latin-1 in your string literals), <code>use utf8</code> will be unhappy. If you want to have such bytes under <code>use utf8</code>, you can disable this pragma until the end the block (or file, if at top level) by <code><span class="keyword">no</span> <span class="variable">utf8</span><span class="operator">;</span>
+</code>.</p>
+
+<h2 id="Utility-functions">Utility functions</h2>
+
+<p>The following functions are defined in the <code>utf8::</code> package by the Perl core. You do not need to say <code>use utf8</code> to use these and in fact you should not say that unless you really want to have UTF-8 source code.</p>
+
+<ul>
+
+<li><p><code>$num_octets = utf8::upgrade($string)</code></p>
+
+<p>(Since Perl v5.8.0) Converts in-place the internal representation of the string from an octet sequence in the native encoding (Latin-1 or EBCDIC) to UTF-8. The logical character sequence itself is unchanged. If <i>$string</i> is already stored as UTF-8, then this is a no-op. Returns the number of octets necessary to represent the string as UTF-8. Can be used to make sure that the UTF-8 flag is on, so that <code>\w</code> or <code>lc()</code> work as Unicode on strings containing non-ASCII characters whose code points are below 256.</p>
+
+<p><b>Note that this function does not handle arbitrary encodings</b>; use <a href="../lib/Encode.html">Encode</a> instead.</p>
+
+</li>
+<li><p><code>$success = utf8::downgrade($string[, $fail_ok])</code></p>
+
+<p>(Since Perl v5.8.0) Converts in-place the internal representation of the string from UTF-8 to the equivalent octet sequence in the native encoding (Latin-1 or EBCDIC). The logical character sequence itself is unchanged. If <i>$string</i> is already stored as native 8 bit, then this is a no-op. Can be used to make sure that the UTF-8 flag is off, e.g. when you want to make sure that the substr() or length() function works with the usually faster byte algorithm.</p>
+
+<p>Fails if the original UTF-8 sequence cannot be represented in the native 8 bit encoding. On failure dies or, if the value of <i>$fail_ok</i> is true, returns false.</p>
+
+<p>Returns true on success.</p>
+
+<p><b>Note that this function does not handle arbitrary encodings</b>; use <a href="../lib/Encode.html">Encode</a> instead.</p>
+
+</li>
+<li><p><code>utf8::encode($string)</code></p>
+
+<p>(Since Perl v5.8.0) Converts in-place the character sequence to the corresponding octet sequence in UTF-8. That is, every (possibly wide) character gets replaced with a sequence of one or more characters that represent the individual UTF-8 bytes of the character. The UTF8 flag is turned off. Returns nothing.</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$a</span> <span class="operator">=</span> <span class="string">"\x{100}"</span><span class="operator">;</span> <span class="comment"># $a contains one character, with ord 0x100</span>
+ <span class="variable">utf8::encode</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">);</span>  <span class="comment"># $a contains two characters, with ords (on</span>
+                    <span class="comment"># ASCII platforms) 0xc4 and 0x80.  On EBCDIC</span>
+                    <span class="comment"># 1047, this would instead be 0x8C and 0x41.</span>
+</code></pre>
+
+<p><b>Note that this function does not handle arbitrary encodings</b>; use <a href="../lib/Encode.html">Encode</a> instead.</p>
+
+</li>
+<li><p><code>$success = utf8::decode($string)</code></p>
+
+<p>(Since Perl v5.8.0) Attempts to convert in-place the octet sequence encoded as UTF-8 to the corresponding character sequence. That is, it replaces each sequence of characters in the string whose ords represent a valid UTF-8 byte sequence, with the corresponding single character. The UTF-8 flag is turned on only if the source string contains multiple-byte UTF-8 characters. If <i>$string</i> is invalid as UTF-8, returns false; otherwise returns true.</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$a</span> <span class="operator">=</span> <span class="string">"\xc4\x80"</span><span class="operator">;</span> <span class="comment"># $a contains two characters, with ords</span>
+                     <span class="comment"># 0xc4 and 0x80</span>
+ <span class="variable">utf8::decode</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">);</span>   <span class="comment"># On ASCII platforms, $a contains one char,</span>
+                     <span class="comment"># with ord 0x100.   Since these bytes aren't</span>
+                     <span class="comment"># legal UTF-EBCDIC, on EBCDIC platforms, $a is</span>
+                     <span class="comment"># unchanged and the function returns FALSE.</span>
+</code></pre>
+
+<p><b>Note that this function does not handle arbitrary encodings</b>; use <a href="../lib/Encode.html">Encode</a> instead.</p>
+
+</li>
+<li><p><code>$unicode = utf8::native_to_unicode($code_point)</code></p>
+
+<p>(Since Perl v5.8.0) This takes an unsigned integer (which represents the ordinal number of a character (or a code point) on the platform the program is being run on) and returns its Unicode equivalent value. Since ASCII platforms natively use the Unicode code points, this function returns its input on them. On EBCDIC platforms it converts from EBCDIC to Unicode.</p>
+
+<p>A meaningless value will currently be returned if the input is not an unsigned integer.</p>
+
+<p>Since Perl v5.22.0, calls to this function are optimized out on ASCII platforms, so there is no performance hit in using it there.</p>
+
+</li>
+<li><p><code>$native = utf8::unicode_to_native($code_point)</code></p>
+
+<p>(Since Perl v5.8.0) This is the inverse of <code>utf8::native_to_unicode()</code>, converting the other direction. Again, on ASCII platforms, this returns its input, but on EBCDIC platforms it will find the native platform code point, given any Unicode one.</p>
+
+<p>A meaningless value will currently be returned if the input is not an unsigned integer.</p>
+
+<p>Since Perl v5.22.0, calls to this function are optimized out on ASCII platforms, so there is no performance hit in using it there.</p>
+
+</li>
+<li><p><code>$flag = utf8::is_utf8($string)</code></p>
+
+<p>(Since Perl 5.8.1) Test whether <i>$string</i> is marked internally as encoded in UTF-8. Functionally the same as <code>Encode::is_utf8()</code>.</p>
+
+</li>
+<li><p><code>$flag = utf8::valid($string)</code></p>
+
+<p>[INTERNAL] Test whether <i>$string</i> is in a consistent state regarding UTF-8. Will return true if it is well-formed UTF-8 and has the UTF-8 flag on <b>or</b> if <i>$string</i> is held as bytes (both these states are &#39;consistent&#39;). Main reason for this routine is to allow Perl&#39;s test suite to check that operations have left strings in a consistent state. You most probably want to use <code>utf8::is_utf8()</code> instead.</p>
+
+</li>
+</ul>
+
+<p><code>utf8::encode</code> is like <code>utf8::upgrade</code>, but the UTF8 flag is cleared. See <a href="../lib/pods/perlunicode.html">perlunicode</a>, and the C API functions <code><a href="../lib/pods/perlapi.html#sv_utf8_upgrade">sv_utf8_upgrade</a></code>, <code><a href="../lib/pods/perlapi.html#sv_utf8_downgrade">&quot;sv_utf8_downgrade&quot; in perlapi</a></code>, <code><a href="../lib/pods/perlapi.html#sv_utf8_encode">&quot;sv_utf8_encode&quot; in perlapi</a></code>, and <code><a href="../lib/pods/perlapi.html#sv_utf8_decode">&quot;sv_utf8_decode&quot; in perlapi</a></code>, which are wrapped by the Perl functions <code>utf8::upgrade</code>, <code>utf8::downgrade</code>, <code>utf8::encode</code> and <code>utf8::decode</code>. Also, the functions <code>utf8::is_utf8</code>, <code>utf8::valid</code>, <code>utf8::encode</code>, <code>utf8::decode</code>, <code>utf8::upgrade</code>, and <code>utf8::downgrade</code> are actually internal, and thus always available, without a <code>require utf8</code> statement.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Some filesystems may not support UTF-8 file names, or they may be supported incompatibly with Perl. Therefore UTF-8 names that are visible to the filesystem, such as module names may not work.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../lib/pods/perlunitut.html">perlunitut</a>, <a href="../lib/pods/perluniintro.html">perluniintro</a>, <a href="../lib/pods/perlrun.html">perlrun</a>, <a href="../lib/bytes.html">bytes</a>, <a href="../lib/pods/perlunicode.html">perlunicode</a></p>
+
+
+</body>
+
+</html>
+
+

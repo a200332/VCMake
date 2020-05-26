@@ -1,0 +1,156 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Methods">Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#INCOMPATIBILITIES">INCOMPATIBILITIES</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::Event - Use Win32 event objects from Perl</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes version 1.09 of Win32::Event, released November 15, 2014 as part of Win32-IPC version 1.11.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::Event</span><span class="operator">;</span>
+        
+        <span class="variable">$event</span> <span class="operator">=</span> <span class="variable">Win32::Event</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$manual</span><span class="operator">,</span><span class="variable">$initial</span><span class="operator">,</span><span class="variable">$name</span><span class="operator">);</span>
+        <span class="variable">$event</span><span class="operator">-&gt;</span><span class="variable">wait</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module allows access to the Win32 event objects. The <code>wait</code> method and <code>wait_all</code> &amp; <code>wait_any</code> functions are inherited from the <a href="../../lib/Win32/IPC.html">Win32::IPC</a> module.</p>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="event-Win32::Event-new-manual-initial-name">$event = Win32::Event-&gt;new([$manual, [$initial, [$name]]])</dt>
+<dd>
+
+<p>Constructor for a new event object. If <code>$manual</code> is true, you must manually reset the event after it is signalled (the default is false). If <code>$initial</code> is true, the initial state of the object is signalled (default false). If <code>$name</code> is omitted or <code>undef</code>, creates an unnamed event object.</p>
+
+<p>If <code>$name</code> signifies an existing event object, then <code>$manual</code> and <code>$initial</code> are ignored and the object is opened. If this happens, <code>$^E</code> will be set to 183 (ERROR_ALREADY_EXISTS).</p>
+
+</dd>
+<dt id="event-Win32::Event-open-name">$event = Win32::Event-&gt;open($name)</dt>
+<dd>
+
+<p>Constructor for opening an existing event object.</p>
+
+</dd>
+<dt id="event-pulse">$event-&gt;pulse</dt>
+<dd>
+
+<p><b>Microsoft has stated this function is unreliable and should be avoided.</b> Consult Microsoft&#39;s documentation for <code>PulseEvent</code> for details.</p>
+
+<p>Signal the <code>$event</code> and then immediately reset it. If <code>$event</code> is a manual-reset event, releases all threads currently blocking on it. If it&#39;s an auto-reset event, releases just one thread.</p>
+
+<p>If no threads are waiting, just resets the event.</p>
+
+<p>It returns a true value if successful, or zero on failure (additional error information can be found in <code>$^E</code>).</p>
+
+</dd>
+<dt id="event-reset">$event-&gt;reset</dt>
+<dd>
+
+<p>Reset the <code>$event</code> to nonsignalled. It returns a true value if successful, or zero on failure (additional error information can be found in <code>$^E</code>).</p>
+
+</dd>
+<dt id="event-set">$event-&gt;set</dt>
+<dd>
+
+<p>Set the <code>$event</code> to signalled. It returns a true value if successful, or zero on failure (additional error information can be found in <code>$^E</code>).</p>
+
+</dd>
+<dt id="event-wait-timeout">$event-&gt;wait([$timeout])</dt>
+<dd>
+
+<p>Wait for <code>$event</code> to be signalled. See <a href="../../lib/Win32/IPC.html">Win32::IPC</a>.</p>
+
+</dd>
+</dl>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<p>None.</p>
+
+<h1 id="CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</h1>
+
+<p>Win32::Event requires no configuration files or environment variables.</p>
+
+<p>It runs under 32-bit or 64-bit Microsoft Windows, either natively or under Cygwin.</p>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p><a href="../../lib/Win32/IPC.html">Win32::IPC</a></p>
+
+<h1 id="INCOMPATIBILITIES">INCOMPATIBILITIES</h1>
+
+<p>Prior to version 1.06, the Win32 IPC modules treated <code>undef</code> values differently. In version 1.06 and later, passing <code>undef</code> as the value of an optional parameter is the same as omitting that parameter. In previous versions, <code>undef</code> was interpreted as either the empty string or 0 (along with a warning about &quot;Use of uninitialized value...&quot;).</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>Signal handlers will not be called during the <code>wait</code> method. See <a href="../../lib/Win32/IPC.html#BUGS-AND-LIMITATIONS">&quot;BUGS AND LIMITATIONS&quot; in Win32::IPC</a> for details.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Christopher J. Madsen <span style="white-space: nowrap;"><code>&lt;perl AT cjmweb.net&gt;</code></span></p>
+
+<p>Please report any bugs or feature requests to <span style="white-space: nowrap;"><code>&lt;bug-Win32-IPC AT rt.cpan.org&gt;</code></span> or through the web interface at <a href="http://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-IPC">http://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-IPC</a>.</p>
+
+<p>You can follow or contribute to Win32-IPC&#39;s development at <a href="https://github.com/madsen/win32-ipc">https://github.com/madsen/win32-ipc</a>.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2014 by Christopher J. Madsen.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+
+
+</body>
+
+</html>
+
+

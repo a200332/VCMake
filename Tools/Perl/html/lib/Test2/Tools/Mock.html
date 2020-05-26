@@ -1,0 +1,319 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#DEFAULT">DEFAULT</a></li>
+      <li><a href="#BY-REQUEST">BY REQUEST</a>
+        <ul>
+          <li><a href="#DEFINING-MOCKS">DEFINING MOCKS</a></li>
+          <li><a href="#BUILDING-MOCKS">BUILDING MOCKS</a></li>
+          <li><a href="#METHOD-GENERATORS">METHOD GENERATORS</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#MOCK-CONTROL-OBJECTS">MOCK CONTROL OBJECTS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Tools::Mock - Class/Instance mocking for Test2.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Mocking is often an essential part of testing. This library covers some of the most common mocking needs. This plugin is heavily influenced by <a>Mock::Quick</a>, but with an improved API. This plugin is also intended to play well with other plugins in ways <a>Mock::Quick</a> would be unable to.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$mock</span> <span class="operator">=</span> <span class="variable">mock</span> <span class="string">'Some::Class'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">add</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">new_method</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">},</span>
+        <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">override</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">replace_method</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">},</span>
+        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">Some::Class</span><span class="operator">-&gt;</span><span class="variable">new_method</span><span class="operator">();</span>        <span class="comment"># Calls the newly injected method</span>
+    <span class="variable">Some::Class</span><span class="operator">-&gt;</span><span class="variable">replace_method</span><span class="operator">();</span>    <span class="comment"># Calls our replacement method.</span>
+    
+    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">override</span><span class="operator">(...)</span> <span class="comment"># Override some more</span>
+    
+    <span class="variable">$mock</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span> <span class="comment"># Undoes all the mocking, restoring all original methods.</span>
+    
+    <span class="keyword">my</span> <span class="variable">$simple_mock</span> <span class="operator">=</span> <span class="variable">mock</span> <span class="operator">{}</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">add</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">is_active</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+        <span class="operator">]</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">$simple_mock</span><span class="operator">-&gt;</span><span class="variable">is_active</span><span class="operator">();</span>        <span class="comment"># Calls our newly mocked method.</span>
+</code></pre>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<h2 id="DEFAULT">DEFAULT</h2>
+
+<dl>
+
+<dt id="mock">mock</dt>
+<dd>
+
+<p>This is a one-stop shop function that delegates to one of the other methods depending on how it is used. If you are not comfortable with a function that has a lot of potential behaviors, you can use one of the other functions directly.</p>
+
+</dd>
+<dt id="mock-mocked-object">$mock = mocked($object)</dt>
+<dd>
+
+</dd>
+<dt id="mock-mocked-class">$mock = mocked($class)</dt>
+<dd>
+
+<p>Check if an object or class is mocked. If it is mocked the <code>$mock</code> object (<a href="../../../lib/Test2/Mock.html">Test2::Mock</a>) will be returned.</p>
+
+</dd>
+<dt id="mock-mock-class">$mock = mock $class =&gt; ( ... );</dt>
+<dd>
+
+</dd>
+<dt id="mock-mock-instance">$mock = mock $instance =&gt; ( ... )</dt>
+<dd>
+
+</dd>
+<dt id="mock-mock-class-class">$mock = mock &#39;class&#39;, $class =&gt; ( ... )</dt>
+<dd>
+
+<p>These forms delegate to <code>mock_class()</code> to mock a package. The third form is to be explicit about what type of mocking you want.</p>
+
+</dd>
+<dt id="obj-mock">$obj = mock()</dt>
+<dd>
+
+</dd>
+<dt id="obj-mock1">$obj = mock { ... }</dt>
+<dd>
+
+</dd>
+<dt id="obj-mock-obj">$obj = mock &#39;obj&#39;, ...;</dt>
+<dd>
+
+<p>These forms delegate to <code>mock_obj()</code> to create instances of anonymous packages where methods are vivified into existence as needed.</p>
+
+</dd>
+<dt id="mock-mock-sub">mock $mock =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="mock-method">mock $method =&gt; ( ... )</dt>
+<dd>
+
+<p>These forms go together, the first form will set <code>$mock</code> as the current mock build, then run the sub. Within the sub you can declare mock specifications using the second form. The first form delegates to <code>mock_build()</code>.</p>
+
+<p>The second form calls the specified method on the current build. This second form delegates to <code>mock_do()</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="BY-REQUEST">BY REQUEST</h2>
+
+<h3 id="DEFINING-MOCKS">DEFINING MOCKS</h3>
+
+<dl>
+
+<dt id="obj-mock_obj">$obj = mock_obj( ... )</dt>
+<dd>
+
+</dd>
+<dt id="obj-mock_obj1">$obj = mock_obj { ... } =&gt; ( ... )</dt>
+<dd>
+
+</dd>
+<dt id="obj-mock_obj-sub">$obj = mock_obj sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="obj-mock_obj-...-sub">$obj = mock_obj { ... } =&gt; sub { ... }</dt>
+<dd>
+
+<p>This method lets you quickly generate a blessed object. The object will be an instance of a randomly generated package name. Methods will vivify as read/write accessors as needed.</p>
+
+<p>Arguments can be any method available to <a href="../../../lib/Test2/Mock.html">Test2::Mock</a> followed by an argument. If the very first argument is a hashref then it will be blessed as your new object.</p>
+
+<p>If you provide a coderef instead of key/value pairs, the coderef will be run to build the mock. (See the <a href="#BUILDING-MOCKS">&quot;BUILDING MOCKS&quot;</a> section).</p>
+
+</dd>
+<dt id="mock-mock_class-class">$mock = mock_class $class =&gt; ( ... )</dt>
+<dd>
+
+</dd>
+<dt id="mock-mock_class-instance">$mock = mock_class $instance =&gt; ( ... )</dt>
+<dd>
+
+</dd>
+<dt id="mock-mock_class-...-sub">$mock = mock_class ... =&gt; sub { ... }</dt>
+<dd>
+
+<p>This will create a new instance of <a href="../../../lib/Test2/Mock.html">Test2::Mock</a> to control the package specified. If you give it a blessed reference it will use the class of the instance.</p>
+
+<p>Arguments can be any method available to <a href="../../../lib/Test2/Mock.html">Test2::Mock</a> followed by an argument. If the very first argument is a hashref then it will be blessed as your new object.</p>
+
+<p>If you provide a coderef instead of key/value pairs, the coderef will be run to build the mock. (See the <a href="#BUILDING-MOCKS">&quot;BUILDING MOCKS&quot;</a> section).</p>
+
+</dd>
+</dl>
+
+<h3 id="BUILDING-MOCKS">BUILDING MOCKS</h3>
+
+<dl>
+
+<dt id="mock_build-mock-sub">mock_build $mock =&gt; sub { ... }</dt>
+<dd>
+
+<p>Set <code>$mock</code> as the current build, then run the specified code. <code>$mock</code> will no longer be the current build when the sub is complete.</p>
+
+</dd>
+<dt id="mock-mock_building">$mock = mock_building()</dt>
+<dd>
+
+<p>Get the current building <code>$mock</code> object.</p>
+
+</dd>
+<dt id="mock_do-method-args">mock_do $method =&gt; $args</dt>
+<dd>
+
+<p>Run the specified method on the currently building object.</p>
+
+</dd>
+</dl>
+
+<h3 id="METHOD-GENERATORS">METHOD GENERATORS</h3>
+
+<dl>
+
+<dt id="sub-mock_accessor-field">$sub = mock_accessor $field</dt>
+<dd>
+
+<p>Generate a read/write accessor for the specified field. This will generate a sub like the following:</p>
+
+<pre><code>    <span class="variable">$sub</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="operator">(</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$field</span><span class="operator">}</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span> <span class="keyword">if</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$field</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="sub-mock_getter-field">$sub = mock_getter $field</dt>
+<dd>
+
+<p>Generate a read only accessor for the specified field. This will generate a sub like the following:</p>
+
+<pre><code>    <span class="variable">$sub</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$field</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="sub-mock_setter-field">$sub = mock_setter $field</dt>
+<dd>
+
+<p>Generate a write accessor for the specified field. This will generate a sub like the following:</p>
+
+<pre><code>    <span class="variable">$sub</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="operator">(</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$field</span><span class="operator">}</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="pairs-mock_accessors-qw-name1-name2-name3">%pairs = mock_accessors(qw/name1 name2 name3/)</dt>
+<dd>
+
+<p>Generates several read/write accessors at once, returns key/value pairs where the key is the field name, and the value is the coderef.</p>
+
+</dd>
+<dt id="pairs-mock_getters-qw-name1-name2-name3">%pairs = mock_getters(qw/name1 name2 name3/)</dt>
+<dd>
+
+<p>Generates several read only accessors at once, returns key/value pairs where the key is the field name, and the value is the coderef.</p>
+
+</dd>
+<dt id="pairs-mock_setters-qw-name1-name2-name3">%pairs = mock_setters(qw/name1 name2 name3/)</dt>
+<dd>
+
+<p>Generates several write accessors at once, returns key/value pairs where the key is the field name, and the value is the coderef.</p>
+
+</dd>
+</dl>
+
+<h1 id="MOCK-CONTROL-OBJECTS">MOCK CONTROL OBJECTS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$mock</span> <span class="operator">=</span> <span class="variable">mock</span><span class="operator">(...);</span>
+</code></pre>
+
+<p>Mock objects are instances of <a href="../../../lib/Test2/Mock.html">Test2::Mock</a>. See it for their methods.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

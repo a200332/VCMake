@@ -1,0 +1,188 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#WHICH-TYPE-OF-SUBTEST-DO-I-NEED">WHICH TYPE OF SUBTEST DO I NEED?</a>
+    <ul>
+      <li><a href="#SUBTEST-WITH-USER-SUPPLIED-CODEREF">SUBTEST WITH USER SUPPLIED CODEREF</a></li>
+      <li><a href="#SUBTEST-WITH-TOOL-SIDE-CODEREF">SUBTEST WITH TOOL-SIDE CODEREF</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Manual::Tooling::Subtest - How to implement a tool that makes use of subtests.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Subtests are a nice way of making related events visually, and architecturally distinct.</p>
+
+<h1 id="WHICH-TYPE-OF-SUBTEST-DO-I-NEED">WHICH TYPE OF SUBTEST DO I NEED?</h1>
+
+<p>There are 2 types of subtest. The first type is subtests with user-supplied coderefs, such as the <code>subtest()</code> function itself. The second type is subtest that do not have any user supplied coderefs.</p>
+
+<p>So which type do you need? The answer to that is simple, if you are going to let the user define the subtest with their own codeblock, you have the first type, otherwise you have the second.</p>
+
+<p>In either case, you will still need use the same API function: <code>Test2::API::run_subtest</code>.</p>
+
+<h2 id="SUBTEST-WITH-USER-SUPPLIED-CODEREF">SUBTEST WITH USER SUPPLIED CODEREF</h2>
+
+<p>This example will emulate the <code>subtest</code> function.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context run_subtest/</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_subtest </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$code</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="comment"># Like any other tool, you need to acquire a context, if you do not then</span>
+        <span class="comment"># things will not report the correct file and line number.</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    
+        <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">run_subtest</span><span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$code</span><span class="operator">);</span>
+    
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="variable">$bool</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This looks incredibly simple... and it is. <code>run_subtest()</code> does all the hard work for you. This will issue an <a href="../../../../lib/Test2/Event/Subtest.html">Test2::Event::Subtest</a> event with the results of the subtest. The subtest event itself will report to the proper file and line number due to the context you acquired (even though it does not <i>look</i> like you used the context.</p>
+
+<p><code>run_subtest()</code> can take additional arguments:</p>
+
+<pre><code>    <span class="variable">run_subtest</span><span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$code</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%params</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">);</span>
+</code></pre>
+
+<dl>
+
+<dt id="args">@args</dt>
+<dd>
+
+<p>This allows you to pass arguments into the codeblock that gets run.</p>
+
+</dd>
+<dt id="params">\%params</dt>
+<dd>
+
+<p>This is a hashref of parameters. Currently there are 3 possible parameters:</p>
+
+<dl>
+
+<dt id="buffered-bool">buffered =&gt; $bool</dt>
+<dd>
+
+<p>This will turn the subtest into the new style buffered subtest. This type of subtest is recommended, but not default.</p>
+
+</dd>
+<dt id="inherit_trace-bool">inherit_trace =&gt; $bool</dt>
+<dd>
+
+<p>This is used for tool-side coderefs.</p>
+
+</dd>
+<dt id="no_fork-bool">no_fork =&gt; $bool</dt>
+<dd>
+
+<p>react to forking/threading inside the subtest itself. In general you are unlikely to need/want this parameter.</p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h2 id="SUBTEST-WITH-TOOL-SIDE-CODEREF">SUBTEST WITH TOOL-SIDE CODEREF</h2>
+
+<p>This is particularly useful if you want to turn a tool that wraps other tools into a subtest. For this we will be using the tool we created in <a href="../../../../lib/Test2/Manual/Tooling/Nesting.html">Test2::Manual::Tooling::Nesting</a>.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context run_subtest/</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> check_class </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    
+        <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+            <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"got foo"</span><span class="operator">);</span>
+            <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">,</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">"got bar"</span><span class="operator">);</span>
+        <span class="operator">};</span>
+    
+        <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">run_subtest</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$code</span><span class="operator">,</span> <span class="operator">{</span><span class="string">buffered</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">inherit_trace</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">);</span>
+    
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="variable">$bool</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>run_subtest()</code> function does all the heavy lifting for us. All we need to do is give the function a name, a coderef to run, and the <code>inherit_trace =&gt; 1</code> parameter. The <code>buffered =&gt; 1</code> parameter is optional, but recommended.</p>
+
+<p>The <code>inherit_trace</code> parameter tells the subtest tool that the contexts acquired inside the nested tools should use the same trace as the subtest itself. For user-supplied codeblocks you do not use inherit_trace because you want errors to report to the user-supplied file+line.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Test2/Manual.html">Test2::Manual</a> - Primary index of the manual.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Manual can be found at <i>http://github.com/Test-More/Test2-Manual/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

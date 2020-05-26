@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#General-Info">General Info</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::Oracle::Troubleshooting::Vms - Tips and Hints to Troubleshoot DBD::Oracle on Vms</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.74</p>
+
+<h1 id="General-Info">General Info</h1>
+
+<p>This is related to Oracle RDBMS 9.2 and later, since Oracle made fundamental changes to oracle installation requirements and factual installation with this release.</p>
+
+<p>Oracle&#39;s goal was to make VMS installation be more like on *nix and Windows, with an all new Oracle Home structure too, requiring an ODS-5 disk to install Oracle Home on instead of the good old ODS-2.</p>
+
+<p>Another major change is the introduction of an Oracle generated logical name table for oracle logical names like ORA_ROOT and all its derivatives like ORA_PROGINT etc. And that this logical name table is inserted in LNM$FILE_DEV in LNM$PROCESS_DIRECTORY.</p>
+
+<pre><code>    (LNM$PROCESS_DIRECTORY)
+
+    &quot;LNM$FILE_DEV&quot; = &quot;SERVER_810111112&quot;
+            = &quot;LNM$PROCESS&quot;
+            = &quot;LNM$JOB&quot;
+            = &quot;LNM$GROUP&quot;
+            = &quot;LNM$SYSTEM&quot;
+            = &quot;DECW$LOGICAL_NAMES&quot;</code></pre>
+
+<p>This ensures that any process that needs to have access to oracle gets the environment by just adding one logical name table to a central process specific mechanism.</p>
+
+<p>But as it is inserted at the very top of LNM$FILE_DEV it also represents a source of misfortune - especially if a user with enough privilege to update the oracle table does so (presumably unintentionally), as an example by changing NLS_LANG.</p>
+
+<p>PERL has the ability to define, redefine and undefine (deassign) logical names, but if not told otherwise by the user does it in the first table in above list, and not as one would normally expect in the process table.</p>
+
+<p>Installing DBI and DBD::Oracle has influence upon this since in both cases a few environment variables are read or set in the test phase. For DBI it is the logical SYS$SCRATCH, which is a JOB logical. For DBD-Oracle it is when testing a new feature in the Oracle RDBMS: UTF8 and UTF16 character set functionality, and in order to do this it sets and unsets the related environment variables NLS_NCHAR and NLS_LANG.</p>
+
+<p>If one is not careful this changes the values set in the oracle table - and in the worst case stays active until the next major system reset. It can also be a very hard error to track down since it happens in a place where one normally never looks.</p>
+
+<p>Furthermore, it is very possibly that some or all of the UTF tests fails, since if one have a variable like NLS_LANG in his process table, then even though &#39;mms test&#39; sets it in the wrong table it is not invoked as it is overruled by the process logical...</p>
+
+<p>The way to ensure that no logicals are set in the oracle table and that the UTF tests get the best environment to test in, and that DBI correctly translates the SYS$SCRATCH logical, use the logical</p>
+
+<pre><code>      PERL_ENV_TABLES</code></pre>
+
+<p>to ensure that PERL&#39;s behavior is to leave the oracle table alone and use the process table instead:</p>
+
+<pre><code>      $ DEFINE PERL_ENV_TABLES LNM$PROCESS, LNM$JOB</code></pre>
+
+<p>This tells PERL to use the LNM$PROCESS table as the default place to set and unset variables so that only the perl users environment is affected when installing DBD::Oracle, and ensures that the LNM$JOB table is read when SYS$SCRATCH is to be translated.</p>
+
+<p>PERL_ENV_TABLES is well documented in the PERLVMS man page.</p>
+
+<p>Oracle8 releases are not affected, as they don&#39;t have the oracle table implementation, and no UTF support.</p>
+
+<p>Oracle 9.0 is uncertain, since testing has not been possible yet, but the remedy will not hurt :)</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Tim Bunce &lt;timb@cpan.org&gt;</p>
+
+</li>
+<li><p>John Scoles &lt;byterock@cpan.org&gt;</p>
+
+</li>
+<li><p>Yanick Champoux &lt;yanick@cpan.org&gt;</p>
+
+</li>
+<li><p>Martin J. Evans &lt;mjevans@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 1994 by Tim Bunce.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

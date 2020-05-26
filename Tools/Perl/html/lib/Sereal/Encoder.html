@@ -1,0 +1,598 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CLASS-METHODS">CLASS METHODS</a>
+    <ul>
+      <li><a href="#new">new</a>
+        <ul>
+          <li><a href="#compress">compress</a></li>
+          <li><a href="#compress_threshold">compress_threshold</a></li>
+          <li><a href="#compress_level">compress_level</a></li>
+          <li><a href="#snappy">snappy</a></li>
+          <li><a href="#snappy_incr">snappy_incr</a></li>
+          <li><a href="#snappy_threshold">snappy_threshold</a></li>
+          <li><a href="#croak_on_bless">croak_on_bless</a></li>
+          <li><a href="#freeze_callbacks">freeze_callbacks</a></li>
+          <li><a href="#no_bless_objects">no_bless_objects</a></li>
+          <li><a href="#undef_unknown">undef_unknown</a></li>
+          <li><a href="#stringify_unknown">stringify_unknown</a></li>
+          <li><a href="#warn_unknown">warn_unknown</a></li>
+          <li><a href="#max_recursion_depth">max_recursion_depth</a></li>
+          <li><a href="#canonical">canonical</a></li>
+          <li><a href="#canonical_refs">canonical_refs</a></li>
+          <li><a href="#sort_keys">sort_keys</a></li>
+          <li><a href="#no_shared_hashkeys">no_shared_hashkeys</a></li>
+          <li><a href="#dedupe_strings">dedupe_strings</a></li>
+          <li><a href="#aliased_dedupe_strings">aliased_dedupe_strings</a></li>
+          <li><a href="#protocol_version">protocol_version</a></li>
+          <li><a href="#use_protocol_v1">use_protocol_v1</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#INSTANCE-METHODS">INSTANCE METHODS</a>
+    <ul>
+      <li><a href="#encode">encode</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTABLE-FUNCTIONS">EXPORTABLE FUNCTIONS</a>
+    <ul>
+      <li><a href="#sereal_encode_with_object">sereal_encode_with_object</a></li>
+      <li><a href="#encode_sereal">encode_sereal</a></li>
+      <li><a href="#encode_sereal_with_header_data">encode_sereal_with_header_data</a></li>
+    </ul>
+  </li>
+  <li><a href="#PERFORMANCE">PERFORMANCE</a></li>
+  <li><a href="#FREEZE-THAW-CALLBACK-MECHANISM">FREEZE/THAW CALLBACK MECHANISM</a></li>
+  <li><a href="#THREAD-SAFETY">THREAD-SAFETY</a></li>
+  <li><a href="#CANONICAL-REPRESENTATION">CANONICAL REPRESENTATION</a></li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
+  <li><a href="#BUGS-CONTACT-AND-SUPPORT">BUGS, CONTACT AND SUPPORT</a></li>
+  <li><a href="#AUTHORS-AND-CONTRIBUTORS">AUTHORS AND CONTRIBUTORS</a></li>
+  <li><a href="#ACKNOWLEDGMENT">ACKNOWLEDGMENT</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sereal::Encoder - Fast, compact, powerful binary serialization</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sereal::Encoder</span> <span class="string">qw(encode_sereal sereal_encode_with_object)</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$encoder</span> <span class="operator">=</span> <span class="variable">Sereal::Encoder</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">{</span><span class="operator">...</span><span class="variable">options</span><span class="operator">...</span><span class="operator">}</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$out</span> <span class="operator">=</span> <span class="variable">$encoder</span><span class="operator">-&gt;</span><span class="variable">encode</span><span class="operator">(</span><span class="variable">$structure</span><span class="operator">);</span>
+  
+  <span class="comment"># alternatively the functional interface:</span>
+  <span class="variable">$out</span> <span class="operator">=</span> <span class="variable">sereal_encode_with_object</span><span class="operator">(</span><span class="variable">$encoder</span><span class="operator">,</span> <span class="variable">$structure</span><span class="operator">);</span>
+  
+  <span class="comment"># much slower functional interface with no persistent objects:</span>
+  <span class="variable">$out</span> <span class="operator">=</span> <span class="variable">encode_sereal</span><span class="operator">(</span><span class="variable">$structure</span><span class="operator">,</span> <span class="operator">{</span><span class="operator">...</span> <span class="variable">options</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This library implements an efficient, compact-output, and feature-rich serializer using a binary protocol called <i>Sereal</i>. Its sister module <a href="../../lib/Sereal/Decoder.html">Sereal::Decoder</a> implements a decoder for this format. The two are released separately to allow for independent and safer upgrading. If you care greatly about performance, consider reading the <a href="../../lib/Sereal/Performance.html">Sereal::Performance</a> documentation after finishing this document.</p>
+
+<p>The Sereal protocol version emitted by this encoder implementation is currently protocol version 4 by default.</p>
+
+<p>The protocol specification and many other bits of documentation can be found in the github repository. Right now, the specification is at <a href="https://github.com/Sereal/Sereal/blob/master/sereal_spec.pod">https://github.com/Sereal/Sereal/blob/master/sereal_spec.pod</a>, there is a discussion of the design objectives in <a href="https://github.com/Sereal/Sereal/blob/master/README.pod">https://github.com/Sereal/Sereal/blob/master/README.pod</a>, and the output of our benchmarks can be seen at <a href="https://github.com/Sereal/Sereal/wiki/Sereal-Comparison-Graphs">https://github.com/Sereal/Sereal/wiki/Sereal-Comparison-Graphs</a>. For more information on getting the best performance out of Sereal, have a look at the <a href="#PERFORMANCE">&quot;PERFORMANCE&quot;</a> section below.</p>
+
+<h1 id="CLASS-METHODS">CLASS METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<p>Constructor. Optionally takes a hash reference as first parameter. This hash reference may contain any number of options that influence the behaviour of the encoder.</p>
+
+<p>Currently, the following options are recognized, none of them are on by default.</p>
+
+<h3 id="compress">compress</h3>
+
+<p>If this option provided and true, compression of the document body is enabled. As of Sereal version 4, three different compression techniques are supported and can be enabled by setting <code>compress</code> to the respective named constants (exportable from the <code>Sereal::Encoder</code> module): Snappy (named constant: <code>SRL_SNAPPY</code>), Zlib (<code>SRL_ZLIB</code>) and Zstd (<code>SRL_ZSTD</code>). For your convenience, there is also a <code>SRL_UNCOMPRESSED</code> constant.</p>
+
+<p>If this option is set, then the Snappy-related options below are ignored. They are otherwise recognized for compatibility only.</p>
+
+<h3 id="compress_threshold">compress_threshold</h3>
+
+<p>The size threshold (in bytes) of the uncompressed output below which compression is not even attempted even if enabled. Defaults to one kilobyte (1024 bytes). Set this to 0 and <code>compress</code> to a non-<code>SRL_UNCOMPRESSED</code> value to always attempt to compress. Note that the document will not be compressed if the resulting size will be bigger than the original size (even if <code>compress_threshold</code> is 0).</p>
+
+<h3 id="compress_level">compress_level</h3>
+
+<p>If Zlib or Zstd compressions are used, then this option will set a compression level: Zlib uses range from 1 (fastest) to 9 (best). Defaults to 6. Zstd uses range from 1 (fastest) to 22 (best). Default is 3.</p>
+
+<h3 id="snappy">snappy</h3>
+
+<p>See also the <code>compress</code> option. This option is provided only for compatibility with Sereal V1.</p>
+
+<p>If set, the main payload of the Sereal document will be compressed using Google&#39;s Snappy algorithm. This can yield anywhere from no effect to significant savings on output size at rather low run time cost. If in doubt, test with your data whether this helps or not.</p>
+
+<p>The decoder (version 0.04 and up) will know how to handle Snappy-compressed Sereal documents transparently.</p>
+
+<p><b>Note:</b> The <code>snappy_incr</code> and <code>snappy</code> options are identical in Sereal protocol v2 and up (so by default). If using an older protocol version (see <code>protocol_version</code> and <code>use_protocol_v1</code> options below) to emit Sereal V1 documents, this emits non-incrementally decodable documents. See <code>snappy_incr</code> in those cases.</p>
+
+<h3 id="snappy_incr">snappy_incr</h3>
+
+<p>See also the <code>compress</code> option. This option is provided only for compatibility with Sereal V1.</p>
+
+<p>Same as the <code>snappy</code> option for default operation (that is in Sereal v2 or up).</p>
+
+<p>In Sereal V1, enables a version of the Snappy protocol which is suitable for incremental parsing of packets. See also the <code>snappy</code> option above for more details.</p>
+
+<h3 id="snappy_threshold">snappy_threshold</h3>
+
+<p>See also the <code>compress</code> option. This option is provided only for compatibility with Sereal V1.</p>
+
+<p>This option is a synonym for the <code>compress_threshold</code> option, but only if Snappy compression is enabled.</p>
+
+<h3 id="croak_on_bless">croak_on_bless</h3>
+
+<p>If this option is set, then the encoder will refuse to serialize blessed references and throw an exception instead.</p>
+
+<p>This can be important because blessed references can mean executing a destructor on a remote system or generally executing code based on data.</p>
+
+<p>See also <code>no_bless_objects</code> to skip the blessing of objects. When both flags are set, <code>croak_on_bless</code> has a higher precedence then <code>no_bless_objects</code>.</p>
+
+<h3 id="freeze_callbacks">freeze_callbacks</h3>
+
+<p>This option was introduced in Sereal v2 and needs a Sereal v2 decoder.</p>
+
+<p>If this option is set, the encoder will check for and possibly invoke the <code>FREEZE</code> method on any object in the input data. An object that was serialized using its <code>FREEZE</code> method will have its corresponding <code>THAW</code> class method called during deserialization. The exact semantics are documented below under <a href="#FREEZE-THAW-CALLBACK-MECHANISM">&quot;FREEZE/THAW CALLBACK MECHANISM&quot;</a>.</p>
+
+<p>Beware that using this functionality means a significant slowdown for object serialization. Even when serializing objects without a <code>FREEZE</code> method, the additional method look up will cost a small amount of runtime. Yes, <code>Sereal::Encoder</code> is so fast that this may make a difference.</p>
+
+<h3 id="no_bless_objects">no_bless_objects</h3>
+
+<p>If this option is set, then the encoder will serialize blessed references without the bless information and provide plain data structures instead.</p>
+
+<p>See also the <code>croak_on_bless</code> option above for more details.</p>
+
+<h3 id="undef_unknown">undef_unknown</h3>
+
+<p>If set, unknown/unsupported data structures will be encoded as <code>undef</code> instead of throwing an exception.</p>
+
+<p>Mutually exclusive with <code>stringify_unknown</code>. See also <code>warn_unknown</code> below.</p>
+
+<h3 id="stringify_unknown">stringify_unknown</h3>
+
+<p>If set, unknown/unsupported data structures will be stringified and encoded as that string instead of throwing an exception. The stringification may cause a warning to be emitted by perl.</p>
+
+<p>Mutually exclusive with <code>undef_unknown</code>. See also <code>warn_unknown</code> below.</p>
+
+<h3 id="warn_unknown">warn_unknown</h3>
+
+<p>Only has an effect if <code>undef_unknown</code> or <code>stringify_unknown</code> are enabled.</p>
+
+<p>If set to a positive integer, any unknown/unsupported data structure encountered will emit a warning. If set to a negative integer, it will warn for unsupported data structures just the same as for a positive value with one exception: For blessed, unsupported items that have string overloading, we silently stringify without warning.</p>
+
+<h3 id="max_recursion_depth">max_recursion_depth</h3>
+
+<p><code>Sereal::Encoder</code> is recursive. If you pass it a Perl data structure that is deeply nested, it will eventually exhaust the C stack. Therefore, there is a limit on the depth of recursion that is accepted. It defaults to 10000 nested calls. You may choose to override this value with the <code>max_recursion_depth</code> option. Beware that setting it too high can cause hard crashes, so only do that if you <b>KNOW</b> that it is safe to do so.</p>
+
+<p>Do note that the setting is somewhat approximate. Setting it to 10000 may break at somewhere between 9997 and 10003 nested structures depending on their types.</p>
+
+<h3 id="canonical">canonical</h3>
+
+<p>Enable all options which are related to producing canonical output, so that two strucutures with similar contents produce the same serialized form.</p>
+
+<p>See the caveats elsewhere in this document about producing canonical output.</p>
+
+<p>Currently sets the default for the following parameters: <code>canonical_refs</code> and <code>sort_keys</code>. If the option is explicitly set then this setting is ignored. More options may be added in the future.</p>
+
+<p>You are warned that use of this option may incur additional performance penalties in a future release by enabling other options than those listed here.</p>
+
+<h3 id="canonical_refs">canonical_refs</h3>
+
+<p>Normally <code>Sereal::Encoder</code> will ARRAYREF and HASHREF tags when the item contains less than 16 items, and and is not referenced more than once. This flag will override this optimization and use a standard REFN ARRAY style tag output. This is primarily useful for producing canonical output and for testing Sereal itself.</p>
+
+<p>See <a href="#CANONICAL-REPRESENTATION">&quot;CANONICAL REPRESENTATION&quot;</a> for why you might want to use this, and for the various caveats involved.</p>
+
+<h3 id="sort_keys">sort_keys</h3>
+
+<p>Normally <code>Sereal::Encoder</code> will output hashes in whatever order is convenient, generally that used by perl to actually store the hash, or whatever order was returned by a tied hash.</p>
+
+<p>If this option is enabled then the Encoder will sort the keys before outputting them. It uses more memory, and is quite a bit slower than the default.</p>
+
+<p>Generally speaking this should mean that a hash and a copy should produce the same output. Nevertheless the user is warned that Perl has a way of &quot;morphing&quot; variables on use, and some of its rules are a little arcane (for instance utf8 keys), and so two hashes that might appear to be the same might still produce different output as far as Sereal is concerned.</p>
+
+<p>As of 3.006_007 (prerelease candidate for 3.007) the sort order has been changed to the following: order by length of keys (in bytes) ascending, then by byte order of the raw underlying string, then by utf8ness, with non-utf8 first. This order was chosen because it is the most efficient to implement, both in terms of memory and time. This sort order is enabled when sort_keys is set to 1.</p>
+
+<p>You may also produce output in Perl &quot;cmp&quot; order, by setting sort_keys to 2. And for backwards compatibility you may also produce output in reverse Perl &quot;cmp&quot; order by setting sort_keys to 3. Prior to 3.006_007 this was the only sort order possible, although it was not explicitly defined what it was.</p>
+
+<p>Note that comparatively speaking both of the &quot;cmp&quot; sort orders are slow and memory inefficient. Unless you have a really good reason stick to the default which is fast and as lean as possible.</p>
+
+<p>Unless you are concerned with &quot;cross process canonical representation&quot; then it doesn&#39;t matter what option you choose.</p>
+
+<p>See <a href="#CANONICAL-REPRESENTATION">&quot;CANONICAL REPRESENTATION&quot;</a> for why you might want to use this, and for the various caveats involved.</p>
+
+<h3 id="no_shared_hashkeys">no_shared_hashkeys</h3>
+
+<p>When the <code>no_shared_hashkeys</code> option is set to a true value, then the encoder will disable the detection and elimination of repeated hash keys. This only has an effect for serializing structures containing hashes. By skipping the detection of repeated hash keys, performance goes up a bit, but the size of the output can potentially be much larger.</p>
+
+<p>Do not disable this unless you have a reason to.</p>
+
+<h3 id="dedupe_strings">dedupe_strings</h3>
+
+<p>If this is option is enabled/true then Sereal will use a hash to encode duplicates of strings during serialization efficiently using (internal) backreferences. This has a performance and memory penalty during encoding so it defaults to off. On the other hand, data structures with many duplicated strings will see a significant reduction in the size of the encoded form. Currently only strings longer than 3 characters will be deduped, however this may change in the future.</p>
+
+<p>Note that Sereal will perform certain types of deduping automatically even without this option. In particular class names and hash keys (see also the <code>no_shared_hashkeys</code> setting) are deduped regardless of this option. Only enable this if you have good reason to believe that there are many duplicated strings as values in your data structure.</p>
+
+<p>Use of this option does not require an upgraded decoder (this option was added in Sereal::Encoder 0.32). The deduping is performed in such a way that older decoders should handle it just fine. In other words, the output of a Sereal <b>decoder</b> should not depend on whether this option was used during <b>encoding</b>. See also below: <i>aliased_dedupe_strings</i>.</p>
+
+<h3 id="aliased_dedupe_strings">aliased_dedupe_strings</h3>
+
+<p>This is an advanced option that should be used only after fully understanding its ramifications.</p>
+
+<p>This option enables a mode of operation that is similar to <i>dedupe_strings</i> and if both options are set, <i>aliased_dedupe_strings</i> takes precedence.</p>
+
+<p>The behaviour of <i>aliased_dedupe_strings</i> differs from <i>dedupe_strings</i> in that the duplicate occurrences of strings are emitted as Perl language level <b>aliases</b> instead of as Sereal-internal backreferences. This means that using this option actually produces a different output data structure when decoding. The upshot is that with this option, the application using (decoding) the data may save a lot of memory in some situations but at the cost of potential action at a distance due to the aliasing.</p>
+
+<p><i>Beware:</i> The test suite currently does not cover this option as well as it probably should. Patches welcome.</p>
+
+<h3 id="protocol_version">protocol_version</h3>
+
+<p>Specifies the version of the Sereal protocol to emit. Valid are integers between 1 and the current version. If not specified, the most recent protocol version will be used. See also <code>use_protocol_v1</code>:</p>
+
+<p>It is strongly advised to use the latest protocol version outside of migration periods.</p>
+
+<h3 id="use_protocol_v1">use_protocol_v1</h3>
+
+<p>This option is deprecated in favour of the <code>protocol_version</code> option (see above).</p>
+
+<p>If set, the encoder will emit Sereal documents following protocol version 1. This is strongly discouraged except for temporary compatibility/migration purposes.</p>
+
+<h1 id="INSTANCE-METHODS">INSTANCE METHODS</h1>
+
+<h2 id="encode">encode</h2>
+
+<p>Given a Perl data structure, serializes that data structure and returns a binary string that can be turned back into the original data structure by <a href="../../lib/Sereal/Decoder.html">Sereal::Decoder</a>. The method expects a data structure to serialize as first argument, optionally followed by a header data structure.</p>
+
+<p>A header is intended for embedding small amounts of meta data, such as routing information, in a document that allows users to avoid deserializing main body needlessly.</p>
+
+<h1 id="EXPORTABLE-FUNCTIONS">EXPORTABLE FUNCTIONS</h1>
+
+<h2 id="sereal_encode_with_object">sereal_encode_with_object</h2>
+
+<p>The functional interface that is equivalent to using <code>encode</code>. Takes an encoder object reference as first argument, followed by a data structure and optional header to serialize.</p>
+
+<p>This functional interface is marginally faster than the OO interface since it avoids method resolution overhead and, on sufficiently modern Perl versions, can usually avoid subroutine call overhead.</p>
+
+<h2 id="encode_sereal">encode_sereal</h2>
+
+<p>The functional interface that is equivalent to using <code>new</code> and <code>encode</code>. Expects a data structure to serialize as first argument, optionally followed by a hash reference of options (see documentation for <code>new()</code>).</p>
+
+<p>This function cannot be used for encoding a data structure with a header. See <code>encode_sereal_with_header_data</code>.</p>
+
+<p>This functional interface is significantly slower than the OO interface since it cannot reuse the encoder object.</p>
+
+<h2 id="encode_sereal_with_header_data">encode_sereal_with_header_data</h2>
+
+<p>The functional interface that is equivalent to using <code>new</code> and <code>encode</code>. Expects a data structure and a header to serialize as first and second arguments, optionally followed by a hash reference of options (see documentation for <code>new()</code>).</p>
+
+<p>This functional interface is significantly slower than the OO interface since it cannot reuse the encoder object.</p>
+
+<h1 id="PERFORMANCE">PERFORMANCE</h1>
+
+<p>See <a href="../../lib/Sereal/Performance.html">Sereal::Performance</a> for detailed considerations on performance tuning. Let it just be said that:</p>
+
+<p><b>If you care about performance at all, then use <a href="#sereal_encode_with_object">&quot;sereal_encode_with_object&quot;</a> or the OO interface instead of <a href="#encode_sereal">&quot;encode_sereal&quot;</a>. It&#39;s a significant difference in performance if you are serializing small data structures.</b></p>
+
+<p>The exact performance in time and space depends heavily on the data structure to be serialized. Often there is a trade-off between space and time. If in doubt, do your own testing and most importantly ALWAYS TEST WITH REAL DATA. If you care purely about speed at the expense of output size, you can use the <code>no_shared_hashkeys</code> option for a small speed-up. If you need smaller output at the cost of higher CPU load and more memory used during encoding/decoding, try the <code>dedupe_strings</code> option and enable Snappy compression.</p>
+
+<p>For ready-made comparison scripts, see the <i>author_tools/bench.pl</i> and <i>author_tools/dbench.pl</i> programs that are part of this distribution. Suffice to say that this library is easily competitive in both time and space efficiency with the best alternatives.</p>
+
+<h1 id="FREEZE-THAW-CALLBACK-MECHANISM">FREEZE/THAW CALLBACK MECHANISM</h1>
+
+<p>This mechanism is enabled using the <code>freeze_callbacks</code> option of the encoder. It is inspired by the equivalent mechanism in <a>CBOR::XS</a> and differs only in one minor detail, explained below. The general mechanism is documented in the <i>A GENERIC OBJECT SERIALIATION PROTOCOL</i> section of <a>Types::Serializer</a>. Similar to CBOR using <code>CBOR</code>, Sereal uses the string <code>Sereal</code> as a serializer identifier for the callbacks.</p>
+
+<p>The one difference to the mechanism as supported by CBOR is that in Sereal, the <code>FREEZE</code> callback must return a single value. That value can be any data structure supported by Sereal (hopefully without causing infinite recursion by including the original object). But <code>FREEZE</code> can&#39;t return a list as with CBOR. This should not be any practical limitation whatsoever. Just return an array reference instead of a list.</p>
+
+<p>Here is a contrived example of a class implementing the <code>FREEZE</code> / <code>THAW</code> mechanism.</p>
+
+<pre><code>  <span class="keyword">package</span>
+    <span class="variable">File</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moo</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'path'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">);</span>
+  <span class="variable">has</span> <span class="string">'fh'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">);</span>
+  
+  <span class="comment"># open file handle if necessary and return it</span>
+  <span class="keyword">sub</span><span class="variable"> get_fh </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    <span class="comment"># This could also be done with fancier Moo(se) syntax</span>
+    <span class="keyword">my</span> <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">fh</span><span class="operator">;</span>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">not</span> <span class="variable">$fh</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">open</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">"&lt;"</span><span class="operator">,</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">path</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">fh</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    <span class="keyword">return</span> <span class="variable">$fh</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> FREEZE </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$serializer</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="comment"># Could switch on $serializer here: JSON, CBOR, Sereal, ...</span>
+    <span class="comment"># But this case is so simple that it will work with ALL of them.</span>
+    <span class="comment"># Do not try to serialize our file handle! Path will be enough</span>
+    <span class="comment"># to recreate.</span>
+    <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">path</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> THAW </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$serializer</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="comment"># Turn back into object.</span>
+    <span class="keyword">return</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">path</span> <span class="operator">=&gt;</span> <span class="variable">$data</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Why is the <code>FREEZE</code>/<code>THAW</code> mechanism important here? Our contrived <code>File</code> class may contain a file handle which can&#39;t be serialized. So <code>FREEZE</code> not only returns just the path (which is more compact than encoding the actual object contents), but it strips the file handle which can be lazily reopened on the other side of the serialization/deserialization pipe. But this example also shows that a naive implementation can easily end up with subtle bugs. A file handle itself has state (position in file, etc). Thus the deserialization in the above example won&#39;t accurately reproduce the original state. It can&#39;t, of course, if it&#39;s deserialized in a different environment anyway.</p>
+
+<h1 id="THREAD-SAFETY">THREAD-SAFETY</h1>
+
+<p><code>Sereal::Encoder</code> is thread-safe on Perl&#39;s 5.8.7 and higher. This means &quot;thread-safe&quot; in the sense that if you create a new thread, all <code>Sereal::Encoder</code> objects will become a reference to undef in the new thread. This might change in a future release to become a full clone of the encoder object.</p>
+
+<h1 id="CANONICAL-REPRESENTATION">CANONICAL REPRESENTATION</h1>
+
+<p>You might want to compare two data structures by comparing their serialized byte strings. For that to work reliably the serialization must take extra steps to ensure that identical data structures are encoded into identical serialized byte strings (a so-called &quot;canonical representation&quot;).</p>
+
+<p>Unfortunately in Perl there is no such thing as a &quot;canonical representation&quot;. Most people are interested in &quot;structural equivalence&quot; but even that is less well defined than most people think. For instance in the following example:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$array1</span><span class="operator">=</span> <span class="operator">[</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$array2</span><span class="operator">=</span> <span class="keyword">do</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$zero</span><span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+        <span class="keyword">sub</span><span class="operator">{</span> <span class="operator">\</span><span class="variable">@_</span> <span class="operator">}-&gt;(</span><span class="variable">$zero</span><span class="operator">,</span><span class="variable">$zero</span><span class="operator">);</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>the question of whether <code>$array1</code> is structurally equivalent to <code>$array2</code> is a subjective one. Sereal for instance would <b>NOT</b> consider them equivalent but <code>Test::Deep</code> would. There are many examples of this in Perl. Simply stringifying a number technically changes the scalar. Storable would notice this, but Sereal generally would not.</p>
+
+<p>Despite this as of 3.002 the Sereal encoder supports a &quot;canonical&quot; option which will make a &quot;best effort&quot; attempt at producing a canonical representation of a data structure. This mode is actually a combination of several other modes which may also be enabled independently, and as and when we add new options to the encoder that would assist in this regard then the <code>canonical</code> will also enable them. These options may come with a performance penalty so care should be taken to read the Changes file and test the performance implications when upgrading a system that uses this option.</p>
+
+<p>It is important to note that using canonical representation to determine if two data structures are different is subject to false-positives. If two Sereal encodings are identical you can generally assume that the two data structures are functionally equivalent from the point of view of normal Perl code (XS code might disagree). However if two Sereal encodings differ the data structures may actually be functionally equivalent. In practice it seems the the false-positive rate is low, but your milage may vary.</p>
+
+<p>Some of the issues with producing a true canonical representation are outlined below:</p>
+
+<dl>
+
+<dt id="Sereal-doesnt-order-the-hash-keys-by-default">Sereal doesn&#39;t order the hash keys by default.</dt>
+<dd>
+
+<p>This can be enabled via the <code>sort_keys</code>, which is itself enabled by <code>canonical</code> option.</p>
+
+</dd>
+<dt id="Sereal-output-is-sensitive-to-refcounts">Sereal output is sensitive to refcounts</dt>
+<dd>
+
+<p>This can be somewhat mitigated by the use of <code>canonical_refs</code>, see above.</p>
+
+</dd>
+<dt id="There-are-multiple-valid-Sereal-documents-that-you-can-produce-for-the-same-Perl-data-structure">There are multiple valid Sereal documents that you can produce for the same Perl data structure.</dt>
+<dd>
+
+<p>Just <a href="#sort_keys">sorting hash keys</a> is not enough. Some of the reasons are outlined below. These issues are especially relevant when considering language interoperability.</p>
+
+<dl>
+
+<dt id="PAD-bytes">PAD bytes</dt>
+<dd>
+
+<p>A trivial example is PAD bytes which mean nothing and are skipped. They mostly exist for encoder optimizations to prevent certain nasty backtracking situations from becoming O(n) at the cost of one byte of output. An explicit canonical mode would have to outlaw them (or add more of them) and thus require a much more complicated implementation of refcount/weakref handing in the encoder while at the same time causing some operations to go from O(1) to a full memcpy of everything after the point of where we backtracked to. Nasty.</p>
+
+</dd>
+<dt id="COPY-tag">COPY tag</dt>
+<dd>
+
+<p>Another example is COPY. The COPY tag indicates that the next element is an identical copy of a previous element (which is itself forbidden from including COPY&#39;s other than for class names). COPY is purely internal. The Perl/XS implementation uses it to share hash keys and class names. One could use it for other strings (theoretically), but doesn&#39;t for time-efficiency reasons. We&#39;d have to outlaw the use of this (significant) optimization of canonicalization.</p>
+
+</dd>
+<dt id="REF-representation">REF representation</dt>
+<dd>
+
+<p>Sereal represents a reference to an array as a sequence of tags which, in its simplest form, reads <i>REF, ARRAY $array_length TAG1 TAG2 ...</i>. The separation of &quot;REF&quot; and &quot;ARRAY&quot; is necessary to properly implement all of Perl&#39;s referencing and aliasing semantics correctly. Quite frequently, however, your array is only referenced once and plainly so. If it&#39;s also at most 15 elements long, Sereal optimizes all of the &quot;REF&quot; and &quot;ARRAY&quot; tags, as well as the length into a special one byte ARRAYREF tag. This is a very significant optimization for common cases. This, however, does mean that most arrays up to 15 elements could be represented in two different, yet perfectly valid forms. ARRAYREF would have to be outlawed for a properly canonical form. The exact same logic applies to HASH vs. HASHREF. This behavior can be overridden by the <code>canonical_refs</code> option, which disables use of HASHREF and ARRAYREF.</p>
+
+</dd>
+<dt id="Numeric-representation">Numeric representation</dt>
+<dd>
+
+<p>Similar to how Sereal can represent arrays and hashes in a full and a compact form. For small integers (between -16 and +15 inclusive), Sereal emits only one byte including the encoding of the type of data. For larger integers, it can use either variants (positive only) or zigzag encoding, which can also represent negative numbers. For a canonical mode, the space optimizations would have to be turned off and it would have to be explicitly specified whether variant or zigzag encoding is to be used for encoding positive integers.</p>
+
+<p>Perl may choose to retain multiple representations of a scalar. Specifically, it can convert integers, floating point numbers, and strings on the fly and will aggressively cache the results. Normally, it remembers which of the representations can be considered canonical, that means, which can be used to recreate the others reliably. For example, <code>0</code> and <code>&quot;0&quot;</code> can both be considered canonical since they naturally transform into each other. Beyond intrinsic ambiguity, there are ways to trick Perl into allowing a single scalar to have distinct string, integer, and floating point representations that are all flagged as canonical, but can&#39;t be transformed into each other. These are the so-called dualvars. Sereal cannot represent dualvars (and that&#39;s a good thing).</p>
+
+<p>Floating point values can appear to be the same but serialize to different byte strings due to insignificant &#39;noise&#39; in the floating point representation. Sereal supports different floating point precisions and will generally choose the most compact that can represent your floating point number correctly.</p>
+
+</dd>
+</dl>
+
+<p>There&#39;s also a few cases where Sereal will produce different documents for values that you might think are the same thing, because if you e.g. compared them with <code>eq</code> or <code>==</code> in perl itself would think they were equivalent. However for the purposes of serialization they&#39;re not the same value.</p>
+
+<p>A good example of these cases is where <a>Test::Deep</a> and Sereal&#39;s canonical mode differ. We have tests for some of these cases in <i>t/030_canonical_vs_test_deep.t</i>. Here&#39;s the issues we&#39;ve noticed so far:</p>
+
+<dl>
+
+<dt id="Sereal-considers-ASCII-strings-with-the-UTF-8-flag-to-be-different-from-the-same-string-without-the-UTF-8-flag">Sereal considers ASCII strings with the UTF-8 flag to be different from the same string without the UTF-8 flag</dt>
+<dd>
+
+<p>Consider:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$language_code</span> <span class="operator">=</span> <span class="string">"en"</span><span class="operator">;</span>
+</code></pre>
+
+<p>v.s.:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$language_code</span> <span class="operator">=</span> <span class="string">"en"</span><span class="operator">;</span>
+    <span class="variable">utf8::upgrade</span><span class="operator">(</span><span class="variable">$en</span><span class="operator">);</span>
+</code></pre>
+
+<p>Sereal&#39;s canonical mode will encode these strings differently, as it should, since the UTF-8 flag will be passed along on interpolation.</p>
+
+<p>But this can be confusing if you&#39;re just getting some user-supplied ASCII strings that you may inadvertently toggle the UTF-8 flag on, e.g. because you&#39;re comparing an ASCII value in a database to a value submitted in a UTF-8 web form.</p>
+
+</dd>
+<dt id="Sereal-will-encode-strings-that-look-like-numbers-as-strings-unless-theyve-been-used-in-numeric-context">Sereal will encode strings that look like numbers as strings, unless they&#39;ve been used in numeric context</dt>
+<dd>
+
+<p>I.e. these values will be encoded differently, respectively:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$IV_x</span> <span class="operator">=</span> <span class="string">"12345"</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$IV_y</span> <span class="operator">=</span> <span class="string">"12345"</span> <span class="operator">+</span> <span class="number">0</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$NV_x</span> <span class="operator">=</span> <span class="string">"12.345"</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$NV_y</span> <span class="operator">=</span> <span class="string">"12.345"</span> <span class="operator">+</span> <span class="number">0</span><span class="operator">;</span>
+</code></pre>
+
+<p>But as noted above something like Test::Deep will consider these to be the same thing.</p>
+
+</dd>
+</dl>
+
+<p>We might produce certain aggressive flags to the canonical mode in the future to deal with this. For the cases noted above some combination of turning the UTF-8 flag on on all strings, or stripping it from strings that have it but are ASCII-only would &quot;work&quot;, similarly we could scan strings to see if they match <code>looks_like_number()</code> and if so numify them.</p>
+
+<p>This would produce output that either would be a lot bigger (having to encode all numbers as strings), or would be more expensive to generate (having to scan strings for numeric or non-ASCII context), and for some cases like the UTF-8 flag munging wouldn&#39;t be suitable for general use outside of canonicialization.</p>
+
+</dd>
+</dl>
+
+<p>Often, people don&#39;t actually care about &quot;canonical&quot; in the strict sense required for real <i>identity</i> checking. They just require a best-effort sort of thing for caching. But it&#39;s a slippery slope!</p>
+
+<p>In a nutshell, the <code>canonical</code> option may be sufficient for an application which is simply serializing a cache key, and thus there&#39;s little harm in an occasional false-negative, but think carefully before applying Sereal in other use-cases.</p>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<dl>
+
+<dt id="Strings-Or-Numbers">Strings Or Numbers</dt>
+<dd>
+
+<p>Perl does not make a strong distinction between strings and numbers, and from an internal point of view it can be difficult to tell what the &quot;right&quot; representation is for a given variable.</p>
+
+<p>Sereal tries to not be lossy. So if it detects that the string value of a var, and the numeric value are different it will generally round trip the *string* value. This means that &quot;special&quot; strings often used in Perl function returns, like &quot;0 but true&quot;, and &quot;0e0&quot;, will round trip in a way that their normal Perl semantics are preserved. However this also means that &quot;non canonical&quot; values, like &quot; 100 &quot;, which will numify as 100 without warnings, will round trip as their string values.</p>
+
+<p>Perl also has some operators, the binary operators, ^, | and &amp;, which do different things depending on whether their arguments had been used in numeric context as the following examples show:</p>
+
+<pre><code>    <span class="variable">perl</span> <span class="operator">-</span><span class="variable">le'my</span> <span class="variable">$x</span><span class="operator">=</span><span class="string">"1"</span><span class="operator">;</span> <span class="variable">$i</span><span class="operator">=</span><span class="keyword">int</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">);</span> <span class="keyword">print</span> <span class="keyword">unpack</span> <span class="string">"H*"</span><span class="operator">,</span> <span class="variable">$x</span> <span class="operator">^</span> <span class="string">"1"</span><span class="string">'
+    30
+    
+    perl -le'</span><span class="keyword">my</span> <span class="variable">$x</span><span class="operator">=</span><span class="string">"1"</span><span class="operator">;</span> <span class="keyword">print</span> <span class="keyword">unpack</span> <span class="string">"H*"</span><span class="operator">,</span> <span class="variable">$x</span> <span class="operator">^</span> <span class="string">"1"</span><span class="string">'
+    00
+    
+    perl -le'</span><span class="keyword">my</span> <span class="variable">$x</span><span class="operator">=</span><span class="string">" 1 "</span><span class="operator">;</span> <span class="variable">$i</span><span class="operator">=</span><span class="keyword">int</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">);</span> <span class="keyword">print</span> <span class="keyword">unpack</span> <span class="string">"H*"</span><span class="operator">,</span> <span class="variable">$x</span> <span class="operator">^</span> <span class="string">"1"</span><span class="string">'
+    30
+    
+    perl -le'</span><span class="keyword">my</span> <span class="variable">$x</span><span class="operator">=</span><span class="string">" 1 "</span><span class="operator">;</span> <span class="keyword">print</span> <span class="keyword">unpack</span> <span class="string">"H*"</span><span class="operator">,</span> <span class="variable">$x</span> <span class="operator">^</span> <span class="string">"1"</span><span class="string">'
+    113120
+    </span>
+</code></pre>
+
+<p>Sereal currently cannot round trip this property properly.</p>
+
+<p>An extreme case of this problem is that of &quot;dualvars&quot;, which can be created using the Scalar::Util::dualvar() function. This function allows one to create variables which have string and integer values which are completely unrelated to each other. Sereal currently will choose the *string* value when it detects these items.</p>
+
+<p>It is possible that a future release of the protocol will fix these issues.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS-CONTACT-AND-SUPPORT">BUGS, CONTACT AND SUPPORT</h1>
+
+<p>For reporting bugs, please use the github bug tracker at <a href="http://github.com/Sereal/Sereal/issues">http://github.com/Sereal/Sereal/issues</a>.</p>
+
+<p>For support and discussion of Sereal, there are two Google Groups:</p>
+
+<p>Announcements around Sereal (extremely low volume): <a href="https://groups.google.com/forum/?fromgroups#!forum/sereal-announce">https://groups.google.com/forum/?fromgroups#!forum/sereal-announce</a></p>
+
+<p>Sereal development list: <a href="https://groups.google.com/forum/?fromgroups#!forum/sereal-dev">https://groups.google.com/forum/?fromgroups#!forum/sereal-dev</a></p>
+
+<h1 id="AUTHORS-AND-CONTRIBUTORS">AUTHORS AND CONTRIBUTORS</h1>
+
+<p>Yves Orton &lt;demerphq@gmail.com&gt;</p>
+
+<p>Damian Gryski</p>
+
+<p>Steffen Mueller &lt;smueller@cpan.org&gt;</p>
+
+<p>Rafa&euml;l Garcia-Suarez</p>
+
+<p>&AElig;var Arnfj&ouml;r&eth; Bjarmason &lt;avar@cpan.org&gt;</p>
+
+<p>Tim Bunce</p>
+
+<p>Daniel Dragan &lt;bulkdd@cpan.org&gt; (Windows support and bugfixes)</p>
+
+<p>Zefram</p>
+
+<p>Borislav Nikolov</p>
+
+<p>Ivan Kruglov &lt;ivan.kruglov@yahoo.com&gt;</p>
+
+<p>Some inspiration and code was taken from Marc Lehmann&#39;s excellent <a>JSON::XS</a> module due to obvious overlap in problem domain. Thank you!</p>
+
+<h1 id="ACKNOWLEDGMENT">ACKNOWLEDGMENT</h1>
+
+<p>This module was originally developed for Booking.com. With approval from Booking.com, this module was generalized and published on CPAN, for which the authors would like to express their gratitude.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2012, 2013, 2014 by Steffen Mueller Copyright (C) 2012, 2013, 2014 by Yves Orton</p>
+
+<p>The license for the code in this distribution is the following, with the exceptions listed below:</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>Except portions taken from Marc Lehmann&#39;s code for the JSON::XS module, which is licensed under the same terms as this module.</p>
+
+<p>Also except the code for Snappy compression library, whose license is reproduced below and which, to the best of our knowledge, is compatible with this module&#39;s license. The license for the enclosed Snappy code is:</p>
+
+<pre><code>  Copyright 2011, Google Inc.
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+    * Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
+  distribution.
+    * Neither the name of Google Inc. nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre>
+
+
+</body>
+
+</html>
+
+

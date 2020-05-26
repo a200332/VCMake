@@ -1,0 +1,204 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#IMPORTANT-CONCEPTS">IMPORTANT CONCEPTS</a>
+    <ul>
+      <li><a href="#BUILD">BUILD</a></li>
+      <li><a href="#RUNNER">RUNNER</a></li>
+      <li><a href="#TASK">TASK</a>
+        <ul>
+          <li><a href="#ACTION">ACTION</a></li>
+          <li><a href="#GROUP">GROUP</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Workflow - A test workflow is a way of structuring tests using composable units.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>A test workflow is a way of structuring tests using composable units. A well known example of a test workflow is <a href="http://rspec.info/">RSPEC</a>. RSPEC is implemented using Test2::Workflow in <a href="../../lib/Test2/Tools/Spec.html">Test2::Tools::Spec</a> along with several extensions.</p>
+
+<h1 id="IMPORTANT-CONCEPTS">IMPORTANT CONCEPTS</h1>
+
+<h2 id="BUILD">BUILD</h2>
+
+<p><a href="../../lib/Test2/Workflow/Build.html">Test2::Workflow::Build</a></p>
+
+<p>A Build is used to compose tasks. Usually a build object is pushed to the stack before running code that adds tasks to the build. Once the build sub is complete the build is popped and returned. Usually a build is converted into a root task or task group.</p>
+
+<h2 id="RUNNER">RUNNER</h2>
+
+<p><a href="../../lib/Test2/Workflow/Runner.html">Test2::Workflow::Runner</a></p>
+
+<p>A runner takes the composed tasks and executes them in the proper order.</p>
+
+<h2 id="TASK">TASK</h2>
+
+<p><a href="../../lib/Test2/Workflow/Task.html">Test2::Workflow::Task</a></p>
+
+<p>A task is a unit of work to accomplish. There are 2 main types of task.</p>
+
+<h3 id="ACTION">ACTION</h3>
+
+<p>An action is the most simple unit used in composition. An action is essentially a name and a codeblock to run.</p>
+
+<h3 id="GROUP">GROUP</h3>
+
+<p>A group is a task that is composed of other tasks.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>All exports are optional, you must request the ones you want.</p>
+
+<dl>
+
+<dt id="parsed-parse_args-args-args">$parsed = parse_args(args =&gt; \@args)</dt>
+<dd>
+
+</dd>
+<dt id="parsed-parse_args-args-args-level-L">$parsed = parse_args(args =&gt; \@args, level =&gt; $L)</dt>
+<dd>
+
+</dd>
+<dt id="parsed-parse_args-args-args-caller-caller-L">$parsed = parse_args(args =&gt; \@args, caller =&gt; [caller($L)])</dt>
+<dd>
+
+<p>This will parse a &quot;typical&quot; task builders arguments. The <code>@args</code> array MUST contain a name (plain scalar containing text) and also a single CODE reference. The <code>@args</code> array MAY also contain any quantity of line numbers or hashrefs. The resulting data structure will be a single hashref with all the provided hashrefs squashed together, and the &#39;name&#39;, &#39;code&#39;, &#39;lines&#39; and &#39;frame&#39; keys set from other arguments.</p>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="comment"># All hashrefs from @args get squashed together:</span>
+        <span class="variable">%squashed_input_hashref_data</span><span class="operator">,</span>
+    
+        <span class="comment"># @args must have exactly 1 plaintext scalar that is not a number, it</span>
+        <span class="comment"># is considered the name:</span>
+        <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'name from input args'</span>
+    
+        <span class="comment"># Integer values are treated as line numbers</span>
+        <span class="string">lines</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">35</span><span class="operator">,</span> <span class="number">44</span> <span class="operator">]</span><span class="operator">,</span>
+    
+        <span class="comment"># Exactly 1 coderef must be provided in @args:</span>
+        <span class="string">code</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">some_code</span><span class="operator">,</span>
+    
+        <span class="comment"># 'frame' contains the 'caller' data. This may be passed in directly,</span>
+        <span class="comment"># obtained from the 'level' parameter, or automatically deduced.</span>
+        <span class="string">frame</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'A::Package'</span><span class="operator">,</span> <span class="string">'a_file.pm'</span><span class="operator">,</span> <span class="number">42</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="build-init_root-pkg-args">$build = init_root($pkg, %args)</dt>
+<dd>
+
+<p>This will initialize (or return the existing) a build for the specified package. <code>%args</code> get passed into the <a href="../../lib/Test2/Workflow/Build.html">Test2::Workflow::Build</a> constructor. This uses the following defaults (which can be overridden using <code>%args</code>):</p>
+
+<pre><code>    name    =&gt; $pkg,
+    flat    =&gt; 1,
+    iso     =&gt; 0,
+    async   =&gt; 0,
+    is_root =&gt; 1,</code></pre>
+
+<p>Note that <code>%args</code> is completely ignored if the package build has already been initialized.</p>
+
+</dd>
+<dt id="build-root_build-pkg">$build = root_build($pkg)</dt>
+<dd>
+
+<p>This will return the root build for the specified package.</p>
+
+</dd>
+<dt id="build-current_build">$build = current_build()</dt>
+<dd>
+
+<p>This will return the build currently at the top of the build stack (or undef).</p>
+
+</dd>
+<dt id="build-build-name-params-sub">$build = build($name, \%params, sub { ... })</dt>
+<dd>
+
+<p>This will push a new build object onto the build stash then run the provided codeblock. Once the codeblock has finished running the build will be popped off the stack and returned.</p>
+
+<p>See <code>parse_args()</code> for details about argument processing.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="Test2::Tools::Spec">Test2::Tools::Spec</dt>
+<dd>
+
+<p><a href="../../lib/Test2/Tools/Spec.html">Test2::Tools::Spec</a> is an implementation of RSPEC using this library.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Workflow can be found at <i>http://github.com/Test-More/Test2-Workflow/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2016 Chad Granum &lt;exodist7@gmail.com&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

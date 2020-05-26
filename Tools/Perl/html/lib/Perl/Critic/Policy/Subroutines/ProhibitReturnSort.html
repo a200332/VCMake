@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#KNOWN-BUGS">KNOWN BUGS</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Subroutines::ProhibitReturnSort - Behavior of <code>sort</code> is not defined if called in scalar context.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The behavior of the builtin <code>sort</code> function is not defined if called in scalar context. So if you write a subroutine that directly <code>return</code>s the result of a <code>sort</code> operation, then you code will behave unpredictably if someone calls your subroutine in a scalar context. This Policy emits a violation if the <code>return</code> keyword is directly followed by the <code>sort</code> function. To safely return a sorted list of values from a subroutine, you should assign the sorted values to a temporary variable first. For example:</p>
+
+<pre><code>   <span class="keyword">sub</span><span class="variable"> frobulate </span><span class="operator">{</span>
+   
+       <span class="keyword">return</span> <span class="keyword">sort</span> <span class="variable">@list</span><span class="operator">;</span>  <span class="comment"># not ok!</span>
+   
+       <span class="keyword">my</span> <span class="variable">@sorted_list</span> <span class="operator">=</span> <span class="keyword">sort</span> <span class="variable">@list</span><span class="operator">;</span>
+       <span class="keyword">return</span> <span class="variable">@sorted_list</span> <span class="comment"># OK</span>
+   <span class="operator">}</span>
+</code></pre>
+
+<h1 id="KNOWN-BUGS">KNOWN BUGS</h1>
+
+<p>This Policy is not sensitive to the <code>wantarray</code> function. So the following code would generate a false violation:</p>
+
+<pre><code>   <span class="keyword">sub</span><span class="variable"> frobulate </span><span class="operator">{</span>
+   
+       <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">wantarray</span><span class="operator">)</span> <span class="operator">{</span>
+           <span class="keyword">return</span> <span class="keyword">sort</span> <span class="variable">@list</span><span class="operator">;</span>
+       <span class="operator">}</span>
+       <span class="keyword">else</span><span class="operator">{</span>
+           <span class="keyword">return</span> <span class="keyword">join</span> <span class="variable">@list</span><span class="operator">;</span>
+       <span class="operator">}</span>
+   <span class="operator">}</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>This Policy was suggested by Ulrich Wisser and the <a href="http://iis.se">http://iis.se</a> team.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2017 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

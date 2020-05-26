@@ -1,0 +1,121 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#COPYRIGHT-AND-DISCLAIMERS">COPYRIGHT AND DISCLAIMERS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Pod::Simple::LinkSection -- represent &quot;section&quot; attributes of L codes</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="comment"># a long story</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class is not of interest to general users.</p>
+
+<p>Pod::Simple uses this class for representing the value of the &quot;section&quot; attribute of &quot;L&quot; start-element events. Most applications can just use the normal stringification of objects of this class; they stringify to just the text content of the section, such as &quot;foo&quot; for <code>L&lt;Stuff/foo&gt;</code>, and &quot;bar&quot; for <code>L&lt;Stuff/bI&lt;ar&gt;&gt;</code>.</p>
+
+<p>However, anyone particularly interested in getting the full value of the treelet, can just traverse the content of the treeleet @$treelet_object. To wit:</p>
+
+<pre><code>  <span class="operator">% </span><span class="variable">perl</span> <span class="operator">-</span><span class="variable">MData::Dumper</span> <span class="keyword">-e</span>
+    <span class="string">"use base qw(Pod::Simple::Methody);
+     sub start_L { print Dumper(</span><span class="variable">$_</span><span class="string">[1]{'section'} ) }
+     __PACKAGE__-&gt;new-&gt;parse_string_document('=head1 L&lt;Foo/bI&lt;ar&gt;baz&gt;&gt;')
+    "</span>
+  <span class="variable">Output</span><span class="operator">:</span>
+  <span class="variable">$VAR1</span> <span class="operator">=</span> <span class="keyword">bless</span><span class="operator">(</span> <span class="operator">[</span>
+                   <span class="string">''</span><span class="operator">,</span>
+                   <span class="operator">{}</span><span class="operator">,</span>
+                   <span class="string">'b'</span><span class="operator">,</span>
+                   <span class="keyword">bless</span><span class="operator">(</span> <span class="operator">[</span>
+                            <span class="string">'I'</span><span class="operator">,</span>
+                            <span class="operator">{}</span><span class="operator">,</span>
+                            <span class="string">'ar'</span>
+                          <span class="operator">]</span><span class="operator">,</span> <span class="string">'Pod::Simple::LinkSection'</span> <span class="operator">),</span>
+                   <span class="string">'baz'</span>
+                 <span class="operator">]</span><span class="operator">,</span> <span class="string">'Pod::Simple::LinkSection'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>But stringify it and you get just the text content:</p>
+
+<pre><code>  <span class="operator">% </span><span class="variable">perl</span> <span class="operator">-</span><span class="variable">MData::Dumper</span> <span class="keyword">-e</span>
+    <span class="string">"use base qw(Pod::Simple::Methody);
+     sub start_L { print Dumper( '' . </span><span class="variable">$_</span><span class="string">[1]{'section'} ) }
+     __PACKAGE__-&gt;new-&gt;parse_string_document('=head1 L&lt;Foo/bI&lt;ar&gt;baz&gt;&gt;')
+    "</span>
+  <span class="variable">Output</span><span class="operator">:</span>
+  <span class="variable">$VAR1</span> <span class="operator">=</span> <span class="string">'barbaz'</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/Pod/Simple.html">Pod::Simple</a></p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Questions or discussion about POD and Pod::Simple should be sent to the pod-people@perl.org mail list. Send an empty email to pod-people-subscribe@perl.org to subscribe.</p>
+
+<p>This module is managed in an open GitHub repository, <a href="https://github.com/perl-pod/pod-simple/">https://github.com/perl-pod/pod-simple/</a>. Feel free to fork and contribute, or to clone <a href="git://github.com/perl-pod/pod-simple.git">git://github.com/perl-pod/pod-simple.git</a> and send patches!</p>
+
+<p>Patches against Pod::Simple are welcome. Please send bug reports to &lt;bug-pod-simple@rt.cpan.org&gt;.</p>
+
+<h1 id="COPYRIGHT-AND-DISCLAIMERS">COPYRIGHT AND DISCLAIMERS</h1>
+
+<p>Copyright (c) 2004 Sean M. Burke.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Pod::Simple was created by Sean M. Burke &lt;sburke@cpan.org&gt;. But don&#39;t bother him, he&#39;s retired.</p>
+
+<p>Pod::Simple is maintained by:</p>
+
+<ul>
+
+<li><p>Allison Randal <code>allison@perl.org</code></p>
+
+</li>
+<li><p>Hans Dieter Pearcey <code>hdp@cpan.org</code></p>
+
+</li>
+<li><p>David E. Wheeler <code>dwheeler@cpan.org</code></p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

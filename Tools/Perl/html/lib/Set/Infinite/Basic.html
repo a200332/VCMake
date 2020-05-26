@@ -1,0 +1,273 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#empty_set">empty_set</a></li>
+      <li><a href="#universal_set">universal_set</a></li>
+      <li><a href="#until">until</a></li>
+      <li><a href="#copy">copy</a></li>
+      <li><a href="#clone">clone</a></li>
+      <li><a href="#Mode-functions">Mode functions:</a></li>
+      <li><a href="#Logic-functions">Logic functions:</a></li>
+      <li><a href="#Set-functions">Set functions:</a></li>
+      <li><a href="#Scalar-functions">Scalar functions:</a></li>
+      <li><a href="#Overloaded-Perl-functions">Overloaded Perl functions:</a></li>
+      <li><a href="#Global-functions">Global functions:</a></li>
+      <li><a href="#Internal-functions">Internal functions:</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#INTERNALS">INTERNALS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Set::Infinite::Basic - Sets of intervals 6 =head1 SYNOPSIS</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Set::Infinite::Basic</span><span class="operator">;</span>
+  
+  <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">Set::Infinite::Basic</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">);</span>    <span class="comment"># [1..2]</span>
+  <span class="keyword">print</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">union</span><span class="operator">(</span><span class="number">5</span><span class="operator">,</span><span class="number">6</span><span class="operator">);</span>            <span class="comment"># [1..2],[5..6]</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Set::Infinite::Basic is a Set Theory module for infinite sets.</p>
+
+<p>It works on reals, integers, and objects.</p>
+
+<p>This module does not support recurrences. Recurrences are implemented in Set::Infinite.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="empty_set">empty_set</h2>
+
+<p>Creates an empty_set.</p>
+
+<p>If called from an existing set, the empty set inherits the &quot;type&quot; and &quot;density&quot; characteristics.</p>
+
+<h2 id="universal_set">universal_set</h2>
+
+<p>Creates a set containing &quot;all&quot; possible elements.</p>
+
+<p>If called from an existing set, the universal set inherits the &quot;type&quot; and &quot;density&quot; characteristics.</p>
+
+<h2 id="until">until</h2>
+
+<p>Extends a set until another:</p>
+
+<pre><code>    0,5,7 -&gt; until 2,6,10</code></pre>
+
+<p>gives</p>
+
+<pre><code>    [0..2), [5..6), [7..10)</code></pre>
+
+<p>Note: this function is still experimental.</p>
+
+<h2 id="copy">copy</h2>
+
+<h2 id="clone">clone</h2>
+
+<p>Makes a new object from the object&#39;s data.</p>
+
+<h2 id="Mode-functions">Mode functions:</h2>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">real</span><span class="operator">;</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">integer</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Logic-functions">Logic functions:</h2>
+
+<pre><code>    <span class="variable">$logic</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">intersects</span><span class="operator">(</span><span class="variable">$b</span><span class="operator">);</span>
+    
+    <span class="variable">$logic</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span><span class="variable">$b</span><span class="operator">);</span>
+    
+    <span class="variable">$logic</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">is_null</span><span class="operator">;</span>  <span class="comment"># also called "is_empty"</span>
+</code></pre>
+
+<h2 id="Set-functions">Set functions:</h2>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">union</span><span class="operator">(</span><span class="variable">$b</span><span class="operator">);</span>    
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">intersection</span><span class="operator">(</span><span class="variable">$b</span><span class="operator">);</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">;</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">(</span><span class="variable">$b</span><span class="operator">);</span>   <span class="comment"># can also be called "minus" or "difference"</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">symmetric_difference</span><span class="operator">(</span> <span class="variable">$b</span> <span class="operator">);</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">span</span><span class="operator">;</span>   
+    
+        <span class="variable">result</span> <span class="variable">is</span> <span class="operator">(</span><span class="variable">min</span> <span class="operator">..</span> <span class="variable">max</span><span class="operator">)</span>
+</code></pre>
+
+<h2 id="Scalar-functions">Scalar functions:</h2>
+
+<pre><code>    <span class="variable">$i</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">min</span><span class="operator">;</span>
+    
+    <span class="variable">$i</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">max</span><span class="operator">;</span>
+    
+    <span class="variable">$i</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">size</span><span class="operator">;</span>  
+    
+    <span class="variable">$i</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">count</span><span class="operator">;</span>  <span class="comment"># number of spans</span>
+</code></pre>
+
+<h2 id="Overloaded-Perl-functions">Overloaded Perl functions:</h2>
+
+<pre><code>    print    
+
+    sort, &lt;=&gt; </code></pre>
+
+<h2 id="Global-functions">Global functions:</h2>
+
+<pre><code>    <span class="variable">separators</span><span class="operator">(</span><span class="variable">@i</span><span class="operator">)</span>
+    
+        <span class="variable">chooses</span> <span class="variable">the</span> <span class="variable">interval</span> <span class="variable">separators</span><span class="operator">.</span> 
+    
+        <span class="keyword">default</span> <span class="variable">are</span> <span class="operator">[</span> <span class="operator">]</span> <span class="operator">(</span> <span class="operator">)</span> <span class="string">'..'</span> <span class="string">','</span><span class="operator">.</span>
+    
+    <span class="variable">INFINITY</span>
+    
+        <span class="variable">returns</span> <span class="variable">an</span> <span class="string">'Infinity'</span> <span class="variable">number</span><span class="operator">.</span>
+    
+    <span class="variable">NEG_INFINITY</span>
+    
+        <span class="variable">returns</span> <span class="variable">a</span> <span class="string">'-Infinity'</span> <span class="variable">number</span><span class="operator">.</span>
+    
+    <span class="variable">iterate</span> <span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">}</span> <span class="operator">)</span>
+    
+        <span class="variable">Iterates</span> <span class="variable">over</span> <span class="variable">a</span> <span class="variable">subroutine</span><span class="operator">.</span> 
+        <span class="variable">Returns</span> <span class="variable">the</span> <span class="variable">union</span> <span class="variable">of</span> <span class="variable">partial</span> <span class="variable">results</span><span class="operator">.</span>
+    
+    <span class="variable">first</span>
+    
+        <span class="variable">In</span> <span class="keyword">scalar</span> <span class="variable">context</span> <span class="variable">returns</span> <span class="variable">the</span> <span class="variable">first</span> <span class="variable">interval</span> <span class="variable">of</span> <span class="variable">a</span> <span class="variable">set</span><span class="operator">.</span>
+    
+        <span class="variable">In</span> <span class="variable">list</span> <span class="variable">context</span> <span class="variable">returns</span> <span class="variable">the</span> <span class="variable">first</span> <span class="variable">interval</span> <span class="variable">of</span> <span class="variable">a</span> <span class="variable">set</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">the</span>
+        <span class="string">'tail'</span><span class="operator">.</span>
+    
+        <span class="variable">Works</span> <span class="variable">in</span> <span class="variable">unbounded</span> <span class="variable">sets</span>
+    
+    <span class="variable">type</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">)</span>
+    
+        <span class="variable">chooses</span> <span class="variable">an</span> <span class="variable">object</span> <span class="variable">data</span> <span class="variable">type</span><span class="operator">.</span> 
+    
+        <span class="keyword">default</span> <span class="variable">is</span> <span class="variable">none</span> <span class="operator">(</span><span class="variable">a</span> <span class="variable">normal</span> <span class="variable">perl</span> <span class="variable">SCALAR</span><span class="operator">).</span>
+    
+        <span class="variable">examples</span><span class="operator">:</span> 
+    
+        <span class="variable">type</span><span class="operator">(</span><span class="string">'Math::BigFloat'</span><span class="operator">);</span>
+        <span class="variable">type</span><span class="operator">(</span><span class="string">'Math::BigInt'</span><span class="operator">);</span>
+        <span class="variable">type</span><span class="operator">(</span><span class="string">'Set::Infinite::Date'</span><span class="operator">);</span>
+            <span class="variable">See</span> <span class="variable">notes</span> <span class="variable">on</span> <span class="variable">Set::Infinite::Date</span> <span class="variable">below</span><span class="operator">.</span>
+    
+    <span class="variable">tolerance</span><span class="operator">(</span><span class="number">0</span><span class="operator">)</span>    <span class="variable">defaults</span> <span class="variable">to</span> <span class="variable">real</span> <span class="variable">sets</span> <span class="operator">(</span><span class="keyword">default</span><span class="operator">)</span>
+    <span class="variable">tolerance</span><span class="operator">(</span><span class="number">1</span><span class="operator">)</span>    <span class="variable">defaults</span> <span class="variable">to</span> <span class="variable">integer</span> <span class="variable">sets</span>
+    
+    <span class="variable">real</span>            <span class="variable">defaults</span> <span class="variable">to</span> <span class="variable">real</span> <span class="variable">sets</span> <span class="operator">(</span><span class="keyword">default</span><span class="operator">)</span>
+    
+    <span class="variable">integer</span>         <span class="variable">defaults</span> <span class="variable">to</span> <span class="variable">integer</span> <span class="variable">sets</span>
+</code></pre>
+
+<h2 id="Internal-functions">Internal functions:</h2>
+
+<pre><code>    <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">fixtype</span><span class="operator">;</span> 
+    
+    <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">numeric</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">Set::Infinite</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">10</span><span class="operator">,</span><span class="number">1</span><span class="operator">);</span>
+        <span class="variable">Will</span> <span class="variable">be</span> <span class="variable">interpreted</span> <span class="variable">as</span> <span class="operator">[</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">]</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">Set::Infinite</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">3</span><span class="operator">,</span><span class="number">4</span><span class="operator">);</span>
+        <span class="variable">Will</span> <span class="variable">be</span> <span class="variable">interpreted</span> <span class="variable">as</span> <span class="operator">[</span><span class="number">1</span><span class="operator">..</span><span class="number">2</span><span class="operator">]</span><span class="operator">,</span><span class="operator">[</span><span class="number">3</span><span class="operator">..</span><span class="number">4</span><span class="operator">]</span> <span class="variable">instead</span> <span class="variable">of</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">3</span><span class="operator">,</span><span class="number">4</span><span class="operator">]</span><span class="operator">.</span>
+        <span class="variable">You</span> <span class="variable">probably</span> <span class="variable">want</span> <span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">,</span><span class="operator">[</span><span class="number">2</span><span class="operator">]</span><span class="operator">,</span><span class="operator">[</span><span class="number">3</span><span class="operator">]</span><span class="operator">,</span><span class="operator">[</span><span class="number">4</span><span class="operator">]</span><span class="operator">)</span> <span class="variable">instead</span><span class="operator">,</span>
+        <span class="keyword">or</span> <span class="variable">maybe</span> <span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span><span class="number">4</span><span class="operator">)</span> 
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">Set::Infinite</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">3</span><span class="operator">);</span>
+        <span class="variable">Will</span> <span class="variable">be</span> <span class="variable">interpreted</span> <span class="variable">as</span> <span class="operator">[</span><span class="number">1</span><span class="operator">..</span><span class="number">2</span><span class="operator">]</span><span class="operator">,</span><span class="number">3</span> <span class="variable">instead</span> <span class="variable">of</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">3</span><span class="operator">]</span><span class="operator">.</span>
+        <span class="variable">You</span> <span class="variable">probably</span> <span class="variable">want</span> <span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span><span class="number">3</span><span class="operator">)</span> <span class="variable">instead</span><span class="operator">.</span>
+</code></pre>
+
+<h1 id="INTERNALS">INTERNALS</h1>
+
+<p>The internal representation of a <i>span</i> is a hash:</p>
+
+<pre><code>    <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span>   <span class="variable">start</span> <span class="variable">of</span> <span class="variable">span</span><span class="operator">,</span>
+      <span class="string">b</span> <span class="operator">=&gt;</span>   <span class="variable">end</span> <span class="variable">of</span> <span class="variable">span</span><span class="operator">,</span>
+      <span class="string">open_begin</span> <span class="operator">=&gt;</span>   <span class="string">'0'</span> <span class="variable">the</span> <span class="variable">span</span> <span class="variable">starts</span> <span class="variable">in</span> <span class="string">'a'</span>
+                      <span class="string">'1'</span> <span class="variable">the</span> <span class="variable">span</span> <span class="variable">starts</span> <span class="variable">after</span> <span class="string">'a'</span>
+      <span class="string">open_end</span> <span class="operator">=&gt;</span>     <span class="string">'0'</span> <span class="variable">the</span> <span class="variable">span</span> <span class="variable">ends</span> <span class="variable">in</span> <span class="string">'b'</span>
+                      <span class="string">'1'</span> <span class="variable">the</span> <span class="variable">span</span> <span class="variable">ends</span> <span class="variable">before</span> <span class="string">'b'</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>For example, this set:</p>
+
+<pre><code>    [100..200),300,(400..infinity)</code></pre>
+
+<p>is represented by the array of hashes:</p>
+
+<pre><code>    <span class="string">list</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">100</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">200</span><span class="operator">,</span> <span class="string">open_begin</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span> <span class="string">open_end</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">300</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">300</span><span class="operator">,</span> <span class="string">open_begin</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span> <span class="string">open_end</span> <span class="operator">=&gt;</span> <span class="number">0</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">400</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">infinity</span><span class="operator">,</span> <span class="string">open_begin</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span> <span class="string">open_end</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">]</span>
+</code></pre>
+
+<p>The <i>density</i> of a set is stored in the <code>tolerance</code> variable:</p>
+
+<pre><code>    <span class="string">tolerance</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">;</span>  <span class="comment"># the set is made of real numbers.</span>
+    
+    <span class="string">tolerance</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>  <span class="comment"># the set is made of integers.</span>
+</code></pre>
+
+<p>The <code>type</code> variable stores the <i>class</i> of objects that will be stored in the set.</p>
+
+<pre><code>    <span class="string">type</span> <span class="operator">=&gt;</span> <span class="string">'DateTime'</span><span class="operator">;</span>   <span class="comment"># this is a set of DateTime objects</span>
+</code></pre>
+
+<p>The <i>infinity</i> value is generated by Perl, when it finds a numerical overflow:</p>
+
+<pre><code>    <span class="variable">$inf</span> <span class="operator">=</span> <span class="number">100</span><span class="operator">**</span><span class="number">100</span><span class="operator">**</span><span class="number">100</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<pre><code>    Set::Infinite</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<pre><code>    Flavio S. Glock &lt;fglock@gmail.com&gt;</code></pre>
+
+
+</body>
+
+</html>
+
+

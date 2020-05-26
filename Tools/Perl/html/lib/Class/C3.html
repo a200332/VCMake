@@ -1,0 +1,400 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#What-is-C3">What is C3?</a></li>
+      <li><a href="#How-does-C3-work">How does C3 work.</a></li>
+      <li><a href="#How-does-this-module-work">How does this module work?</a></li>
+    </ul>
+  </li>
+  <li><a href="#OPTIONAL-LOWERCASE-PRAGMA">OPTIONAL LOWERCASE PRAGMA</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#METHOD-REDISPATCHING">METHOD REDISPATCHING</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#COMPATIBILITY">COMPATIBILITY</a></li>
+  <li><a href="#Class::C3::XS">Class::C3::XS</a></li>
+  <li><a href="#CODE-COVERAGE">CODE COVERAGE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a>
+    <ul>
+      <li><a href="#The-original-Dylan-paper">The original Dylan paper</a></li>
+      <li><a href="#The-prototype-Perl-6-Object-Model-uses-C3">The prototype Perl 6 Object Model uses C3</a></li>
+      <li><a href="#Parrot-now-uses-C3">Parrot now uses C3</a></li>
+      <li><a href="#Python-2.3-MRO-related-links">Python 2.3 MRO related links</a></li>
+      <li><a href="#C3-for-TinyCLOS">C3 for TinyCLOS</a></li>
+    </ul>
+  </li>
+  <li><a href="#ACKNOWLEGEMENTS">ACKNOWLEGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::C3 - A pragma to use the C3 method resolution order algorithm</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="comment"># NOTE - DO NOT USE Class::C3 directly as a user, use MRO::Compat instead!</span>
+    <span class="keyword">package</span> <span class="variable">ClassA</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+    <span class="keyword">sub</span><span class="variable"> hello </span><span class="operator">{</span> <span class="string">'A::hello'</span> <span class="operator">}</span>
+    
+    <span class="keyword">package</span> <span class="variable">ClassB</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'ClassA'</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+    
+    <span class="keyword">package</span> <span class="variable">ClassC</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'ClassA'</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> hello </span><span class="operator">{</span> <span class="string">'C::hello'</span> <span class="operator">}</span>
+    
+    <span class="keyword">package</span> <span class="variable">ClassD</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="operator">(</span><span class="string">'ClassB'</span><span class="operator">,</span> <span class="string">'ClassC'</span><span class="operator">);</span>
+    <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+    
+    <span class="comment"># Classic Diamond MI pattern</span>
+    <span class="comment">#    &lt;A&gt;</span>
+    <span class="comment">#   /   \</span>
+    <span class="comment"># &lt;B&gt;   &lt;C&gt;</span>
+    <span class="comment">#   \   /</span>
+    <span class="comment">#    &lt;D&gt;</span>
+    
+    <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+    
+    <span class="comment"># initializez the C3 module</span>
+    <span class="comment"># (formerly called in INIT)</span>
+    <span class="variable">Class::C3::initialize</span><span class="operator">();</span>
+    
+    <span class="keyword">print</span> <span class="keyword">join</span> <span class="string">', '</span> <span class="operator">=&gt;</span> <span class="variable">Class::C3::calculateMRO</span><span class="operator">(</span><span class="string">'ClassD'</span><span class="operator">);</span> <span class="comment"># prints ClassD, ClassB, ClassC, ClassA</span>
+    
+    <span class="keyword">print</span> <span class="variable">ClassD</span><span class="operator">-&gt;</span><span class="variable">hello</span><span class="operator">();</span> <span class="comment"># prints 'C::hello' instead of the standard p5 'A::hello'</span>
+    
+    <span class="variable">ClassD</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'hello'</span><span class="operator">)-&gt;();</span>          <span class="comment"># can() also works correctly</span>
+    <span class="variable">UNIVERSAL::can</span><span class="operator">(</span><span class="string">'ClassD'</span><span class="operator">,</span> <span class="string">'hello'</span><span class="operator">);</span> <span class="comment"># as does UNIVERSAL::can()</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is pragma to change Perl 5&#39;s standard method resolution order from depth-first left-to-right (a.k.a - pre-order) to the more sophisticated C3 method resolution order.</p>
+
+<p><b>NOTE:</b> YOU SHOULD NOT USE THIS MODULE DIRECTLY - The feature provided is integrated into perl version &gt;= 5.9.5, and you should use <a href="../../lib/MRO/Compat.html">MRO::Compat</a> instead, which will use the core implementation in newer perls, but fallback to using this implementation on older perls.</p>
+
+<h2 id="What-is-C3">What is C3?</h2>
+
+<p>C3 is the name of an algorithm which aims to provide a sane method resolution order under multiple inheritance. It was first introduced in the language Dylan (see links in the <a href="#SEE-ALSO">&quot;SEE ALSO&quot;</a> section), and then later adopted as the preferred MRO (Method Resolution Order) for the new-style classes in Python 2.3. Most recently it has been adopted as the &#39;canonical&#39; MRO for Perl 6 classes, and the default MRO for Parrot objects as well.</p>
+
+<h2 id="How-does-C3-work">How does C3 work.</h2>
+
+<p>C3 works by always preserving local precedence ordering. This essentially means that no class will appear before any of its subclasses. Take the classic diamond inheritance pattern for instance:</p>
+
+<pre><code>     &lt;A&gt;
+    /   \
+  &lt;B&gt;   &lt;C&gt;
+    \   /
+     &lt;D&gt;</code></pre>
+
+<p>The standard Perl 5 MRO would be (D, B, A, C). The result being that <b>A</b> appears before <b>C</b>, even though <b>C</b> is the subclass of <b>A</b>. The C3 MRO algorithm however, produces the following MRO (D, B, C, A), which does not have this same issue.</p>
+
+<p>This example is fairly trivial, for more complex examples and a deeper explanation, see the links in the <a href="#SEE-ALSO">&quot;SEE ALSO&quot;</a> section.</p>
+
+<h2 id="How-does-this-module-work">How does this module work?</h2>
+
+<p>This module uses a technique similar to Perl 5&#39;s method caching. When <code>Class::C3::initialize</code> is called, this module calculates the MRO of all the classes which called <code>use Class::C3</code>. It then gathers information from the symbol tables of each of those classes, and builds a set of method aliases for the correct dispatch ordering. Once all these C3-based method tables are created, it then adds the method aliases into the local classes symbol table.</p>
+
+<p>The end result is actually classes with pre-cached method dispatch. However, this caching does not do well if you start changing your <code>@ISA</code> or messing with class symbol tables, so you should consider your classes to be effectively closed. See the <a>CAVEATS</a> section for more details.</p>
+
+<h1 id="OPTIONAL-LOWERCASE-PRAGMA">OPTIONAL LOWERCASE PRAGMA</h1>
+
+<p>This release also includes an optional module <b>c3</b> in the <i>opt/</i> folder. I did not include this in the regular install since lowercase module names are considered <i>&quot;bad&quot;</i> by some people. However I think that code looks much nicer like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">c3</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is more clunky:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+</code></pre>
+
+<p>But hey, it&#39;s your choice, that&#39;s why it is optional.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<dl>
+
+<dt id="calculateMRO-class"><b>calculateMRO ($class)</b></dt>
+<dd>
+
+<p>Given a <code>$class</code> this will return an array of class names in the proper C3 method resolution order.</p>
+
+</dd>
+<dt id="initialize"><b>initialize</b></dt>
+<dd>
+
+<p>This <b>must be called</b> to initialize the C3 method dispatch tables, this module <b>will not work</b> if you do not do this. It is advised to do this as soon as possible <b>after</b> loading any classes which use C3. Here is a quick code example:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+  <span class="comment"># ... Foo methods here</span>
+  
+  <span class="keyword">package</span> <span class="variable">Bar</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Foo'</span><span class="operator">;</span>
+  <span class="comment"># ... Bar methods here</span>
+  
+  <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+  
+  <span class="variable">Class::C3::initialize</span><span class="operator">();</span> <span class="comment"># now it is safe to use Foo and Bar</span>
+</code></pre>
+
+<p>This function used to be called automatically for you in the INIT phase of the perl compiler, but that lead to warnings if this module was required at runtime. After discussion with my user base (the <a>DBIx::Class</a> folks), we decided that calling this in INIT was more of an annoyance than a convenience. I apologize to anyone this causes problems for (although I would be very surprised if I had any other users other than the <a>DBIx::Class</a> folks). The simplest solution of course is to define your own INIT method which calls this function.</p>
+
+<p>NOTE:</p>
+
+<p>If <code>initialize</code> detects that <code>initialize</code> has already been executed, it will <a href="#uninitialize">&quot;uninitialize&quot;</a> and clear the MRO cache first.</p>
+
+</dd>
+<dt id="uninitialize"><b>uninitialize</b></dt>
+<dd>
+
+<p>Calling this function results in the removal of all cached methods, and the restoration of the old Perl 5 style dispatch order (depth-first, left-to-right).</p>
+
+</dd>
+<dt id="reinitialize"><b>reinitialize</b></dt>
+<dd>
+
+<p>This is an alias for <a href="#initialize">&quot;initialize&quot;</a> above.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHOD-REDISPATCHING">METHOD REDISPATCHING</h1>
+
+<p>It is always useful to be able to re-dispatch your method call to the &quot;next most applicable method&quot;. This module provides a pseudo package along the lines of <code>SUPER::</code> or <code>NEXT::</code> which will re-dispatch the method along the C3 linearization. This is best shown with an example.</p>
+
+<pre><code>  <span class="comment"># a classic diamond MI pattern ...</span>
+  <span class="comment">#    &lt;A&gt;</span>
+  <span class="comment">#   /   \</span>
+  <span class="comment"># &lt;B&gt;   &lt;C&gt;</span>
+  <span class="comment">#   \   /</span>
+  <span class="comment">#    &lt;D&gt;</span>
+  
+  <span class="keyword">package</span> <span class="variable">ClassA</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span> <span class="string">'ClassA::foo'</span> <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">ClassB</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'ClassA'</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span> <span class="string">'ClassB::foo =&gt; '</span> <span class="operator">.</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">next::method</span><span class="operator">()</span> <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">ClassC</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'ClassA'</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span> <span class="string">'ClassC::foo =&gt; '</span> <span class="operator">.</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">next::method</span><span class="operator">()</span> <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">ClassD</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="operator">(</span><span class="string">'ClassB'</span><span class="operator">,</span> <span class="string">'ClassC'</span><span class="operator">);</span>
+  <span class="keyword">use</span> <span class="variable">Class::C3</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span> <span class="string">'D::foo =&gt; '</span> <span class="operator">.</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">next::method</span><span class="operator">()</span> <span class="operator">}</span>
+  
+  <span class="keyword">print</span> <span class="variable">D</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">;</span> <span class="comment"># prints out "D::foo =&gt; B::foo =&gt; C::foo =&gt; A::foo"</span>
+</code></pre>
+
+<p>A few things to note. First, we do not require you to add on the method name to the <code>next::method</code> call (this is unlike <code>NEXT::</code> and <code>SUPER::</code> which do require that). This helps to enforce the rule that you cannot dispatch to a method of a different name (this is how <code>NEXT::</code> behaves as well).</p>
+
+<p>The next thing to keep in mind is that you will need to pass all arguments to <code>next::method</code>. It can not automatically use the current <code>@_</code>.</p>
+
+<p>If <code>next::method</code> cannot find a next method to re-dispatch the call to, it will throw an exception. You can use <code>next::can</code> to see if <code>next::method</code> will succeed before you call it like so:</p>
+
+<pre><code>  <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">next::method</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="keyword">if</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">next::can</span><span class="operator">;</span>
+</code></pre>
+
+<p>Additionally, you can use <code>maybe::next::method</code> as a shortcut to only call the next method if it exists. The previous example could be simply written as:</p>
+
+<pre><code>  <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">maybe::next::method</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+</code></pre>
+
+<p>There are some caveats about using <code>next::method</code>, see below for those.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>This module used to be labeled as <i>experimental</i>, however it has now been pretty heavily tested by the good folks over at <a>DBIx::Class</a> and I am confident this module is perfectly usable for whatever your needs might be.</p>
+
+<p>But there are still caveats, so here goes ...</p>
+
+<dl>
+
+<dt id="Use-of-SUPER">Use of <code>SUPER::</code>.</dt>
+<dd>
+
+<p>The idea of <code>SUPER::</code> under multiple inheritance is ambiguous, and generally not recommended anyway. However, its use in conjunction with this module is very much not recommended, and in fact very discouraged. The recommended approach is to instead use the supplied <code>next::method</code> feature, see more details on its usage above.</p>
+
+</dd>
+<dt id="Changing-ISA">Changing <code>@ISA</code>.</dt>
+<dd>
+
+<p>It is the author&#39;s opinion that changing <code>@ISA</code> at runtime is pure insanity anyway. However, people do it, so I must caveat. Any changes to the <code>@ISA</code> will not be reflected in the MRO calculated by this module, and therefore probably won&#39;t even show up. If you do this, you will need to call <code>reinitialize</code> in order to recalculate <b>all</b> method dispatch tables. See the <code>reinitialize</code> documentation and an example in <i>t/20_reinitialize.t</i> for more information.</p>
+
+</dd>
+<dt id="Adding-deleting-methods-from-class-symbol-tables">Adding/deleting methods from class symbol tables.</dt>
+<dd>
+
+<p>This module calculates the MRO for each requested class by interrogating the symbol tables of said classes. So any symbol table manipulation which takes place after our INIT phase is run will not be reflected in the calculated MRO. Just as with changing the <code>@ISA</code>, you will need to call <code>reinitialize</code> for any changes you make to take effect.</p>
+
+</dd>
+<dt id="Calling-next::method-from-methods-defined-outside-the-class">Calling <code>next::method</code> from methods defined outside the class</dt>
+<dd>
+
+<p>There is an edge case when using <code>next::method</code> from within a subroutine which was created in a different module than the one it is called from. It sounds complicated, but it really isn&#39;t. Here is an example which will not work correctly:</p>
+
+<pre><code>  <span class="variable">*Foo::foo</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">next::method</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">};</span>
+</code></pre>
+
+<p>The problem exists because the anonymous subroutine being assigned to the glob <code>*Foo::foo</code> will show up in the call stack as being called <code>__ANON__</code> and not <code>foo</code> as you might expect. Since <code>next::method</code> uses <code>caller</code> to find the name of the method it was called in, it will fail in this case.</p>
+
+<p>But fear not, there is a simple solution. The module <code>Sub::Name</code> will reach into the perl internals and assign a name to an anonymous subroutine for you. Simply do this:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sub::Name</span> <span class="string">'subname'</span><span class="operator">;</span>
+  <span class="variable">*Foo::foo</span> <span class="operator">=</span> <span class="variable">subname</span> <span class="string">'Foo::foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">(</span><span class="keyword">shift</span><span class="operator">)-&gt;</span><span class="variable">next::method</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">)</span> <span class="operator">};</span>
+</code></pre>
+
+<p>and things will Just Work. Of course this is not always possible to do, but to be honest, I just can&#39;t manage to find a workaround for it, so until someone gives me a working patch this will be a known limitation of this module.</p>
+
+</dd>
+</dl>
+
+<h1 id="COMPATIBILITY">COMPATIBILITY</h1>
+
+<p>If your software requires Perl 5.9.5 or higher, you do not need <a href="../../lib/Class/C3.html">Class::C3</a>, you can simply <code>use mro &#39;c3&#39;</code>, and not worry about <code>initialize()</code>, avoid some of the above caveats, and get the best possible performance. See <a href="../../lib/mro.html">mro</a> for more details.</p>
+
+<p>If your software is meant to work on earlier Perls, use <a href="../../lib/Class/C3.html">Class::C3</a> as documented here. <a href="../../lib/Class/C3.html">Class::C3</a> will detect Perl 5.9.5+ and take advantage of the core support when available.</p>
+
+<h1 id="Class::C3::XS">Class::C3::XS</h1>
+
+<p>This module will load <a>Class::C3::XS</a> if it&#39;s installed and you are running on a Perl version older than 5.9.5. The optional module will be automatically installed for you if a C compiler is available, as it results in significant performance improvements (but unlike the 5.9.5+ core support, it still has all of the same caveats as <a href="../../lib/Class/C3.html">Class::C3</a>).</p>
+
+<h1 id="CODE-COVERAGE">CODE COVERAGE</h1>
+
+<p><a>Devel::Cover</a> was reporting 94.4% overall test coverage earlier in this module&#39;s life. Currently, the test suite does things that break under coverage testing, but it is fair to assume the coverage is still close to that value.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<h2 id="The-original-Dylan-paper">The original Dylan paper</h2>
+
+<dl>
+
+<dt id="https:-web.archive.org-web-20000817033012id_-http:-www.webcom.com-haahr-dylan-linearization-oopsla96.html"><a href="https://web.archive.org/web/20000817033012id_/http://www.webcom.com/haahr/dylan/linearization-oopsla96.html">https://web.archive.org/web/20000817033012id_/http://www.webcom.com/haahr/dylan/linearization-oopsla96.html</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="The-prototype-Perl-6-Object-Model-uses-C3">The prototype Perl 6 Object Model uses C3</h2>
+
+<dl>
+
+<dt id="http:-svn.openfoundry.org-pugs-perl5-Perl6-MetaModel"><a href="http://svn.openfoundry.org/pugs/perl5/Perl6-MetaModel/">http://svn.openfoundry.org/pugs/perl5/Perl6-MetaModel/</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Parrot-now-uses-C3">Parrot now uses C3</h2>
+
+<dl>
+
+<dt id="http:-aspn.activestate.com-ASPN-Mail-Message-perl6-internals-2746631"><a href="http://aspn.activestate.com/ASPN/Mail/Message/perl6-internals/2746631">http://aspn.activestate.com/ASPN/Mail/Message/perl6-internals/2746631</a></dt>
+<dd>
+
+</dd>
+<dt id="http:-use.perl.org-autrijus-journal-25768"><a href="http://use.perl.org/~autrijus/journal/25768">http://use.perl.org/~autrijus/journal/25768</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="Python-2.3-MRO-related-links">Python 2.3 MRO related links</h2>
+
+<dl>
+
+<dt id="http:-www.python.org-2.3-mro.html"><a href="http://www.python.org/2.3/mro.html">http://www.python.org/2.3/mro.html</a></dt>
+<dd>
+
+</dd>
+<dt id="http:-www.python.org-2.2.2-descrintro.html-mro"><a href="http://www.python.org/2.2.2/descrintro.html#mro">http://www.python.org/2.2.2/descrintro.html#mro</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="C3-for-TinyCLOS">C3 for TinyCLOS</h2>
+
+<dl>
+
+<dt id="http:-www.call-with-current-continuation.org-eggs-c3.html"><a href="http://www.call-with-current-continuation.org/eggs/c3.html">http://www.call-with-current-continuation.org/eggs/c3.html</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="ACKNOWLEGEMENTS">ACKNOWLEGEMENTS</h1>
+
+<dl>
+
+<dt id="Thanks-to-Matt-S.-Trout-for-using-this-module-in-his-module-DBIx::Class-and-finding-many-bugs-and-providing-fixes">Thanks to Matt S. Trout for using this module in his module <a>DBIx::Class</a> and finding many bugs and providing fixes.</dt>
+<dd>
+
+</dd>
+<dt id="Thanks-to-Justin-Guenther-for-making-next::method-more-robust-by-handling-calls-inside-eval-and-anon-subs">Thanks to Justin Guenther for making <code>next::method</code> more robust by handling calls inside <code>eval</code> and anon-subs.</dt>
+<dd>
+
+</dd>
+<dt id="Thanks-to-Robert-Norris-for-adding-support-for-next::can-and-maybe::next::method">Thanks to Robert Norris for adding support for <code>next::can</code> and <code>maybe::next::method</code>.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Stevan Little, &lt;stevan@iinteractive.com&gt;</p>
+
+<p>Brandon L. Black, &lt;blblack@gmail.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright 2005, 2006 by Infinity Interactive, Inc.</p>
+
+<p><a href="http://www.iinteractive.com">http://www.iinteractive.com</a></p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

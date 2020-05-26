@@ -1,0 +1,189 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#mkopt">mkopt</a></li>
+      <li><a href="#mkopt_hash">mkopt_hash</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Data::OptList - parse and validate simple name/value option pairs</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.110</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Data::OptList</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$options</span> <span class="operator">=</span> <span class="variable">Data::OptList::mkopt</span><span class="operator">(</span><span class="operator">[</span>
+    <span class="string">qw(key1 key2 key3 key4)</span><span class="operator">,</span>
+    <span class="string">key5</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">key6</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">key7</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">},</span>
+    <span class="string">key8</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">key8</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>...is the same thing, more or less, as:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$options</span> <span class="operator">=</span> <span class="operator">[</span>
+    <span class="operator">[</span> <span class="string">key1</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key2</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key3</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key4</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key5</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>      <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key6</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">,</span>      <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key7</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">},</span>  <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key8</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>      <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">key8</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">,</span>      <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Hashes are great for storing named data, but if you want more than one entry for a name, you have to use a list of pairs. Even then, this is really boring to write:</p>
+
+<pre><code>  <span class="variable">$values</span> <span class="operator">=</span> <span class="operator">[</span>
+    <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>
+    <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>
+    <span class="string">baz</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>
+    <span class="string">xyz</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>Just look at all those undefs! Don&#39;t worry, we can get rid of those:</p>
+
+<pre><code>  <span class="variable">$values</span> <span class="operator">=</span> <span class="operator">[</span>
+    <span class="keyword">map</span> <span class="operator">{</span> <span class="variable">$_</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span> <span class="operator">}</span> <span class="string">qw(foo bar baz)</span><span class="operator">,</span>
+    <span class="string">xyz</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>Aaaauuugh! We&#39;ve saved a little typing, but now it requires thought to read, and thinking is even worse than typing... and it&#39;s got a bug! It looked right, didn&#39;t it? Well, the <code><span class="string">xyz</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> gets consumed by the map, and we don&#39;t get the data we wanted.</p>
+
+<p>With Data::OptList, you can do this instead:</p>
+
+<pre><code>  <span class="variable">$values</span> <span class="operator">=</span> <span class="variable">Data::OptList::mkopt</span><span class="operator">(</span><span class="operator">[</span>
+    <span class="string">qw(foo bar baz)</span><span class="operator">,</span>
+    <span class="string">xyz</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>This works by assuming that any defined scalar is a name and any reference following a name is its value.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="mkopt">mkopt</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$opt_list</span> <span class="operator">=</span> <span class="variable">Data::OptList::mkopt</span><span class="operator">(</span><span class="variable">$input</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%arg</span><span class="operator">);</span>
+</code></pre>
+
+<p>Valid arguments are:</p>
+
+<pre><code>  <span class="variable">moniker</span>        <span class="operator">-</span> <span class="variable">a</span> <span class="variable">word</span> <span class="variable">used</span> <span class="variable">in</span> <span class="variable">errors</span> <span class="variable">to</span> <span class="variable">describe</span> <span class="variable">the</span> <span class="variable">opt</span> <span class="variable">list</span><span class="operator">;</span> <span class="variable">encouraged</span>
+  <span class="variable">require_unique</span> <span class="operator">-</span> <span class="keyword">if</span> <span class="variable">true</span><span class="operator">,</span> <span class="keyword">no</span> <span class="variable">name</span> <span class="variable">may</span> <span class="variable">appear</span> <span class="variable">more</span> <span class="variable">than</span> <span class="variable">once</span>
+  <span class="variable">must_be</span>        <span class="operator">-</span> <span class="variable">types</span> <span class="variable">to</span> <span class="variable">which</span> <span class="variable">opt</span> <span class="variable">list</span> <span class="keyword">values</span> <span class="variable">are</span> <span class="variable">limited</span> <span class="operator">(</span><span class="variable">described</span> <span class="variable">below</span><span class="operator">)</span>
+  <span class="variable">name_test</span>      <span class="operator">-</span> <span class="variable">a</span> <span class="variable">coderef</span> <span class="variable">used</span> <span class="variable">to</span> <span class="variable">test</span> <span class="variable">whether</span> <span class="variable">a</span> <span class="variable">value</span> <span class="variable">can</span> <span class="variable">be</span> <span class="variable">a</span> <span class="variable">name</span>
+                   <span class="operator">(</span><span class="variable">described</span> <span class="variable">below</span><span class="operator">,</span> <span class="variable">but</span> <span class="variable">you</span> <span class="variable">probably</span> <span class="variable">don't</span> <span class="variable">want</span> <span class="variable">this</span><span class="operator">)</span>
+</code></pre>
+
+<p>This produces an array of arrays; the inner arrays are name/value pairs. Values will be either &quot;undef&quot; or a reference.</p>
+
+<p>Positional parameters may be used for compatibility with the old <code>mkopt</code> interface:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$opt_list</span> <span class="operator">=</span> <span class="variable">Data::OptList::mkopt</span><span class="operator">(</span><span class="variable">$input</span><span class="operator">,</span> <span class="variable">$moniker</span><span class="operator">,</span> <span class="variable">$req_uni</span><span class="operator">,</span> <span class="variable">$must_be</span><span class="operator">);</span>
+</code></pre>
+
+<p>Valid values for <code>$input</code>:</p>
+
+<pre><code> undef    -&gt; []
+ hashref  -&gt; [ [ key1 =&gt; value1 ] ... ] # non-ref values become undef
+ arrayref -&gt; every name followed by a non-name becomes a pair: [ name =&gt; ref ]
+             every name followed by undef becomes a pair: [ name =&gt; undef ]
+             otherwise, it becomes [ name =&gt; undef ] like so:
+             [ &quot;a&quot;, &quot;b&quot;, [ 1, 2 ] ] -&gt; [ [ a =&gt; undef ], [ b =&gt; [ 1, 2 ] ] ]</code></pre>
+
+<p>By default, a <i>name</i> is any defined non-reference. The <code>name_test</code> parameter can be a code ref that tests whether the argument passed it is a name or not. This should be used rarely. Interactions between <code>require_unique</code> and <code>name_test</code> are not yet particularly elegant, as <code>require_unique</code> just tests string equality. <b>This may change.</b></p>
+
+<p>The <code>must_be</code> parameter is either a scalar or array of scalars; it defines what kind(s) of refs may be values. If an invalid value is found, an exception is thrown. If no value is passed for this argument, any reference is valid. If <code>must_be</code> specifies that values must be CODE, HASH, ARRAY, or SCALAR, then Params::Util is used to check whether the given value can provide that interface. Otherwise, it checks that the given value is an object of the kind.</p>
+
+<p>In other words:</p>
+
+<pre><code>  [ qw(SCALAR HASH Object::Known) ]</code></pre>
+
+<p>Means:</p>
+
+<pre><code>  _SCALAR0($value) or _HASH($value) or _INSTANCE($value, &#39;Object::Known&#39;)</code></pre>
+
+<h2 id="mkopt_hash">mkopt_hash</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$opt_hash</span> <span class="operator">=</span> <span class="variable">Data::OptList::mkopt_hash</span><span class="operator">(</span><span class="variable">$input</span><span class="operator">,</span> <span class="variable">$moniker</span><span class="operator">,</span> <span class="variable">$must_be</span><span class="operator">);</span>
+</code></pre>
+
+<p>Given valid <code><a href="#mkopt">&quot;mkopt&quot;</a></code> input, this routine returns a reference to a hash. It will throw an exception if any name has more than one value.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>Both <code>mkopt</code> and <code>mkopt_hash</code> may be exported on request.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Olivier Mengu&eacute; &lt;dolmen@cpan.org&gt;</p>
+
+</li>
+<li><p>Ricardo SIGNES &lt;rjbs@codesimply.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Ricardo Signes.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

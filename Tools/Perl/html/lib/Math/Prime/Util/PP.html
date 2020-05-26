@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#euler_phi">euler_phi</a></li>
+      <li><a href="#euler_phi_range">euler_phi_range</a></li>
+      <li><a href="#moebius">moebius</a></li>
+      <li><a href="#moebius_range">moebius_range</a></li>
+    </ul>
+  </li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#PERFORMANCE">PERFORMANCE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.69</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>The functionality is basically identical to <a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a>, as this module is just the Pure Perl implementation. This documentation will only note differences.</p>
+
+<pre><code>  <span class="comment"># Normally you would just import the functions you are using.</span>
+  <span class="comment"># Nothing is exported by default.</span>
+  <span class="keyword">use</span> <span class="variable">Math::Prime::Util</span> <span class="string">':all'</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Pure Perl implementations of prime number utilities that are normally handled with XS or GMP. Having the Perl implementations (1) provides examples, (2) allows the functions to run even if XS isn&#39;t available, and (3) gives big number support if <a href="../../../../lib/Math/Prime/Util/GMP.html">Math::Prime::Util::GMP</a> isn&#39;t available. This is a subset of <a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a>&#39;s functionality.</p>
+
+<p>All routines should work with native integers or multi-precision numbers. To enable big numbers, use bigint or bignum:</p>
+
+<pre><code>    use bigint;
+    say prime_count_approx(1000000000000000000000000)&#39;
+    # says 18435599767347543283712</code></pre>
+
+<p>This is still experimental, and some functions will be very slow. The <a href="../../../../lib/Math/Prime/Util/GMP.html">Math::Prime::Util::GMP</a> module has much faster versions of many of these functions. Alternately, <a>Math::Pari</a> has a lot of these types of functions.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="euler_phi">euler_phi</h2>
+
+<p>Takes a <i>single</i> integer input and returns the Euler totient.</p>
+
+<h2 id="euler_phi_range">euler_phi_range</h2>
+
+<p>Takes two values defining a range <code>low</code> to <code>high</code> and returns an array with the totient of each value in the range, inclusive.</p>
+
+<h2 id="moebius">moebius</h2>
+
+<p>Takes a <i>single</i> integer input and returns the Moebius function.</p>
+
+<h2 id="moebius_range">moebius_range</h2>
+
+<p>Takes two values defining a range <code>low</code> to <code>high</code> and returns an array with the Moebius function of each value in the range, inclusive.</p>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>The SQUFOF and Fermat factoring algorithms are not implemented yet.</p>
+
+<p>Some of the prime methods use more memory than they should, as the segmented sieve is not properly used in <code>primes</code> and <code>prime_count</code>.</p>
+
+<h1 id="PERFORMANCE">PERFORMANCE</h1>
+
+<p>Performance compared to the XS/C code is quite poor for many operations. Some operations that are relatively close for small and medium-size values:</p>
+
+<pre><code>  next_prime / prev_prime
+  is_prime / is_prob_prime
+  is_strong_pseudoprime
+  ExponentialIntegral / LogarithmicIntegral / RiemannR
+  primearray</code></pre>
+
+<p>Operations that are slower include:</p>
+
+<pre><code>  primes
+  random_prime / random_ndigit_prime
+  factor / factor_exp / divisors
+  nth_prime
+  prime_count
+  is_aks_prime</code></pre>
+
+<p>Performance improvement in this code is still possible. The prime sieve is over 2x faster than anything I was able to find online, but it is still has room for improvement.</p>
+
+<p><a href="../../../../lib/Math/Prime/Util/GMP.html">Math::Prime::Util::GMP</a> offers <code>C+XS+GMP</code> support for most of the important functions, and will be vastly faster for most operations. If you install that module, <a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a> will load it automatically, meaning you should not have to think about what code is actually being used (C, GMP, or Perl).</p>
+
+<p>Memory use will generally be higher for the PP code, and in some cases <b>much</b> higher. Some of this may be addressed in a later release.</p>
+
+<p>For small values (e.g. primes and prime counts under 10M) most of this will not matter.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a></p>
+
+<p><a href="../../../../lib/Math/Prime/Util/GMP.html">Math::Prime::Util::GMP</a></p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Dana Jacobsen &lt;dana@acm.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2012-2016 by Dana Jacobsen &lt;dana@acm.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

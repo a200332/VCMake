@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ValuesAndExpressions::ProhibitCommaSeparatedStatements - Don&#39;t use the comma operator as a statement separator.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl&#39;s comma statement separator has really low precedence, which leads to code that looks like it&#39;s using the comma list element separator not actually doing so. Conway suggests that the statement separator not be used in order to prevent this situation.</p>
+
+<p>The confusion that the statement separator causes is primarily due to the assignment operators having higher precedence.</p>
+
+<p>For example, trying to combine two arrays into another like this won&#39;t work:</p>
+
+<pre><code>    <span class="variable">@x</span> <span class="operator">=</span> <span class="variable">@y</span><span class="operator">,</span> <span class="variable">@z</span><span class="operator">;</span>
+</code></pre>
+
+<p>because it is equivalent to</p>
+
+<pre><code>    <span class="variable">@x</span> <span class="operator">=</span> <span class="variable">@y</span><span class="operator">;</span>
+    <span class="variable">@z</span><span class="operator">;</span>
+</code></pre>
+
+<p>Conversely, there are the built-in functions, like <code>print</code>, that normally force the rest of the statement into list context, but don&#39;t when called like a subroutine.</p>
+
+<p>This is not likely to produce what is intended:</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="keyword">join</span> <span class="string">q{, }</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">7</span><span class="operator">,</span> <span class="string">": the single-digit primes.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>The obvious fix is to add parentheses. Placing them like</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span> <span class="string">q{, }</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">7</span> <span class="operator">),</span> <span class="string">": the single-digit primes.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>will work, but</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="operator">(</span> <span class="keyword">join</span> <span class="string">q{, }</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">7</span> <span class="operator">),</span> <span class="string">": the single-digit primes.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>will not, because it is equivalent to</p>
+
+<pre><code>    <span class="keyword">print</span><span class="operator">(</span> <span class="keyword">join</span> <span class="string">q{, }</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">7</span> <span class="operator">);</span>
+    <span class="string">": the single-digit primes.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This policy can be configured to allow the last statement in a <code>map</code> or <code>grep</code> block to be comma separated. This is done via the <code>allow_last_statement_to_be_comma_separated_in_map_and_grep</code> option like so:</p>
+
+<pre><code>    [ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    allow_last_statement_to_be_comma_separated_in_map_and_grep = 1</code></pre>
+
+<p>With this option off (the default), the following code violates this policy.</p>
+
+<pre><code>    <span class="variable">%hash</span> <span class="operator">=</span> <span class="keyword">map</span> <span class="operator">{</span><span class="variable">$_</span><span class="operator">,</span> <span class="number">1</span><span class="operator">}</span> <span class="variable">@list</span><span class="operator">;</span>
+</code></pre>
+
+<p>With this option on, this statement is allowed. Even if this option is off, using a fat comma <code>=&gt;</code> works, but that forces stringification on the first value, which may not be what you want.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Needs to check for <code>scalar( something, something )</code>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Elliot Shank <code>&lt;perl@galumph.com&gt;</code></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2007-2011 Elliot Shank.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

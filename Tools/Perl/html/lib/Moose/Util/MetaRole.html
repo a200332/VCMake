@@ -1,0 +1,262 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USAGE">USAGE</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#apply_metaroles">apply_metaroles( ... )</a></li>
+      <li><a href="#apply_base_class_roles-for-class-roles-roles">apply_base_class_roles( for =&gt; $class, roles =&gt; \@roles )</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Util::MetaRole - Apply roles to any metaclass, as well as the object base class</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::Moose</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span> <span class="operator">();</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Exporter</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Util::MetaRole</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">MyApp::Role::Meta::Class</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MyApp::Role::Meta::Method::Constructor</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MyApp::Role::Object</span><span class="operator">;</span>
+  
+  <span class="variable">Moose::Exporter</span><span class="operator">-&gt;</span><span class="variable">setup_import_methods</span><span class="operator">(</span> <span class="string">also</span> <span class="operator">=&gt;</span> <span class="string">'Moose'</span> <span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> init_meta </span><span class="operator">{</span>
+      <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">%args</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="variable">Moose</span><span class="operator">-&gt;</span><span class="variable">init_meta</span><span class="operator">(</span><span class="variable">%args</span><span class="operator">);</span>
+  
+      <span class="variable">Moose::Util::MetaRole::apply_metaroles</span><span class="operator">(</span>
+          <span class="string">for</span>             <span class="operator">=&gt;</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">for_class</span><span class="operator">}</span><span class="operator">,</span>
+          <span class="string">class_metaroles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+              <span class="string">class</span>       <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'MyApp::Role::Meta::Class'</span><span class="operator">]</span><span class="operator">,</span>
+              <span class="string">constructor</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'MyApp::Role::Meta::Method::Constructor'</span><span class="operator">]</span><span class="operator">,</span>
+          <span class="operator">}</span><span class="operator">,</span>
+      <span class="operator">);</span>
+  
+      <span class="variable">Moose::Util::MetaRole::apply_base_class_roles</span><span class="operator">(</span>
+          <span class="string">for</span>   <span class="operator">=&gt;</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">for_class</span><span class="operator">}</span><span class="operator">,</span>
+          <span class="string">roles</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'MyApp::Role::Object'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">);</span>
+  
+      <span class="keyword">return</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">for_class</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">();</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This utility module is designed to help authors of Moose extensions write extensions that are able to cooperate with other Moose extensions. To do this, you must write your extensions as roles, which can then be dynamically applied to the caller&#39;s metaclasses.</p>
+
+<p>This module makes sure to preserve any existing superclasses and roles already set for the meta objects, which means that any number of extensions can apply roles in any order.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>The easiest way to use this module is through <a href="../../../lib/Moose/Exporter.html">Moose::Exporter</a>, which can generate the appropriate <code>init_meta</code> method for you, and make sure it is called when imported.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<p>This module provides two functions.</p>
+
+<h2 id="apply_metaroles">apply_metaroles( ... )</h2>
+
+<p>This function will apply roles to one or more metaclasses for the specified class. It will return a new metaclass object for the class or role passed in the &quot;for&quot; parameter.</p>
+
+<p>It accepts the following parameters:</p>
+
+<ul>
+
+<li><p>for =&gt; $name</p>
+
+<p>This specifies the class or for which to alter the meta classes. This can be a package name, or an appropriate meta-object (a <a href="../../../lib/Moose/Meta/Class.html">Moose::Meta::Class</a> or <a href="../../../lib/Moose/Meta/Role.html">Moose::Meta::Role</a>).</p>
+
+</li>
+<li><p>class_metaroles =&gt; \%roles</p>
+
+<p>This is a hash reference specifying which metaroles will be applied to the class metaclass and its contained metaclasses and helper classes.</p>
+
+<p>Each key should in turn point to an array reference of role names.</p>
+
+<p>It accepts the following keys:</p>
+
+<dl>
+
+<dt id="class">class</dt>
+<dd>
+
+</dd>
+<dt id="attribute">attribute</dt>
+<dd>
+
+</dd>
+<dt id="method">method</dt>
+<dd>
+
+</dd>
+<dt id="wrapped_method">wrapped_method</dt>
+<dd>
+
+</dd>
+<dt id="instance">instance</dt>
+<dd>
+
+</dd>
+<dt id="constructor">constructor</dt>
+<dd>
+
+</dd>
+<dt id="destructor">destructor</dt>
+<dd>
+
+</dd>
+<dt id="error">error</dt>
+<dd>
+
+</dd>
+</dl>
+
+</li>
+<li><p>role_metaroles =&gt; \%roles</p>
+
+<p>This is a hash reference specifying which metaroles will be applied to the role metaclass and its contained metaclasses and helper classes.</p>
+
+<p>It accepts the following keys:</p>
+
+<dl>
+
+<dt id="role">role</dt>
+<dd>
+
+</dd>
+<dt id="attribute1">attribute</dt>
+<dd>
+
+</dd>
+<dt id="method1">method</dt>
+<dd>
+
+</dd>
+<dt id="required_method">required_method</dt>
+<dd>
+
+</dd>
+<dt id="conflicting_method">conflicting_method</dt>
+<dd>
+
+</dd>
+<dt id="application_to_class">application_to_class</dt>
+<dd>
+
+</dd>
+<dt id="application_to_role">application_to_role</dt>
+<dd>
+
+</dd>
+<dt id="application_to_instance">application_to_instance</dt>
+<dd>
+
+</dd>
+<dt id="application_role_summation">application_role_summation</dt>
+<dd>
+
+</dd>
+<dt id="applied_attribute">applied_attribute</dt>
+<dd>
+
+</dd>
+</dl>
+
+</li>
+</ul>
+
+<h2 id="apply_base_class_roles-for-class-roles-roles">apply_base_class_roles( for =&gt; $class, roles =&gt; \@roles )</h2>
+
+<p>This function will apply the specified roles to the object&#39;s base class.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

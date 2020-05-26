@@ -1,0 +1,315 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Global-Variables">Global Variables</a></li>
+      <li><a href="#API-Methods">API Methods</a></li>
+      <li><a href="#Client-Callback-Methods">Client Callback Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DB - programmatic interface to the Perl debugging API</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">CLIENT</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">DB</span><span class="operator">;</span>
+    <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">qw(DB)</span><span class="operator">;</span>
+    
+    <span class="comment"># these (inherited) methods can be called by the client</span>
+    
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">register</span><span class="operator">()</span>      <span class="comment"># register a client package name</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">done</span><span class="operator">()</span>          <span class="comment"># de-register from the debugging API</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">skippkg</span><span class="operator">(</span><span class="string">'hide::hide'</span><span class="operator">)</span>  <span class="comment"># ask DB not to stop in this package</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">cont</span><span class="operator">(</span><span class="operator">[</span><span class="variable">WHERE</span><span class="operator">]</span><span class="operator">)</span>       <span class="comment"># run some more (until BREAK or </span>
+                                <span class="comment"># another breakpointt)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">step</span><span class="operator">()</span>              <span class="comment"># single step</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">()</span>              <span class="comment"># step over</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">ret</span><span class="operator">()</span>               <span class="comment"># return from current subroutine</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">backtrace</span><span class="operator">()</span>         <span class="comment"># return the call stack description</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">ready</span><span class="operator">()</span>             <span class="comment"># call when client setup is done</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">trace_toggle</span><span class="operator">()</span>      <span class="comment"># toggle subroutine call trace mode</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">subs</span><span class="operator">(</span><span class="operator">[</span><span class="variable">SUBS</span><span class="operator">]</span><span class="operator">)</span>        <span class="comment"># return subroutine information</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">files</span><span class="operator">()</span>             <span class="comment"># return list of all files known to DB</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">lines</span><span class="operator">()</span>             <span class="comment"># return lines in currently loaded file</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">loadfile</span><span class="operator">(</span><span class="variable">FILE</span><span class="operator">,</span><span class="variable">LINE</span><span class="operator">)</span> <span class="comment"># load a file and let other clients know</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">lineevents</span><span class="operator">()</span>        <span class="comment"># return info on lines with actions</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">set_break</span><span class="operator">(</span><span class="operator">[</span><span class="variable">WHERE</span><span class="operator">]</span><span class="operator">,</span><span class="operator">[</span><span class="variable">COND</span><span class="operator">]</span><span class="operator">)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">set_tbreak</span><span class="operator">(</span><span class="operator">[</span><span class="variable">WHERE</span><span class="operator">]</span><span class="operator">)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">clr_breaks</span><span class="operator">(</span><span class="operator">[</span><span class="variable">LIST</span><span class="operator">]</span><span class="operator">)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">set_action</span><span class="operator">(</span><span class="variable">WHERE</span><span class="operator">,</span><span class="variable">ACTION</span><span class="operator">)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">clr_actions</span><span class="operator">(</span><span class="operator">[</span><span class="variable">LIST</span><span class="operator">]</span><span class="operator">)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">evalcode</span><span class="operator">(</span><span class="variable">STRING</span><span class="operator">)</span>  <span class="comment"># eval STRING in executing code's context</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">prestop</span><span class="operator">(</span><span class="operator">[</span><span class="variable">STRING</span><span class="operator">]</span><span class="operator">)</span> <span class="comment"># execute in code context before stopping</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">poststop</span><span class="operator">(</span><span class="operator">[</span><span class="variable">STRING</span><span class="operator">]</span><span class="operator">)</span><span class="comment"># execute in code context before resuming</span>
+    
+    <span class="comment"># These methods will be called at the appropriate times.</span>
+    <span class="comment"># Stub versions provided do nothing.</span>
+    <span class="comment"># None of these can block.</span>
+    
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">init</span><span class="operator">()</span>          <span class="comment"># called when debug API inits itself</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">stop</span><span class="operator">(</span><span class="variable">FILE</span><span class="operator">,</span><span class="variable">LINE</span><span class="operator">)</span> <span class="comment"># when execution stops</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">idle</span><span class="operator">()</span>          <span class="comment"># while stopped (can be a client event loop)</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">cleanup</span><span class="operator">()</span>       <span class="comment"># just before exit</span>
+    <span class="variable">CLIENT</span><span class="operator">-&gt;</span><span class="variable">output</span><span class="operator">(</span><span class="variable">LIST</span><span class="operator">)</span>    <span class="comment"># called to print any output that</span>
+                            <span class="comment"># the API must show</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl debug information is frequently required not just by debuggers, but also by modules that need some &quot;special&quot; information to do their job properly, like profilers.</p>
+
+<p>This module abstracts and provides all of the hooks into Perl internal debugging functionality, so that various implementations of Perl debuggers (or packages that want to simply get at the &quot;privileged&quot; debugging data) can all benefit from the development of this common code. Currently used by Swat, the perl/Tk GUI debugger.</p>
+
+<p>Note that multiple &quot;front-ends&quot; can latch into this debugging API simultaneously. This is intended to facilitate things like debugging with a command line and GUI at the same time, debugging debuggers etc. [Sounds nice, but this needs some serious support -- GSAR]</p>
+
+<p>In particular, this API does <b>not</b> provide the following functions:</p>
+
+<ul>
+
+<li><p>data display</p>
+
+</li>
+<li><p>command processing</p>
+
+</li>
+<li><p>command alias management</p>
+
+</li>
+<li><p>user interface (tty or graphical)</p>
+
+</li>
+</ul>
+
+<p>These are intended to be services performed by the clients of this API.</p>
+
+<p>This module attempts to be squeaky clean w.r.t <code><span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+</code> and when warnings are enabled.</p>
+
+<h2 id="Global-Variables">Global Variables</h2>
+
+<p>The following &quot;public&quot; global names can be read by clients of this API. Beware that these should be considered &quot;readonly&quot;.</p>
+
+<dl>
+
+<dt id="DB::sub">$DB::sub</dt>
+<dd>
+
+<p>Name of current executing subroutine.</p>
+
+</dd>
+<dt id="DB::sub1">%DB::sub</dt>
+<dd>
+
+<p>The keys of this hash are the names of all the known subroutines. Each value is an encoded string that has the sprintf(3) format <code>(&quot;%s:%d-%d&quot;, filename, fromline, toline)</code>.</p>
+
+</dd>
+<dt id="DB::single">$DB::single</dt>
+<dd>
+
+<p>Single-step flag. Will be true if the API will stop at the next statement.</p>
+
+</dd>
+<dt id="DB::signal">$DB::signal</dt>
+<dd>
+
+<p>Signal flag. Will be set to a true value if a signal was caught. Clients may check for this flag to abort time-consuming operations.</p>
+
+</dd>
+<dt id="DB::trace">$DB::trace</dt>
+<dd>
+
+<p>This flag is set to true if the API is tracing through subroutine calls.</p>
+
+</dd>
+<dt id="DB::args">@DB::args</dt>
+<dd>
+
+<p>Contains the arguments of current subroutine, or the <code>@ARGV</code> array if in the toplevel context.</p>
+
+</dd>
+<dt id="DB::dbline">@DB::dbline</dt>
+<dd>
+
+<p>List of lines in currently loaded file.</p>
+
+</dd>
+<dt id="DB::dbline1">%DB::dbline</dt>
+<dd>
+
+<p>Actions in current file (keys are line numbers). The values are strings that have the sprintf(3) format <code>(&quot;%s\000%s&quot;, breakcondition, actioncode)</code>.</p>
+
+</dd>
+<dt id="DB::package">$DB::package</dt>
+<dd>
+
+<p>Package namespace of currently executing code.</p>
+
+</dd>
+<dt id="DB::filename">$DB::filename</dt>
+<dd>
+
+<p>Currently loaded filename.</p>
+
+</dd>
+<dt id="DB::subname">$DB::subname</dt>
+<dd>
+
+<p>Fully qualified name of currently executing subroutine.</p>
+
+</dd>
+<dt id="DB::lineno">$DB::lineno</dt>
+<dd>
+
+<p>Line number that will be executed next.</p>
+
+</dd>
+</dl>
+
+<h2 id="API-Methods">API Methods</h2>
+
+<p>The following are methods in the DB base class. A client must access these methods by inheritance (*not* by calling them directly), since the API keeps track of clients through the inheritance mechanism.</p>
+
+<dl>
+
+<dt id="CLIENT-register">CLIENT-&gt;register()</dt>
+<dd>
+
+<p>register a client object/package</p>
+
+</dd>
+<dt id="CLIENT-evalcode-STRING">CLIENT-&gt;evalcode(STRING)</dt>
+<dd>
+
+<p>eval STRING in executing code context</p>
+
+</dd>
+<dt id="CLIENT-skippkg-D::hide">CLIENT-&gt;skippkg(&#39;D::hide&#39;)</dt>
+<dd>
+
+<p>ask DB not to stop in these packages</p>
+
+</dd>
+<dt id="CLIENT-run">CLIENT-&gt;run()</dt>
+<dd>
+
+<p>run some more (until a breakpt is reached)</p>
+
+</dd>
+<dt id="CLIENT-step">CLIENT-&gt;step()</dt>
+<dd>
+
+<p>single step</p>
+
+</dd>
+<dt id="CLIENT-next">CLIENT-&gt;next()</dt>
+<dd>
+
+<p>step over</p>
+
+</dd>
+<dt id="CLIENT-done">CLIENT-&gt;done()</dt>
+<dd>
+
+<p>de-register from the debugging API</p>
+
+</dd>
+</dl>
+
+<h2 id="Client-Callback-Methods">Client Callback Methods</h2>
+
+<p>The following &quot;virtual&quot; methods can be defined by the client. They will be called by the API at appropriate points. Note that unless specified otherwise, the debug API only defines empty, non-functional default versions of these methods.</p>
+
+<dl>
+
+<dt id="CLIENT-init">CLIENT-&gt;init()</dt>
+<dd>
+
+<p>Called after debug API inits itself.</p>
+
+</dd>
+<dt id="CLIENT-prestop-STRING">CLIENT-&gt;prestop([STRING])</dt>
+<dd>
+
+<p>Usually inherited from DB package. If no arguments are passed, returns the prestop action string.</p>
+
+</dd>
+<dt id="CLIENT-stop">CLIENT-&gt;stop()</dt>
+<dd>
+
+<p>Called when execution stops (w/ args file, line).</p>
+
+</dd>
+<dt id="CLIENT-idle">CLIENT-&gt;idle()</dt>
+<dd>
+
+<p>Called while stopped (can be a client event loop).</p>
+
+</dd>
+<dt id="CLIENT-poststop-STRING">CLIENT-&gt;poststop([STRING])</dt>
+<dd>
+
+<p>Usually inherited from DB package. If no arguments are passed, returns the poststop action string.</p>
+
+</dd>
+<dt id="CLIENT-evalcode-STRING1">CLIENT-&gt;evalcode(STRING)</dt>
+<dd>
+
+<p>Usually inherited from DB package. Ask for a STRING to be <code>eval</code>-ed in executing code context.</p>
+
+</dd>
+<dt id="CLIENT-cleanup">CLIENT-&gt;cleanup()</dt>
+<dd>
+
+<p>Called just before exit.</p>
+
+</dd>
+<dt id="CLIENT-output-LIST">CLIENT-&gt;output(LIST)</dt>
+<dd>
+
+<p>Called when API must show a message (warnings, errors etc.).</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>The interface defined by this module is missing some of the later additions to perl&#39;s debugging functionality. As such, this interface should be considered highly experimental and subject to change.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Gurusamy Sarathy gsar@activestate.com</p>
+
+<p>This code heavily adapted from an early version of perl5db.pl attributable to Larry Wall and the Perl Porters.</p>
+
+
+</body>
+
+</html>
+
+

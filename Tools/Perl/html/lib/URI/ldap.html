@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>URI::ldap - LDAP Uniform Resource Locators</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">URI</span><span class="operator">;</span>
+  
+  <span class="variable">$uri</span> <span class="operator">=</span> <span class="variable">URI</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"ldap:</span><span class="variable">$uri_string</span><span class="string">"</span><span class="operator">);</span>
+  <span class="variable">$dn</span>     <span class="operator">=</span> <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">dn</span><span class="operator">;</span>
+  <span class="variable">$filter</span> <span class="operator">=</span> <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">filter</span><span class="operator">;</span>
+  <span class="variable">@attr</span>   <span class="operator">=</span> <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">attributes</span><span class="operator">;</span>
+  <span class="variable">$scope</span>  <span class="operator">=</span> <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">scope</span><span class="operator">;</span>
+  <span class="variable">%extn</span>   <span class="operator">=</span> <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">extensions</span><span class="operator">;</span>
+  
+  <span class="variable">$uri</span> <span class="operator">=</span> <span class="variable">URI</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"ldap:"</span><span class="operator">);</span>  <span class="comment"># start empty</span>
+  <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">host</span><span class="operator">(</span><span class="string">"ldap.itd.umich.edu"</span><span class="operator">);</span>
+  <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">dn</span><span class="operator">(</span><span class="string">"o=University of Michigan,c=US"</span><span class="operator">);</span>
+  <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">attributes</span><span class="operator">(</span><span class="string">qw(postalAddress)</span><span class="operator">);</span>
+  <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">scope</span><span class="operator">(</span><span class="string">'sub'</span><span class="operator">);</span>
+  <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">filter</span><span class="operator">(</span><span class="string">'(cn=Babs Jensen)'</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">as_string</span><span class="operator">,</span><span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>URI::ldap</code> provides an interface to parse an LDAP URI into its constituent parts and also to build a URI as described in RFC 2255.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p><code>URI::ldap</code> supports all the generic and server methods defined by <a href="../../lib/URI.html">URI</a>, plus the following.</p>
+
+<p>Each of the following methods can be used to set or get the value in the URI. The values are passed in unescaped form. None of these return undefined values, but elements without a default can be empty. If arguments are given, then a new value is set for the given part of the URI.</p>
+
+<dl>
+
+<dt id="uri-dn-new_dn">$uri-&gt;dn( [$new_dn] )</dt>
+<dd>
+
+<p>Sets or gets the <i>Distinguished Name</i> part of the URI. The DN identifies the base object of the LDAP search.</p>
+
+</dd>
+<dt id="uri-attributes-new_attrs">$uri-&gt;attributes( [@new_attrs] )</dt>
+<dd>
+
+<p>Sets or gets the list of attribute names which are returned by the search.</p>
+
+</dd>
+<dt id="uri-scope-new_scope">$uri-&gt;scope( [$new_scope] )</dt>
+<dd>
+
+<p>Sets or gets the scope to be used by the search. The value can be one of <code>&quot;base&quot;</code>, <code>&quot;one&quot;</code> or <code>&quot;sub&quot;</code>. If none is given in the URI then the return value defaults to <code>&quot;base&quot;</code>.</p>
+
+</dd>
+<dt id="uri-_scope-new_scope">$uri-&gt;_scope( [$new_scope] )</dt>
+<dd>
+
+<p>Same as scope(), but does not default to anything.</p>
+
+</dd>
+<dt id="uri-filter-new_filter">$uri-&gt;filter( [$new_filter] )</dt>
+<dd>
+
+<p>Sets or gets the filter to be used by the search. If none is given in the URI then the return value defaults to <code>&quot;(objectClass=*)&quot;</code>.</p>
+
+</dd>
+<dt id="uri-_filter-new_filter">$uri-&gt;_filter( [$new_filter] )</dt>
+<dd>
+
+<p>Same as filter(), but does not default to anything.</p>
+
+</dd>
+<dt id="uri-extensions-etype-evalue">$uri-&gt;extensions( [$etype =&gt; $evalue,...] )</dt>
+<dd>
+
+<p>Sets or gets the extensions used for the search. The list passed should be in the form etype1 =&gt; evalue1, etype2 =&gt; evalue2,... This is also the form of list that is returned.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="http://tools.ietf.org/html/rfc2255">http://tools.ietf.org/html/rfc2255</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Graham Barr &lt;<i>gbarr@pobox.com</i>&gt;</p>
+
+<p>Slightly modified by Gisle Aas to fit into the URI distribution.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 1998 Graham Barr. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

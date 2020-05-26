@@ -1,0 +1,200 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#RATIONALE">RATIONALE</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#USE-OPTIONS">USE OPTIONS</a></li>
+  <li><a href="#DEPRECATIONS">DEPRECATIONS</a></li>
+  <li><a href="#JSON-SUPPORT">JSON SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>boolean - Boolean support for Perl</p>
+
+
+<a href="https://travis-ci.org/ingydotnet/boolean-pm"><img src="https://travis-ci.org/ingydotnet/boolean-pm.png" alt="boolean-pm"></a>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes <a href="../lib/boolean.html">boolean</a> version <b>0.46</b>.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">boolean</span><span class="operator">;</span>
+    
+    <span class="keyword">do</span> <span class="operator">&amp;</span><span class="variable">always</span> <span class="keyword">if</span> <span class="variable">true</span><span class="operator">;</span>
+    <span class="keyword">do</span> <span class="operator">&amp;</span><span class="variable">never</span> <span class="keyword">if</span> <span class="variable">false</span><span class="operator">;</span>
+    
+    <span class="keyword">do</span> <span class="operator">&amp;</span><span class="variable">maybe</span> <span class="keyword">if</span> <span class="variable">boolean</span><span class="operator">(</span><span class="variable">$value</span><span class="operator">)-&gt;</span><span class="variable">isTrue</span><span class="operator">;</span>
+</code></pre>
+
+<p>and:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">boolean</span> <span class="string">':all'</span><span class="operator">;</span>
+    
+    <span class="variable">$guess</span> <span class="operator">=</span> <span class="keyword">int</span><span class="operator">(</span><span class="keyword">rand</span><span class="operator">(</span><span class="number">2</span><span class="operator">))</span> <span class="operator">% </span><span class="number">2</span> <span class="operator">?</span> <span class="variable">true</span> <span class="operator">:</span> <span class="variable">false</span><span class="operator">;</span>
+    
+    <span class="keyword">do</span> <span class="operator">&amp;</span><span class="variable">something</span> <span class="keyword">if</span> <span class="variable">isTrue</span><span class="operator">(</span><span class="variable">$guess</span><span class="operator">);</span>
+    <span class="keyword">do</span> <span class="operator">&amp;</span><span class="variable">something_else</span> <span class="keyword">if</span> <span class="variable">isFalse</span><span class="operator">(</span><span class="variable">$guess</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Most programming languages have a native <code>Boolean</code> data type. Perl does not.</p>
+
+<p>Perl has a simple and well known Truth System. The following scalar values are false:</p>
+
+<pre><code>    <span class="variable">$false1</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span>
+    <span class="variable">$false2</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+    <span class="variable">$false3</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">.</span><span class="number">0</span><span class="operator">;</span>
+    <span class="variable">$false4</span> <span class="operator">=</span> <span class="string">''</span><span class="operator">;</span>
+    <span class="variable">$false5</span> <span class="operator">=</span> <span class="string">'0'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Every other scalar value is true.</p>
+
+<p>This module provides basic Boolean support, by defining two special objects: <code>true</code> and <code>false</code>.</p>
+
+<h1 id="RATIONALE">RATIONALE</h1>
+
+<p>When sharing data between programming languages, it is important to support the same group of basic types. In Perlish programming languages, these types include: Hash, Array, String, Number, Null and Boolean. Perl lacks native Boolean support.</p>
+
+<p>Data interchange modules like YAML and JSON can now <code>use boolean</code> to encode<i>decode</i>roundtrip Boolean values.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<p>This module defines the following functions:</p>
+
+<dl>
+
+<dt id="true"><code>true</code></dt>
+<dd>
+
+<p>This function returns a scalar value which will evaluate to true. The value is a singleton object, meaning there is only one &quot;true&quot; value in a Perl process at any time. You can check to see whether the value is the &quot;true&quot; object with the isTrue function described below.</p>
+
+</dd>
+<dt id="false"><code>false</code></dt>
+<dd>
+
+<p>This function returns a scalar value which will evaluate to false. The value is a singleton object, meaning there is only one &quot;false&quot; value in a Perl process at any time. You can check to see whether the value is the &quot;false&quot; object with the isFalse function described below.</p>
+
+</dd>
+<dt id="boolean-scalar"><code>boolean($scalar)</code></dt>
+<dd>
+
+<p>Casts the scalar value to a boolean value. If <code>$scalar</code> is true, it returns <code>boolean::true</code>, otherwise it returns <code>boolean::false</code>.</p>
+
+</dd>
+<dt id="isTrue-scalar"><code>isTrue($scalar)</code></dt>
+<dd>
+
+<p>Returns <code>boolean::true</code> if the scalar passed to it is the <code>boolean::true</code> object. Returns <code>boolean::false</code> otherwise.</p>
+
+</dd>
+<dt id="isFalse-scalar"><code>isFalse($scalar)</code></dt>
+<dd>
+
+<p>Returns <code>boolean::true</code> if the scalar passed to it is the <code>boolean::false</code> object. Returns <code>boolean::false</code> otherwise.</p>
+
+</dd>
+<dt id="isBoolean-scalar"><code>isBoolean($scalar)</code></dt>
+<dd>
+
+<p>Returns <code>boolean::true</code> if the scalar passed to it is the <code>boolean::true</code> or <code>boolean::false</code> object. Returns <code>boolean::false</code> otherwise.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>Since true and false return objects, you can call methods on them.</p>
+
+<dl>
+
+<dt id="boolean-isTrue"><code>$boolean-&gt;isTrue</code></dt>
+<dd>
+
+<p>Same as isTrue($boolean).</p>
+
+</dd>
+<dt id="boolean-isFalse"><code>$boolean-&gt;isFalse</code></dt>
+<dd>
+
+<p>Same as isFalse($boolean).</p>
+
+</dd>
+</dl>
+
+<h1 id="USE-OPTIONS">USE OPTIONS</h1>
+
+<p>By default this module exports the <code>true</code>, <code>false</code> and <code>boolean</code> functions.</p>
+
+<p>The module also defines these export tags:</p>
+
+<dl>
+
+<dt id="all"><code>:all</code></dt>
+<dd>
+
+<p>Exports <code>true</code>, <code>false</code>, <code>boolean</code>, <code>isTrue</code>, <code>isFalse</code>, <code>isBoolean</code></p>
+
+</dd>
+</dl>
+
+<h1 id="DEPRECATIONS">DEPRECATIONS</h1>
+
+<p>This module offered an export tag, <code>-truth</code>, that overrides the Perl interpreter&#39;s internal values for true and false. This has been found to corrupt the interpreter in some circumstances. Also, these overrides will no longer be possible as of Perl 5.22. Therefore, the <code>-truth</code> import tag is deprecated.</p>
+
+<h1 id="JSON-SUPPORT">JSON SUPPORT</h1>
+
+<p>JSON::MaybeXS (or less preferably JSON.pm ) will encode Perl data with boolean.pm values correctly if you use the <code>convert_blessed</code> option:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">boolean</span> <span class="operator">-</span><span class="variable">truth</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">JSON::MaybeXS</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">-&gt;</span><span class="variable">convert_blessed</span><span class="operator">;</span>
+    <span class="keyword">say</span> <span class="variable">$json</span><span class="operator">-&gt;</span><span class="variable">encode</span><span class="operator">(</span><span class="operator">{</span><span class="string">false</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="number">0</span> <span class="operator">==</span> <span class="number">1</span><span class="operator">)</span><span class="operator">}</span><span class="operator">);</span>     <span class="comment"># Says: '{"false":false}',</span>
+</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ingy d&ouml;t Net &lt;ingy@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright 2007-2016. Ingy d&ouml;t Net.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <a href="http://www.perl.com/perl/misc/Artistic.html">http://www.perl.com/perl/misc/Artistic.html</a></p>
+
+
+</body>
+
+</html>
+
+

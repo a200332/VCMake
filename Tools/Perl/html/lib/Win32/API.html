@@ -1,0 +1,723 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#IMPORTING-A-FUNCTION">IMPORTING A FUNCTION</a></li>
+      <li><a href="#IMPORTING-A-FUNCTION-BY-PROTOTYPE">IMPORTING A FUNCTION BY PROTOTYPE</a></li>
+      <li><a href="#IMPORTING-A-FUNCTION-WITH-A-PARAMETER-LIST">IMPORTING A FUNCTION WITH A PARAMETER LIST</a></li>
+      <li><a href="#CALLING-AN-IMPORTED-FUNCTION">CALLING AN IMPORTED FUNCTION</a></li>
+      <li><a href="#USING-STRUCTURES">USING STRUCTURES</a></li>
+      <li><a href="#EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</a>
+        <ul>
+          <li><a href="#ReadMemory">ReadMemory</a></li>
+          <li><a href="#WriteMemory">WriteMemory</a></li>
+          <li><a href="#MoveMemory">MoveMemory</a></li>
+          <li><a href="#IsBadReadPtr">IsBadReadPtr</a></li>
+          <li><a href="#SafeReadWideCString">SafeReadWideCString</a></li>
+        </ul>
+      </li>
+      <li><a href="#CONSTRUCTORS">CONSTRUCTORS</a>
+        <ul>
+          <li><a href="#new">new</a></li>
+          <li><a href="#Import-obj-Win32::API::More-Import-dllname-undef-funcptr-c_proto-in-out-calling_convention">Import $obj = Win32::API::More-&gt;Import([$dllname | (undef , $funcptr)], [$c_proto | ($in, $out [, $calling_convention])]);</a></li>
+        </ul>
+      </li>
+      <li><a href="#METHODS">METHODS</a>
+        <ul>
+          <li><a href="#Call">Call</a></li>
+          <li><a href="#UseMI64">UseMI64</a></li>
+        </ul>
+      </li>
+      <li><a href="#VERBOSE-DEBUGGING">VERBOSE DEBUGGING</a></li>
+    </ul>
+  </li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#MAINTAINER">MAINTAINER</a></li>
+  <li><a href="#MAJOR-CONTRIBUTOR">MAJOR CONTRIBUTOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::API - Perl Win32 API Import Facility</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment">#### Method 1: with prototype</span>
+  
+  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="variable">$function</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'mydll'</span><span class="operator">,</span> <span class="string">'int sum_integers(int a, int b)'</span>
+  <span class="operator">);</span>
+  <span class="comment">#### $^E is non-Cygwin only</span>
+  <span class="keyword">die</span> <span class="string">"Error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">$function</span><span class="operator">;</span>
+  <span class="comment">#### or on Cygwin and non-Cygwin</span>
+  <span class="keyword">die</span> <span class="string">"Error: "</span><span class="operator">.(</span><span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">Win32::GetLastError</span><span class="operator">()))</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">$function</span><span class="operator">;</span>
+  <span class="comment">####</span>
+  <span class="variable">$return</span> <span class="operator">=</span> <span class="variable">$function</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>
+  
+  <span class="comment">#### Method 2: with prototype and your function pointer</span>
+  
+  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="variable">$function</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="keyword">undef</span><span class="operator">,</span> <span class="number">38123456</span><span class="operator">,</span> <span class="string">'int name_ignored(int a, int b)'</span>
+  <span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"Error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">$function</span><span class="operator">;</span> <span class="comment">#$^E is non-Cygwin only</span>
+  <span class="variable">$return</span> <span class="operator">=</span> <span class="variable">$function</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>
+  
+  <span class="comment">#### Method 3: with parameter list </span>
+  
+  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="variable">$function</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'mydll'</span><span class="operator">,</span> <span class="string">'sum_integers'</span><span class="operator">,</span> <span class="string">'II'</span><span class="operator">,</span> <span class="string">'I'</span>
+  <span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"Error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">$function</span><span class="operator">;</span> <span class="comment">#$^E is non-Cygwin only</span>
+  <span class="variable">$return</span> <span class="operator">=</span> <span class="variable">$function</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>
+     
+  <span class="comment">#### Method 4: with parameter list and your function pointer</span>
+  
+  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="variable">$function</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="keyword">undef</span><span class="operator">,</span> <span class="number">38123456</span><span class="operator">,</span> <span class="string">'name_ignored'</span><span class="operator">,</span> <span class="string">'II'</span><span class="operator">,</span> <span class="string">'I'</span>
+  <span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"Error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">$function</span><span class="operator">;</span> <span class="comment">#$^E is non-Cygwin only</span>
+  <span class="variable">$return</span> <span class="operator">=</span> <span class="variable">$function</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>
+  
+  <span class="comment">#### Method 5: with Import (slightly faster than -&gt;Call)</span>
+   
+  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="variable">$function</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">Import</span><span class="operator">(</span>
+      <span class="string">'mydll'</span><span class="operator">,</span> <span class="string">'int sum_integers(int a, int b)'</span>
+  <span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"Error: $^E"</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">$function</span><span class="operator">;</span> <span class="comment">#$^E is non-Cygwin only</span>
+  <span class="variable">$return</span> <span class="operator">=</span> <span class="variable">sum_integers</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<p>With this module you can import and call arbitrary functions from Win32&#39;s Dynamic Link Libraries (DLL) or arbitrary functions for which you have a pointer (MS COM, etc), without having to write an XS extension. Note, however, that this module can&#39;t do everything. In fact, parameters input and output is limited to simpler cases.</p>
+
+<p>A regular <b>XS</b> extension is always safer and faster anyway.</p>
+
+<p>The current version of Win32::API is always available at your nearest CPAN mirror:</p>
+
+<pre><code>  http://search.cpan.org/dist/Win32-API/</code></pre>
+
+<p>A short example of how you can use this module (it just gets the PID of the current process, eg. same as Perl&#39;s internal <code>$$</code>):</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+    <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">Import</span><span class="operator">(</span><span class="string">"kernel32"</span><span class="operator">,</span> <span class="string">"int GetCurrentProcessId()"</span><span class="operator">);</span>
+    <span class="variable">$PID</span> <span class="operator">=</span> <span class="variable">GetCurrentProcessId</span><span class="operator">();</span>
+</code></pre>
+
+<p>Starting with 0.69. Win32::API initiated objects are deprecated due to numerous bugs and improvements, use Win32::API::More now. The use statement remains as <code><span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+</code>.</p>
+
+<p>The possibilities are nearly infinite (but not all are good :-). Enjoy it.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>To use this module put the following line at the beginning of your script:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can now use the <code>new()</code> function of the Win32::API module to create a new Win32::API::More object (see <a href="#IMPORTING-A-FUNCTION">&quot;IMPORTING A FUNCTION&quot;</a>) and then invoke the <code>Call()</code> method on this object to perform a call to the imported API (see <a href="#CALLING-AN-IMPORTED-FUNCTION">&quot;CALLING AN IMPORTED FUNCTION&quot;</a>).</p>
+
+<p>Starting from version 0.40, you can also avoid creating a Win32::API::More object and instead automatically define a Perl sub with the same name of the API function you&#39;re importing. This 2nd way using <code>Import</code> to create a sub instead of an object is slightly faster than doing <code>-&gt;Call()</code>. The details of the API definitions are the same, just the method name is different:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$GetCurrentProcessId</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">"kernel32"</span><span class="operator">,</span> <span class="string">"int GetCurrentProcessId()"</span>
+    <span class="operator">);</span>
+    <span class="keyword">die</span> <span class="string">"Failed to import GetCurrentProcessId"</span> <span class="keyword">if</span> <span class="operator">!</span><span class="variable">$GetCurrentProcessId</span><span class="operator">;</span>
+    <span class="variable">$GetCurrentProcessId</span><span class="operator">-&gt;</span><span class="variable">UseMI64</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$PID</span> <span class="operator">=</span> <span class="variable">$GetCurrentProcessId</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">();</span>
+    
+    <span class="comment">#### vs.</span>
+    
+    <span class="keyword">my</span> <span class="variable">$UnusedGCPI</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">Import</span><span class="operator">(</span><span class="string">"kernel32"</span><span class="operator">,</span> <span class="string">"int GetCurrentProcessId()"</span><span class="operator">);</span>
+    <span class="keyword">die</span> <span class="string">"Failed to import GetCurrentProcessId"</span> <span class="keyword">if</span> <span class="operator">!</span><span class="variable">$UnusedGCPI</span><span class="operator">;</span>
+    <span class="variable">$UnusedGCPI</span><span class="operator">-&gt;</span><span class="variable">UseMI64</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+    <span class="variable">$PID</span> <span class="operator">=</span> <span class="variable">GetCurrentProcessId</span><span class="operator">();</span>
+</code></pre>
+
+<p>Note that <code>Import</code> returns the Win32::API obj on success and false on failure (in which case you can check the content of <code>$^E</code>). This allows some settings to be set through method calls that can&#39;t be specified as a parameter to Import, yet still have the convience of not writing <code>-&gt;Call()</code>. The Win32::API obj does not need to be assigned to a scalar. <code>unless(Win32::API::More-&gt;Import</code> is fine. Prior to v0.76_02, <code>Import</code> returned returned 1 on success and 0 on failure.</p>
+
+<h2 id="IMPORTING-A-FUNCTION">IMPORTING A FUNCTION</h2>
+
+<p>You can import a function from a 32 bit Dynamic Link Library (DLL) file with the <code>new()</code> function or, starting in 0.69, supply your own function pointer. This will create a Perl object that contains the reference to that function, which you can later <code>Call()</code>.</p>
+
+<p>What you need to know is the prototype of the function you&#39;re going to import (eg. the definition of the function expressed in C syntax).</p>
+
+<p>Starting from version 0.40, there are 2 different approaches for this step: (the preferred) one uses the prototype directly, while the other (now deprecated) one uses Win32::API&#39;s internal representation for parameters.</p>
+
+<h2 id="IMPORTING-A-FUNCTION-BY-PROTOTYPE">IMPORTING A FUNCTION BY PROTOTYPE</h2>
+
+<p>You need to pass 2 or 3 parameters:</p>
+
+<ol>
+
+<li><p>The name of the library from which you want to import the function. If the name is undef, you are requesting a object created from a function pointer, and must supply item 2.</p>
+
+</li>
+<li><p>This parameter is optional, most people should skip it, skip does not mean supplying undef. Supply a function pointer in the format of number 1234, not string &quot;\x01\x02\x03\x04&quot;. Undef will be returned if the pointer is not readable, <a href="../../lib/Win32.html#Win32::GetLastError">Win32::GetLastError</a>/<a href="../../lib/pods/perlvar.html#E">&quot;$^E&quot; in perlvar</a> will be <code>ERROR_NOACCESS</code>.</p>
+
+</li>
+<li><p>The C prototype of the function. If you are using a function pointer, the name of the function should be something &quot;friendly&quot; to you and no attempt is made to retrieve such a name from any DLL&#39;s export table. This name for a function pointer is also used for Import().</p>
+
+</li>
+</ol>
+
+<p>When calling a function imported with a prototype, if you pass an undefined Perl scalar to one of its arguments, it will be automatically turned into a C <code>NULL</code> value.</p>
+
+<p>See <a href="../../lib/Win32/API/Type.html">Win32::API::Type</a> for a list of the known parameter types and <a href="../../lib/Win32/API/Struct.html">Win32::API::Struct</a> for information on how to define a structure.</p>
+
+<p>If a prototype type is exactly <code>signed char</code> or <code>unsigned char</code> for an &quot;in&quot; parameter or the return parameter, and for &quot;in&quot; parameters only <code>signed char *</code> or <code>unsigned char *</code> the parameters will be treated as a number, <code>0x01</code>, not <code>&quot;\x01&quot;</code>. &quot;UCHAR&quot; is not &quot;unsigned char&quot;. Change the C prototype if you want numeric handling for your chars.</p>
+
+<h2 id="IMPORTING-A-FUNCTION-WITH-A-PARAMETER-LIST">IMPORTING A FUNCTION WITH A PARAMETER LIST</h2>
+
+<p>You need to pass at minimum 4 parameters.</p>
+
+<dl>
+
+<dt id="The-name-of-the-library-from-which-you-want-to-import-the-function">1. The name of the library from which you want to import the function.</dt>
+<dd>
+
+</dd>
+<dt id="This-parameter-is-optional-most-people-should-skip-it-skip-does-not-mean-supplying-undef.-Supply-a-function-pointer-in-the-format-of-number-1234-not-string-x01-x02-x03-x04.-Undef-will-be-returned-if-the-pointer-is-not-readable-Win32::GetLastError-E-in-perlvar-will-be-ERROR_NOACCESS">2. This parameter is optional, most people should skip it, skip does not mean supplying undef. Supply a function pointer in the format of number <code>1234</code>, not string <code>&quot;\x01\x02\x03\x04&quot;</code>. Undef will be returned if the pointer is not readable, <a href="../../lib/Win32.html#Win32::GetLastError">Win32::GetLastError</a>/<a href="../../lib/pods/perlvar.html#E">&quot;$^E&quot; in perlvar</a> will be <code>ERROR_NOACCESS</code>.</dt>
+<dd>
+
+</dd>
+<dt id="The-name-of-the-function-as-exported-by-the-library-or-for-function-pointers-a-name-that-is-friendly-to-you.-This-name-for-a-function-pointer-is-also-used-for-Import-.-No-attempt-is-made-to-retrieve-such-a-name-from-any-DLLs-export-table-in-the-2nd-case">3. The name of the function (as exported by the library) or for function pointers a name that is &quot;friendly&quot; to you. This name for a function pointer is also used for Import(). No attempt is made to retrieve such a name from any DLL&#39;s export table in the 2nd case.</dt>
+<dd>
+
+</dd>
+<dt id="The-number-and-types-of-the-arguments-the-function-expects-as-input">4. The number and types of the arguments the function expects as input.</dt>
+<dd>
+
+</dd>
+<dt id="The-type-of-the-value-returned-by-the-function">5. The type of the value returned by the function.</dt>
+<dd>
+
+</dd>
+<dt id="And-optionally-you-can-specify-the-calling-convention-this-defaults-to-__stdcall-alternatively-you-can-specify-_cdecl-or-__cdecl-API-v0.68-or-API-v0.70_02-WINAPI-NTAPI-CALLBACK-__stdcall-WINAPIV-__cdecl-.-False-is-__stdcall.-Vararg-functions-are-always-cdecl.-MS-DLLs-are-typically-stdcall.-Non-MS-DLLs-are-typically-cdecl.-If-API-v0.75-mixing-up-the-calling-convention-on-32-bits-is-detected-and-Perl-will-croak-an-error-message-and-die">6. And optionally you can specify the calling convention, this defaults to &#39;__stdcall&#39;, alternatively you can specify &#39;_cdecl&#39; or &#39;__cdecl&#39; (API &gt; v0.68) or (API &gt; v0.70_02) &#39;WINAPI&#39;, &#39;NTAPI&#39;, &#39;CALLBACK&#39; (__stdcall), &#39;WINAPIV&#39; (__cdecl) . False is __stdcall. Vararg functions are always cdecl. MS DLLs are typically stdcall. Non-MS DLLs are typically cdecl. If API &gt; v0.75, mixing up the calling convention on 32 bits is detected and Perl will <code>croak</code> an error message and <code>die</code>.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>To better explain their meaning, let&#39;s suppose that we want to import and call the Win32 API <code>GetTempPath()</code>. This function is defined in C as:</p>
+
+<pre><code>    <span class="variable">DWORD</span> <span class="variable">WINAPI</span> <span class="variable">GetTempPathA</span><span class="operator">(</span> <span class="variable">DWORD</span> <span class="variable">nBufferLength</span><span class="operator">,</span> <span class="variable">LPSTR</span> <span class="variable">lpBuffer</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This is documented in the <b>Win32 SDK Reference</b>; you can look for it on the Microsoft&#39;s WWW site, or in your C compiler&#39;s documentation, if you own one.</p>
+
+<dl>
+
+<dt id="pod1"><b>1.</b></dt>
+<dd>
+
+<p>The first parameter is the name of the library file that exports this function; our function resides in the <i>KERNEL32.DLL</i> system file.</p>
+
+<p>When specifying this name as parameter, the <i>.DLL</i> extension is implicit, and if no path is given, the file is searched through a couple of directories, including:</p>
+
+<dl>
+
+<dt id="The-directory-from-which-the-application-loaded">1. The directory from which the application loaded.</dt>
+<dd>
+
+</dd>
+<dt id="The-current-directory">2. The current directory.</dt>
+<dd>
+
+</dd>
+<dt id="The-Windows-system-directory-eg.-c:-windows-system-or-system32">3. The Windows system directory (eg. c:\windows\system or system32).</dt>
+<dd>
+
+</dd>
+<dt id="The-Windows-directory-eg.-c:-windows">4. The Windows directory (eg. c:\windows).</dt>
+<dd>
+
+</dd>
+<dt id="The-directories-that-are-listed-in-the-PATH-environment-variable">5. The directories that are listed in the PATH environment variable.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>You may, but don&#39;t have to write <i>C:\windows\system\kernel32.dll</i>; or <i>kernel32.dll</i>, only <i>kernel32</i> is enough:</p>
+
+<pre><code>    $GetTempPath = new Win32::API::More(&#39;kernel32&#39;, ...</code></pre>
+
+</dd>
+<dt id="pod2"><b>2.</b></dt>
+<dd>
+
+<p>Since this function is from a DLL, skip the 2nd parameter. Skip does not mean supplying undef.</p>
+
+</dd>
+<dt id="pod3"><b>3.</b></dt>
+<dd>
+
+<p>Now for the real second parameter: the name of the function. It must be written exactly as it is exported by the library (case is significant here). If you are using Windows 95 or NT 4.0, you can use the <b>Quick View</b> command on the DLL file to see the function it exports. Remember that you can only import functions from 32 or 64 bit DLLs: in Quick View, the file&#39;s characteristics should report somewhere &quot;32 bit word machine&quot;; as a rule of thumb, when you see that all the exported functions are in upper case, the DLL is a 16 bit one and you can&#39;t use it. You also can not load a 32 bit DLL into a 64 bit Perl, or vice versa. If you try, <code>new</code>/<code>Import</code> will fail and <code>$^E</code> will be <code>ERROR_BAD_EXE_FORMAT</code>. If their capitalization looks correct, then it&#39;s probably a 32 bit DLL. If you have Platform SDK or Visual Studio, you can use the Dumpbin tool. Call it as <code>dumpbin /exports name_of_dll.dll</code> on the command line. If you have Mingw GCC, use objdump as <code>objdump -x name_of_dll.dll &gt; dlldump.txt</code> and search for the word exports in the very long output.</p>
+
+<p>Also note that many Win32 APIs are exported twice, with the addition of a final <b>A</b> or <b>W</b> to their name, for - respectively - the ASCII and the Unicode version. When a function name is not found, Win32::API will actually append an <b>A</b> to the name and try again; if the extension is built on a Unicode system, then it will try with the <b>W</b> instead. So our function name will be:</p>
+
+<pre><code>    $GetTempPath = new Win32::API::More(&#39;kernel32&#39;, &#39;GetTempPath&#39;, ...</code></pre>
+
+<p>In our case <code>GetTempPath</code> is really loaded as <code>GetTempPathA</code>.</p>
+
+</dd>
+<dt id="pod4"><b>4.</b></dt>
+<dd>
+
+<p>The third parameter, the input parameter list, specifies how many arguments the function wants, and their types. It can be passed as a single string, in which each character represents one parameter, or as a list reference. The following forms are valid:</p>
+
+<pre><code>    &quot;abcd&quot;
+    [a, b, c, d]
+    \@LIST</code></pre>
+
+<p>But those are not:</p>
+
+<pre><code>    (a, b, c, d)
+    @LIST</code></pre>
+
+<p>The number of characters, or elements in the list, specifies the number of parameters, and each character or element specifies the type of an argument; allowed types are:</p>
+
+<dl>
+
+<dt id="I:-value-is-an-unsigned-integer-unsigned-int"><code>I</code>: value is an unsigned integer (unsigned int)</dt>
+<dd>
+
+</dd>
+<dt id="i:-value-is-an-signed-integer-signed-int-or-int"><code>i</code>: value is an signed integer (signed int or int)</dt>
+<dd>
+
+</dd>
+<dt id="N:-value-is-a-unsigned-pointer-sized-number-unsigned-long"><code>N</code>: value is a unsigned pointer sized number (unsigned long)</dt>
+<dd>
+
+</dd>
+<dt id="n:-value-is-a-signed-pointer-sized-number-signed-long-or-long"><code>n</code>: value is a signed pointer sized number (signed long or long)</dt>
+<dd>
+
+</dd>
+<dt id="Q:-value-is-a-unsigned-64-bit-integer-number-unsigned-long-long-unsigned-__int64-See-next-item-for-details"><code>Q</code>: value is a unsigned 64 bit integer number (unsigned long long, unsigned __int64) See next item for details.</dt>
+<dd>
+
+</dd>
+<dt id="q:-value-is-a-signed-64-bit-integer-number-long-long-__int64-If-your-perl-has-Q-q-quads-support-for-pack-in-perlfunc-then-Win32::APIs-q-is-a-normal-perl-numeric-scalar.-All-64-bit-Perls-have-quad-support.-Almost-no-32-bit-Perls-have-quad-support.-On-32-bit-Perls-without-quad-support-Win32::APIs-q-Q-letter-is-a-packed-8-byte-string.-So-0x8000000050000000-from-a-perl-with-native-Quad-support-would-be-written-as-x00-x00-x00-x50-x00-x00-x00-x80-on-a-32-bit-Perl-without-Quad-support.-To-improve-the-use-of-64-bit-integers-with-Win32::API-on-a-32-bit-Perl-without-Quad-support-there-is-a-per-Win32::API::-object-setting-called-UseMI64-that-causes-all-quads-to-be-accepted-as-and-returned-as-Math::Int64-objects.-For-in-params-in-Win32::API-and-Win32::API::More-and-out-in-Win32::API::Callback-only-if-the-argument-is-a-reference-it-will-automatically-be-treated-as-a-Math::Int64-object-without-having-to-previously-call-UseMI64"><code>q</code>: value is a signed 64 bit integer number (long long, __int64) If your perl has &#39;Q&#39;/&#39;q&#39; quads support for <a href="../../lib/pods/perlfunc.html#pack">&quot;pack&quot; in perlfunc</a> then Win32::API&#39;s &#39;q&#39; is a normal perl numeric scalar. All 64 bit Perls have quad support. Almost no 32 bit Perls have quad support. On 32 bit Perls, without quad support, Win32::API&#39;s &#39;q&#39;/&#39;Q&#39; letter is a packed 8 byte string. So <code>0x8000000050000000</code> from a perl with native Quad support would be written as <code>&quot;\x00\x00\x00\x50\x00\x00\x00\x80&quot;</code> on a 32 bit Perl without Quad support. To improve the use of 64 bit integers with Win32::API on a 32 bit Perl without Quad support, there is a per Win32::API::* object setting called <a href="#UseMI64">&quot;UseMI64&quot;</a> that causes all quads to be accepted as, and returned as <a>Math::Int64</a> objects. For &quot;in&quot; params in Win32::API and Win32::API::More and &quot;out&quot; in Win32::API::Callback only, if the argument is a reference, it will automatically be treated as a Math::Int64 object without having to previously call <a href="#UseMI64">&quot;UseMI64&quot;</a>.</dt>
+<dd>
+
+</dd>
+<dt id="F:-value-is-a-single-precision-4-bytes-floating-point-number-float"><code>F</code>: value is a single precision (4 bytes) floating point number (float)</dt>
+<dd>
+
+</dd>
+<dt id="D:-value-is-a-double-precision-8-bytes-floating-point-number-double"><code>D</code>: value is a double precision (8 bytes) floating point number (double)</dt>
+<dd>
+
+</dd>
+<dt id="S:-value-is-a-unsigned-short-unsigned-short"><code>S</code>: value is a unsigned short (unsigned short)</dt>
+<dd>
+
+</dd>
+<dt id="s:-value-is-a-signed-short-signed-short-or-short"><code>s</code>: value is a signed short (signed short or short)</dt>
+<dd>
+
+</dd>
+<dt id="C:-value-is-a-char-char-pass-as-a-not-97-abc-will-truncate-to-a"><code>C</code>: value is a char (char), pass as <code>&quot;a&quot;</code>, not <code>97</code>, <code>&quot;abc&quot;</code> will truncate to <code>&quot;a&quot;</code></dt>
+<dd>
+
+</dd>
+<dt id="P:-value-is-a-pointer-to-a-string-structure-etc...-padding-out-the-buffer-string-is-required-buffer-overflow-detection-is-performed.-Pack-and-unpack-the-data-yourself.-If-P-is-a-return-type-only-null-terminated-strings-or-NULL-pointer-are-supported.-If-P-is-an-in-type-NULL-is-integer-0.-undef-0-and-0-are-not-integer-0-0-0-is-integer-0"><code>P</code>: value is a pointer (to a string, structure, etc...) padding out the buffer string is required, buffer overflow detection is performed. Pack and unpack the data yourself. If P is a return type, only null terminated strings or NULL pointer are supported. If P is an in type, NULL is integer <code>0</code>. <code>undef</code>, <code>&quot;0&quot;</code>, and <code>&quot;&quot;+0</code> are not integer <code>0</code>, <code>&quot;0&quot;+0</code> is integer <code>0</code>.</dt>
+<dd>
+
+<p>It is suggested to not use P as a return type and instead use N and read the memory yourself, and free the pointer if applicable. This pointer is effectively undefined after the C function returns control to Perl. The C function may not hold onto it after the C function returns control. There are exceptions where the pointer will remain valid after the C function returns control, but tread at your own risk, and at your knowledge of Perl interpreter&#39;s C internals.</p>
+
+</dd>
+<dt id="T:-value-is-a-Win32::API::Struct-object-in-parameter-only-pass-by-reference-pointer-only-pass-by-copy-not-implemented-see-other-sections-for-more"><code>T</code>: value is a Win32::API::Struct object, in parameter only, pass by reference (pointer) only, pass by copy not implemented, see other sections for more</dt>
+<dd>
+
+</dd>
+<dt id="K:-value-is-a-Win32::API::Callback-object-in-parameter-only-see-Win32::API::Callback"><code>K</code>: value is a Win32::API::Callback object, in parameter only, (see <a href="../../lib/Win32/API/Callback.html">Win32::API::Callback</a>)</dt>
+<dd>
+
+</dd>
+<dt id="V:-no-value-no-parameters-stands-for-void-may-not-be-combined-with-any-other-letters-equivalent-to-a"><code>V</code>: no value, no parameters, stands for <code>void</code>, may not be combined with any other letters, equivalent to a &quot;&quot;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>For beginners, just skip this paragraph. Note, all parameter types are little endian. This is probably what you want unless the documentation for the C function you are calling explicitly says the parameters must be big endian. If there is no documentation for your C function or no mention of endianess in the documentation, this doesn&#39;t apply to you and skip the rest of this paragraph. There is no inherent support for big endian parameters. Perl&#39;s scalar numbers model is that numeric scalars are effectively opaque and their machine representation is irrelevant. On Windows Perl, scalar numbers are little endian internally. So <code><span class="variable">$number</span> <span class="operator">=</span> <span class="number">5</span><span class="operator">;</span> <span class="keyword">print</span> <span class="string">"</span><span class="variable">$number</span><span class="string">"</span><span class="operator">;</span>
+</code> will put 5 on the screen. <code>$number</code> given to Win32::API will pass little endian integer 5 to the C function call. This is almost surly what you want. If you really must pass a big endian integer, do <code><span class="variable">$number</span> <span class="operator">=</span> <span class="keyword">unpack</span><span class="operator">(</span><span class="string">'L'</span><span class="operator">,</span> <span class="keyword">pack</span><span class="operator">(</span><span class="string">'N'</span><span class="operator">,</span> <span class="number">5</span><span class="operator">));</span>
+</code>, then <code><span class="keyword">print</span> <span class="string">"</span><span class="variable">$number</span><span class="string">"</span><span class="operator">;</span>
+</code> will put 83886080 on the screen, but this is big endian 5, and passing 83886080 to <code>-&gt;Call()</code> will make sure that the C function is getting big endian 5. See <a href="../../lib/pods/perlpacktut.html">perlpacktut</a> for more.</p>
+
+<p>Our function needs two parameters: a number (<code>DWORD</code>) and a pointer to a string (<code>LPSTR</code>):</p>
+
+<pre><code>    $GetTempPath = new Win32::API(&#39;kernel32&#39;, &#39;GetTempPath&#39;, &#39;NP&#39;, ...</code></pre>
+
+</dd>
+<dt id="pod41"><b>4.</b></dt>
+<dd>
+
+<p>The fourth is the type of the value returned by the function. It can be one of the types seen above, plus another type named <b>V</b> (for <code>void</code>), used for functions that do not return a value. In our example the value returned by GetTempPath() is a <code>DWORD</code>, which is a typedef for unsigned long, so our return type will be <b>N</b>:</p>
+
+<pre><code>    <span class="variable">$GetTempPath</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Win32::API::More</span><span class="operator">(</span><span class="string">'kernel32'</span><span class="operator">,</span> <span class="string">'GetTempPath'</span><span class="operator">,</span> <span class="string">'NP'</span><span class="operator">,</span> <span class="string">'N'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Now the line is complete, and the GetTempPath() API is ready to be used in Perl. Before calling it, you should test that $GetTempPath is <a href="../../lib/pods/perlfunc.html#defined">&quot;defined&quot; in perlfunc</a>, otherwise errors such as the function or the library could not be loaded or the C prototype was unparsable happened, and no object was created. If the return value is undefined, to get detailed error status, use <a href="../../lib/pods/perlvar.html#E">&quot;$^E&quot; in perlvar</a> or <a href="../../lib/Win32.html#Win32::GetLastError">Win32::GetLastError</a>. <code>$^E</code> is slower than <code>Win32::GetLastError</code> and useless on Cygwin, but <code>$^E</code> in string context provides a readable description of the error. In numeric context, <code>$^E</code> is equivelent to <code>Win32::GetLastError</code>. <code>Win32::GetLastError</code> always returns an integer error code. You may use <a href="../../lib/Win32.html#Win32::FormatMessage">Win32::FormatMessage</a> to convert an integer error code to a readable description on Cygwin and Native builds of Perl.</p>
+
+<p>Our definition, with error checking added, should then look like this:</p>
+
+<pre><code>    <span class="variable">$GetTempPath</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Win32::API::More</span><span class="operator">(</span><span class="string">'kernel32'</span><span class="operator">,</span> <span class="string">'GetTempPath'</span><span class="operator">,</span> <span class="string">'NP'</span><span class="operator">,</span> <span class="string">'N'</span><span class="operator">);</span>
+    <span class="keyword">if</span><span class="operator">(</span><span class="keyword">not</span> <span class="keyword">defined</span> <span class="variable">$GetTempPath</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">die</span> <span class="string">"Can't import API GetTempPath: $^E\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="CALLING-AN-IMPORTED-FUNCTION">CALLING AN IMPORTED FUNCTION</h2>
+
+<p>To effectively make a call to an imported function you must use the Call() method on the Win32::API object you created. Continuing with the example from the previous paragraph, the GetTempPath() API can be called using the method:</p>
+
+<pre><code>    $GetTempPath-&gt;Call(...</code></pre>
+
+<p>Of course, parameters have to be passed as defined in the import phase. In particular, if the number of parameters does not match (in the example, if GetTempPath() is called with more or less than two parameters), Perl will <code>croak</code> an error message and <code>die</code>.</p>
+
+<p>The two parameters needed here are the length of the buffer that will hold the returned temporary path, and a pointer to the buffer itself. For numerical parameters except for char, you can use either a constant expression or a variable, it will be numified similar to the expression <code>($var+0)</code>. For pointers, also note that <b>memory must be allocated before calling the function</b>, just like in C. For example, to pass a buffer of 80 characters to GetTempPath(), it must be initialized before with:</p>
+
+<pre><code>    <span class="variable">$lpBuffer</span> <span class="operator">=</span> <span class="string">" "</span> <span class="operator">x</span> <span class="number">80</span><span class="operator">;</span>
+</code></pre>
+
+<p>This allocates a string of 80 characters. If you don&#39;t do so, you&#39;ll probably get a fatal buffer overflow error starting in 0.69. The call should therefore include:</p>
+
+<pre><code>    <span class="variable">$lpBuffer</span> <span class="operator">=</span> <span class="string">" "</span> <span class="operator">x</span> <span class="number">80</span><span class="operator">;</span>
+    <span class="variable">$GetTempPath</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="number">80</span><span class="operator">,</span> <span class="variable">$lpBuffer</span><span class="operator">);</span>
+</code></pre>
+
+<p>And the result will be stored in the $lpBuffer variable. Note that you never need to pass a reference to the variable (eg. you <b>don&#39;t need</b> <code>\$lpBuffer</code>), even if its value will be set by the function.</p>
+
+<p>A little problem here is that Perl does not trim the variable, so $lpBuffer will still contain 80 characters in return; the exceeding characters will be spaces, because we said <code>&quot; &quot; x 80</code>.</p>
+
+<p>In this case we&#39;re lucky enough, because the value returned by the GetTempPath() function is the length of the string, so to get the actual temporary path we can write:</p>
+
+<pre><code>    <span class="variable">$lpBuffer</span> <span class="operator">=</span> <span class="string">" "</span> <span class="operator">x</span> <span class="number">80</span><span class="operator">;</span>
+    <span class="variable">$return</span> <span class="operator">=</span> <span class="variable">$GetTempPath</span><span class="operator">-&gt;</span><span class="variable">Call</span><span class="operator">(</span><span class="number">80</span><span class="operator">,</span> <span class="variable">$lpBuffer</span><span class="operator">);</span>
+    <span class="variable">$TempPath</span> <span class="operator">=</span> <span class="keyword">substr</span><span class="operator">(</span><span class="variable">$lpBuffer</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="variable">$return</span><span class="operator">);</span>
+</code></pre>
+
+<p>If you don&#39;t know the length of the string, you can usually cut it at the <code>\0</code> (ASCII zero) character, which is the string delimiter in C:</p>
+
+<pre><code>    <span class="variable">$TempPath</span> <span class="operator">=</span> <span class="operator">((</span><span class="keyword">split</span><span class="operator">(</span><span class="regex">/\0/</span><span class="operator">,</span> <span class="variable">$lpBuffer</span><span class="operator">))</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>  
+    <span class="comment"># or    </span>
+    <span class="variable">$lpBuffer</span> <span class="operator">=~</span> <span class="regex">s/\0.*$//</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="USING-STRUCTURES">USING STRUCTURES</h2>
+
+<p>Starting from version 0.40, Win32::API comes with a support package named Win32::API::Struct. The package is loaded automatically with Win32::API, so you don&#39;t need to use it explicitly.</p>
+
+<p>With this module you can conveniently define structures and use them as parameters to Win32::API functions. A short example follows:</p>
+
+<pre><code>    <span class="comment"># the 'POINT' structure is defined in C as:</span>
+    <span class="comment">#     typedef struct {</span>
+    <span class="comment">#        LONG  x;</span>
+    <span class="comment">#        LONG  y;</span>
+    <span class="comment">#     } POINT;</span>
+    
+    
+    <span class="comment">#### define the structure</span>
+    <span class="variable">Win32::API::Struct</span><span class="operator">-&gt;</span><span class="variable">typedef</span><span class="operator">(</span> <span class="string">POINT</span> <span class="operator">=&gt;</span> <span class="string">qw{
+        LONG x; 
+        LONG y; 
+    }</span><span class="operator">);</span>
+    
+    <span class="comment">#### import an API that uses this structure</span>
+    <span class="variable">Win32::API</span><span class="operator">-&gt;</span><span class="variable">Import</span><span class="operator">(</span><span class="string">'user32'</span><span class="operator">,</span> <span class="string">'BOOL GetCursorPos(LPPOINT lpPoint)'</span><span class="operator">);</span>
+    
+    <span class="comment">#### create a 'POINT' object</span>
+    <span class="keyword">my</span> <span class="variable">$pt</span> <span class="operator">=</span> <span class="variable">Win32::API::Struct</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'POINT'</span><span class="operator">);</span>
+    
+    <span class="comment">#### call the function passing our structure object</span>
+    <span class="variable">GetCursorPos</span><span class="operator">(</span><span class="variable">$pt</span><span class="operator">);</span>
+    
+    <span class="comment">#### and now, access its members</span>
+    <span class="keyword">print</span> <span class="string">"The cursor is at: </span><span class="variable">$pt</span><span class="string">-&gt;{x}, </span><span class="variable">$pt</span><span class="string">-&gt;{y}\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Note that this works only when the function wants a <b>pointer to a structure</b>, not a &quot;pass by copy&quot; structure. As you can see, our structure is named &#39;POINT&#39;, but the API used &#39;LPPOINT&#39;. Some heuristics are done to validate the argument&#39;s type vs the parameter&#39;s type if the function has a C prototype definition (not letter definition). First, if the parameter type starts with the LP prefix, the LP prefix is stripped, then compared to the argument&#39;s type. If that fails, the Win32::API::Type database (see <a href="../../lib/Win32/API/Type.html#typedef">&quot;typedef&quot; in Win32::API::Type</a>) will be used to convert the parameter type to the base type. If that fails, the parameter type will be stripped of a trailing whitespace then a &#39;*&#39;, and then checked against the base type. <a href="../../lib/pods/perlfunc.html#die">Dies</a> if the parameter and argument types do not match after 3 attempts.</p>
+
+<p>For more information, see also <a href="../../lib/Win32/API/Struct.html">Win32::API::Struct</a>.</p>
+
+<p>If you don&#39;t want (or can&#39;t) use the <code>Win32::API::Struct</code> facility, you can still use the low-level approach to use structures:</p>
+
+<ol>
+
+<li><p>you have to <a href="../../lib/pods/perlfunc.html#pack">pack()</a> the required elements in a variable:</p>
+
+<pre><code>    <span class="variable">$lpPoint</span> <span class="operator">=</span> <span class="keyword">pack</span><span class="operator">(</span><span class="string">'ll'</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">0</span><span class="operator">);</span> <span class="comment"># store two LONGs</span>
+</code></pre>
+
+</li>
+<li><p>to access the values stored in a structure, <a href="../../lib/pods/perlfunc.html#unpack">unpack()</a> it as required:</p>
+
+<pre><code>    <span class="operator">(</span><span class="variable">$x</span><span class="operator">,</span> <span class="variable">$y</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">unpack</span><span class="operator">(</span><span class="string">';;'</span><span class="operator">,</span> <span class="variable">$lpPoint</span><span class="operator">);</span> <span class="comment"># get the actual values</span>
+</code></pre>
+
+</li>
+</ol>
+
+<p>The rest is left as an exercise to the reader...</p>
+
+<h2 id="EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</h2>
+
+<h3 id="ReadMemory">ReadMemory</h3>
+
+<pre><code>    <span class="variable">$copy_of_memblock</span> <span class="operator">=</span> <span class="variable">ReadMemory</span><span class="operator">(</span><span class="variable">$SourcePtr</span><span class="operator">,</span> <span class="variable">$length</span><span class="operator">);</span>
+</code></pre>
+
+<p>Reads the source pointer for <code>$length</code> number of bytes. Returns a copy of the memory block in a scalar. No readability checking is done on <code>$SourcePtr</code>. <code>$SourcePtr</code>&#39;s format is 123456, not <code>&quot;\x01\x02\x03\x04&quot;</code>.</p>
+
+<h3 id="WriteMemory">WriteMemory</h3>
+
+<pre><code>    <span class="variable">WriteMemory</span><span class="operator">(</span><span class="variable">$DestPtr</span><span class="operator">,</span> <span class="variable">$sourceScalar</span><span class="operator">,</span> <span class="variable">$length</span><span class="operator">);</span>
+</code></pre>
+
+<p>Copies the string contents of the <code>$sourceScalar</code> scalar to <code>$DestPtr</code> for <code>$length</code> bytes. $length must be less than or equal to the length of <code>$sourceScalar</code>, otherwise the function croaks. No readability checking is done on <code>$DestPtr</code>. <code>$DestPtr</code>&#39;s format is 123456, not <code>&quot;\x01\x02\x03\x04&quot;</code>. Returns nothing.</p>
+
+<h3 id="MoveMemory">MoveMemory</h3>
+
+<pre><code>    <span class="variable">MoveMemory</span><span class="operator">(</span><span class="variable">$destPtr</span><span class="operator">,</span> <span class="variable">$sourcePtr</span><span class="operator">,</span> <span class="variable">$length</span><span class="operator">);</span>
+</code></pre>
+
+<p>Copies a block of memory from one location to another. The source and destination blocks may overlap. All pointers are in the format of 123456, not <code>&quot;\x01\x02\x03\x04&quot;</code>. No readability checking is done. Returns nothing.</p>
+
+<h3 id="IsBadReadPtr">IsBadReadPtr</h3>
+
+<pre><code>    <span class="keyword">if</span><span class="operator">(</span><span class="variable">IsBadReadPtr</span><span class="operator">(</span><span class="variable">$ptr</span><span class="operator">,</span> <span class="variable">$length</span><span class="operator">))</span> <span class="operator">{</span><span class="keyword">die</span> <span class="string">"bad ptr"</span><span class="operator">;}</span>
+</code></pre>
+
+<p>Probes a memory block for <code>$length</code> bytes for readability. Returns true if access violation occurs, otherwise false is returned. This function is useful to avoid dereferencing pointers which will crash the perl process. This function has many limitations, including not detecting uninitialized memory, not detecting freed memory, and not detecting gibberish. It can not tell whether a function pointer is valid x86 machine code. Ideally, you should never use it, or remove it once your code is stable. <code>$ptr</code> is in the format of 123456, not <code>&quot;\x01\x02\x03\x04&quot;</code>. See MS&#39;s documentation for a lot more on this function of the same name.</p>
+
+<h3 id="SafeReadWideCString">SafeReadWideCString</h3>
+
+<pre><code>    <span class="variable">$source</span> <span class="operator">=</span> <span class="variable">Encode::encode</span><span class="operator">(</span><span class="string">"UTF-16LE"</span><span class="operator">,</span><span class="string">"Just another perl h\x{00E2}cker\x00"</span><span class="operator">);</span>
+    <span class="variable">$string</span> <span class="operator">=</span> <span class="variable">SafeReadWideCString</span><span class="operator">(</span><span class="keyword">unpack</span><span class="operator">(</span><span class="string">'J'</span><span class="operator">,</span><span class="keyword">pack</span><span class="operator">(</span><span class="string">'p'</span><span class="operator">,</span> <span class="variable">$source</span><span class="operator">)));</span>
+    <span class="keyword">die</span> <span class="string">"impossible"</span> <span class="keyword">if</span> <span class="variable">$source</span> <span class="keyword">ne</span> <span class="string">"Just another perl h\x{00E2}cker"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Safely (SEH aware) reads a utf-16 wide null terminated string (the first and only parameter), into a scalar. Returns undef, if an access violation happens or null pointer (same thing). The string pointer is in the format of 123456, not <code>&quot;\x01\x02\x03\x04&quot;</code>. The returned scalar will be UTF8 marked if the string can not be represented in the system&#39;s ANSI codepage. Conversion is done with WideCharToMultiByte. Returns a 0 length scalar string if WideCharToMultiByte fails. This function was created because <a href="../../lib/pods/perlfunc.html#pack">pack&#39;s</a> p letter won&#39;t read UTF16 and <a href="#ReadMemory">&quot;ReadMemory&quot;</a> and <a href="#IsBadReadPtr">&quot;IsBadReadPtr&quot;</a> require an explicit length.</p>
+
+<h2 id="CONSTRUCTORS">CONSTRUCTORS</h2>
+
+<h3 id="new">new</h3>
+
+<pre><code>    <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="operator">[</span><span class="variable">$dllname</span> <span class="operator">|</span> <span class="operator">(</span><span class="keyword">undef</span> <span class="operator">,</span> <span class="variable">$funcptr</span><span class="operator">)</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="variable">$c_proto</span> <span class="operator">|</span> <span class="operator">(</span><span class="variable">$in</span><span class="operator">,</span> <span class="variable">$out</span> <span class="operator">[</span><span class="operator">,</span> <span class="variable">$calling_convention</span><span class="operator">]</span><span class="operator">)</span><span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>See <a href="#DESCRIPTION">&quot;DESCRIPTION&quot;</a>.</p>
+
+<h3 id="Import-obj-Win32::API::More-Import-dllname-undef-funcptr-c_proto-in-out-calling_convention">Import $obj = Win32::API::More-&gt;Import([$dllname | (undef , $funcptr)], [$c_proto | ($in, $out [, $calling_convention])]);</h3>
+
+<p>See <a href="#DESCRIPTION">&quot;DESCRIPTION&quot;</a>.</p>
+
+<h2 id="METHODS">METHODS</h2>
+
+<h3 id="Call">Call</h3>
+
+<p>The main method of a Win32::API object. Documented elsewhere in this document.</p>
+
+<h3 id="UseMI64">UseMI64</h3>
+
+<pre><code>    <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$APIObj</span><span class="operator">-&gt;</span><span class="variable">UseMI64</span><span class="operator">();</span>
+    <span class="variable">$oldbool</span> <span class="operator">=</span> <span class="variable">$APIObj</span><span class="operator">-&gt;</span><span class="variable">UseMI64</span><span class="operator">(</span><span class="variable">$newbool</span><span class="operator">);</span>
+</code></pre>
+
+<p>Turns on Quads as <a>Math::Int64</a> objects support for a particular object instance. You must call <a href="../../lib/pods/perlfunc.html#use">&quot;use&quot; in perlfunc</a>/<a href="../../lib/pods/perlfunc.html#require">&quot;require&quot; in perlfunc</a> on Math::Int64 before calling UseMI64. Win32::API does not <code>use</code> Math::Int64 for you. Works on Win32::API and Win32::API::Callback objects. This method does not exist if your Perl natively supports Quads (64 bit Perl for example). Takes 1 optional parameter, which is a true or false value to use or don&#39;t use Math::Int64, returns the old setting, which is a true or false value. If called without any parameters, returns current setting, which is a true or false value, without setting the option. As discussed in <a href="#q">&quot;q&quot;</a>, if you are not using Math::Int64 you must supply/will receive 8 byte scalar strings for quads. For &quot;in&quot; params in Win32::API and Win32::API::More and &quot;out&quot; in Win32::API::Callback only, if the argument is a reference, it will automatically be treated as a Math::Int64 object without having to previously call this function.</p>
+
+<h2 id="VERBOSE-DEBUGGING">VERBOSE DEBUGGING</h2>
+
+<p>If using <code>Win32::GetLastError</code> and <code>$^E</code> does not reveal the problem with your use of Win32::API, you may turn on Win32::API&#39;s very verbose debugging mode as follows</p>
+
+<pre><code>    <span class="keyword">BEGIN</span> <span class="operator">{</span>
+        <span class="variable">$Win32::API::DEBUG</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+    <span class="variable">$function</span> <span class="operator">=</span> <span class="variable">Win32::API::More</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">'mydll'</span><span class="operator">,</span> <span class="string">'int sum_integers(int a, int b)'</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="HISTORY">HISTORY</h1>
+
+<dl>
+
+<dt id="UseMI64-API-change">UseMI64 API change</dt>
+<dd>
+
+<p>Starting in 0.71, UseMI64 on a set returns old value, not previously new value.</p>
+
+</dd>
+<dt id="fork-safe">fork safe</dt>
+<dd>
+
+<p>Starting in 0.71, a Win32::API object can go through a fork and work correctly in the child and parent psuedo-processes. Previously when either psuedo-processes exited, the DLL would be unloaded and the other psuedo-processes would crash if a Call() was done on the object.</p>
+
+</dd>
+<dt id="return-value-signedness">return value signedness</dt>
+<dd>
+
+<p>Prior to 0.69, for numeric integer types, the return scalar was always signed. Unsigned-ness was ignored.</p>
+
+</dd>
+<dt id="shorts">shorts</dt>
+<dd>
+
+<p>Prior to 0.69, shorts were not supported. &#39;S&#39; meant a sturct. To fix this Win32::API::More class was created for 0.69. &#39;S&#39;/&#39;s&#39; now means short, per pack&#39;s letters. Struct has been moved to letter &#39;T&#39;. Win32::API will continue to exist for legacy code.</p>
+
+</dd>
+<dt id="float-return-types">float return types</dt>
+<dd>
+
+<p>Prior to 0.69, if a function had a return type of float, it was silently not called.</p>
+
+</dd>
+<dt id="buffer-overflow-protection">buffer overflow protection</dt>
+<dd>
+
+<p>Introduced in 0.69. If disabling is required, which is highly <b>not recommended</b>, set an environmental variable called WIN32_API_SORRY_I_WAS_AN_IDIOT to 1.</p>
+
+</dd>
+<dt id="automatic-un-pack">automatic un/pack</dt>
+<dd>
+
+<p>Starting with 0.69, when using Win32::API::More, there is automatic un/packing of pointers to numbers-ish things for in parameters when using the C prototype interface.</p>
+
+</dd>
+<dt id="Quads-on-32-bit">Quads on 32 bit</dt>
+<dd>
+
+<p>Added in 0.70.</p>
+
+</dd>
+<dt id="stdcall-vs-__cdecl-checking-on-32-bits">__stdcall vs __cdecl checking on 32 bits</dt>
+<dd>
+
+<p>Added in 0.76_01</p>
+
+</dd>
+<dt id="Import-returns-an-api-obj-on-success-undef-on-failure-instead-of-1-or-0">Import returns an api obj on success, undef on failure, instead of 1 or 0</dt>
+<dd>
+
+<p>Added in 0.76_02</p>
+
+</dd>
+<dt id="checking-for-new-Import-failure-is-broken-and-deprecated">checking <code>$!</code> for <code>new</code>/<code>Import</code> failure is broken and deprecated</dt>
+<dd>
+
+<p>Starting in 0.76_06, due to many bugs with <code>new</code> and <code>Import</code> not setting <a href="../../lib/pods/perlvar.html#pod">&quot;$!&quot; in perlvar</a> or Win32 and C error codes overlapping and Win32 error codes being stringified as different C error codes, checking <code>$!</code> is deprecated and the existing, partial setting of <code>$!</code>, maybe removed in the future. Only check <code>Win32::GetLastError()</code> or <code>$^E</code> to find out why the call failed.</p>
+
+</dd>
+</dl>
+
+<p>See the <code>Changes</code> file for more details, many of which not mentioned here.</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<dl>
+
+<dt id="Unicode-DLL-paths">&nbsp; Unicode DLL paths</dt>
+<dd>
+
+<p>Untested.</p>
+
+</dd>
+<dt id="ithreads">&nbsp; ithreads</dt>
+<dd>
+
+<p>Minimally tested.</p>
+
+</dd>
+<dt id="C-functions-getting-utf8-scalars-vs-byte-scalars">&nbsp; C functions getting utf8 scalars vs byte scalars</dt>
+<dd>
+
+<p>Untested and undefined.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Math::Int64</a></p>
+
+<p><a href="../../lib/Win32/API/Struct.html">Win32::API::Struct</a></p>
+
+<p><a href="../../lib/Win32/API/Type.html">Win32::API::Type</a></p>
+
+<p><a href="../../lib/Win32/API/Callback.html">Win32::API::Callback</a></p>
+
+<p><a href="../../lib/Win32/API/Callback/IATPatch.html">Win32::API::Callback::IATPatch</a></p>
+
+<p><a href="http://homepage.ntlworld.com/jonathan.deboynepollard/FGA/function-calling-conventions.html">http://homepage.ntlworld.com/jonathan.deboynepollard/FGA/function-calling-conventions.html</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Aldo Calpini ( <i>dada@perl.it</i> ).</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<p>Cosimo Streppone ( <i>cosimo@cpan.org</i> )</p>
+
+<h1 id="MAJOR-CONTRIBUTOR">MAJOR CONTRIBUTOR</h1>
+
+<p>Daniel Dragan ( <i>bulkdd@cpan.org</i> )</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>To finally clarify this, <code>Win32::API</code> is OSI-approved free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <a href="http://dev.perl.org/licenses/artistic.html">http://dev.perl.org/licenses/artistic.html</a></p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>All the credits go to Andrea Frosini for the neat assembler trick that makes this thing work. I&#39;ve also used some work by Dave Roth for the prototyping stuff. A big thank you also to Gurusamy Sarathy for his invaluable help in XS development, and to all the Perl community for being what it is.</p>
+
+<p>Cosimo also wants to personally thank everyone that contributed to Win32::API with complaints, emails, patches, RT bug reports and so on.</p>
+
+
+</body>
+
+</html>
+
+

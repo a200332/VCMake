@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#Methods">Methods</a>
+    <ul>
+      <li><a href="#mk_classdata">mk_classdata</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS-and-QUERIES">BUGS and QUERIES</a></li>
+  <li><a href="#COPYRIGHT-and-LICENSE">COPYRIGHT and LICENSE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::Data::Inheritable - Inheritable, overridable class data</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Stuff</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">qw(Class::Data::Inheritable)</span><span class="operator">;</span>
+  
+  <span class="comment"># Set up DataFile as inheritable class data.</span>
+  <span class="variable">Stuff</span><span class="operator">-&gt;</span><span class="variable">mk_classdata</span><span class="operator">(</span><span class="string">'DataFile'</span><span class="operator">);</span>
+  
+  <span class="comment"># Declare the location of the data file for this class.</span>
+  <span class="variable">Stuff</span><span class="operator">-&gt;</span><span class="variable">DataFile</span><span class="operator">(</span><span class="string">'/etc/stuff/data'</span><span class="operator">);</span>
+  
+  <span class="comment"># Or, all in one shot:</span>
+  <span class="variable">Stuff</span><span class="operator">-&gt;</span><span class="variable">mk_classdata</span><span class="operator">(</span><span class="string">DataFile</span> <span class="operator">=&gt;</span> <span class="string">'/etc/stuff/data'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Class::Data::Inheritable is for creating accessor/mutators to class data. That is, if you want to store something about your class as a whole (instead of about a single object). This data is then inherited by your subclasses and can be overriden.</p>
+
+<p>For example:</p>
+
+<pre><code>  <span class="variable">Pere::Ubu</span><span class="operator">-&gt;</span><span class="variable">mk_classdata</span><span class="operator">(</span><span class="string">'Suitcase'</span><span class="operator">);</span>
+</code></pre>
+
+<p>will generate the method Suitcase() in the class Pere::Ubu.</p>
+
+<p>This new method can be used to get and set a piece of class data.</p>
+
+<pre><code>  <span class="variable">Pere::Ubu</span><span class="operator">-&gt;</span><span class="variable">Suitcase</span><span class="operator">(</span><span class="string">'Red'</span><span class="operator">);</span>
+  <span class="variable">$suitcase</span> <span class="operator">=</span> <span class="variable">Pere::Ubu</span><span class="operator">-&gt;</span><span class="variable">Suitcase</span><span class="operator">;</span>
+</code></pre>
+
+<p>The interesting part happens when a class inherits from Pere::Ubu:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Raygun</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">qw(Pere::Ubu)</span><span class="operator">;</span>
+  
+  <span class="comment"># Raygun's suitcase is Red.</span>
+  <span class="variable">$suitcase</span> <span class="operator">=</span> <span class="variable">Raygun</span><span class="operator">-&gt;</span><span class="variable">Suitcase</span><span class="operator">;</span>
+</code></pre>
+
+<p>Raygun inherits its Suitcase class data from Pere::Ubu.</p>
+
+<p>Inheritance of class data works analogous to method inheritance. As long as Raygun does not &quot;override&quot; its inherited class data (by using Suitcase() to set a new value) it will continue to use whatever is set in Pere::Ubu and inherit further changes:</p>
+
+<pre><code>  <span class="comment"># Both Raygun's and Pere::Ubu's suitcases are now Blue</span>
+  <span class="variable">Pere::Ubu</span><span class="operator">-&gt;</span><span class="variable">Suitcase</span><span class="operator">(</span><span class="string">'Blue'</span><span class="operator">);</span>
+</code></pre>
+
+<p>However, should Raygun decide to set its own Suitcase() it has now &quot;overridden&quot; Pere::Ubu and is on its own, just like if it had overriden a method:</p>
+
+<pre><code>  <span class="comment"># Raygun has an orange suitcase, Pere::Ubu's is still Blue.</span>
+  <span class="variable">Raygun</span><span class="operator">-&gt;</span><span class="variable">Suitcase</span><span class="operator">(</span><span class="string">'Orange'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Now that Raygun has overridden Pere::Ubu futher changes by Pere::Ubu no longer effect Raygun.</p>
+
+<pre><code>  <span class="comment"># Raygun still has an orange suitcase, but Pere::Ubu is using Samsonite.</span>
+  <span class="variable">Pere::Ubu</span><span class="operator">-&gt;</span><span class="variable">Suitcase</span><span class="operator">(</span><span class="string">'Samsonite'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="Methods">Methods</h1>
+
+<h2 id="mk_classdata">mk_classdata</h2>
+
+<pre><code>  <span class="variable">Class</span><span class="operator">-&gt;</span><span class="variable">mk_classdata</span><span class="operator">(</span><span class="variable">$data_accessor_name</span><span class="operator">);</span>
+  <span class="variable">Class</span><span class="operator">-&gt;</span><span class="variable">mk_classdata</span><span class="operator">(</span><span class="variable">$data_accessor_name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">);</span>
+</code></pre>
+
+<p>This is a class method used to declare new class data accessors. A new accessor will be created in the Class using the name from $data_accessor_name, and optionally initially setting it to the given value.</p>
+
+<p>To facilitate overriding, mk_classdata creates an alias to the accessor, _field_accessor(). So Suitcase() would have an alias _Suitcase_accessor() that does the exact same thing as Suitcase(). This is useful if you want to alter the behavior of a single accessor yet still get the benefits of inheritable class data. For example.</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> Suitcase </span><span class="operator">{</span>
+      <span class="keyword">my</span><span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">warn</span> <span class="string">"Fashion tragedy"</span> <span class="keyword">if</span> <span class="variable">@_</span> <span class="keyword">and</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="keyword">eq</span> <span class="string">'Plaid'</span><span class="operator">;</span>
+  
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_Suitcase_accessor</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Original code by Damian Conway.</p>
+
+<p>Maintained by Michael G Schwern until September 2005.</p>
+
+<p>Now maintained by Tony Bowden.</p>
+
+<h1 id="BUGS-and-QUERIES">BUGS and QUERIES</h1>
+
+<p>Please direct all correspondence regarding this module to: bug-Class-Data-Inheritable@rt.cpan.org</p>
+
+<h1 id="COPYRIGHT-and-LICENSE">COPYRIGHT and LICENSE</h1>
+
+<p>Copyright (c) 2000-2005, Damian Conway and Michael G Schwern. All Rights Reserved.</p>
+
+<p>This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/pods/perltooc.html">perltooc</a> has a very elaborate discussion of class data in Perl.</p>
+
+
+</body>
+
+</html>
+
+

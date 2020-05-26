@@ -1,0 +1,1136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONSTRUCTORS">CONSTRUCTORS</a>
+    <ul>
+      <li><a href="#path">path</a></li>
+      <li><a href="#new">new</a></li>
+      <li><a href="#cwd">cwd</a></li>
+      <li><a href="#rootdir">rootdir</a></li>
+      <li><a href="#tempfile-tempdir">tempfile, tempdir</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#absolute">absolute</a></li>
+      <li><a href="#append-append_raw-append_utf8">append, append_raw, append_utf8</a></li>
+      <li><a href="#assert">assert</a></li>
+      <li><a href="#basename">basename</a></li>
+      <li><a href="#canonpath">canonpath</a></li>
+      <li><a href="#cached_temp">cached_temp</a></li>
+      <li><a href="#child">child</a></li>
+      <li><a href="#children">children</a></li>
+      <li><a href="#chmod">chmod</a></li>
+      <li><a href="#copy">copy</a></li>
+      <li><a href="#digest">digest</a></li>
+      <li><a href="#dirname-deprecated">dirname (deprecated)</a></li>
+      <li><a href="#edit-edit_raw-edit_utf8">edit, edit_raw, edit_utf8</a></li>
+      <li><a href="#edit_lines-edit_lines_utf8-edit_lines_raw">edit_lines, edit_lines_utf8, edit_lines_raw</a></li>
+      <li><a href="#exists-is_file-is_dir">exists, is_file, is_dir</a></li>
+      <li><a href="#filehandle">filehandle</a></li>
+      <li><a href="#is_absolute-is_relative">is_absolute, is_relative</a></li>
+      <li><a href="#is_rootdir">is_rootdir</a></li>
+      <li><a href="#iterator">iterator</a></li>
+      <li><a href="#lines-lines_raw-lines_utf8">lines, lines_raw, lines_utf8</a></li>
+      <li><a href="#mkpath">mkpath</a></li>
+      <li><a href="#move">move</a></li>
+      <li><a href="#openr-openw-openrw-opena">openr, openw, openrw, opena</a></li>
+      <li><a href="#parent">parent</a></li>
+      <li><a href="#realpath">realpath</a></li>
+      <li><a href="#relative">relative</a></li>
+      <li><a href="#remove">remove</a></li>
+      <li><a href="#remove_tree">remove_tree</a></li>
+      <li><a href="#sibling">sibling</a></li>
+      <li><a href="#slurp-slurp_raw-slurp_utf8">slurp, slurp_raw, slurp_utf8</a></li>
+      <li><a href="#spew-spew_raw-spew_utf8">spew, spew_raw, spew_utf8</a></li>
+      <li><a href="#stat-lstat">stat, lstat</a></li>
+      <li><a href="#stringify">stringify</a></li>
+      <li><a href="#subsumes">subsumes</a></li>
+      <li><a href="#touch">touch</a></li>
+      <li><a href="#touchpath">touchpath</a></li>
+      <li><a href="#visit">visit</a></li>
+      <li><a href="#volume">volume</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXCEPTION-HANDLING">EXCEPTION HANDLING</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a>
+    <ul>
+      <li><a href="#Subclassing-not-supported">Subclassing not supported</a></li>
+      <li><a href="#File-locking">File locking</a>
+        <ul>
+          <li><a href="#NFS-and-BSD">NFS and BSD</a></li>
+          <li><a href="#AIX-and-locking">AIX and locking</a></li>
+        </ul>
+      </li>
+      <li><a href="#utf8-vs-UTF-8">utf8 vs UTF-8</a></li>
+      <li><a href="#Default-IO-layers-and-the-open-pragma">Default IO layers and the open pragma</a></li>
+    </ul>
+  </li>
+  <li><a href="#TYPE-CONSTRAINTS-AND-COERCION">TYPE CONSTRAINTS AND COERCION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a>
+    <ul>
+      <li><a href="#Bugs-Feature-Requests">Bugs / Feature Requests</a></li>
+      <li><a href="#Source-Code">Source Code</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Path::Tiny - File path utility</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.104</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Path::Tiny</span><span class="operator">;</span>
+  
+  <span class="comment"># creating Path::Tiny objects</span>
+  
+  <span class="variable">$dir</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">);</span>
+  <span class="variable">$foo</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">);</span>
+  
+  <span class="variable">$subdir</span> <span class="operator">=</span> <span class="variable">$dir</span><span class="operator">-&gt;</span><span class="variable">child</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">);</span>
+  <span class="variable">$bar</span> <span class="operator">=</span> <span class="variable">$subdir</span><span class="operator">-&gt;</span><span class="variable">child</span><span class="operator">(</span><span class="string">"bar.txt"</span><span class="operator">);</span>
+  
+  <span class="comment"># stringifies as cleaned up path</span>
+  
+  <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"./foo.txt"</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$file</span><span class="operator">;</span> <span class="comment"># "foo.txt"</span>
+  
+  <span class="comment"># reading files</span>
+  
+  <span class="variable">$guts</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+  <span class="variable">$guts</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">slurp_utf8</span><span class="operator">;</span>
+  
+  <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">lines</span><span class="operator">;</span>
+  <span class="variable">@lines</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">lines_utf8</span><span class="operator">;</span>
+  
+  <span class="operator">(</span><span class="variable">$head</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">lines</span><span class="operator">(</span> <span class="operator">{</span><span class="string">count</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span> <span class="operator">);</span>
+  <span class="operator">(</span><span class="variable">$tail</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$file</span><span class="operator">-&gt;</span><span class="variable">lines</span><span class="operator">(</span> <span class="operator">{</span><span class="string">count</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">1</span><span class="operator">}</span> <span class="operator">);</span>
+  
+  <span class="comment"># writing files</span>
+  
+  <span class="variable">$bar</span><span class="operator">-&gt;</span><span class="variable">spew</span><span class="operator">(</span> <span class="variable">@data</span> <span class="operator">);</span>
+  <span class="variable">$bar</span><span class="operator">-&gt;</span><span class="variable">spew_utf8</span><span class="operator">(</span> <span class="variable">@data</span> <span class="operator">);</span>
+  
+  <span class="comment"># reading directories</span>
+  
+  <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">$dir</span><span class="operator">-&gt;</span><span class="variable">children</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+  
+  <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$dir</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+  <span class="keyword">while</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$next</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;()</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a small, fast utility for working with file paths. It is friendlier to use than <a href="../../lib/File/Spec.html">File::Spec</a> and provides easy access to functions from several other core file handling modules. It aims to be smaller and faster than many alternatives on CPAN, while helping people do many common things in consistent and less error-prone ways.</p>
+
+<p>Path::Tiny does not try to work for anything except Unix-like and Win32 platforms. Even then, it might break if you try something particularly obscure or tortuous. (Quick! What does this mean: <code>///../../..//./././a//b/.././c/././</code>? And how does it differ on Win32?)</p>
+
+<p>All paths are forced to have Unix-style forward slashes. Stringifying the object gives you back the path (after some clean up).</p>
+
+<p>File input/output methods <code>flock</code> handles before reading or writing, as appropriate (if supported by the platform).</p>
+
+<p>The <code>*_utf8</code> methods (<code>slurp_utf8</code>, <code>lines_utf8</code>, etc.) operate in raw mode. On Windows, that means they will not have CRLF translation from the <code>:crlf</code> IO layer. Installing <a>Unicode::UTF8</a> 0.58 or later will speed up <code>*_utf8</code> situations in many cases and is highly recommended. Alternatively, installing <a>PerlIO::utf8_strict</a> 0.003 or later will be used in place of the default <code>:encoding(UTF-8)</code>.</p>
+
+<p>This module depends heavily on PerlIO layers for correct operation and thus requires Perl 5.008001 or later.</p>
+
+<h1 id="CONSTRUCTORS">CONSTRUCTORS</h1>
+
+<h2 id="path">path</h2>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">);</span>
+    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">,</span> <span class="string">"file.txt"</span><span class="operator">);</span> <span class="comment"># list</span>
+    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"."</span><span class="operator">);</span>                <span class="comment"># cwd</span>
+    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"~user/file.txt"</span><span class="operator">);</span>   <span class="comment"># tilde processing</span>
+</code></pre>
+
+<p>Constructs a <code>Path::Tiny</code> object. It doesn&#39;t matter if you give a file or directory path. It&#39;s still up to you to call directory-like methods only on directories and file-like methods only on files. This function is exported automatically by default.</p>
+
+<p>The first argument must be defined and have non-zero length or an exception will be thrown. This prevents subtle, dangerous errors with code like <code>path( maybe_undef() )-&gt;remove_tree</code>.</p>
+
+<p>If the first component of the path is a tilde (&#39;~&#39;) then the component will be replaced with the output of <code>glob(&#39;~&#39;)</code>. If the first component of the path is a tilde followed by a user name then the component will be replaced with output of <code>glob(&#39;~username&#39;)</code>. Behaviour for non-existent users depends on the output of <code>glob</code> on the system.</p>
+
+<p>On Windows, if the path consists of a drive identifier without a path component (<code>C:</code> or <code>D:</code>), it will be expanded to the absolute path of the current directory on that volume using <code>Cwd::getdcwd()</code>.</p>
+
+<p>If called with a single <code>Path::Tiny</code> argument, the original is returned unless the original is holding a temporary file or directory reference in which case a stringified copy is made.</p>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">);</span>
+    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">tempfile</span><span class="operator">;</span>
+    
+    <span class="variable">$p2</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="variable">$path</span><span class="operator">);</span> <span class="comment"># like $p2 = $path</span>
+    <span class="variable">$t2</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="variable">$temp</span><span class="operator">);</span> <span class="comment"># like $t2 = path( "$temp" )</span>
+</code></pre>
+
+<p>This optimizes copies without proliferating references unexpectedly if a copy is made by code outside your control.</p>
+
+<p>Current API available since 0.017.</p>
+
+<h2 id="new">new</h2>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">);</span>
+</code></pre>
+
+<p>This is just like <code>path</code>, but with method call overhead. (Why would you do that?)</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="cwd">cwd</h2>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">cwd</span><span class="operator">;</span> <span class="comment"># path( Cwd::getcwd )</span>
+    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">cwd</span><span class="operator">;</span> <span class="comment"># optional export</span>
+</code></pre>
+
+<p>Gives you the absolute path to the current directory as a <code>Path::Tiny</code> object. This is slightly faster than <code>path(&quot;.&quot;)-&gt;absolute</code>.</p>
+
+<p><code>cwd</code> may be exported on request and used as a function instead of as a method.</p>
+
+<p>Current API available since 0.018.</p>
+
+<h2 id="rootdir">rootdir</h2>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">rootdir</span><span class="operator">;</span> <span class="comment"># /</span>
+    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">rootdir</span><span class="operator">;</span>             <span class="comment"># optional export </span>
+</code></pre>
+
+<p>Gives you <code>File::Spec-&gt;rootdir</code> as a <code>Path::Tiny</code> object if you&#39;re too picky for <code>path(&quot;/&quot;)</code>.</p>
+
+<p><code>rootdir</code> may be exported on request and used as a function instead of as a method.</p>
+
+<p>Current API available since 0.018.</p>
+
+<h2 id="tempfile-tempdir">tempfile, tempdir</h2>
+
+<pre><code>    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">tempfile</span><span class="operator">(</span> <span class="variable">@options</span> <span class="operator">);</span>
+    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">tempdir</span><span class="operator">(</span> <span class="variable">@options</span> <span class="operator">);</span>
+    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">tempfile</span><span class="operator">(</span> <span class="variable">@options</span> <span class="operator">);</span> <span class="comment"># optional export</span>
+    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">tempdir</span><span class="operator">(</span> <span class="variable">@options</span> <span class="operator">);</span>  <span class="comment"># optional export</span>
+</code></pre>
+
+<p><code>tempfile</code> passes the options to <code>File::Temp-&gt;new</code> and returns a <code>Path::Tiny</code> object with the file name. The <code>TMPDIR</code> option is enabled by default.</p>
+
+<p>The resulting <code>File::Temp</code> object is cached. When the <code>Path::Tiny</code> object is destroyed, the <code>File::Temp</code> object will be as well.</p>
+
+<p><code>File::Temp</code> annoyingly requires you to specify a custom template in slightly different ways depending on which function or method you call, but <code>Path::Tiny</code> lets you ignore that and can take either a leading template or a <code>TEMPLATE</code> option and does the right thing.</p>
+
+<pre><code>    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">tempfile</span><span class="operator">(</span> <span class="string">"customXXXXXXXX"</span> <span class="operator">);</span>             <span class="comment"># ok</span>
+    <span class="variable">$temp</span> <span class="operator">=</span> <span class="variable">Path::Tiny</span><span class="operator">-&gt;</span><span class="variable">tempfile</span><span class="operator">(</span> <span class="string">TEMPLATE</span> <span class="operator">=&gt;</span> <span class="string">"customXXXXXXXX"</span> <span class="operator">);</span> <span class="comment"># ok</span>
+</code></pre>
+
+<p>The tempfile path object will be normalized to have an absolute path, even if created in a relative directory using <code>DIR</code>. If you want it to have the <code>realpath</code> instead, pass a leading options hash like this:</p>
+
+<pre><code>    <span class="variable">$real_temp</span> <span class="operator">=</span> <span class="variable">tempfile</span><span class="operator">(</span><span class="operator">{</span><span class="string">realpath</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">@options</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>tempdir</code> is just like <code>tempfile</code>, except it calls <code>File::Temp-&gt;newdir</code> instead.</p>
+
+<p>Both <code>tempfile</code> and <code>tempdir</code> may be exported on request and used as functions instead of as methods.</p>
+
+<p><b>Note</b>: for tempfiles, the filehandles from File::Temp are closed and not reused. This is not as secure as using File::Temp handles directly, but is less prone to deadlocks or access problems on some platforms. Think of what <code>Path::Tiny</code> gives you to be just a temporary file <b>name</b> that gets cleaned up.</p>
+
+<p><b>Note 2</b>: if you don&#39;t want these cleaned up automatically when the object is destroyed, File::Temp requires different options for directories and files. Use <code>CLEANUP =&gt; 0</code> for directories and <code>UNLINK =&gt; 0</code> for files.</p>
+
+<p><b>Note 3</b>: Don&#39;t lose the temporary object by chaining a method call instead of storing it:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$lost</span> <span class="operator">=</span> <span class="variable">tempdir</span><span class="operator">()-&gt;</span><span class="variable">child</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">);</span> <span class="comment"># tempdir cleaned up right away</span>
+</code></pre>
+
+<p><b>Note 4</b>: The cached object may be accessed with the <a href="#cached_temp">&quot;cached_temp&quot;</a> method. Keeping a reference to, or modifying the cached object may break the behavior documented above and is not supported. Use at your own risk.</p>
+
+<p>Current API available since 0.097.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="absolute">absolute</h2>
+
+<pre><code>    <span class="variable">$abs</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">absolute</span><span class="operator">;</span>
+    <span class="variable">$abs</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">absolute</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns a new <code>Path::Tiny</code> object with an absolute path (or itself if already absolute). If no argument is given, the current directory is used as the absolute base path. If an argument is given, it will be converted to an absolute path (if it is not already) and used as the absolute base path.</p>
+
+<p>This will not resolve upward directories (&quot;foo/../bar&quot;) unless <code>canonpath</code> in <a href="../../lib/File/Spec.html">File::Spec</a> would normally do so on your platform. If you need them resolved, you must call the more expensive <code>realpath</code> method instead.</p>
+
+<p>On Windows, an absolute path without a volume component will have it added based on the current drive.</p>
+
+<p>Current API available since 0.101.</p>
+
+<h2 id="append-append_raw-append_utf8">append, append_raw, append_utf8</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">append</span><span class="operator">(</span><span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">append</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">append</span><span class="operator">(</span><span class="operator">{</span><span class="string">binmode</span> <span class="operator">=&gt;</span> <span class="string">":raw"</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">append_raw</span><span class="operator">(</span><span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">append_utf8</span><span class="operator">(</span><span class="variable">@data</span><span class="operator">);</span>
+</code></pre>
+
+<p>Appends data to a file. The file is locked with <code>flock</code> prior to writing. An optional hash reference may be used to pass options. Valid options are:</p>
+
+<ul>
+
+<li><p><code>binmode</code>: passed to <code>binmode()</code> on the handle used for writing.</p>
+
+</li>
+<li><p><code>truncate</code>: truncates the file after locking and before appending</p>
+
+</li>
+</ul>
+
+<p>The <code>truncate</code> option is a way to replace the contents of a file <b>in place</b>, unlike <a href="#spew">&quot;spew&quot;</a> which writes to a temporary file and then replaces the original (if it exists).</p>
+
+<p><code>append_raw</code> is like <code>append</code> with a <code>binmode</code> of <code>:unix</code> for fast, unbuffered, raw write.</p>
+
+<p><code>append_utf8</code> is like <code>append</code> with a <code>binmode</code> of <code>:unix:encoding(UTF-8)</code> (or <a>PerlIO::utf8_strict</a>). If <a>Unicode::UTF8</a> 0.58+ is installed, a raw append will be done instead on the data encoded with <code>Unicode::UTF8</code>.</p>
+
+<p>Current API available since 0.060.</p>
+
+<h2 id="assert">assert</h2>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">assert</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">exists</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns the invocant after asserting that a code reference argument returns true. When the assertion code reference runs, it will have the invocant object in the <code>$_</code> variable. If it returns false, an exception will be thrown. The assertion code reference may also throw its own exception.</p>
+
+<p>If no assertion is provided, the invocant is returned without error.</p>
+
+<p>Current API available since 0.062.</p>
+
+<h2 id="basename">basename</h2>
+
+<pre><code>    <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar.txt"</span><span class="operator">)-&gt;</span><span class="variable">basename</span><span class="operator">;</span>        <span class="comment"># bar.txt</span>
+    <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">basename</span><span class="operator">(</span><span class="string">'.txt'</span><span class="operator">);</span>    <span class="comment"># foo</span>
+    <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">basename</span><span class="operator">(</span><span class="string">qr/.txt/</span><span class="operator">);</span>  <span class="comment"># foo</span>
+    <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">basename</span><span class="operator">(</span><span class="variable">@suffixes</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns the file portion or last directory portion of a path.</p>
+
+<p>Given a list of suffixes as strings or regular expressions, any that match at the end of the file portion or last directory portion will be removed before the result is returned.</p>
+
+<p>Current API available since 0.054.</p>
+
+<h2 id="canonpath">canonpath</h2>
+
+<pre><code>    <span class="variable">$canonical</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">canonpath</span><span class="operator">;</span> <span class="comment"># foo\bar on Windows</span>
+</code></pre>
+
+<p>Returns a string with the canonical format of the path name for the platform. In particular, this means directory separators will be <code>\</code> on Windows.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="cached_temp">cached_temp</h2>
+
+<p>Returns the cached <code>File::Temp</code> or <code>File::Temp::Dir</code> object if the <code>Path::Tiny</code> object was created with <code>/tempfile</code> or <code>/tempdir</code>. If there is no such object, this method throws.</p>
+
+<p><b>WARNING</b>: Keeping a reference to, or modifying the cached object may break the behavior documented for temporary files and directories created with <code>Path::Tiny</code> and is not supported. Use at your own risk.</p>
+
+<p>Current API available since 0.101.</p>
+
+<h2 id="child">child</h2>
+
+<pre><code>    <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">child</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">);</span> <span class="comment"># "/tmp/foo.txt"</span>
+    <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">child</span><span class="operator">(</span><span class="variable">@parts</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns a new <code>Path::Tiny</code> object relative to the original. Works like <code>catfile</code> or <code>catdir</code> from File::Spec, but without caring about file or directories.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="children">children</h2>
+
+<pre><code>    <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">children</span><span class="operator">;</span>
+    <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">children</span><span class="operator">(</span> <span class="string">qr/\.txt$/</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns a list of <code>Path::Tiny</code> objects for all files and directories within a directory. Excludes &quot;.&quot; and &quot;..&quot; automatically.</p>
+
+<p>If an optional <code>qr//</code> argument is provided, it only returns objects for child names that match the given regular expression. Only the base name is used for matching:</p>
+
+<pre><code>    <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">children</span><span class="operator">(</span> <span class="string">qr/^foo/</span> <span class="operator">);</span>
+    <span class="comment"># matches children like the glob foo*</span>
+</code></pre>
+
+<p>Current API available since 0.028.</p>
+
+<h2 id="chmod">chmod</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">chmod</span><span class="operator">(</span><span class="number">0777</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">chmod</span><span class="operator">(</span><span class="string">"0755"</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">chmod</span><span class="operator">(</span><span class="string">"go-w"</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">chmod</span><span class="operator">(</span><span class="string">"a=r,u+wx"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Sets file or directory permissions. The argument can be a numeric mode, a octal string beginning with a &quot;0&quot; or a limited subset of the symbolic mode use by <i>/bin/chmod</i>.</p>
+
+<p>The symbolic mode must be a comma-delimited list of mode clauses. Clauses must match <code>qr/\A([augo]+)([=+-])([rwx]+)\z/</code>, which defines &quot;who&quot;, &quot;op&quot; and &quot;perms&quot; parameters for each clause. Unlike <i>/bin/chmod</i>, all three parameters are required for each clause, multiple ops are not allowed and permissions <code>stugoX</code> are not supported. (See <a>File::chmod</a> for more complex needs.)</p>
+
+<p>Current API available since 0.053.</p>
+
+<h2 id="copy">copy</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">copy</span><span class="operator">(</span><span class="string">"/tmp/bar.txt"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Copies the current path to the given destination using <a href="../../lib/File/Copy.html">File::Copy</a>&#39;s <code>copy</code> function. Upon success, returns the <code>Path::Tiny</code> object for the newly copied file.</p>
+
+<p>Current API available since 0.070.</p>
+
+<h2 id="digest">digest</h2>
+
+<pre><code>    <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">digest</span><span class="operator">;</span>        <span class="comment"># SHA-256</span>
+    <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">digest</span><span class="operator">(</span><span class="string">"MD5"</span><span class="operator">);</span> <span class="comment"># user-selected</span>
+    <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">digest</span><span class="operator">(</span> <span class="operator">{</span> <span class="string">chunk_size</span> <span class="operator">=&gt;</span> <span class="number">1e6</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">"MD5"</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns a hexadecimal digest for a file. An optional hash reference of options may be given. The only option is <code>chunk_size</code>. If <code>chunk_size</code> is given, that many bytes will be read at a time. If not provided, the entire file will be slurped into memory to compute the digest.</p>
+
+<p>Any subsequent arguments are passed to the constructor for <a href="../../lib/Digest.html">Digest</a> to select an algorithm. If no arguments are given, the default is SHA-256.</p>
+
+<p>Current API available since 0.056.</p>
+
+<h2 id="dirname-deprecated">dirname (deprecated)</h2>
+
+<pre><code>    <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">dirname</span><span class="operator">;</span> <span class="comment"># "/tmp/"</span>
+</code></pre>
+
+<p>Returns the directory portion you would get from calling <code>File::Spec-&gt;splitpath( $path-&gt;stringify )</code> or <code>&quot;.&quot;</code> for a path without a parent directory portion. Because <a href="../../lib/File/Spec.html">File::Spec</a> is inconsistent, the result might or might not have a trailing slash. Because of this, this method is <b>deprecated</b>.</p>
+
+<p>A better, more consistently approach is likely <code>$path-&gt;parent-&gt;stringify</code>, which will not have a trailing slash except for a root directory.</p>
+
+<p>Deprecated in 0.056.</p>
+
+<h2 id="edit-edit_raw-edit_utf8">edit, edit_raw, edit_utf8</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">edit</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span><span class="operator">,</span> <span class="variable">$options</span> <span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">edit_utf8</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span> <span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">edit_raw</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span> <span class="operator">);</span>
+</code></pre>
+
+<p>These are convenience methods that allow &quot;editing&quot; a file using a single callback argument. They slurp the file using <code>slurp</code>, place the contents inside a localized <code>$_</code> variable, call the callback function (without arguments), and then write <code>$_</code> (presumably mutated) back to the file with <code>spew</code>.</p>
+
+<p>An optional hash reference may be used to pass options. The only option is <code>binmode</code>, which is passed to <code>slurp</code> and <code>spew</code>.</p>
+
+<p><code>edit_utf8</code> and <code>edit_raw</code> act like their respective <code>slurp_*</code> and <code>spew_*</code> methods.</p>
+
+<p>Current API available since 0.077.</p>
+
+<h2 id="edit_lines-edit_lines_utf8-edit_lines_raw">edit_lines, edit_lines_utf8, edit_lines_raw</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">edit_lines</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span><span class="operator">,</span> <span class="variable">$options</span> <span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">edit_lines_utf8</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span> <span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">edit_lines_raw</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span> <span class="operator">);</span>
+</code></pre>
+
+<p>These are convenience methods that allow &quot;editing&quot; a file&#39;s lines using a single callback argument. They iterate over the file: for each line, the line is put into a localized <code>$_</code> variable, the callback function is executed (without arguments) and then <code>$_</code> is written to a temporary file. When iteration is finished, the temporary file is atomically renamed over the original.</p>
+
+<p>An optional hash reference may be used to pass options. The only option is <code>binmode</code>, which is passed to the method that open handles for reading and writing.</p>
+
+<p><code>edit_lines_utf8</code> and <code>edit_lines_raw</code> act like their respective <code>slurp_*</code> and <code>spew_*</code> methods.</p>
+
+<p>Current API available since 0.077.</p>
+
+<h2 id="exists-is_file-is_dir">exists, is_file, is_dir</h2>
+
+<pre><code>    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">exists</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>     <span class="comment"># -e</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">is_dir</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>     <span class="comment"># -d</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">is_file</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>    <span class="comment"># -e &amp;&amp; ! -d</span>
+</code></pre>
+
+<p>Implements file test operations, this means the file or directory actually has to exist on the filesystem. Until then, it&#39;s just a path.</p>
+
+<p><b>Note</b>: <code>is_file</code> is not <code>-f</code> because <code>-f</code> is not the opposite of <code>-d</code>. <code>-f</code> means &quot;plain file&quot;, excluding symlinks, devices, etc. that often can be read just like files.</p>
+
+<p>Use <code>-f</code> instead if you really mean to check for a plain file.</p>
+
+<p>Current API available since 0.053.</p>
+
+<h2 id="filehandle">filehandle</h2>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">filehandle</span><span class="operator">(</span><span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$binmode</span><span class="operator">);</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">filehandle</span><span class="operator">(</span><span class="operator">{</span> <span class="string">locked</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$binmode</span><span class="operator">);</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">filehandle</span><span class="operator">(</span><span class="operator">{</span> <span class="string">exclusive</span> <span class="operator">=&gt;</span> <span class="number">1</span>  <span class="operator">}</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$binmode</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns an open file handle. The <code>$mode</code> argument must be a Perl-style read/write mode string (&quot;&lt;&quot; ,&quot;&gt;&quot;, &quot;&gt;&gt;&quot;, etc.). If a <code>$binmode</code> is given, it is set during the <code>open</code> call.</p>
+
+<p>An optional hash reference may be used to pass options.</p>
+
+<p>The <code>locked</code> option governs file locking; if true, handles opened for writing, appending or read-write are locked with <code>LOCK_EX</code>; otherwise, they are locked with <code>LOCK_SH</code>. When using <code>locked</code>, &quot;&gt;&quot; or &quot;+&gt;&quot; modes will delay truncation until after the lock is acquired.</p>
+
+<p>The <code>exclusive</code> option causes the open() call to fail if the file already exists. This corresponds to the O_EXCL flag to sysopen / open(2). <code>exclusive</code> implies <code>locked</code> and will set it for you if you forget it.</p>
+
+<p>See <code>openr</code>, <code>openw</code>, <code>openrw</code>, and <code>opena</code> for sugar.</p>
+
+<p>Current API available since 0.066.</p>
+
+<h2 id="is_absolute-is_relative">is_absolute, is_relative</h2>
+
+<pre><code>    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">is_absolute</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">is_relative</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Booleans for whether the path appears absolute or relative.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="is_rootdir">is_rootdir</h2>
+
+<pre><code>    <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">!</span> <span class="variable">$path</span><span class="operator">-&gt;</span><span class="variable">is_rootdir</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">$path</span><span class="operator">-&gt;</span><span class="variable">parent</span><span class="operator">;</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Boolean for whether the path is the root directory of the volume. I.e. the <code>dirname</code> is <code>q[/]</code> and the <code>basename</code> is <code>q[]</code>.</p>
+
+<p>This works even on <code>MSWin32</code> with drives and UNC volumes:</p>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"C:/"</span><span class="operator">)-&gt;</span><span class="variable">is_rootdir</span><span class="operator">;</span>             <span class="comment"># true</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"//server/share/"</span><span class="operator">)-&gt;</span><span class="variable">is_rootdir</span><span class="operator">;</span> <span class="comment">#true</span>
+</code></pre>
+
+<p>Current API available since 0.038.</p>
+
+<h2 id="iterator">iterator</h2>
+
+<pre><code>    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">iterator</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">%options</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns a code reference that walks a directory lazily. Each invocation returns a <code>Path::Tiny</code> object or undef when the iterator is exhausted.</p>
+
+<pre><code>    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;()</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The current and parent directory entries (&quot;.&quot; and &quot;..&quot;) will not be included.</p>
+
+<p>If the <code>recurse</code> option is true, the iterator will walk the directory recursively, breadth-first. If the <code>follow_symlinks</code> option is also true, directory links will be followed recursively. There is no protection against loops when following links. If a directory is not readable, it will not be followed.</p>
+
+<p>The default is the same as:</p>
+
+<pre><code>    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">iterator</span><span class="operator">(</span> <span class="operator">{</span>
+        <span class="string">recurse</span>         <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+        <span class="string">follow_symlinks</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+    <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>For a more powerful, recursive iterator with built-in loop avoidance, see <a>Path::Iterator::Rule</a>.</p>
+
+<p>See also <a href="#visit">&quot;visit&quot;</a>.</p>
+
+<p>Current API available since 0.016.</p>
+
+<h2 id="lines-lines_raw-lines_utf8">lines, lines_raw, lines_utf8</h2>
+
+<pre><code>    <span class="variable">@contents</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">lines</span><span class="operator">;</span>
+    <span class="variable">@contents</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">lines</span><span class="operator">(\</span><span class="variable">%options</span><span class="operator">);</span>
+    <span class="variable">@contents</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">lines_raw</span><span class="operator">;</span>
+    <span class="variable">@contents</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">lines_utf8</span><span class="operator">;</span>
+    
+    <span class="variable">@contents</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">lines</span><span class="operator">(</span> <span class="operator">{</span> <span class="string">chomp</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">count</span> <span class="operator">=&gt;</span> <span class="number">4</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns a list of lines from a file. Optionally takes a hash-reference of options. Valid options are <code>binmode</code>, <code>count</code> and <code>chomp</code>.</p>
+
+<p>If <code>binmode</code> is provided, it will be set on the handle prior to reading.</p>
+
+<p>If a positive <code>count</code> is provided, that many lines will be returned from the start of the file. If a negative <code>count</code> is provided, the entire file will be read, but only <code>abs(count)</code> will be kept and returned. If <code>abs(count)</code> exceeds the number of lines in the file, all lines will be returned.</p>
+
+<p>If <code>chomp</code> is set, any end-of-line character sequences (<code>CR</code>, <code>CRLF</code>, or <code>LF</code>) will be removed from the lines returned.</p>
+
+<p>Because the return is a list, <code>lines</code> in scalar context will return the number of lines (and throw away the data).</p>
+
+<pre><code>    <span class="variable">$number_of_lines</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">lines</span><span class="operator">;</span>
+</code></pre>
+
+<p><code>lines_raw</code> is like <code>lines</code> with a <code>binmode</code> of <code>:raw</code>. We use <code>:raw</code> instead of <code>:unix</code> so PerlIO buffering can manage reading by line.</p>
+
+<p><code>lines_utf8</code> is like <code>lines</code> with a <code>binmode</code> of <code>:raw:encoding(UTF-8)</code> (or <a>PerlIO::utf8_strict</a>). If <a>Unicode::UTF8</a> 0.58+ is installed, a raw UTF-8 slurp will be done and then the lines will be split. This is actually faster than relying on <code>:encoding(UTF-8)</code>, though a bit memory intensive. If memory use is a concern, consider <code>openr_utf8</code> and iterating directly on the handle.</p>
+
+<p>Current API available since 0.065.</p>
+
+<h2 id="mkpath">mkpath</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">mkpath</span><span class="operator">;</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">mkpath</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">%options</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Like calling <code>make_path</code> from <a href="../../lib/File/Path.html">File::Path</a>. An optional hash reference is passed through to <code>make_path</code>. Errors will be trapped and an exception thrown. Returns the list of directories created or an empty list if the directories already exist, just like <code>make_path</code>.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="move">move</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">move</span><span class="operator">(</span><span class="string">"bar.txt"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Move the current path to the given destination path using Perl&#39;s built-in <a href="../../lib/pods/perlfunc.html#rename">rename</a> function. Returns the result of the <code>rename</code> function.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="openr-openw-openrw-opena">openr, openw, openrw, opena</h2>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openr</span><span class="operator">(</span><span class="variable">$binmode</span><span class="operator">);</span>  <span class="comment"># read</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openr_raw</span><span class="operator">;</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openr_utf8</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openw</span><span class="operator">(</span><span class="variable">$binmode</span><span class="operator">);</span>  <span class="comment"># write</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openw_raw</span><span class="operator">;</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openw_utf8</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">opena</span><span class="operator">(</span><span class="variable">$binmode</span><span class="operator">);</span>  <span class="comment"># append</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">opena_raw</span><span class="operator">;</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">opena_utf8</span><span class="operator">;</span>
+    
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openrw</span><span class="operator">(</span><span class="variable">$binmode</span><span class="operator">);</span> <span class="comment"># read/write</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openrw_raw</span><span class="operator">;</span>
+    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openrw_utf8</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns a file handle opened in the specified mode. The <code>openr</code> style methods take a single <code>binmode</code> argument. All of the <code>open*</code> methods have <code>open*_raw</code> and <code>open*_utf8</code> equivalents that use <code>:raw</code> and <code>:raw:encoding(UTF-8)</code>, respectively.</p>
+
+<p>An optional hash reference may be used to pass options. The only option is <code>locked</code>. If true, handles opened for writing, appending or read-write are locked with <code>LOCK_EX</code>; otherwise, they are locked for <code>LOCK_SH</code>.</p>
+
+<pre><code>    <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">openrw_utf8</span><span class="operator">(</span> <span class="operator">{</span> <span class="string">locked</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>See <a href="#filehandle">&quot;filehandle&quot;</a> for more on locking.</p>
+
+<p>Current API available since 0.011.</p>
+
+<h2 id="parent">parent</h2>
+
+<pre><code>    <span class="variable">$parent</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">parent</span><span class="operator">;</span> <span class="comment"># foo/bar</span>
+    <span class="variable">$parent</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/wibble.txt"</span><span class="operator">)-&gt;</span><span class="variable">parent</span><span class="operator">;</span> <span class="comment"># foo</span>
+    
+    <span class="variable">$parent</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">parent</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span> <span class="comment"># foo</span>
+</code></pre>
+
+<p>Returns a <code>Path::Tiny</code> object corresponding to the parent directory of the original directory or file. An optional positive integer argument is the number of parent directories upwards to return. <code>parent</code> by itself is equivalent to <code>parent(1)</code>.</p>
+
+<p>Current API available since 0.014.</p>
+
+<h2 id="realpath">realpath</h2>
+
+<pre><code>    <span class="variable">$real</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/baz/foo/../bar"</span><span class="operator">)-&gt;</span><span class="variable">realpath</span><span class="operator">;</span>
+    <span class="variable">$real</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/../bar"</span><span class="operator">)-&gt;</span><span class="variable">realpath</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns a new <code>Path::Tiny</code> object with all symbolic links and upward directory parts resolved using <a href="../../lib/Cwd.html">Cwd</a>&#39;s <code>realpath</code>. Compared to <code>absolute</code>, this is more expensive as it must actually consult the filesystem.</p>
+
+<p>If the parent path can&#39;t be resolved (e.g. if it includes directories that don&#39;t exist), an exception will be thrown:</p>
+
+<pre><code>    <span class="variable">$real</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"doesnt_exist/foo"</span><span class="operator">)-&gt;</span><span class="variable">realpath</span><span class="operator">;</span> <span class="comment"># dies</span>
+</code></pre>
+
+<p>However, if the parent path exists and only the last component (e.g. filename) doesn&#39;t exist, the realpath will be the realpath of the parent plus the non-existent last component:</p>
+
+<pre><code>    <span class="variable">$real</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"./aasdlfasdlf"</span><span class="operator">)-&gt;</span><span class="variable">realpath</span><span class="operator">;</span> <span class="comment"># works</span>
+</code></pre>
+
+<p>The underlying <a href="../../lib/Cwd.html">Cwd</a> module usually worked this way on Unix, but died on Windows (and some Unixes) if the full path didn&#39;t exist. As of version 0.064, it&#39;s safe to use anywhere.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="relative">relative</h2>
+
+<pre><code>    <span class="variable">$rel</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">relative</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">);</span> <span class="comment"># foo/bar</span>
+</code></pre>
+
+<p>Returns a <code>Path::Tiny</code> object with a path relative to a new base path given as an argument. If no argument is given, the current directory will be used as the new base path.</p>
+
+<p>If either path is already relative, it will be made absolute based on the current directly before determining the new relative path.</p>
+
+<p>The algorithm is roughly as follows:</p>
+
+<ul>
+
+<li><p>If the original and new base path are on different volumes, an exception will be thrown.</p>
+
+</li>
+<li><p>If the original and new base are identical, the relative path is <code>&quot;.&quot;</code>.</p>
+
+</li>
+<li><p>If the new base subsumes the original, the relative path is the original path with the new base chopped off the front</p>
+
+</li>
+<li><p>If the new base does not subsume the original, a common prefix path is determined (possibly the root directory) and the relative path will consist of updirs (<code>&quot;..&quot;</code>) to reach the common prefix, followed by the original path less the common prefix.</p>
+
+</li>
+</ul>
+
+<p>Unlike <code>File::Spec::abs2rel</code>, in the last case above, the calculation based on a common prefix takes into account symlinks that could affect the updir process. Given an original path &quot;/A/B&quot; and a new base &quot;/A/C&quot;, (where &quot;A&quot;, &quot;B&quot; and &quot;C&quot; could each have multiple path components):</p>
+
+<ul>
+
+<li><p>Symlinks in &quot;A&quot; don&#39;t change the result unless the last component of A is a symlink and the first component of &quot;C&quot; is an updir.</p>
+
+</li>
+<li><p>Symlinks in &quot;B&quot; don&#39;t change the result and will exist in the result as given.</p>
+
+</li>
+<li><p>Symlinks and updirs in &quot;C&quot; must be resolved to actual paths, taking into account the possibility that not all path components might exist on the filesystem.</p>
+
+</li>
+</ul>
+
+<p>Current API available since 0.001. New algorithm (that accounts for symlinks) available since 0.079.</p>
+
+<h2 id="remove">remove</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">remove</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is just like <code>unlink</code>, except for its error handling: if the path does not exist, it returns false; if deleting the file fails, it throws an exception.</p>
+
+<p>Current API available since 0.012.</p>
+
+<h2 id="remove_tree">remove_tree</h2>
+
+<pre><code>    <span class="comment"># directory</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">remove_tree</span><span class="operator">;</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">remove_tree</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">%options</span> <span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">)-&gt;</span><span class="variable">remove_tree</span><span class="operator">(</span> <span class="operator">{</span> <span class="string">safe</span> <span class="operator">=&gt;</span> <span class="number">0</span> <span class="operator">}</span> <span class="operator">);</span> <span class="comment"># force remove</span>
+</code></pre>
+
+<p>Like calling <code>remove_tree</code> from <a href="../../lib/File/Path.html">File::Path</a>, but defaults to <code>safe</code> mode. An optional hash reference is passed through to <code>remove_tree</code>. Errors will be trapped and an exception thrown. Returns the number of directories deleted, just like <code>remove_tree</code>.</p>
+
+<p>If you want to remove a directory only if it is empty, use the built-in <code>rmdir</code> function instead.</p>
+
+<pre><code>    <span class="keyword">rmdir</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/baz/"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Current API available since 0.013.</p>
+
+<h2 id="sibling">sibling</h2>
+
+<pre><code>    <span class="variable">$foo</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">);</span>
+    <span class="variable">$sib</span> <span class="operator">=</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">sibling</span><span class="operator">(</span><span class="string">"bar.txt"</span><span class="operator">);</span>        <span class="comment"># /tmp/bar.txt</span>
+    <span class="variable">$sib</span> <span class="operator">=</span> <span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">sibling</span><span class="operator">(</span><span class="string">"baz"</span><span class="operator">,</span> <span class="string">"bam.txt"</span><span class="operator">);</span> <span class="comment"># /tmp/baz/bam.txt</span>
+</code></pre>
+
+<p>Returns a new <code>Path::Tiny</code> object relative to the parent of the original. This is slightly more efficient than <code>$path-&gt;parent-&gt;child(...)</code>.</p>
+
+<p>Current API available since 0.058.</p>
+
+<h2 id="slurp-slurp_raw-slurp_utf8">slurp, slurp_raw, slurp_utf8</h2>
+
+<pre><code>    <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+    <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">slurp</span><span class="operator">(</span> <span class="operator">{</span><span class="string">binmode</span> <span class="operator">=&gt;</span> <span class="string">":raw"</span><span class="operator">}</span> <span class="operator">);</span>
+    <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">slurp_raw</span><span class="operator">;</span>
+    <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">slurp_utf8</span><span class="operator">;</span>
+</code></pre>
+
+<p>Reads file contents into a scalar. Takes an optional hash reference which may be used to pass options. The only available option is <code>binmode</code>, which is passed to <code>binmode()</code> on the handle used for reading.</p>
+
+<p><code>slurp_raw</code> is like <code>slurp</code> with a <code>binmode</code> of <code>:unix</code> for a fast, unbuffered, raw read.</p>
+
+<p><code>slurp_utf8</code> is like <code>slurp</code> with a <code>binmode</code> of <code>:unix:encoding(UTF-8)</code> (or <a>PerlIO::utf8_strict</a>). If <a>Unicode::UTF8</a> 0.58+ is installed, a raw slurp will be done instead and the result decoded with <code>Unicode::UTF8</code>. This is just as strict and is roughly an order of magnitude faster than using <code>:encoding(UTF-8)</code>.</p>
+
+<p><b>Note</b>: <code>slurp</code> and friends lock the filehandle before slurping. If you plan to slurp from a file created with <a href="../../lib/File/Temp.html">File::Temp</a>, be sure to close other handles or open without locking to avoid a deadlock:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$tempfile</span> <span class="operator">=</span> <span class="variable">File::Temp</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">EXLOCK</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$guts</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="variable">$tempfile</span><span class="operator">)-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+</code></pre>
+
+<p>Current API available since 0.004.</p>
+
+<h2 id="spew-spew_raw-spew_utf8">spew, spew_raw, spew_utf8</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">spew</span><span class="operator">(</span><span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">spew</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">spew</span><span class="operator">(</span><span class="operator">{</span><span class="string">binmode</span> <span class="operator">=&gt;</span> <span class="string">":raw"</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">spew_raw</span><span class="operator">(</span><span class="variable">@data</span><span class="operator">);</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">spew_utf8</span><span class="operator">(</span><span class="variable">@data</span><span class="operator">);</span>
+</code></pre>
+
+<p>Writes data to a file atomically. The file is written to a temporary file in the same directory, then renamed over the original. An optional hash reference may be used to pass options. The only option is <code>binmode</code>, which is passed to <code>binmode()</code> on the handle used for writing.</p>
+
+<p><code>spew_raw</code> is like <code>spew</code> with a <code>binmode</code> of <code>:unix</code> for a fast, unbuffered, raw write.</p>
+
+<p><code>spew_utf8</code> is like <code>spew</code> with a <code>binmode</code> of <code>:unix:encoding(UTF-8)</code> (or <a>PerlIO::utf8_strict</a>). If <a>Unicode::UTF8</a> 0.58+ is installed, a raw spew will be done instead on the data encoded with <code>Unicode::UTF8</code>.</p>
+
+<p><b>NOTE</b>: because the file is written to a temporary file and then renamed, the new file will wind up with permissions based on your current umask. This is a feature to protect you from a race condition that would otherwise give different permissions than you might expect. If you really want to keep the original mode flags, use <a href="#append">&quot;append&quot;</a> with the <code>truncate</code> option.</p>
+
+<p>Current API available since 0.011.</p>
+
+<h2 id="stat-lstat">stat, lstat</h2>
+
+<pre><code>    <span class="variable">$stat</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">stat</span><span class="operator">;</span>
+    <span class="variable">$stat</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/some/symlink"</span><span class="operator">)-&gt;</span><span class="variable">lstat</span><span class="operator">;</span>
+</code></pre>
+
+<p>Like calling <code>stat</code> or <code>lstat</code> from <a href="../../lib/File/stat.html">File::stat</a>.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="stringify">stringify</h2>
+
+<pre><code>    <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">);</span>
+    <span class="keyword">say</span> <span class="variable">$path</span><span class="operator">-&gt;</span><span class="variable">stringify</span><span class="operator">;</span> <span class="comment"># same as "$path"</span>
+</code></pre>
+
+<p>Returns a string representation of the path. Unlike <code>canonpath</code>, this method returns the path standardized with Unix-style <code>/</code> directory separators.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h2 id="subsumes">subsumes</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">subsumes</span><span class="operator">(</span><span class="string">"foo/bar/baz"</span><span class="operator">);</span> <span class="comment"># true</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"/foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">subsumes</span><span class="operator">(</span><span class="string">"/foo/baz"</span><span class="operator">);</span>   <span class="comment"># false</span>
+</code></pre>
+
+<p>Returns true if the first path is a prefix of the second path at a directory boundary.</p>
+
+<p>This <b>does not</b> resolve parent directory entries (<code>..</code>) or symlinks:</p>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">subsumes</span><span class="operator">(</span><span class="string">"foo/bar/../baz"</span><span class="operator">);</span> <span class="comment"># true</span>
+</code></pre>
+
+<p>If such things are important to you, ensure that both paths are resolved to the filesystem with <code>realpath</code>:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$p1</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar"</span><span class="operator">)-&gt;</span><span class="variable">realpath</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$p2</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo/bar/../baz"</span><span class="operator">)-&gt;</span><span class="variable">realpath</span><span class="operator">;</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$p1</span><span class="operator">-&gt;</span><span class="variable">subsumes</span><span class="operator">(</span><span class="variable">$p2</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Current API available since 0.048.</p>
+
+<h2 id="touch">touch</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">touch</span><span class="operator">;</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">touch</span><span class="operator">(</span><span class="variable">$epoch_secs</span><span class="operator">);</span>
+</code></pre>
+
+<p>Like the Unix <code>touch</code> utility. Creates the file if it doesn&#39;t exist, or else changes the modification and access times to the current time. If the first argument is the epoch seconds then it will be used.</p>
+
+<p>Returns the path object so it can be easily chained with other methods:</p>
+
+<pre><code>    <span class="comment"># won't die if foo.txt doesn't exist</span>
+    <span class="variable">$content</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">touch</span><span class="operator">-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+</code></pre>
+
+<p>Current API available since 0.015.</p>
+
+<h2 id="touchpath">touchpath</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"bar/baz/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">touchpath</span><span class="operator">;</span>
+</code></pre>
+
+<p>Combines <code>mkpath</code> and <code>touch</code>. Creates the parent directory if it doesn&#39;t exist, before touching the file. Returns the path object like <code>touch</code> does.</p>
+
+<p>Current API available since 0.022.</p>
+
+<h2 id="visit">visit</h2>
+
+<pre><code>    <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">visit</span><span class="operator">(</span> <span class="operator">\&amp;</span><span class="variable">callback</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%options</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Executes a callback for each child of a directory. It returns a hash reference with any state accumulated during iteration.</p>
+
+<p>The options are the same as for <a href="#iterator">&quot;iterator&quot;</a> (which it uses internally): <code>recurse</code> and <code>follow_symlinks</code>. Both default to false.</p>
+
+<p>The callback function will receive a <code>Path::Tiny</code> object as the first argument and a hash reference to accumulate state as the second argument. For example:</p>
+
+<pre><code>    <span class="comment"># collect files sizes</span>
+    <span class="keyword">my</span> <span class="variable">$sizes</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">visit</span><span class="operator">(</span>
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$path</span><span class="operator">,</span> <span class="variable">$state</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">$path</span><span class="operator">-&gt;</span><span class="variable">is_dir</span><span class="operator">;</span>
+            <span class="variable">$state</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$path</span><span class="operator">}</span> <span class="operator">=</span> <span class="keyword">-s</span> <span class="variable">$path</span><span class="operator">;</span>
+        <span class="operator">},</span>
+        <span class="operator">{</span> <span class="string">recurse</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>For convenience, the <code>Path::Tiny</code> object will also be locally aliased as the <code>$_</code> global variable:</p>
+
+<pre><code>    <span class="comment"># print paths matching /foo/</span>
+    <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">visit</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">say</span> <span class="keyword">if</span> <span class="regex">/foo/</span> <span class="operator">},</span> <span class="operator">{</span> <span class="string">recurse</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If the callback returns a <b>reference</b> to a false scalar value, iteration will terminate. This is not the same as &quot;pruning&quot; a directory search; this just stops all iteration and returns the state hash reference.</p>
+
+<pre><code>    <span class="comment"># find up to 10 files larger than 100K</span>
+    <span class="keyword">my</span> <span class="variable">$files</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp"</span><span class="operator">)-&gt;</span><span class="variable">visit</span><span class="operator">(</span>
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$path</span><span class="operator">,</span> <span class="variable">$state</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="variable">$state</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$path</span><span class="operator">}</span><span class="operator">++</span> <span class="keyword">if</span> <span class="keyword">-s</span> <span class="variable">$path</span> <span class="operator">&gt;</span> <span class="number">102400</span>
+            <span class="keyword">return</span> <span class="operator">\</span><span class="number">0</span> <span class="keyword">if</span> <span class="keyword">keys</span> <span class="variable">%$state</span> <span class="operator">==</span> <span class="number">10</span><span class="operator">;</span>
+        <span class="operator">},</span>
+        <span class="operator">{</span> <span class="string">recurse</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>If you want more flexible iteration, use a module like <a>Path::Iterator::Rule</a>.</p>
+
+<p>Current API available since 0.062.</p>
+
+<h2 id="volume">volume</h2>
+
+<pre><code>    <span class="variable">$vol</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">volume</span><span class="operator">;</span>   <span class="comment"># ""</span>
+    <span class="variable">$vol</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="string">"C:/tmp/foo.txt"</span><span class="operator">)-&gt;</span><span class="variable">volume</span><span class="operator">;</span> <span class="comment"># "C:"</span>
+</code></pre>
+
+<p>Returns the volume portion of the path. This is equivalent to what <a href="../../lib/File/Spec.html">File::Spec</a> would give from <code>splitpath</code> and thus usually is the empty string on Unix-like operating systems or the drive letter for an absolute path on <code>MSWin32</code>.</p>
+
+<p>Current API available since 0.001.</p>
+
+<h1 id="EXCEPTION-HANDLING">EXCEPTION HANDLING</h1>
+
+<p>Simple usage errors will generally croak. Failures of underlying Perl functions will be thrown as exceptions in the class <code>Path::Tiny::Error</code>.</p>
+
+<p>A <code>Path::Tiny::Error</code> object will be a hash reference with the following fields:</p>
+
+<ul>
+
+<li><p><code>op</code> &mdash; a description of the operation, usually function call and any extra info</p>
+
+</li>
+<li><p><code>file</code> &mdash; the file or directory relating to the error</p>
+
+</li>
+<li><p><code>err</code> &mdash; hold <code>$!</code> at the time the error was thrown</p>
+
+</li>
+<li><p><code>msg</code> &mdash; a string combining the above data and a Carp-like short stack trace</p>
+
+</li>
+</ul>
+
+<p>Exception objects will stringify as the <code>msg</code> field.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<h2 id="Subclassing-not-supported">Subclassing not supported</h2>
+
+<p>For speed, this class is implemented as an array based object and uses many direct function calls internally. You must not subclass it and expect things to work properly.</p>
+
+<h2 id="File-locking">File locking</h2>
+
+<p>If flock is not supported on a platform, it will not be used, even if locking is requested.</p>
+
+<p>See additional caveats below.</p>
+
+<h3 id="NFS-and-BSD">NFS and BSD</h3>
+
+<p>On BSD, Perl&#39;s flock implementation may not work to lock files on an NFS filesystem. Path::Tiny has some heuristics to detect this and will warn once and let you continue in an unsafe mode. If you want this failure to be fatal, you can fatalize the &#39;flock&#39; warnings category:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">warnings</span> <span class="string">FATAL</span> <span class="operator">=&gt;</span> <span class="string">'flock'</span><span class="operator">;</span>
+</code></pre>
+
+<h3 id="AIX-and-locking">AIX and locking</h3>
+
+<p>AIX requires a write handle for locking. Therefore, calls that normally open a read handle and take a shared lock instead will open a read-write handle and take an exclusive lock. If the user does not have write permission, no lock will be used.</p>
+
+<h2 id="utf8-vs-UTF-8">utf8 vs UTF-8</h2>
+
+<p>All the <code>*_utf8</code> methods by default use <code>:encoding(UTF-8)</code> -- either as <code>:unix:encoding(UTF-8)</code> (unbuffered) or <code>:raw:encoding(UTF-8)</code> (buffered) -- which is strict against the Unicode spec and disallows illegal Unicode codepoints or UTF-8 sequences.</p>
+
+<p>Unfortunately, <code>:encoding(UTF-8)</code> is very, very slow. If you install <a>Unicode::UTF8</a> 0.58 or later, that module will be used by some <code>*_utf8</code> methods to encode or decode data after a raw, binary input/output operation, which is much faster. Alternatively, if you install <a>PerlIO::utf8_strict</a>, that will be used instead of <code>:encoding(UTF-8)</code> and is also very fast.</p>
+
+<p>If you need the performance and can accept the security risk, <code><span class="variable">slurp</span><span class="operator">(</span><span class="operator">{</span><span class="string">binmode</span> <span class="operator">=&gt;</span> <span class="string">":unix:utf8"</span><span class="operator">}</span><span class="operator">)</span>
+</code> will be faster than <code>:unix:encoding(UTF-8)</code> (but not as fast as <code>Unicode::UTF8</code>).</p>
+
+<p>Note that the <code>*_utf8</code> methods read in <b>raw</b> mode. There is no CRLF translation on Windows. If you must have CRLF translation, use the regular input/output methods with an appropriate binmode:</p>
+
+<pre><code>  <span class="variable">$path</span><span class="operator">-&gt;</span><span class="variable">spew_utf8</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>                            <span class="comment"># raw</span>
+  <span class="variable">$path</span><span class="operator">-&gt;</span><span class="variable">spew</span><span class="operator">(</span><span class="operator">{</span><span class="string">binmode</span> <span class="operator">=&gt;</span> <span class="string">":encoding(UTF-8)"</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">;</span> <span class="comment"># LF -&gt; CRLF</span>
+</code></pre>
+
+<h2 id="Default-IO-layers-and-the-open-pragma">Default IO layers and the open pragma</h2>
+
+<p>If you have Perl 5.10 or later, file input/output methods (<code>slurp</code>, <code>spew</code>, etc.) and high-level handle opening methods ( <code>filehandle</code>, <code>openr</code>, <code>openw</code>, etc. ) respect default encodings set by the <code>-C</code> switch or lexical <a href="../../lib/open.html">open</a> settings of the caller. For UTF-8, this is almost certainly slower than using the dedicated <code>_utf8</code> methods if you have <a>Unicode::UTF8</a>.</p>
+
+<h1 id="TYPE-CONSTRAINTS-AND-COERCION">TYPE CONSTRAINTS AND COERCION</h1>
+
+<p>A standard <a>MooseX::Types</a> library is available at <a>MooseX::Types::Path::Tiny</a>. A <a>Type::Tiny</a> equivalent is available as <a>Types::Path::Tiny</a>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>These are other file/path utilities, which may offer a different feature set than <code>Path::Tiny</code>.</p>
+
+<ul>
+
+<li><p><a>File::chmod</a></p>
+
+</li>
+<li><p><a>File::Fu</a></p>
+
+</li>
+<li><p><a>IO::All</a></p>
+
+</li>
+<li><p><a>Path::Class</a></p>
+
+</li>
+</ul>
+
+<p>These iterators may be slightly faster than the recursive iterator in <code>Path::Tiny</code>:</p>
+
+<ul>
+
+<li><p><a>Path::Iterator::Rule</a></p>
+
+</li>
+<li><p><a href="../../lib/File/Next.html">File::Next</a></p>
+
+</li>
+</ul>
+
+<p>There are probably comparable, non-Tiny tools. Let me know if you want me to add a module to the list.</p>
+
+<p>This module was featured in the <a href="http://www.perladvent.org/2013/2013-12-18.html">2013 Perl Advent Calendar</a>.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<h2 id="Bugs-Feature-Requests">Bugs / Feature Requests</h2>
+
+<p>Please report any bugs or feature requests through the issue tracker at <a href="https://github.com/dagolden/Path-Tiny/issues">https://github.com/dagolden/Path-Tiny/issues</a>. You will be notified automatically of any progress on your issue.</p>
+
+<h2 id="Source-Code">Source Code</h2>
+
+<p>This is open source software. The code repository is available for public review and contribution under the terms of the license.</p>
+
+<p><a href="https://github.com/dagolden/Path-Tiny">https://github.com/dagolden/Path-Tiny</a></p>
+
+<pre><code>  git clone https://github.com/dagolden/Path-Tiny.git</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>David Golden &lt;dagolden@cpan.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Alex Efros &lt;powerman@powerman.name&gt;</p>
+
+</li>
+<li><p>Chris Williams &lt;bingos@cpan.org&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>David Steinbrunner &lt;dsteinbrunner@pobox.com&gt;</p>
+
+</li>
+<li><p>Doug Bell &lt;madcityzen@gmail.com&gt;</p>
+
+</li>
+<li><p>Gabor Szabo &lt;szabgab@cpan.org&gt;</p>
+
+</li>
+<li><p>Gabriel Andrade &lt;gabiruh@gmail.com&gt;</p>
+
+</li>
+<li><p>George Hartzell &lt;hartzell@cpan.org&gt;</p>
+
+</li>
+<li><p>Geraud Continsouzas &lt;geraud@scsi.nc&gt;</p>
+
+</li>
+<li><p>Goro Fuji &lt;gfuji@cpan.org&gt;</p>
+
+</li>
+<li><p>Graham Knop &lt;haarg@haarg.org&gt;</p>
+
+</li>
+<li><p>Graham Ollis &lt;plicease@cpan.org&gt;</p>
+
+</li>
+<li><p>James Hunt &lt;james@niftylogic.com&gt;</p>
+
+</li>
+<li><p>John Karr &lt;brainbuz@brainbuz.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Mark Ellis &lt;mark.ellis@cartridgesave.co.uk&gt;</p>
+
+</li>
+<li><p>Martin Kjeldsen &lt;mk@bluepipe.dk&gt;</p>
+
+</li>
+<li><p>Michael G. Schwern &lt;mschwern@cpan.org&gt;</p>
+
+</li>
+<li><p>Nigel Gregoire &lt;nigelgregoire@gmail.com&gt;</p>
+
+</li>
+<li><p>Philippe Bruhat (BooK) &lt;book@cpan.org&gt;</p>
+
+</li>
+<li><p>Regina Verbae &lt;regina-verbae@users.noreply.github.com&gt;</p>
+
+</li>
+<li><p>Roy Ivy III &lt;rivy@cpan.org&gt;</p>
+
+</li>
+<li><p>Shlomi Fish &lt;shlomif@shlomifish.org&gt;</p>
+
+</li>
+<li><p>Smylers &lt;Smylers@stripey.com&gt;</p>
+
+</li>
+<li><p>Tatsuhiko Miyagawa &lt;miyagawa@bulknews.net&gt;</p>
+
+</li>
+<li><p>Toby Inkster &lt;tobyink@cpan.org&gt;</p>
+
+</li>
+<li><p>Yanick Champoux &lt;yanick@babyl.dyndns.org&gt;</p>
+
+</li>
+<li><p>&#xAE40;&#xB3C4;&#xD615; - Keedi Kim &lt;keedi@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2014 by David Golden.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Apache License, Version 2.0, January 2004</code></pre>
+
+
+</body>
+
+</html>
+
+

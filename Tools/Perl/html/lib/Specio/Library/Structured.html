@@ -1,0 +1,191 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Dict">Dict</a></li>
+      <li><a href="#Map">Map</a></li>
+      <li><a href="#Tuple">Tuple</a></li>
+    </ul>
+  </li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Library::Structured - Structured types for Specio (Dict, Map, Tuple)</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Library::String</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Library::Structured</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$map</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Map'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">key</span>   <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">),</span>
+            <span class="string">value</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+        <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$tuple</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Tuple'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Num'</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$dict</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Dict'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">kv</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">name</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+                <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>This particular library should be considered in an alpha state. The syntax for defining structured types may change, as well as some of the internals of its implementation.</b></p>
+
+<p>This library provides a set of structured types for Specio, <code>Dict</code>, <code>Map</code>, and <code>Tuple</code>. This library also exports two helper subs used for some types, <code>optional</code> and <code>slurpy</code>.</p>
+
+<p>All structured types are parameterized by calling <code>t( &#39;Type Name&#39;, of =&gt; ... )</code>. The arguments passed after <code>of</code> vary for each type.</p>
+
+<h2 id="Dict">Dict</h2>
+
+<p>A <code>Dict</code> is a hashref with a well-defined set of keys and types for those key.</p>
+
+<p>The argument passed to <code>of</code> should be a single hashref. That hashref must contain a <code>kv</code> key defining the expected keys and the types for their values. This <code>kv</code> value is itself a hashref. If a key/value pair is optional, use <code>optional</code> around the <i>type</i> for that key:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$person</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Dict'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">kv</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">first</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">),</span>
+                <span class="string">middle</span> <span class="operator">=&gt;</span> <span class="variable">optional</span><span class="operator">(</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">)</span> <span class="operator">),</span>
+                <span class="string">last</span>   <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">),</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>If a key is optional, then it can be omitted entirely, but if it passed then it&#39;s type will be checked, so it cannot just be set to <code>undef</code>.</p>
+
+<p>You can also pass a <code>slurpy</code> key. If this is passed, then the <code>Dict</code> will allow other, unknown keys, as long as they match the specified type:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$person</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Dict'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">kv</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">first</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">),</span>
+                <span class="string">middle</span> <span class="operator">=&gt;</span> <span class="variable">optional</span><span class="operator">(</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">)</span> <span class="operator">),</span>
+                <span class="string">last</span>   <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'NonEmptyStr'</span><span class="operator">),</span>
+            <span class="operator">}</span><span class="operator">,</span>
+            <span class="string">slurpy</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+        <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Map">Map</h2>
+
+<p>A <code>Map</code> is a hashref with specified types for its keys and values, but no well-defined key names.</p>
+
+<p>The argument passed to <code>of</code> should be a single hashref with two keys, <code>key</code> and <code>value</code>. The type for the <code>key</code> will typically be some sort of key, but if you&#39;re using a tied hash or an object with hash overloading it could conceivably be any sort of value.</p>
+
+<h2 id="Tuple">Tuple</h2>
+
+<p>A <code>Tuple</code> is an arrayref with a fixed set of members in a specific order.</p>
+
+<p>The argument passed to <code>of</code> should be a single arrayref consisting of types. You can mark a slot in the <code>Tuple</code> as optional by wrapping the type in a call to <code>optional</code>:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$record</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Tuple'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="variable">t</span><span class="operator">(</span><span class="string">'PositiveInt'</span><span class="operator">),</span>
+            <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+            <span class="variable">optional</span><span class="operator">(</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Num'</span><span class="operator">)</span> <span class="operator">),</span>
+            <span class="variable">optional</span><span class="operator">(</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Num'</span><span class="operator">)</span> <span class="operator">),</span>
+        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>You can have as many <code>optional</code> elements as you want, but they must always come in sequence at the end of the tuple definition. You cannot interleave required and optional elements.</p>
+
+<p>You can also make the Tuple accept an arbitrary number of values by wrapping the last type in a call to <code>slurpy</code>:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$record</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+        <span class="string">'Tuple'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="variable">t</span><span class="operator">(</span><span class="string">'PositiveInt'</span><span class="operator">),</span>
+            <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+            <span class="variable">slurpy</span><span class="operator">(</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Num'</span><span class="operator">)</span> <span class="operator">),</span>
+        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>In this case, the <code>Tuple</code> will require the first two elements and then allow any number (including zero) of <code>Num</code> elements.</p>
+
+<p>You cannot mix <code>optional</code> and <code>slurpy</code> in a <code>Tuple</code> definition.</p>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>Currently all structured types require that the types they are structured with can be inlined. This may change in the future, but inlining all your types is a really good idea, so you should do that anyway.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

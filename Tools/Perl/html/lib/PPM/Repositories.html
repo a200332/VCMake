@@ -1,0 +1,169 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#The-new-interface">The new interface</a></li>
+      <li><a href="#The-old-interface">The old interface</a></li>
+      <li><a href="#EXPORT">EXPORT</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-ADDITIONS-ETC">BUGS/ADDITIONS/ETC</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPM::Repositories - List of Perl Package Manager repositories</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="comment"># Print all repositories for all architectures</span>
+    <span class="keyword">use</span> <span class="variable">PPM::Repositories</span> <span class="string">qw(get list used_archs)</span><span class="operator">;</span>
+    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$arch</span> <span class="operator">(</span><span class="variable">used_archs</span><span class="operator">())</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">"</span><span class="variable">$arch</span><span class="string">\n"</span><span class="operator">;</span>
+        <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">(</span><span class="variable">list</span><span class="operator">(</span><span class="variable">$arch</span><span class="operator">))</span> <span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">%repo</span> <span class="operator">=</span> <span class="variable">get</span><span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$arch</span><span class="operator">);</span>
+            <span class="keyword">next</span> <span class="keyword">unless</span> <span class="variable">$repo</span><span class="operator">{</span><span class="string">packlist</span><span class="operator">}</span><span class="operator">;</span>
+            <span class="keyword">print</span> <span class="string">"  </span><span class="variable">$name</span><span class="string">\n"</span><span class="operator">;</span>
+            <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$field</span> <span class="operator">(</span><span class="keyword">sort</span> <span class="keyword">keys</span> <span class="variable">%repo</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="keyword">printf</span> <span class="string">"    %-12s %s\n"</span><span class="operator">,</span> <span class="variable">$field</span><span class="operator">,</span> <span class="variable">$repo</span><span class="operator">{</span><span class="variable">$field</span><span class="operator">}</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module contains a list of PPM repositories for Perl 5.6 and later. For backwards compatibility reasons it exposes the data in 2 different mechanism.</p>
+
+<p>The new interface uses API functions and is supplied for the benefit of PPM version 4 and later. The old interface directly exposes the %Repositories hash and should be used for PPM version 2 and 3.</p>
+
+<h2 id="The-new-interface">The new interface</h2>
+
+<p>The &quot;new&quot; interface is aimed primarily at PPM version 4 users, but also contains information about Perl 5.6 and 5.8 repositories that can be used by PPM version 2 and 3.</p>
+
+<dl>
+
+<dt id="get-NAME-ARCH">get(NAME, ARCH)</dt>
+<dd>
+
+<p>The get() function returns a hash describing the NAME repository for architecture ARCH. It looks like this:</p>
+
+<pre><code>  (
+    home            =&gt; &#39;http://cpan.example.com/&#39;,
+    desc            =&gt; &#39;Example Repository&#39;,
+    packlist        =&gt; &#39;http://cpan.example.com/PPMPackages/10xx/&#39;,
+    packlist_noarch =&gt; &#39;http://cpan.example.com/PPMPackages/noarch/&#39;,
+  )</code></pre>
+
+<p>The <code>home</code> key provides a URL that will display additional information about the repository in a browser (for human consumption, not structured data for any tools).</p>
+
+<p>The <code>desc</code> key contains a description string, giving either a more verbose description of the repository host, or an indication of the provided content for more specialized repositories (e.g. <code>&quot;gtk2-perl bindings&quot;</code>).</p>
+
+<p>The <code>packlist</code> key will point to the repository for the architecture ARCH and will only be defined if the repository supports this architecture. Similarly the <code>packlist_noarch</code> key may point to an architecture-independent repository hosted by the same system. Either or both of <code>packlist</code> and <code>packlist_noarch</code> may be undefined.</p>
+
+<p>ARCH will default to the current Perl version and architecture (it is the same as $Config{archname} under Perl 5.6, and has the major Perl version appended for later versions, such as &quot;$Config{archname}-5.8&quot; for Perl 5.8).</p>
+
+<p>The get() function will return an empty list if the repository NAME does not exist at all.</p>
+
+</dd>
+<dt id="list-ARCH">list(ARCH)</dt>
+<dd>
+
+<p>The list() function returns a list of names for all repositories that contain modules for architecture ARCH. This will include all repositories providing architecture-independent modules as well.</p>
+
+<p>ARCH will default to the current Perl version and architecture.</p>
+
+</dd>
+<dt id="used_archs">used_archs()</dt>
+<dd>
+
+<p>This function returns a list of all architectures that have at least one repository recorded in this module. This list will include the pseudo-architecture <code>noarch</code> for architecture-independent modules.</p>
+
+</dd>
+</dl>
+
+<h2 id="The-old-interface">The old interface</h2>
+
+<p>The &quot;old&quot; interface is supported mainly for backwards compatibility. It uses the old structure layout, and continues to list SOAP style repositories (called &quot;PPMServer&quot;) that are no longer supported in PPM version 4.</p>
+
+<dl>
+
+<dt id="Repositories">%Repositories</dt>
+<dd>
+
+<p>An example entry in %Repositories looks like:</p>
+
+<pre><code>    <span class="string">bribes</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="string">location</span> <span class="operator">=&gt;</span> <span class="string">'http://www.bribes.org/perl/ppm/'</span><span class="operator">,</span>
+        <span class="string">Type</span>     <span class="operator">=&gt;</span> <span class="string">'Webpage'</span><span class="operator">,</span>
+        <span class="string">Active</span>   <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="string">Notes</span>    <span class="operator">=&gt;</span> <span class="string">'Digest::*, Net::Pcap, Win32::* ...'</span><span class="operator">,</span>
+        <span class="string">PerlV</span>    <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">5.6</span><span class="operator">,</span> <span class="number">5.8</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">PerlO</span>    <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'MSWin32'</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">,</span>
+</code></pre>
+
+<p>The meaning of the key/value pairs should be obvious.</p>
+
+<p>Active is either 1, or 0, and it indicates whether or not that particular repository was reachable and contained ppm packages at the time this module was released.</p>
+
+<p>PerlO is the value of $^O. See <a href="../../lib/pods/perlport.html">perlport</a> for a list of values for this variable.</p>
+
+</dd>
+</dl>
+
+<h2 id="EXPORT">EXPORT</h2>
+
+<p>%Repositories is exported by default.</p>
+
+<p>get(), list(), and used_archs() are only exported on demand.</p>
+
+<h1 id="BUGS-ADDITIONS-ETC">BUGS/ADDITIONS/ETC</h1>
+
+<p>Please use https://rt.cpan.org/NoAuth/Bugs.html?Dist=PPM-Repositories to report bugs, request additions etc.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>D.H. (PodMaster)</p>
+
+<p>Maintained since 2008 by Jan Dubois &lt;jand@activestate.com&gt;</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>Copyright (c) 2003,2004,2005 by D.H. (PodMaster). All rights reserved.</p>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>PPM</a>, <a>PPM::Make</a>, <a>CPANPLUS</a>, <a href="../../lib/CPAN.html">CPAN</a>.</p>
+
+
+</body>
+
+</html>
+
+

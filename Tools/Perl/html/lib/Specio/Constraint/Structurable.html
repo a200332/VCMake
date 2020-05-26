@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#API">API</a>
+    <ul>
+      <li><a href="#Specio::Constraint::Structurable-new">Specio::Constraint::Structurable-&gt;new(...)</a></li>
+      <li><a href="#type-parameterize">$type-&gt;parameterize(...)</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Constraint::Structurable - A class which represents structurable constraints</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$tuple</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Tuple'</span><span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$tuple_of_str_int</span> <span class="operator">=</span> <span class="variable">$tuple</span><span class="operator">-&gt;</span><span class="variable">parameterize</span><span class="operator">(</span> <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">)</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class implements the API for structurable types like <code>Dict</code>, <code>Map</code>&lt; and <code>Tuple</code>.</p>
+
+<h1 id="API">API</h1>
+
+<p>This class implements the same API as <a href="../../../lib/Specio/Constraint/Simple.html">Specio::Constraint::Simple</a>, with a few additions.</p>
+
+<h2 id="Specio::Constraint::Structurable-new">Specio::Constraint::Structurable-&gt;new(...)</h2>
+
+<p>This class&#39;s constructor accepts two additional parameters:</p>
+
+<ul>
+
+<li><p>parameterization_args_builder</p>
+
+<p>This is a subroutine that takes the values passed to <code>of</code> and returns a hash of named arguments. These arguments will then be passed into the <code>structured_constraint_generator</code> or <code>structured_inline_generator</code>.</p>
+
+<p>This should also do argument checking to make sure that the argument passed are valid. For example, the <code>Tuple</code> type turns the arrayref passed to <code>of</code> into a hash, along the way checking that the caller did not do things like interleave optional and required elements or mix optional and slurpy together in the definition.</p>
+
+<p>This parameter is required.</p>
+
+</li>
+<li><p>name_builder</p>
+
+<p>This is a subroutine that is called to generate a name for the structured type when it is created. This will be called as a method on the <code>Specio::Constraint::Structurable</code> object. It will be passed the hash of arguments returned by the <code>parameterization_args_builder</code>.</p>
+
+<p>This parameter is required.</p>
+
+</li>
+<li><p>structured_constraint_generator</p>
+
+<p>This is a subroutine that generates a new constraint subroutine when the type is structured.</p>
+
+<p>It will be called as a method on the type and will be passed the hash of arguments returned by the <code>parameterization_args_builder</code>.</p>
+
+<p>This parameter is mutually exclusive with the <code>structured_inline_generator</code> parameter.</p>
+
+<p>This parameter or the <code>structured_inline_generator</code> parameter is required.</p>
+
+</li>
+<li><p>structured_inline_generator</p>
+
+<p>This is a subroutine that generates a new inline generator subroutine when the type is structured.</p>
+
+<p>It will be called as a method on the <a href="../../../lib/Specio/Constraint/Structured.html">Specio::Constraint::Structured</a> object when that object needs to generate an inline constraint. It will receive the type parameter as the first argument and the variable name as a string as the second.</p>
+
+<p>The remaining arguments will be the parameter hash returned by the <code>parameterization_args_builder</code>.</p>
+
+<p>This probably seems fairly confusing, so looking at the examples in the <a>Specio::Library::Structured::*</a> code may be helpful.</p>
+
+<p>This parameter is mutually exclusive with the <code>structured_constraint_generator</code> parameter.</p>
+
+<p>This parameter or the <code>structured_constraint_generator</code> parameter is required.</p>
+
+</li>
+</ul>
+
+<h2 id="type-parameterize">$type-&gt;parameterize(...)</h2>
+
+<p>This method takes two arguments. The <code>of</code> argument should be an object which does the <a href="../../../lib/Specio/Constraint/Role/Interface.html">Specio::Constraint::Role::Interface</a> role, and is required.</p>
+
+<p>The other argument, <code>declared_at</code>, is optional. If it is not given, then a new <a href="../../../lib/Specio/DeclaredAt.html">Specio::DeclaredAt</a> object is creating using a call stack depth of 1.</p>
+
+<p>This method returns a new <a href="../../../lib/Specio/Constraint/Structured.html">Specio::Constraint::Structured</a> object.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

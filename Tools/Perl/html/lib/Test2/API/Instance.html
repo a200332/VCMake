@@ -1,0 +1,335 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::API::Instance - Object used by Test2::API under the hood</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This object encapsulates the global shared state tracked by <a href="../../../lib/Test2.html">Test2</a>. A single global instance of this package is stored (and obscured) by the <a href="../../../lib/Test2/API.html">Test2::API</a> package.</p>
+
+<p>There is no reason to directly use this package. This package is documented for completeness. This package can change, or go away completely at any time. Directly using, or monkeypatching this package is not supported in any way shape or form.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API::Instance</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">Test2::API::Instance</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+</code></pre>
+
+<dl>
+
+<dt id="pid-obj-pid">$pid = $obj-&gt;pid</dt>
+<dd>
+
+<p>PID of this instance.</p>
+
+</dd>
+<dt id="obj-tid">$obj-&gt;tid</dt>
+<dd>
+
+<p>Thread ID of this instance.</p>
+
+</dd>
+<dt id="obj-reset">$obj-&gt;reset()</dt>
+<dd>
+
+<p>Reset the object to defaults.</p>
+
+</dd>
+<dt id="obj-load">$obj-&gt;load()</dt>
+<dd>
+
+<p>Set the internal state to loaded, and run and stored post-load callbacks.</p>
+
+</dd>
+<dt id="bool-obj-loaded">$bool = $obj-&gt;loaded</dt>
+<dd>
+
+<p>Check if the state is set to loaded.</p>
+
+</dd>
+<dt id="arrayref-obj-post_load_callbacks">$arrayref = $obj-&gt;post_load_callbacks</dt>
+<dd>
+
+<p>Get the post-load callbacks.</p>
+
+</dd>
+<dt id="obj-add_post_load_callback-sub">$obj-&gt;add_post_load_callback(sub { ... })</dt>
+<dd>
+
+<p>Add a post-load callback. If <code>load()</code> has already been called then the callback will be immediately executed. If <code>load()</code> has not been called then the callback will be stored and executed later when <code>load()</code> is called.</p>
+
+</dd>
+<dt id="hashref-obj-contexts">$hashref = $obj-&gt;contexts()</dt>
+<dd>
+
+<p>Get a hashref of all active contexts keyed by hub id.</p>
+
+</dd>
+<dt id="arrayref-obj-context_acquire_callbacks">$arrayref = $obj-&gt;context_acquire_callbacks</dt>
+<dd>
+
+<p>Get all context acquire callbacks.</p>
+
+</dd>
+<dt id="arrayref-obj-context_init_callbacks">$arrayref = $obj-&gt;context_init_callbacks</dt>
+<dd>
+
+<p>Get all context init callbacks.</p>
+
+</dd>
+<dt id="arrayref-obj-context_release_callbacks">$arrayref = $obj-&gt;context_release_callbacks</dt>
+<dd>
+
+<p>Get all context release callbacks.</p>
+
+</dd>
+<dt id="arrayref-obj-pre_subtest_callbacks">$arrayref = $obj-&gt;pre_subtest_callbacks</dt>
+<dd>
+
+<p>Get all pre-subtest callbacks.</p>
+
+</dd>
+<dt id="obj-add_context_init_callback-sub">$obj-&gt;add_context_init_callback(sub { ... })</dt>
+<dd>
+
+<p>Add a context init callback. Subs are called every time a context is created. Subs get the newly created context as their only argument.</p>
+
+</dd>
+<dt id="obj-add_context_release_callback-sub">$obj-&gt;add_context_release_callback(sub { ... })</dt>
+<dd>
+
+<p>Add a context release callback. Subs are called every time a context is released. Subs get the released context as their only argument. These callbacks should not call release on the context.</p>
+
+</dd>
+<dt id="obj-add_pre_subtest_callback-sub">$obj-&gt;add_pre_subtest_callback(sub { ... })</dt>
+<dd>
+
+<p>Add a pre-subtest callback. Subs are called every time a subtest is going to be run. Subs get the subtest name, coderef, and any arguments.</p>
+
+</dd>
+<dt id="obj-set_exit">$obj-&gt;set_exit()</dt>
+<dd>
+
+<p>This is intended to be called in an <code><span class="keyword">END</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> block. This will look at test state and set $?. This will also call any end callbacks, and wait on child processes/threads.</p>
+
+</dd>
+<dt id="obj-ipc_enable_shm">$obj-&gt;ipc_enable_shm()</dt>
+<dd>
+
+<p>Turn on SHM for IPC (if possible)</p>
+
+</dd>
+<dt id="shm_id-obj-ipc_shm_id">$shm_id = $obj-&gt;ipc_shm_id()</dt>
+<dd>
+
+<p>If SHM is enabled for IPC this will be the shm_id for it.</p>
+
+</dd>
+<dt id="shm_size-obj-ipc_shm_size">$shm_size = $obj-&gt;ipc_shm_size()</dt>
+<dd>
+
+<p>If SHM is enabled for IPC this will be the size of it.</p>
+
+</dd>
+<dt id="shm_last_val-obj-ipc_shm_last">$shm_last_val = $obj-&gt;ipc_shm_last()</dt>
+<dd>
+
+<p>If SHM is enabled for IPC this will return the last SHM value seen.</p>
+
+</dd>
+<dt id="obj-set_ipc_pending-val">$obj-&gt;set_ipc_pending($val)</dt>
+<dd>
+
+<p>use the IPC SHM to tell other processes and threads there is a pending event. <code>$val</code> should be a unique value no other thread/process will generate.</p>
+
+<p><b>Note:</b> This will also make the current process see a pending event. It does not set <code>ipc_shm_last()</code>, this is important because doing so could hide a previous change.</p>
+
+</dd>
+<dt id="pending-obj-get_ipc_pending">$pending = $obj-&gt;get_ipc_pending()</dt>
+<dd>
+
+<p>This returns -1 if SHM is not enabled for IPC.</p>
+
+<p>This returns 0 if the SHM value matches the last known value, which means there are no pending events.</p>
+
+<p>This returns 1 if the SHM value has changed, which means there are probably pending events.</p>
+
+<p>When 1 is returned this will set <code>$obj-&gt;ipc_shm_last()</code>.</p>
+
+</dd>
+<dt id="timeout-obj-ipc_timeout">$timeout = $obj-&gt;ipc_timeout;</dt>
+<dd>
+
+</dd>
+<dt id="obj-set_ipc_timeout-timeout">$obj-&gt;set_ipc_timeout($timeout);</dt>
+<dd>
+
+<p>How long to wait for child processes and threads before aborting.</p>
+
+</dd>
+<dt id="drivers-obj-ipc_drivers">$drivers = $obj-&gt;ipc_drivers</dt>
+<dd>
+
+<p>Get the list of IPC drivers.</p>
+
+</dd>
+<dt id="obj-add_ipc_driver-DRIVER_CLASS">$obj-&gt;add_ipc_driver($DRIVER_CLASS)</dt>
+<dd>
+
+<p>Add an IPC driver to the list. The most recently added IPC driver will become the global one during initialization. If a driver is added after initialization has occurred a warning will be generated:</p>
+
+<pre><code>    &quot;IPC driver $driver loaded too late to be used as the global ipc driver&quot;</code></pre>
+
+</dd>
+<dt id="bool-obj-ipc_polling">$bool = $obj-&gt;ipc_polling</dt>
+<dd>
+
+<p>Check if polling is enabled.</p>
+
+</dd>
+<dt id="obj-enable_ipc_polling">$obj-&gt;enable_ipc_polling</dt>
+<dd>
+
+<p>Turn on polling. This will cull events from other processes and threads every time a context is created.</p>
+
+</dd>
+<dt id="obj-disable_ipc_polling">$obj-&gt;disable_ipc_polling</dt>
+<dd>
+
+<p>Turn off IPC polling.</p>
+
+</dd>
+<dt id="bool-obj-no_wait">$bool = $obj-&gt;no_wait</dt>
+<dd>
+
+</dd>
+<dt id="bool-obj-set_no_wait-bool">$bool = $obj-&gt;set_no_wait($bool)</dt>
+<dd>
+
+<p>Get/Set no_wait. This option is used to turn off process/thread waiting at exit.</p>
+
+</dd>
+<dt id="arrayref-obj-exit_callbacks">$arrayref = $obj-&gt;exit_callbacks</dt>
+<dd>
+
+<p>Get the exit callbacks.</p>
+
+</dd>
+<dt id="obj-add_exit_callback-sub">$obj-&gt;add_exit_callback(sub { ... })</dt>
+<dd>
+
+<p>Add an exit callback. This callback will be called by <code>set_exit()</code>.</p>
+
+</dd>
+<dt id="bool-obj-finalized">$bool = $obj-&gt;finalized</dt>
+<dd>
+
+<p>Check if the object is finalized. Finalization happens when either <code>ipc()</code>, <code>stack()</code>, or <code>format()</code> are called on the object. Once finalization happens these fields are considered unchangeable (not enforced here, enforced by <a href="../../../lib/Test2.html">Test2</a>).</p>
+
+</dd>
+<dt id="ipc-obj-ipc">$ipc = $obj-&gt;ipc</dt>
+<dd>
+
+<p>Get the one true IPC instance.</p>
+
+</dd>
+<dt id="stack-obj-stack">$stack = $obj-&gt;stack</dt>
+<dd>
+
+<p>Get the one true hub stack.</p>
+
+</dd>
+<dt id="formatter-obj-formatter">$formatter = $obj-&gt;formatter</dt>
+<dd>
+
+<p>Get the global formatter. By default this is the <code>&#39;Test2::Formatter::TAP&#39;</code> package. This could be any package that implements the <code>write()</code> method. This can also be an instantiated object.</p>
+
+</dd>
+<dt id="bool-obj-formatter_set">$bool = $obj-&gt;formatter_set()</dt>
+<dd>
+
+<p>Check if a formatter has been set.</p>
+
+</dd>
+<dt id="obj-add_formatter-class">$obj-&gt;add_formatter($class)</dt>
+<dd>
+
+</dd>
+<dt id="obj-add_formatter-obj">$obj-&gt;add_formatter($obj)</dt>
+<dd>
+
+<p>Add a formatter. The most recently added formatter will become the global one during initialization. If a formatter is added after initialization has occurred a warning will be generated:</p>
+
+<pre><code>    &quot;Formatter $formatter loaded too late to be used as the global formatter&quot;</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

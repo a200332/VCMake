@@ -1,0 +1,268 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#RECOMMENDATIONS">RECOMMENDATIONS</a>
+    <ul>
+      <li><a href="#namespace::autoclean-and-immutabilize">namespace::autoclean and immutabilize</a></li>
+      <li><a href="#Never-override-new">Never override new</a></li>
+      <li><a href="#Always-call-the-original-parent-BUILDARGS">Always call the original/parent BUILDARGS</a></li>
+      <li><a href="#Provide-defaults-whenever-possible-otherwise-use-required">Provide defaults whenever possible, otherwise use required</a></li>
+      <li><a href="#Use-builder-instead-of-default-most-of-the-time">Use builder instead of default most of the time</a></li>
+      <li><a href="#Be-lazy">Be lazy</a></li>
+      <li><a href="#Consider-keeping-clearers-and-predicates-private">Consider keeping clearers and predicates private</a></li>
+      <li><a href="#Avoid-lazy_build">Avoid lazy_build</a></li>
+      <li><a href="#Default-to-read-only-and-consider-keeping-writers-private">Default to read-only, and consider keeping writers private</a></li>
+      <li><a href="#Think-twice-before-changing-an-attributes-type-in-a-subclass">Think twice before changing an attribute&#39;s type in a subclass</a></li>
+      <li><a href="#Dont-use-the-initializer-feature">Don&#39;t use the initializer feature</a></li>
+      <li><a href="#Use-Moose::Meta::Attribute::Native-traits-instead-of-auto_deref">Use Moose::Meta::Attribute::Native traits instead of auto_deref</a></li>
+      <li><a href="#Always-call-inner-in-the-most-specific-subclass">Always call inner in the most specific subclass</a></li>
+      <li><a href="#Namespace-your-types">Namespace your types</a></li>
+      <li><a href="#Do-not-coerce-Moose-built-ins-directly">Do not coerce Moose built-ins directly</a></li>
+      <li><a href="#Do-not-coerce-class-names-directly">Do not coerce class names directly</a></li>
+      <li><a href="#Use-coercion-instead-of-unions">Use coercion instead of unions</a></li>
+      <li><a href="#Define-all-your-types-in-one-module">Define all your types in one module</a></li>
+    </ul>
+  </li>
+  <li><a href="#BENEFITS-OF-BEST-PRACTICES">BENEFITS OF BEST PRACTICES</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::BestPractices - Get the most out of Moose</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="RECOMMENDATIONS">RECOMMENDATIONS</h1>
+
+<p>Moose has a lot of features, and there&#39;s definitely more than one way to do it. However, we think that picking a subset of these features and using them consistently makes everyone&#39;s life easier.</p>
+
+<p>Of course, as with any list of &quot;best practices&quot;, these are really just opinions. Feel free to ignore us.</p>
+
+<h2 id="namespace::autoclean-and-immutabilize"><code>namespace::autoclean</code> and immutabilize</h2>
+
+<p>We recommend that you remove the Moose sugar and end your Moose class definitions by making your class immutable.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Person</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">namespace::autoclean</span><span class="operator">;</span>
+  
+  <span class="comment"># extends, roles, attributes, etc.</span>
+  
+  <span class="comment"># methods</span>
+  
+  <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">make_immutable</span><span class="operator">;</span>
+  
+  <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>use namespace::autoclean</code> bit is simply good code hygiene, as it removes imported symbols from your class&#39;s namespace at the end of your package&#39;s compile cycle, including Moose keywords. Once the class has been built, these keywords are not needed. (This is preferred to placing <code>no Moose</code> at the end of your package).</p>
+
+<p>The <code>make_immutable</code> call allows Moose to speed up a lot of things, most notably object construction. The trade-off is that you can no longer change the class definition.</p>
+
+<h2 id="Never-override-new">Never override <code>new</code></h2>
+
+<p>Overriding <code>new</code> is a very bad practice. Instead, you should use a <code>BUILD</code> or <code>BUILDARGS</code> methods to do the same thing. When you override <code>new</code>, Moose can no longer inline a constructor when your class is immutabilized.</p>
+
+<p>There are two good reasons to override <code>new</code>. One, you are writing a MooseX extension that provides its own <a href="../../../lib/Moose/Object.html">Moose::Object</a> subclass <i>and</i> a subclass of <a href="../../../lib/Moose/Meta/Method/Constructor.html">Moose::Meta::Method::Constructor</a> to inline the constructor. Two, you are subclassing a non-Moose parent.</p>
+
+<p>If you know how to do that, you know when to ignore this best practice ;)</p>
+
+<h2 id="Always-call-the-original-parent-BUILDARGS">Always call the original/parent <code>BUILDARGS</code></h2>
+
+<p>If you <code>override</code> the <code>BUILDARGS</code> method in your class, make sure to play nice and call <code>super()</code> to handle cases you&#39;re not checking for explicitly.</p>
+
+<p>The default <code>BUILDARGS</code> method in <a href="../../../lib/Moose/Object.html">Moose::Object</a> handles both a list and hashref of named parameters correctly, and also checks for a <i>non-hashref</i> single argument.</p>
+
+<h2 id="Provide-defaults-whenever-possible-otherwise-use-required">Provide defaults whenever possible, otherwise use <code>required</code></h2>
+
+<p>When your class provides defaults, this makes constructing new objects simpler. If you cannot provide a default, consider making the attribute <code>required</code>.</p>
+
+<p>If you don&#39;t do either, an attribute can simply be left unset, increasing the complexity of your object, because it has more possible states that you or the user of your class must account for.</p>
+
+<h2 id="Use-builder-instead-of-default-most-of-the-time">Use <code>builder</code> instead of <code>default</code> most of the time</h2>
+
+<p>Builders can be inherited, they have explicit names, and they&#39;re just plain cleaner.</p>
+
+<p>However, <i>do</i> use a default when the default is a non-reference, <i>or</i> when the default is simply an empty reference of some sort.</p>
+
+<p>Also, keep your builder methods private.</p>
+
+<h2 id="Be-lazy">Be <code>lazy</code></h2>
+
+<p>Lazy is good, and often solves initialization ordering problems. It&#39;s also good for deferring work that may never have to be done. Make your attributes <code>lazy</code> unless they&#39;re <code>required</code> or have trivial defaults.</p>
+
+<h2 id="Consider-keeping-clearers-and-predicates-private">Consider keeping clearers and predicates private</h2>
+
+<p>Does everyone <i>really</i> need to be able to clear an attribute? Probably not. Don&#39;t expose this functionality outside your class by default.</p>
+
+<p>Predicates are less problematic, but there&#39;s no reason to make your public API bigger than it has to be.</p>
+
+<h2 id="Avoid-lazy_build">Avoid <code>lazy_build</code></h2>
+
+<p>As described above, you rarely actually need a clearer or a predicate. <code>lazy_build</code> adds both to your public API, which exposes you to use cases that you must now test for. It&#39;s much better to avoid adding them until you really need them - use explicit <code>lazy</code> and <code>builder</code> options instead.</p>
+
+<h2 id="Default-to-read-only-and-consider-keeping-writers-private">Default to read-only, and consider keeping writers private</h2>
+
+<p>Making attributes mutable just means more complexity to account for in your program. The alternative to mutable state is to encourage users of your class to simply make new objects as needed.</p>
+
+<p>If you <i>must</i> make an attribute read-write, consider making the writer a separate private method. Narrower APIs are easy to maintain, and mutable state is trouble.</p>
+
+<p>In order to declare such attributes, provide a private <code>writer</code> parameter:</p>
+
+<pre><code>    <span class="variable">has</span> <span class="string">pizza</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">is</span>     <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+        <span class="string">isa</span>    <span class="operator">=&gt;</span> <span class="string">'Pizza'</span><span class="operator">,</span>
+        <span class="string">writer</span> <span class="operator">=&gt;</span> <span class="string">'_pizza'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Think-twice-before-changing-an-attributes-type-in-a-subclass">Think twice before changing an attribute&#39;s type in a subclass</h2>
+
+<p>Down this path lies great confusion. If the attribute is an object itself, at least make sure that it has the same interface as the type of object in the parent class.</p>
+
+<h2 id="Dont-use-the-initializer-feature">Don&#39;t use the <code>initializer</code> feature</h2>
+
+<p>Don&#39;t know what we&#39;re talking about? That&#39;s fine.</p>
+
+<h2 id="Use-Moose::Meta::Attribute::Native-traits-instead-of-auto_deref">Use <a href="../../../lib/Moose/Meta/Attribute/Native.html">Moose::Meta::Attribute::Native</a> traits instead of <code>auto_deref</code></h2>
+
+<p>The <code>auto_deref</code> feature is a bit troublesome. Directly exposing a complex attribute is ugly. Instead, consider using <a href="../../../lib/Moose/Meta/Attribute/Native.html">Moose::Meta::Attribute::Native</a> traits to define an API that only exposes the necessary pieces of functionality.</p>
+
+<h2 id="Always-call-inner-in-the-most-specific-subclass">Always call <code>inner</code> in the most specific subclass</h2>
+
+<p>When using <code>augment</code> and <code>inner</code>, we recommend that you call <code>inner</code> in the most specific subclass of your hierarchy. This makes it possible to subclass further and extend the hierarchy without changing the parents.</p>
+
+<h2 id="Namespace-your-types">Namespace your types</h2>
+
+<p>Use some sort of namespacing convention for type names. We recommend something like &quot;MyApp::Type::Foo&quot;. We also recommend considering <a>MooseX::Types</a>.</p>
+
+<h2 id="Do-not-coerce-Moose-built-ins-directly">Do not coerce Moose built-ins directly</h2>
+
+<p>If you define a coercion for a Moose built-in like <code>ArrayRef</code>, this will affect every application in the Perl interpreter that uses this type.</p>
+
+<pre><code>    <span class="comment"># very naughty!</span>
+    <span class="variable">coerce</span> <span class="string">'ArrayRef'</span>
+        <span class="operator">=&gt;</span> <span class="variable">from</span> <span class="string">Str</span>
+        <span class="operator">=&gt;</span> <span class="variable">via</span> <span class="operator">{</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="regex">/,/</span> <span class="operator">]</span> <span class="operator">};</span>
+</code></pre>
+
+<p>Instead, create a subtype and coerce that:</p>
+
+<pre><code>    <span class="variable">subtype</span> <span class="string">'My::ArrayRef'</span> <span class="operator">=&gt;</span> <span class="variable">as</span> <span class="string">'ArrayRef'</span><span class="operator">;</span>
+    
+    <span class="variable">coerce</span> <span class="string">'My::ArrayRef'</span>
+        <span class="operator">=&gt;</span> <span class="variable">from</span> <span class="string">'Str'</span>
+        <span class="operator">=&gt;</span> <span class="variable">via</span> <span class="operator">{</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="regex">/,/</span> <span class="operator">]</span> <span class="operator">};</span>
+</code></pre>
+
+<h2 id="Do-not-coerce-class-names-directly">Do not coerce class names directly</h2>
+
+<p>Just as with Moose built-in types, a class type is global for the entire interpreter. If you add a coercion for that class name, it can have magical side effects elsewhere:</p>
+
+<pre><code>    <span class="comment"># also very naughty!</span>
+    <span class="variable">coerce</span> <span class="string">'HTTP::Headers'</span>
+        <span class="operator">=&gt;</span> <span class="variable">from</span> <span class="string">'HashRef'</span>
+        <span class="operator">=&gt;</span> <span class="variable">via</span> <span class="operator">{</span> <span class="variable">HTTP::Headers</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$_</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">};</span>
+</code></pre>
+
+<p>Instead, we can create an &quot;empty&quot; subtype for the coercion:</p>
+
+<pre><code>    <span class="variable">subtype</span> <span class="string">'My::HTTP::Headers'</span> <span class="operator">=&gt;</span> <span class="variable">as</span> <span class="variable">class_type</span><span class="operator">(</span><span class="string">'HTTP::Headers'</span><span class="operator">);</span>
+    
+    <span class="variable">coerce</span> <span class="string">'My::HTTP::Headers'</span>
+        <span class="operator">=&gt;</span> <span class="variable">from</span> <span class="string">'HashRef'</span>
+        <span class="operator">=&gt;</span> <span class="variable">via</span> <span class="operator">{</span> <span class="variable">HTTP::Headers</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$_</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">};</span>
+</code></pre>
+
+<h2 id="Use-coercion-instead-of-unions">Use coercion instead of unions</h2>
+
+<p>Consider using a type coercion instead of a type union. This was covered in <a href="../../../lib/Moose/Manual/Types.html">Moose::Manual::Types</a>.</p>
+
+<h2 id="Define-all-your-types-in-one-module">Define all your types in one module</h2>
+
+<p>Define all your types and coercions in one module. This was also covered in <a href="../../../lib/Moose/Manual/Types.html">Moose::Manual::Types</a>.</p>
+
+<h1 id="BENEFITS-OF-BEST-PRACTICES">BENEFITS OF BEST PRACTICES</h1>
+
+<p>Following these practices has a number of benefits.</p>
+
+<p>It helps ensure that your code will play nice with others, making it more reusable and easier to extend.</p>
+
+<p>Following an accepted set of idioms will make maintenance easier, especially when someone else has to maintain your code. It will also make it easier to get support from other Moose users, since your code will be easier to digest quickly.</p>
+
+<p>Some of these practices are designed to help Moose do the right thing, especially when it comes to immutabilization. This means your code will be faster when immutabilized.</p>
+
+<p>Many of these practices also help get the most out of meta programming. If you used an overridden <code>new</code> to do type coercion by hand, rather than defining a real coercion, there is no introspectable metadata. This sort of thing is particularly problematic for MooseX extensions which rely on introspection to do the right thing.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,228 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::Config::INI - Access and edit INI style config files</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">ActiveState::Config::INI</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$conf</span> <span class="operator">=</span> <span class="variable">ActiveState::Config::INI</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$filename</span> <span class="operator">);</span>
+ <span class="variable">$conf</span><span class="operator">-&gt;</span><span class="variable">property</span><span class="operator">(</span><span class="variable">$section</span><span class="operator">,</span> <span class="variable">$param</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">);</span>
+ <span class="variable">$conf</span><span class="operator">-&gt;</span><span class="variable">save</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>ActiveState::Config::INI</code> class allow INI style configuration files to be accessed and edited safely without rearranging the file or dropping comments. The diff to the file will only affect the lines of properties and sections that has been touched. The existing line ending sequence is preserved regardless of platform.</p>
+
+<p>The INI file dialect that this module support is identical to the one supported by the <a href="../../../lib/Config/Tiny.html">Config::Tiny</a> module: Lines that start with &#39;#&#39; as the first non-whitespace character are ignored (or introduce commented out parameters). The &#39; ; &#39; sequence can be used for trailing comments on parameter values. Quotes have no special meaning in attribute values.</p>
+
+<p>The following methods are provided:</p>
+
+<dl>
+
+<dt id="conf-ActiveState::Config::INI-new">$conf = ActiveState::Config::INI-&gt;new</dt>
+<dd>
+
+</dd>
+<dt id="conf-ActiveState::Config::INI-new-filename">$conf = ActiveState::Config::INI-&gt;new( $filename )</dt>
+<dd>
+
+<p>This constructs a new <code>ActiveState::Config::INI</code> object and returns it. If a file name is passed in, initialize the object by reading the file.</p>
+
+</dd>
+<dt id="conf-read-filename">$conf-&gt;read( $filename )</dt>
+<dd>
+
+<p>Will initialize the object from the given file. Croaks if the file can&#39;t be opened. Any previous state is lost.</p>
+
+<p>No return value.</p>
+
+</dd>
+<dt id="conf-write">$conf-&gt;write</dt>
+<dd>
+
+</dd>
+<dt id="conf-write-filename">$conf-&gt;write( $filename )</dt>
+<dd>
+
+<p>Write the current state back to the given file. The filename can be ommited if the state was previously read from a file. In this case the file will be overwritten.</p>
+
+<p>Croaks if the file can&#39;t be opened or if write fails. The file might have been partly overwritten in this case.</p>
+
+<p>No return value.</p>
+
+</dd>
+<dt id="conf-content">$conf-&gt;content</dt>
+<dd>
+
+</dd>
+<dt id="conf-content-buffer">$conf-&gt;content( $buffer )</dt>
+<dd>
+
+<p>Without argument returns the content that would be written to the file by <code>$conf-&gt;write</code>.</p>
+
+<p>With argument initialize the object from the given buffer. The result is the same as if <code>$conf-&gt;read</code> was invoked on a file with $buffer as its content.</p>
+
+</dd>
+<dt id="conf-sections">$conf-&gt;sections</dt>
+<dd>
+
+<p>Returns the list of section names used in the file. The section names are returned in the same order as found in configuration file.</p>
+
+<p>There will not be an &quot;&quot; entry (the global section) in the returned list, even though this section can be regarded as always present.</p>
+
+<p>The return value in scalar context is undefined.</p>
+
+</dd>
+<dt id="conf-have_section-section">$conf-&gt;have_section( $section )</dt>
+<dd>
+
+<p>Returns TRUE if the given section is present. Disabled sections are still regarded as present.</p>
+
+</dd>
+<dt id="conf-add_section-section-comment">$conf-&gt;add_section( $section, $comment )</dt>
+<dd>
+
+<p>Adds the given section to the end of the configuration file. If a comment is provided it&#39;s added just before the section in the file. The comment might be multi-lined.</p>
+
+<p>If the section is already present in the configuration file nothing is done. There is no check that the leading comment for the section match the given comment.</p>
+
+</dd>
+<dt id="conf-section_enabled-section">$conf-&gt;section_enabled( $section )</dt>
+<dd>
+
+</dd>
+<dt id="conf-section_enabled-section-bool">$conf-&gt;section_enabled( $section =&gt; $bool )</dt>
+<dd>
+
+<p>Get/set the flag that indicate if a section is enabled or not. If set for a section not already present then the section will be automatically added first.</p>
+
+<p>This uses the perlcritic convension of prepending &quot;-&quot; to the section name for disabled sections.</p>
+
+</dd>
+<dt id="conf-delete_section-section">$conf-&gt;delete_section( $section )</dt>
+<dd>
+
+<p>Removes all the lines from the given section from the configuration file. The removed lines are returned as a list. In scalar context the number of deleted lines is returned.</p>
+
+</dd>
+<dt id="conf-properties-section">$conf-&gt;properties( $section )</dt>
+<dd>
+
+<p>Returns the list of the names of the properties currently in use for the given section. Disabled properties are also included in the list.</p>
+
+<p>The return value in scalar context is undefined.</p>
+
+</dd>
+<dt id="conf-property-section-param">$conf-&gt;property( $section, $param )</dt>
+<dd>
+
+</dd>
+<dt id="conf-property-section-param-value">$conf-&gt;property( $section, $param =&gt; $value)</dt>
+<dd>
+
+</dd>
+<dt id="conf-property-section-param-value-enabled">$conf-&gt;property( $section, $param =&gt; $value, $enabled)</dt>
+<dd>
+
+<p>Get/set the given property value. When a property is set then the previous value it had is returned.</p>
+
+<p>If a property value is set it will also become enabled unless $enabled is passed as FALSE or <code>undef</code>. If FALSE is passed the property will be disabled. If <code>undef</code> is passed then the enabledness of the property stay as it was.</p>
+
+<p>Use the empty string as $section to get/set the global property values.</p>
+
+<p>Setting a property to the <code>undef</code> value has the same effect as disabling it; that is <code>$conf-&gt;property_enabled( $section, $param, 0 )</code>.</p>
+
+<p>When setting; if the given section is not present it be added first, and if the given property does not exist a line for it will be inserted as the first property of the section.</p>
+
+</dd>
+<dt id="conf-_property-section-param">$conf-&gt;_property( $section, $param )</dt>
+<dd>
+
+<p>Works like <code>$conf-&gt;property</code> but will even return the current value for disabled properties, while <code>$conf-&gt;property</code> returns <code>undef</code> for these.</p>
+
+</dd>
+<dt id="conf-have_property-section-param">$conf-&gt;have_property( $section, $param )</dt>
+<dd>
+
+<p>Returns TRUE if the given property is present in the configuration file. Disabled properties are considered present.</p>
+
+</dd>
+<dt id="conf-property_enabled-section-param">$conf-&gt;property_enabled( $section, $param )</dt>
+<dd>
+
+</dd>
+<dt id="conf-property_enabled-section-param-enabled">$conf-&gt;property_enabled( $section, $param =&gt; $enabled )</dt>
+<dd>
+
+<p>Get/set the flag that indicate if the given property is enabled or not.</p>
+
+<p>In the file format disabled properties are commented out by prefixing their line with &quot;# &quot;.</p>
+
+</dd>
+<dt id="conf-append_lines-lines">$conf-&gt;append_lines( @lines )</dt>
+<dd>
+
+<p>Will append the given lines to the configuration file. The passed in strings do not have to be &quot;\n&quot; terminated and they should not have embedded newlines.</p>
+
+</dd>
+<dt id="conf-insert_line-offset-line">$conf-&gt;insert_line( $offset, $line )</dt>
+<dd>
+
+<p>Inserts the given line into the configuration file at the given position (0-based line number).</p>
+
+</dd>
+<dt id="conf-delete_lines-offset-length">$conf-&gt;delete_lines( $offset, $length )</dt>
+<dd>
+
+<p>Removes the given lines from the configuration file and returns them.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p><code>Config::Tiny</code> removes &quot;inline comments&quot; (<code><span class="regex">/\s;\s.*/</span>
+</code>) before it tries to recognize section headers or parameters. This cause an incompatiblity with this module which only recognize inline comments in parameter values.</p>
+
+<p>When a new parameter is inserted it&#39;s not aligned with the section header indentation. Should not really be a big deal as section headers should not really be indented.</p>
+
+<p><code>Config::Tiny</code> uses &quot;_&quot; as the name for the global section. This module use &quot;&quot;.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/Config/Tiny.html">Config::Tiny</a> <a href="http://en.wikipedia.org/wiki/INI_file">http://en.wikipedia.org/wiki/INI_file</a></p>
+
+
+</body>
+
+</html>
+
+

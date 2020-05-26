@@ -1,0 +1,461 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#GETTING-INVOLVED">GETTING INVOLVED</a>
+    <ul>
+      <li><a href="#Get-the-Code">Get the Code</a></li>
+      <li><a href="#People">People</a></li>
+      <li><a href="#New-Features">New Features</a></li>
+      <li><a href="#Branch-Layout">Branch Layout</a></li>
+    </ul>
+  </li>
+  <li><a href="#WORKFLOWS">WORKFLOWS</a>
+    <ul>
+      <li><a href="#Getting-Started">Getting Started</a></li>
+      <li><a href="#Development-Workflow">Development Workflow</a>
+        <ul>
+          <li><a href="#Update-Your-Repository">Update Your Repository</a></li>
+          <li><a href="#Create-Your-Topic-Branch">Create Your Topic Branch</a></li>
+          <li><a href="#Hack.-Commit.-Repeat">Hack. Commit. Repeat.</a></li>
+          <li><a href="#Clean-Up-Your-Branch">Clean Up Your Branch</a></li>
+          <li><a href="#Rebase-on-the-Latest">Rebase on the Latest</a></li>
+          <li><a href="#Publish-and-Pull-Request">Publish and Pull Request</a></li>
+        </ul>
+      </li>
+      <li><a href="#Approval-Workflow">Approval Workflow</a></li>
+      <li><a href="#Release-Workflow">Release Workflow</a>
+        <ul>
+          <li><a href="#Release-How-To">Release How-To</a></li>
+        </ul>
+      </li>
+      <li><a href="#Emergency-Bug-Workflow-for-immediate-release">Emergency Bug Workflow (for immediate release)</a></li>
+      <li><a href="#Project-Workflow">Project Workflow</a></li>
+    </ul>
+  </li>
+  <li><a href="#BRANCH-ARCHIVAL">BRANCH ARCHIVAL</a></li>
+  <li><a href="#TESTS-TESTS-TESTS">TESTS, TESTS, TESTS</a></li>
+  <li><a href="#DOCS-DOCS-DOCS">DOCS, DOCS, DOCS</a></li>
+  <li><a href="#BACKWARDS-COMPATIBILITY">BACKWARDS COMPATIBILITY</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::Contributing - How to get involved in Moose</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="GETTING-INVOLVED">GETTING INVOLVED</h1>
+
+<p>Moose is an open project, and we are always willing to accept bug fixes, more tests, and documentation patches. Commit bits are given out freely and it&#39;s easy to get started!</p>
+
+<h2 id="Get-the-Code">Get the Code</h2>
+
+<p>If you just want to get your feet wet and check out the code, you can do so from the comfort of your web browser by going to the official repository on GitHub: <a href="https://github.com/moose/Moose">https://github.com/moose/Moose</a>.</p>
+
+<p>However, if you know how to use git and would rather have a local copy (because, why wouldn&#39;t you?!), then you can clone it:</p>
+
+<pre><code>    git clone git@github.com:moose/Moose.git</code></pre>
+
+<p>If, at some point, you think you&#39;d like to contribute a patch, please see <a href="#Getting-Started">&quot;Getting Started&quot;</a>.</p>
+
+<p><i><b>NOTE:</b> Your contribution is very important to us. If, for some reason, you would prefer not to use Git/GitHub, come talk to us at #moose on irc.perl.org and we can work something out.</i></p>
+
+<h2 id="People">People</h2>
+
+<p>As Moose has matured, some structure has emerged in the process.</p>
+
+<dl>
+
+<dt id="Cabal---people-who-can-release-moose">Cabal - people who can release moose</dt>
+<dd>
+
+<p>These people are the ones who have co-maint on Moose itself and can create a release. They&#39;re listed under <a href="../../../lib/Moose.html#CABAL">&quot;CABAL&quot; in Moose</a> in the Moose documentation. They are responsible for reviewing branches, and are the only people who are allowed to push to stable branches.</p>
+
+<p>Cabal members are listed in <a href="../../../lib/Moose.html">Moose</a> and can often be found on irc in the <a href="irc://irc.perl.org/#moose-dev">irc://irc.perl.org/#moose-dev</a> channel.</p>
+
+</dd>
+<dt id="Contributors---people-creating-a-topic-or-branch">Contributors - people creating a topic or branch</dt>
+<dd>
+
+<p>You!</p>
+
+</dd>
+</dl>
+
+<h2 id="New-Features">New Features</h2>
+
+<p>Moose already has a fairly large feature set, and we are currently <b>not</b> looking to add any major new features to it. If you have an idea for a new feature in Moose, you are encouraged to create a MooseX module first.</p>
+
+<p>At this stage, no new features will even be considered for addition into the core without first being vetted as a MooseX module, unless it is absolutely 100% impossible to implement the feature outside the core.</p>
+
+<p>If you think it is 100% impossible, please come discuss it with us on IRC or via e-mail. Your feature may need a small hook in the core, or a refactoring of some core modules, and we are definitely open to that.</p>
+
+<p>Moose was built from the ground up with the idea of being highly extensible, and quite often the feature requests we see can be implemented through small extensions. Try it, it&#39;s much easier than you might think.</p>
+
+<h2 id="Branch-Layout">Branch Layout</h2>
+
+<p>The repository is divided into several branches to make maintenance easier for everyone involved. The branches below are ordered by level of stability.</p>
+
+<dl>
+
+<dt id="stable">stable/*</dt>
+<dd>
+
+<p>The branch from which releases are cut. When making a new major release, the release manager makes a new <code>stable/X.YY</code> branch at the current position of <code>master</code>. The version used in the stable branch should not include the last two digits of the version number.</p>
+
+<p>For minor releases, patches will be committed to <code>master</code>, and backported (cherry-picked) to the appropriate stable branch as needed. A stable branch is only updated by someone from the Cabal during a release.</p>
+
+</dd>
+<dt id="master">master</dt>
+<dd>
+
+<p>The main development branch. All new code should be written against this branch. This branch contains code that has been reviewed, and will be included in the next major release. Commits which are judged to not break backwards compatibility may be backported into <code>stable</code> to be included in the next minor release.</p>
+
+</dd>
+<dt id="topic">topic/*</dt>
+<dd>
+
+<p>Small personal branches that are still in progress. They can be freely rebased. They contain targeted features that may span a handful of commits. Any change or bugfix should be created in a topic branch.</p>
+
+</dd>
+<dt id="rfc">rfc/*</dt>
+<dd>
+
+<p>Topic branches that are completed and waiting on review. A Cabal member will look over branches in this namespace, and either merge them to <code>master</code> if they are acceptable, or move them back to a different namespace otherwise. This namespace is being phased out now that we are using GitHub&#39;s pull requests in our <a href="#Development-Workflow">&quot;Development Workflow&quot;</a>.</p>
+
+</dd>
+<dt id="attic">attic/*</dt>
+<dd>
+
+<p>Branches which have been reviewed, and rejected. They remain in the repository in case we later change our mind, or in case parts of them are still useful.</p>
+
+</dd>
+<dt id="abandoned">abandoned/*</dt>
+<dd>
+
+<p>Topic branches which have had no activity for a long period of time will be moved here, to keep the main areas clean.</p>
+
+</dd>
+</dl>
+
+<p>Larger, longer term branches can also be created in the root namespace (i.e. at the same level as master and stable). This may be appropriate if multiple people are intending to work on the branch. These branches should not be rebased without checking with other developers first.</p>
+
+<h1 id="WORKFLOWS">WORKFLOWS</h1>
+
+<h2 id="Getting-Started">Getting Started</h2>
+
+<p>So, you&#39;ve cloned the main Moose repository to your local machine (see <a href="#Get-the-Code">&quot;Get the Code&quot;</a>) and you&#39;re ready to do some hacking. We couldn&#39;t be happier to welcome you to our community!</p>
+
+<p>Of course, to ensure that your first experience is as productive and satisfying as possible, you should probably take some time to read over this entire POD document. Doing so will give you a full understanding of how Moose developers and maintainers work together and what they expect from one another. Done? Great!</p>
+
+<p>Next, assuming you have a GitHub account, go to <a href="http://github.com/moose/Moose">http://github.com/moose/Moose</a> and <b>fork the repository</b> (see <a href="https://help.github.com/articles/fork-a-repo">https://help.github.com/articles/fork-a-repo</a>). This will put an exact replica of the Moose repository into your GitHub account, which will serve as a place to publish your patches for the Moose maintainers to review and incorporate.</p>
+
+<p>Once your fork has been created, switch to your local working repository directory and update your <code>origin</code> remote&#39;s push URL. This allows you to use a single remote (<code>origin</code>) to both pull in the latest code from GitHub and also push your work to your own fork:</p>
+
+<pre><code>    # Replace YOUR_USERNAME below with your GitHub username
+    git remote set-url --push origin git@github.com:YOUR_USERNAME/moose.git</code></pre>
+
+<p>You can verify your work:</p>
+
+<pre><code>    $ git remote -v
+    origin  git@github.com:moose/Moose.git (fetch)
+    origin  git@github.com:YOUR_USERNAME/moose.git (push)</code></pre>
+
+<p>Now, you&#39;re ready for action! From now on, you just follow the <a href="#Development-Workflow">&quot;Development Workflow&quot;</a> to publish your work and <b>submit pull requests</b> to the Moose Cabal.</p>
+
+<h2 id="Development-Workflow">Development Workflow</h2>
+
+<p>The general gist of the <b>STANDARD WORKFLOW</b> is:</p>
+
+<dl>
+
+<dt id="Update-your-local-repository-with-the-latest-commits-from-the-official-repository">1. Update your local repository with the latest commits from the official repository</dt>
+<dd>
+
+</dd>
+<dt id="Create-a-new-topic-branch-based-on-the-master-branch">2. Create a new topic branch, based on the master branch</dt>
+<dd>
+
+</dd>
+<dt id="Hack-away">3. Hack away</dt>
+<dd>
+
+</dd>
+<dt id="Commit-and-push-the-topic-branch-to-your-forked-repository">4. Commit and push the topic branch to your forked repository</dt>
+<dd>
+
+</dd>
+<dt id="Submit-a-pull-request-through-GitHub-for-that-branch">5. Submit a pull request through GitHub for that branch</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>What follows is a more detailed rundown of that workflow. Please make sure to review and follow the steps in the previous section, <a href="#Getting-Started">&quot;Getting Started&quot;</a>, if you have not done so already.</p>
+
+<h3 id="Update-Your-Repository">Update Your Repository</h3>
+
+<p>Update your local copy of the master branch from the remote:</p>
+
+<pre><code>    git checkout master
+    git pull --rebase</code></pre>
+
+<h3 id="Create-Your-Topic-Branch">Create Your Topic Branch</h3>
+
+<p>Now, create a new topic branch based on your master branch. It&#39;s useful to use concise, descriptive branch names such as: pod-syntax-contrib, feat-autodelegation, patch-23-role-comp, etc. However, we&#39;ll just call ours <code>my-feature</code> for demonstration purposes:</p>
+
+<pre><code>    git checkout -b topic/my-feature</code></pre>
+
+<h3 id="Hack.-Commit.-Repeat">Hack. Commit. Repeat.</h3>
+
+<p>While you&#39;re hacking, the most important thing to remember is that your topic branch is yours to do with as you like. Nothing you do there will affect anyone else at this point. Commit as often as little or as often as you need to and don&#39;t let perfection get in the way of progress. However, don&#39;t try to do too much as the easiest changes to integrate are small and focused.</p>
+
+<p>If it&#39;s been a while since you created your topic branch, it&#39;s often a good idea to periodically rebase your branch off of the upstream master to reduce your work later on:</p>
+
+<pre><code>    git fetch                   # or, git remote update
+    git rebase origin/master    # or, git pull --rebase origin master</code></pre>
+
+<p>You should also feel free to publish (using <code>push --force</code> if necessary) your branch to your GitHub fork if you simply need feedback from others. (Note: actual collaboration takes a bit more finesse and a lot less <code>--force</code> however).</p>
+
+<h3 id="Clean-Up-Your-Branch">Clean Up Your Branch</h3>
+
+<p>Finally, when your development is done, it&#39;s time to prepare your branch for review. Even the smallest branches can often use a little bit of tidying up before they are unleashed on a reviewer. Clarifying/cleaning up commit messages, reordering commits, splitting large commits or those which contain different types of changes, squashing related or straggler commits are all <b>highly</b> worthwhile activities to undertake on your topic branch.</p>
+
+<p><b>Remember:</b> Your topic branch is yours. Don&#39;t worry about rewriting its history or breaking fast-forward. Some useful commands are listed below but please make sure that you understand what they do as they can rewrite history:</p>
+
+<pre><code>    - git commit --amend
+    - git rebase --interactive
+    - git cherry-pick</code></pre>
+
+<p>Ultimately, your goal in cleaning up your branch is to craft a set of commits whose content and messages are as focused and understandable as possible. Doing so will greatly increase the chances of a speedy review and acceptance into the mainline development.</p>
+
+<h3 id="Rebase-on-the-Latest">Rebase on the Latest</h3>
+
+<p>Before your final push and issuing a pull request, you need to ensure that your changes can be easily merged into the master branch of the upstream repository. This is done by once again rebasing your branch on the latest <code>origin/master</code>.</p>
+
+<pre><code>    git fetch                   # or, git remote update
+    git rebase origin/master    # or, git pull --rebase origin master</code></pre>
+
+<h3 id="Publish-and-Pull-Request">Publish and Pull Request</h3>
+
+<p>Now it&#39;s time to make your final push of the branch to your fork. The <code>--force</code> flag is only necessary if you&#39;ve pushed before and subsequently rewriting your history:</p>
+
+<pre><code>    git push --force</code></pre>
+
+<p>After your branch is published, you can issue a pull request to the Moose Cabal. See &lt;https://help.github.com/articles/using-pull-requests&gt; for details.</p>
+
+<p>Congratulations! You&#39;re now a contributor!</p>
+
+<h2 id="Approval-Workflow">Approval Workflow</h2>
+
+<p>Moose is an open project but it is also an increasingly important one. Many modules depend on Moose being stable. Therefore, we have a basic set of criteria for reviewing and merging branches. What follows is a set of rough guidelines that ensures all new code is properly vetted before it is merged to the master branch.</p>
+
+<p>It should be noted that if you want your specific branch to be approved, it is <b>your</b> responsibility to follow this process and advocate for your branch.</p>
+
+<dl>
+
+<dt id="Small-bug-fixes-doc-patches-and-additional-passing-tests">Small bug fixes, doc patches and additional passing tests.</dt>
+<dd>
+
+<p>These items don&#39;t really require approval beyond one of the core contributors just doing a simple review. For especially simple patches (doc patches especially), committing directly to master is fine.</p>
+
+</dd>
+<dt id="Larger-bug-fixes-doc-additions-and-TODO-or-failing-tests">Larger bug fixes, doc additions and TODO or failing tests.</dt>
+<dd>
+
+<p>Larger bug fixes should be reviewed by at least one cabal member and should be tested using the <i>xt/author/test-my-dependents.t</i> test.</p>
+
+<p>New documentation is always welcome, but should also be reviewed by a cabal member for accuracy.</p>
+
+<p>TODO tests are basically feature requests, see our <a href="#New-Features">&quot;New Features&quot;</a> section for more information on that. If your feature needs core support, create a <code>topic/</code> branch using the <a href="#Development-Workflow">&quot;Development Workflow&quot;</a> and start hacking away.</p>
+
+<p>Failing tests are basically bug reports. You should find a core contributor and/or cabal member to see if it is a real bug, then submit the bug and your test to the RT queue. Source control is not a bug reporting tool.</p>
+
+</dd>
+<dt id="New-user-facing-features">New user-facing features.</dt>
+<dd>
+
+<p>Anything that creates a new user-visible feature needs to be approved by <b>more than one</b> cabal member.</p>
+
+<p>Make sure you have reviewed <a href="#New-Features">&quot;New Features&quot;</a> to be sure that you are following the guidelines. Do not be surprised if a new feature is rejected for the core.</p>
+
+</dd>
+<dt id="New-internals-features">New internals features.</dt>
+<dd>
+
+<p>New features for Moose internals are less restrictive than user facing features, but still require approval by <b>at least one</b> cabal member.</p>
+
+<p>Ideally you will have run the <i>xt/author/test-my-dependents.t</i> script to be sure you are not breaking any MooseX module or causing any other unforeseen havoc. If you do this (rather than make us do it), it will only help to hasten your branch&#39;s approval.</p>
+
+</dd>
+<dt id="Backwards-incompatible-changes">Backwards incompatible changes.</dt>
+<dd>
+
+<p>Anything that breaks backwards compatibility must be discussed by the cabal. Backwards incompatible changes should not be merged to master if there are strong objections from any cabal members.</p>
+
+<p>We have a policy for what we see as sane <a href="#BACKWARDS-COMPATIBILITY">&quot;BACKWARDS COMPATIBILITY&quot;</a> for Moose. If your changes break back-compat, you must be ready to discuss and defend your change.</p>
+
+</dd>
+</dl>
+
+<h2 id="Release-Workflow">Release Workflow</h2>
+
+<pre><code>    # major releases (including trial releases)
+    git checkout master
+
+    # minor releases
+    git checkout stable/X.YY
+
+    # do final changelogging, etc
+    vim dist.ini # increment version number
+    git commit
+    dzil release # or dzil release --trial for trial releases
+    git commit # to add the actual release date
+    git branch stable/X.YY # only for non-trial major releases</code></pre>
+
+<h3 id="Release-How-To">Release How-To</h3>
+
+<p>Moose uses <a>Dist::Zilla</a> to manage releases. Although the git repository comes with a <code>Makefile.PL</code>, it is a very basic one just to allow the basic <code>perl Makefile.PL &amp;&amp; make &amp;&amp; make test</code> cycle to work. In particular, it doesn&#39;t include any release metadata, such as dependencies. In order to get started with Dist::Zilla, first install it: <code>cpanm Dist::Zilla</code>, and then install the plugins necessary for reading the <code>dist.ini</code>: <code>dzil authordeps | cpanm</code>.</p>
+
+<p>Moose releases fall into two categories, each with their own level of release preparation. A minor release is one which does not include any API changes, deprecations, and so on. In that case, it is sufficient to simply test the release candidate against a few different Perls. Testing should be done against at least two recent major versions of Perl (5.8.8 and 5.10.1, for example). If you have more versions available, you are encouraged to test them all. However, we do not put a lot of effort into supporting older 5.8.x releases.</p>
+
+<p>For major releases which include an API change or deprecation, you should run the <i>xt/author/test-my-dependents.t</i> test. This tests a long list of MooseX and other Moose-using modules from CPAN. In order to run this script, you must arrange to have the new version of Moose in Perl&#39;s include path. You can use <code>prove -b</code> and <code>prove -I</code>, install the module, or fiddle with the <code>PERL5LIB</code> environment variable, whatever makes you happy.</p>
+
+<p>This test downloads each module from CPAN, runs its tests, and logs failures and warnings to a set of files named <i>test-mydeps-$$-*.log</i>. If there are failures or warnings, please work with the authors of the modules in question to fix them. If the module author simply isn&#39;t available or does not want to fix the bug, it is okay to make a release.</p>
+
+<p>Regardless of whether or not a new module is available, any breakages should be noted in the conflicts list in the distribution&#39;s <i>dist.ini</i>.</p>
+
+<h2 id="Emergency-Bug-Workflow-for-immediate-release">Emergency Bug Workflow (for immediate release)</h2>
+
+<p>The stable branch exists for easily making bug fix releases.</p>
+
+<pre><code>    git remote update
+    git checkout -b topic/my-emergency-fix origin/master
+    # hack
+    git commit</code></pre>
+
+<p>Then a cabal member merges into <code>master</code>, and backports the change into <code>stable/X.YY</code>:</p>
+
+<pre><code>    git checkout master
+    git merge topic/my-emergency-fix
+    git push
+    git checkout stable/X.YY
+    git cherry-pick -x master
+    git push
+    # release</code></pre>
+
+<h2 id="Project-Workflow">Project Workflow</h2>
+
+<p>For longer lasting branches, we use a subversion style branch layout, where master is routinely merged into the branch. Rebasing is allowed as long as all the branch contributors are using <code>git pull --rebase</code> properly.</p>
+
+<p><code>commit --amend</code>, <code>rebase --interactive</code>, etc. are not allowed, and should only be done in topic branches. Committing to master is still done with the same review process as a topic branch, and the branch must merge as a fast forward.</p>
+
+<p>This is pretty much the way we&#39;re doing branches for large-ish things right now.</p>
+
+<p>Obviously there is no technical limitation on the number of branches. You can freely create topic branches off of project branches, or sub projects inside larger projects freely. Such branches should incorporate the name of the branch they were made off so that people don&#39;t accidentally assume they should be merged into master:</p>
+
+<pre><code>    git checkout -b my-project--topic/foo my-project</code></pre>
+
+<p>(unfortunately Git will not allow <code>my-project/foo</code> as a branch name if <code>my-project</code> is a valid ref).</p>
+
+<h1 id="BRANCH-ARCHIVAL">BRANCH ARCHIVAL</h1>
+
+<p>Merged branches should be deleted.</p>
+
+<p>Failed branches may be kept, but should be moved to <code>attic/</code> to differentiate them from in-progress topic branches.</p>
+
+<p>Branches that have not been worked on for a long time will be moved to <code>abandoned/</code> periodically, but feel free to move the branch back to <code>topic/</code> if you want to start working on it again.</p>
+
+<h1 id="TESTS-TESTS-TESTS">TESTS, TESTS, TESTS</h1>
+
+<p>If you write <i>any</i> code for Moose, you <b>must</b> add tests for that code. If you do not write tests then we cannot guarantee your change will not be removed or altered at a later date, as there is nothing to confirm this is desired behavior.</p>
+
+<p>If your code change/addition is deep within the bowels of Moose and your test exercises this feature in a non-obvious way, please add some comments either near the code in question or in the test so that others know.</p>
+
+<p>We also greatly appreciate documentation to go with your changes, and an entry in the Changes file. Make sure to give yourself credit! Major changes or new user-facing features should also be documented in <a href="../../../lib/Moose/Manual/Delta.html">Moose::Manual::Delta</a>.</p>
+
+<h1 id="DOCS-DOCS-DOCS">DOCS, DOCS, DOCS</h1>
+
+<p>Any user-facing changes must be accompanied by documentation. If you&#39;re not comfortable writing docs yourself, you might be able to convince another Moose dev to help you.</p>
+
+<p>Our goal is to make sure that all features are documented. Undocumented features are not considered part of the API when it comes to determining whether a change is backwards compatible.</p>
+
+<h1 id="BACKWARDS-COMPATIBILITY">BACKWARDS COMPATIBILITY</h1>
+
+<p>Change is inevitable, and Moose is not immune to this. We do our best to maintain backwards compatibility, but we do not want the code base to become overburdened by this. This is not to say that we will be frivolous with our changes, quite the opposite, just that we are not afraid of change and will do our best to keep it as painless as possible for the end user.</p>
+
+<p>Our policy for handling backwards compatibility is documented in more detail in <a href="../../../lib/Moose/Manual/Support.html">Moose::Manual::Support</a>.</p>
+
+<p>All backwards incompatible changes <b>must</b> be documented in <a href="../../../lib/Moose/Manual/Delta.html">Moose::Manual::Delta</a>. Make sure to document any useful tips or workarounds for the change in that document.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

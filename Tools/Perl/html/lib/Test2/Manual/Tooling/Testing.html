@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#THE-HOLY-GRAIL-OF-TESTING-YOUR-TOOLS">THE HOLY GRAIL OF TESTING YOUR TOOLS</a></li>
+  <li><a href="#ADDITIONAL-HELPERS">ADDITIONAL HELPERS</a>
+    <ul>
+      <li><a href="#Test2::Tools::Tester">Test2::Tools::Tester</a></li>
+      <li><a href="#Test2::Tools::HarnessTester">Test2::Tools::HarnessTester</a></li>
+      <li><a href="#Test2::Tools::Compare">Test2::Tools::Compare</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Manual::Tooling::Testing - Tutorial on how to test your testing tools.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Testing your test tools used to be a complex and difficult prospect. The old tools such as <a href="../../../../lib/Test/Tester.html">Test::Tester</a> and <a href="../../../../lib/Test/Builder/Tester.html">Test::Builder::Tester</a> were limited, and fragile. Test2 on the other hand was designed from the very start to be easily tested! This tutorial shows you how.</p>
+
+<h1 id="THE-HOLY-GRAIL-OF-TESTING-YOUR-TOOLS">THE HOLY GRAIL OF TESTING YOUR TOOLS</h1>
+
+<p>The key to making Test2 easily testable (specially when compared to Test::Builder) is the <code>intercept</code> function.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/intercept/</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$events</span> <span class="operator">=</span> <span class="variable">intercept</span> <span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"fail"</span><span class="operator">);</span>
+    
+        <span class="variable">diag</span><span class="operator">(</span><span class="string">"A diag"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>The intercept function lets you use any test tools you want inside a codeblock. No events or contexts generated within the intercept codeblock will have any effect on the outside testing state. The <code>intercept</code> function completely isolates the tools called within.</p>
+
+<p><b>Note:</b> Plugins and things that effect global API state may not be fully isolated. <code>intercept</code> is intended specifically for event isolation.</p>
+
+<p>The <code>intercept</code> function will return an arrayref containing all the events that were generated within the codeblock. You can now make any assertions you want about the events you expected your tools to generate.</p>
+
+<pre><code>    <span class="operator">[</span>
+        <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">,</span> <span class="string">'Test2::Event::Ok'</span><span class="operator">),</span>   <span class="comment"># pass</span>
+        <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">,</span> <span class="string">'Test2::Event::Ok'</span><span class="operator">),</span>   <span class="comment"># fail</span>
+        <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">,</span> <span class="string">'Test2::Event::Diag'</span><span class="operator">),</span> <span class="comment"># Failure diagnostics (not always a second event)</span>
+        <span class="keyword">bless</span><span class="operator">(</span><span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">,</span> <span class="string">'Test2::Event::Diag'</span><span class="operator">),</span> <span class="comment"># custom 'A diag' message</span>
+    <span class="operator">]</span>
+</code></pre>
+
+<p>Most test tools eventually produce one or more events. To effectively verify the events you get from intercept you really should read up on how events work <a href="../../../../lib/Test2/Manual/Anatomy/Event.html">Test2::Manual::Anatomy::Event</a>. Once you know about events you can move on to the next section which points you at some helpers.</p>
+
+<h1 id="ADDITIONAL-HELPERS">ADDITIONAL HELPERS</h1>
+
+<h2 id="Test2::Tools::Tester">Test2::Tools::Tester</h2>
+
+<p>This is the most recent set of tools to help you test your events. To really understand these you should familiarize yourself with <a href="../../../../lib/Test2/Manual/Anatomy/Event.html">Test2::Manual::Anatomy::Event</a>. If you are going to be writing anything more than the most simple of tools you should know how events work.</p>
+
+<p>The <a href="../../../../lib/Test2/Tools/Tester.html">Test2::Tools::Tester</a> documentation is a good place for further reading.</p>
+
+<h2 id="Test2::Tools::HarnessTester">Test2::Tools::HarnessTester</h2>
+
+<p>The <a>Test2::Tools::HarnessTester</a> can export the <code>summarize_events()</code> tool. This tool lets you run your event arrayref through <a>Test2::Harness</a> so that you can get a pass/fail summary.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$summary</span> <span class="operator">=</span> <span class="variable">summarize_events</span><span class="operator">(</span><span class="variable">$events</span><span class="operator">);</span>
+</code></pre>
+
+<p>The summary looks like this:</p>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="string">plan</span>       <span class="operator">=&gt;</span> <span class="variable">$plan_facet</span><span class="operator">,</span>         <span class="comment"># the plan event facet</span>
+        <span class="string">pass</span>       <span class="operator">=&gt;</span> <span class="variable">$bool</span><span class="operator">,</span>               <span class="comment"># true if the events result in a pass</span>
+        <span class="string">fail</span>       <span class="operator">=&gt;</span> <span class="variable">$bool</span><span class="operator">,</span>               <span class="comment"># true if the events result in a fail</span>
+        <span class="string">errors</span>     <span class="operator">=&gt;</span> <span class="variable">$error_count</span><span class="operator">,</span>        <span class="comment"># Number of error facets seen</span>
+        <span class="string">failures</span>   <span class="operator">=&gt;</span> <span class="variable">$failure_count</span><span class="operator">,</span>      <span class="comment"># Number of failing assertions seen</span>
+        <span class="string">assertions</span> <span class="operator">=&gt;</span> <span class="variable">$assertion_count</span><span class="operator">,</span>    <span class="comment"># Total number of assertions seen</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Test2::Tools::Compare">Test2::Tools::Compare</h2>
+
+<p><b>DEPRECATED</b> These tools were written before the switch to faceted events. These will still work, but are no longer the recommended way to test your tools.</p>
+
+<p>The <a href="../../../../lib/Test2/Tools/Compare.html">Test2::Tools::Compare</a> library exports a handful of extras to help test events.</p>
+
+<dl>
+
+<dt id="event-TYPE">event $TYPE =&gt; ...</dt>
+<dd>
+
+<p>Use in an array check against $events to check for a specific type of event with the properties you specify.</p>
+
+</dd>
+<dt id="fail_events-TYPE">fail_events $TYPE =&gt; ...</dt>
+<dd>
+
+<p>Use when you expect a failing assertion of $TYPE. This will automatically check that the next event following it is a diagnostics message with the default failure text.</p>
+
+<p><b>Note:</b> This is outdated as a single event may now possess both the failing assertion AND the failing text, such events will fail this test.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Test2/Manual.html">Test2::Manual</a> - Primary index of the manual.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Manual can be found at <i>http://github.com/Test-More/Test2-Manual/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</a></li>
+      <li><a href="#get_sereal_encoder-OPTSHASH">get_sereal_encoder($OPTSHASH)</a></li>
+      <li><a href="#get_sereal_decoder-OPTSHASH">get_sereal_decoder($OPTSHASH)</a></li>
+      <li><a href="#write_sereal-FILENAME-STRUCT-APPEND-OPTS">write_sereal($FILENAME,$STRUCT,$APPEND,$OPTS)</a></li>
+      <li><a href="#read_sereal-FILENAME-OPTS">read_sereal($FILENAME,$OPTS)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-CONTACT-AND-SUPPORT">BUGS, CONTACT AND SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEDGMENT">ACKNOWLEDGMENT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sereal - Fast, compact, powerful binary (de-)serialization</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sereal</span> <span class="string">qw(encode_sereal decode_sereal
+                sereal_encode_with_object
+                sereal_decode_with_object
+                looks_like_sereal)</span><span class="operator">;</span>
+  <span class="comment"># Note: For performance reasons, you should prefer the OO interface,</span>
+  <span class="comment">#       or sereal_(en|de)code_with_object over the stateless</span>
+  <span class="comment">#       encode_sereal/decode_sereal functions.</span>
+  <span class="comment">#       See the Sereal::Performance documentation for details.</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><i>Sereal</i> is an efficient, compact-output, binary and feature-rich serialization protocol. The Perl encoder is implemented as the <a href="../lib/Sereal/Encoder.html">Sereal::Encoder</a> module, the Perl decoder correspondingly as <a href="../lib/Sereal/Decoder.html">Sereal::Decoder</a>. They are distributed separately to allow for safe upgrading without downtime. (Hint: Upgrade the decoder everywhere first, then the encoder.)</p>
+
+<p>This <code>Sereal</code> module is a very thin wrapper around both <code>Sereal::Encoder</code> and <code>Sereal::Decoder</code>. It depends on both and loads both. So if you have a user of both encoder and decoder, it is enough to depend on a particular version of <code>Sereal</code> and you&#39;ll get the most recent released versions of <code>Sereal::Encoder</code> and <code>Sereal::Decoder</code> whose version is smaller than or equal to the version of <code>Sereal</code> you depend on.</p>
+
+<p>The protocol specification and many other bits of documentation can be found in the github repository. Right now, the specification is at <a href="https://github.com/Sereal/Sereal/blob/master/sereal_spec.pod">https://github.com/Sereal/Sereal/blob/master/sereal_spec.pod</a>, there is a discussion of the design objectives in <a href="https://github.com/Sereal/Sereal/blob/master/README.pod">https://github.com/Sereal/Sereal/blob/master/README.pod</a>, and the output of our benchmarks can be seen at <a href="https://github.com/Sereal/Sereal/wiki/Sereal-Comparison-Graphs">https://github.com/Sereal/Sereal/wiki/Sereal-Comparison-Graphs</a>.</p>
+
+<h2 id="EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</h2>
+
+<p>It is recommended to use the object-oriented interface of <code>Sereal::Encoder</code> and <code>Sereal::Decoder</code> if you care about performance. For detailed performance considerations, see <a href="../lib/Sereal/Performance.html">Sereal::Performance</a>.</p>
+
+<p>You can optionally import five functions from <code>Sereal</code>. <code>encode_sereal</code> is the same function as <a href="../lib/Sereal/Encoder.html">Sereal::Encoder</a>&#39;s <code>encode_sereal</code> function. <code>decode_sereal</code> and <code>looks_like_sereal</code> are the same as <a href="../lib/Sereal/Decoder.html">Sereal::Decoder</a>&#39;s functions of the same names. Finally, you can import the advanced functional interface <code>sereal_encode_with_object</code> and <code>sereal_decode_with_object</code>. Again, see <a href="../lib/Sereal/Performance.html">Sereal::Performance</a> for information about those.</p>
+
+<p>After loading the <code>Sereal</code> module, both <code>Sereal::Encoder</code> and <code>Sereal::Decoder</code> are guaranteed to be loaded, so you can use their object-oriented interface.</p>
+
+<h2 id="get_sereal_encoder-OPTSHASH">get_sereal_encoder($OPTSHASH)</h2>
+
+<p>Returns a Sereal::Encoder with the given options. This encoder will be shared by other calls to this function.</p>
+
+<h2 id="get_sereal_decoder-OPTSHASH">get_sereal_decoder($OPTSHASH)</h2>
+
+<p>Returns a Sereal::Decoder with the given options. This encoder will be shared by other calls to this function.</p>
+
+<h2 id="write_sereal-FILENAME-STRUCT-APPEND-OPTS">write_sereal($FILENAME,$STRUCT,$APPEND,$OPTS)</h2>
+
+<p>Write a sereal packet to $FILENAME. See Sereal::Encoder::write_to_file().</p>
+
+<h2 id="read_sereal-FILENAME-OPTS">read_sereal($FILENAME,$OPTS)</h2>
+
+<p>Read a sereal packet from a file. See Sereal::Decoder::read_from_file().</p>
+
+<h1 id="BUGS-CONTACT-AND-SUPPORT">BUGS, CONTACT AND SUPPORT</h1>
+
+<p>For reporting bugs, please use the github bug tracker at <a href="http://github.com/Sereal/Sereal/issues">http://github.com/Sereal/Sereal/issues</a>.</p>
+
+<p>For support and discussion of Sereal, there are two Google Groups:</p>
+
+<p>Announcements around Sereal (extremely low volume): <a href="https://groups.google.com/forum/?fromgroups#!forum/sereal-announce">https://groups.google.com/forum/?fromgroups#!forum/sereal-announce</a></p>
+
+<p>Sereal development list: <a href="https://groups.google.com/forum/?fromgroups#!forum/sereal-dev">https://groups.google.com/forum/?fromgroups#!forum/sereal-dev</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Steffen Mueller &lt;smueller@cpan.org&gt;</p>
+
+<h1 id="ACKNOWLEDGMENT">ACKNOWLEDGMENT</h1>
+
+<p>This module was originally developed for Booking.com. With approval from Booking.com, this module was generalized and published on CPAN, for which the authors would like to express their gratitude.</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2012, 2013, 2014 by Steffen Mueller</p>
+
+
+</body>
+
+</html>
+
+

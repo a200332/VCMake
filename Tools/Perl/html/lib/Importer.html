@@ -1,0 +1,787 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#WHY">WHY?</a></li>
+  <li><a href="#COMPATIBILITY">COMPATIBILITY</a></li>
+  <li><a href="#IMPORT-PARAMETERS">IMPORT PARAMETERS</a></li>
+  <li><a href="#SUPPORTED-FEATURES">SUPPORTED FEATURES</a>
+    <ul>
+      <li><a href="#TAGS">TAGS</a></li>
+      <li><a href="#PATTERN-or-qr-PATTERN">/PATTERN/ or qr/PATTERN/</a></li>
+      <li><a href="#EXCLUDING-SYMBOLS">EXCLUDING SYMBOLS</a></li>
+      <li><a href="#RENAMING-SYMBOLS-AT-IMPORT">RENAMING SYMBOLS AT IMPORT</a></li>
+      <li><a href="#CUSTOM-EXPORT-ASSIGNMENT">CUSTOM EXPORT ASSIGNMENT</a></li>
+      <li><a href="#UNIMPORTING">UNIMPORTING</a></li>
+      <li><a href="#ANONYMOUS-EXPORTS">ANONYMOUS EXPORTS</a></li>
+      <li><a href="#GENERATED-EXPORTS">GENERATED EXPORTS</a></li>
+    </ul>
+  </li>
+  <li><a href="#UNIMPORT-PARAMETERS">UNIMPORT PARAMETERS</a></li>
+  <li><a href="#SUPPORTED-VARIABLES">SUPPORTED VARIABLES</a>
+    <ul>
+      <li><a href="#EXPORT">@EXPORT</a></li>
+      <li><a href="#EXPORT_OK">@EXPORT_OK</a></li>
+      <li><a href="#EXPORT_TAGS">%EXPORT_TAGS</a></li>
+      <li><a href="#EXPORT_FAIL">@EXPORT_FAIL</a></li>
+      <li><a href="#EXPORT_ANON">%EXPORT_ANON</a></li>
+      <li><a href="#EXPORT_GEN">%EXPORT_GEN</a></li>
+      <li><a href="#EXPORT_MAGIC">%EXPORT_MAGIC</a></li>
+    </ul>
+  </li>
+  <li><a href="#CLASS-METHODS">CLASS METHODS</a></li>
+  <li><a href="#USING-WITH-OTHER-EXPORTER-IMPLEMENTATIONS">USING WITH OTHER EXPORTER IMPLEMENTATIONS</a></li>
+  <li><a href="#OO-Interface">OO Interface</a>
+    <ul>
+      <li><a href="#OBJECT-CONSTRUCTION">OBJECT CONSTRUCTION</a></li>
+      <li><a href="#OBJECT-METHODS">OBJECT METHODS</a></li>
+    </ul>
+  </li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Importer - Alternative but compatible interface to modules that export symbols.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module acts as a layer between <a href="../lib/Exporter.html">Exporter</a> and modules which consume exports. It is feature-compatible with <a href="../lib/Exporter.html">Exporter</a>, plus some much needed extras. You can use this to import symbols from any exporter that follows <a href="../lib/Exporter.html">Exporter</a>s specification. The exporter modules themselves do not need to use or inherit from the <a href="../lib/Exporter.html">Exporter</a> module, they just need to set <code>@EXPORT</code> and/or other variables.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="comment"># Import defaults</span>
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Module'</span><span class="operator">;</span>
+    
+    <span class="comment"># Import a list</span>
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Another::Module'</span> <span class="operator">=&gt;</span> <span class="string">qw/foo bar baz/</span><span class="operator">;</span>
+    
+    <span class="comment"># Import a specific version:</span>
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'That::Module'</span> <span class="operator">=&gt;</span> <span class="string">'1.00'</span><span class="operator">;</span>
+    
+    <span class="comment"># Require a sepcific version of Importer</span>
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="number">0</span><span class="operator">.</span><span class="number">001</span><span class="operator">,</span> <span class="string">'Foo::Bar'</span> <span class="operator">=&gt;</span> <span class="string">qw/a b c/</span><span class="operator">;</span>
+    
+    <span class="variable">foo</span><span class="operator">()</span>
+    <span class="variable">bar</span><span class="operator">()</span>
+    <span class="variable">baz</span><span class="operator">()</span>
+    
+    <span class="comment"># Remove all subroutines imported by Importer</span>
+    <span class="keyword">no</span> <span class="variable">Importer</span><span class="operator">;</span>
+    
+    <span class="comment"># Import symbols into variables</span>
+    <span class="keyword">my</span> <span class="variable">$croak</span> <span class="operator">=</span> <span class="variable">Importer</span><span class="operator">-&gt;</span><span class="variable">get_one</span><span class="operator">(</span><span class="string">Carp</span> <span class="operator">=&gt;</span> <span class="string">qw/croak/</span><span class="operator">);</span>
+    <span class="variable">$croak</span><span class="operator">-&gt;(</span><span class="string">"This will croak"</span><span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$CARP</span> <span class="operator">=</span> <span class="variable">Importer</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span><span class="string">Carp</span> <span class="operator">=&gt;</span> <span class="string">qw/croak confess cluck/</span><span class="operator">);</span>
+    <span class="variable">$CARP</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">croak</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="string">"This will croak"</span><span class="operator">);</span>
+    <span class="variable">$CARP</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">cluck</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="string">"This will cluck"</span><span class="operator">);</span>
+    <span class="variable">$CARP</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">confess</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="string">"This will confess"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="WHY">WHY?</h1>
+
+<p>There was recently a discussion on p5p about adding features to <a href="../lib/Exporter.html">Exporter</a>. This conversation raised some significant concerns, those are listed here, in addition to others.</p>
+
+<dl>
+
+<dt id="The-burden-is-on-export-consumers-to-specify-a-version-of-Exporter">The burden is on export consumers to specify a version of Exporter</dt>
+<dd>
+
+<p>Adding a feature to <a href="../lib/Exporter.html">Exporter</a> means that any consumer module that relies on the new features must depend on a specific version of <a href="../lib/Exporter.html">Exporter</a>. This seems somewhat backwards since <a href="../lib/Exporter.html">Exporter</a> is used by the module you are importing from.</p>
+
+</dd>
+<dt id="Exporter.pm-is-really-old-crazy-code">Exporter.pm is really old/crazy code</dt>
+<dd>
+
+<p>Not much more to say here. It is very old, it is very crazy, and if you break it you break EVERYTHING.</p>
+
+</dd>
+<dt id="Using-a-modules-import-for-exporting-makes-it-hard-to-give-it-other-purposes">Using a modules import() for exporting makes it hard to give it other purposes</dt>
+<dd>
+
+<p>It is not unusual for a module to want to export symbols and provide import behaviors. It is also not unusual for a consumer to only want 1 or the other. Using this module you can import symbols without also getting the <code>import()</code> side effects.</p>
+
+<p>In addition, moving forward, modules can specify exports and have a custom <code>import()</code> without conflating the two. A module can tell you to use Importer to get the symbols, and to use the module directly for behaviors. A module could also use Importer within its own <code>import()</code> method without the need to subclass <a href="../lib/Exporter.html">Exporter</a>, or bring in its <code>import()</code> method.</p>
+
+</dd>
+<dt id="There-are-other-exporter-modules-on-cpan">There are other exporter modules on cpan</dt>
+<dd>
+
+<p>This module normally assumes an exporter uses <a href="../lib/Exporter.html">Exporter</a>, so it looks for the variables and methods <a href="../lib/Exporter.html">Exporter</a> expects. However, other exporters on cpan can override this using the <code>IMPORTER_MENU()</code> hook.</p>
+
+</dd>
+</dl>
+
+<h1 id="COMPATIBILITY">COMPATIBILITY</h1>
+
+<p>This module aims for 100% compatibility with every feature of <a href="../lib/Exporter.html">Exporter</a>, plus added features such as import renaming.</p>
+
+<p>If you find something that works differently, or not at all when compared to <a href="../lib/Exporter.html">Exporter</a> please report it as a bug, unless it is noted as an intentional feature (like import renaming).</p>
+
+<h1 id="IMPORT-PARAMETERS">IMPORT PARAMETERS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="variable">$IMPORTER_VERSION</span><span class="operator">,</span> <span class="variable">$FROM_MODULE</span><span class="operator">,</span> <span class="variable">$FROM_MODULE_VERSION</span><span class="operator">,</span> <span class="operator">\&amp;</span><span class="variable">SET_SYMBOL</span><span class="operator">,</span> <span class="variable">@SYMBOLS</span><span class="operator">;</span>
+</code></pre>
+
+<dl>
+
+<dt id="IMPORTER_VERSION-optional">$IMPORTER_VERSION (optional)</dt>
+<dd>
+
+<p>If you provide a numeric argument as the first argument it will be treated as a version number. Importer will do a version check to make sure it is at least at the requested version.</p>
+
+</dd>
+<dt id="FROM_MODULE-required">$FROM_MODULE (required)</dt>
+<dd>
+
+<p>This is the only required argument. This is the name of the module to import symbols from.</p>
+
+</dd>
+<dt id="FROM_MODULE_VERSION-optional">$FROM_MODULE_VERSION (optional)</dt>
+<dd>
+
+<p>Any numeric argument following the <code>$FROM_MODULE</code> will be treated as a version check against <code>$FROM_MODULE</code>.</p>
+
+</dd>
+<dt id="SET_SYMBOL-optional">\&amp;SET_SYMBOL (optional)</dt>
+<dd>
+
+<p>Normally Importer will put the exports into your namespace. This is usually done via a more complex form of <code>*name = $ref</code>. If you do NOT want this to happen then you can provide a custom sub to handle the assignment.</p>
+
+<p>This is an example that uses this feature to put all the exports into a lexical hash instead of modifying the namespace (This is how the <code>get()</code> method is implemented).</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">%CARP</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">Carp</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$ref</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="variable">$CARP</span><span class="operator">{</span><span class="variable">$name</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$ref</span><span class="operator">;</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">$CARP</span><span class="operator">{</span><span class="string">cluck</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="string">"This will cluck"</span><span class="operator">);</span>
+    <span class="variable">$CARP</span><span class="operator">{</span><span class="string">croak</span><span class="operator">}</span><span class="operator">-&gt;(</span><span class="string">"This will croak"</span><span class="operator">);</span>
+</code></pre>
+
+<p>The first two arguments to the custom sub are the name (no sigil), and the reference. The additional arguments are key/value pairs:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> set_symbol </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$name</span><span class="operator">,</span> <span class="variable">$ref</span><span class="operator">,</span> <span class="variable">%info</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<dl>
+
+<dt id="info-from">$info{from}</dt>
+<dd>
+
+<p>Package the symbol comes from.</p>
+
+</dd>
+<dt id="info-into">$info{into}</dt>
+<dd>
+
+<p>Package to which the symbol should be added.</p>
+
+</dd>
+<dt id="info-sig">$info{sig}</dt>
+<dd>
+
+<p>The sigil that should be used.</p>
+
+</dd>
+<dt id="info-spec">$info{spec}</dt>
+<dd>
+
+<p>Extra details.</p>
+
+</dd>
+<dt id="info-symbol">$info{symbol}</dt>
+<dd>
+
+<p>The original symbol name (with sigil) from the original package.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="SYMBOLS-optional">@SYMBOLS (optional)</dt>
+<dd>
+
+<p>Symbols you wish to import. If no symbols are specified then the defaults will be used. You may also specify tags using the &#39;:&#39; prefix.</p>
+
+</dd>
+</dl>
+
+<h1 id="SUPPORTED-FEATURES">SUPPORTED FEATURES</h1>
+
+<h2 id="TAGS">TAGS</h2>
+
+<p>You can define/import subsets of symbols using predefined tags.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span> <span class="operator">=&gt;</span> <span class="string">':tag'</span><span class="operator">;</span>
+</code></pre>
+
+<p><a href="../lib/Importer.html">Importer</a> will automatically populate the <code>:DEFAULT</code> tag for you. <a href="../lib/Importer.html">Importer</a> will also give you an <code>:ALL</code> tag with ALL exports so long as the exporter does not define a <code>:ALL</code> tag already.</p>
+
+<h2 id="PATTERN-or-qr-PATTERN">/PATTERN/ or qr/PATTERN/</h2>
+
+<p>You can import all symbols that match a pattern. The pattern can be supplied a string starting and ending with &#39;/&#39;, or you can provide a <code>qr/../</code> reference.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span> <span class="operator">=&gt;</span> <span class="string">'/oo/'</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span> <span class="operator">=&gt;</span> <span class="string">qr/oo/</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="EXCLUDING-SYMBOLS">EXCLUDING SYMBOLS</h2>
+
+<p>You can exclude symbols by prefixing them with &#39;!&#39;.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span>
+        <span class="string">'!foo'</span><span class="operator">,</span>         <span class="comment"># Exclude one specific symbol</span>
+        <span class="string">'!/pattern/'</span><span class="operator">,</span>   <span class="comment"># Exclude all matching symbols</span>
+        <span class="string">'!'</span> <span class="operator">=&gt;</span> <span class="string">qr/oo/</span><span class="operator">,</span>  <span class="comment"># Exclude all that match the following arg</span>
+        <span class="string">'!:tag'</span><span class="operator">;</span>        <span class="comment"># Exclude all in tag</span>
+</code></pre>
+
+<h2 id="RENAMING-SYMBOLS-AT-IMPORT">RENAMING SYMBOLS AT IMPORT</h2>
+
+<p><i>This is a new feature,</i> <a href="../lib/Exporter.html">Exporter</a> <i>does not support this on its own.</i></p>
+
+<p>You can rename symbols at import time using a specification hash following the import name:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'my_foo'</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>You can also add a prefix and/or postfix:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-prefix</span> <span class="operator">=&gt;</span> <span class="string">'my_'</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>Using this syntax to set prefix and/or postfix also works on tags and patterns that are specified for import, in which case the prefix/postfix is applied to all symbols from the tag/patterm.</p>
+
+<h2 id="CUSTOM-EXPORT-ASSIGNMENT">CUSTOM EXPORT ASSIGNMENT</h2>
+
+<p>This lets you provide an alternative to the <code>*name = $ref</code> export assignment. See the list of <a href="#IMPORT-PARAMETERS">parameters</a> to <code>import()</code></p>
+
+<h2 id="UNIMPORTING">UNIMPORTING</h2>
+
+<p>See <a href="#UNIMPORT-PARAMETERS">&quot;UNIMPORT PARAMETERS&quot;</a>.</p>
+
+<h2 id="ANONYMOUS-EXPORTS">ANONYMOUS EXPORTS</h2>
+
+<p>See <a href="#EXPORT_ANON">&quot;%EXPORT_ANON&quot;</a>.</p>
+
+<h2 id="GENERATED-EXPORTS">GENERATED EXPORTS</h2>
+
+<p>See <a href="#EXPORT_GEN">&quot;%EXPORT_GEN&quot;</a>.</p>
+
+<h1 id="UNIMPORT-PARAMETERS">UNIMPORT PARAMETERS</h1>
+
+<pre><code>    <span class="keyword">no</span> <span class="variable">Importer</span><span class="operator">;</span>    <span class="comment"># Remove all subs brought in with Importer</span>
+    
+    <span class="keyword">no</span> <span class="variable">Importer</span> <span class="string">qw/foo bar/</span><span class="operator">;</span>    <span class="comment"># Remove only the specified subs</span>
+</code></pre>
+
+<p><b>Only subs can be unimported</b>.</p>
+
+<p><b>You can only unimport subs imported using Importer</b>.</p>
+
+<h1 id="SUPPORTED-VARIABLES">SUPPORTED VARIABLES</h1>
+
+<h2 id="EXPORT">@EXPORT</h2>
+
+<p>This is used exactly the way <a href="../lib/Exporter.html">Exporter</a> uses it.</p>
+
+<p>List of symbols to export. Sigil is optional for subs. Symbols listed here are exported by default. If possible you should put symbols in <code>@EXPORT_OK</code> instead.</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">@EXPORT</span> <span class="operator">=</span> <span class="string">qw/foo bar &amp;baz $BAT/</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="EXPORT_OK">@EXPORT_OK</h2>
+
+<p>This is used exactly the way <a href="../lib/Exporter.html">Exporter</a> uses it.</p>
+
+<p>List of symbols that can be imported. Sigil is optional for subs. Symbols listed here are not exported by default. This is preferred over <code>@EXPORT</code>.</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">@EXPORT_OK</span> <span class="operator">=</span> <span class="string">qw/foo bar &amp;baz $BAT/</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="EXPORT_TAGS">%EXPORT_TAGS</h2>
+
+<p>This module supports tags exactly the way <a href="../lib/Exporter.html">Exporter</a> does.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Some::Thing'</span>  <span class="operator">=&gt;</span> <span class="string">':DEFAULT'</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Other::Thing'</span> <span class="operator">=&gt;</span> <span class="string">':some_tag'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Tags can be specified this way:</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">%EXPORT_TAGS</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">oos</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw/foo boo zoo/</span><span class="operator">]</span><span class="operator">,</span>
+        <span class="string">ees</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw/fee bee zee/</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="EXPORT_FAIL">@EXPORT_FAIL</h2>
+
+<p>This is used exactly the way <a href="../lib/Exporter.html">Exporter</a> uses it.</p>
+
+<p>Use this to list subs that are not available on all platforms. If someone tries to import one of these, Importer will hit your <code>$from-&gt;export_fail(@items)</code> callback to try to resolve the issue. See <a href="../lib/Exporter.html">Exporter</a> for documentation of this feature.</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">@EXPORT_FAIL</span> <span class="operator">=</span> <span class="string">qw/maybe_bad/</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="EXPORT_ANON">%EXPORT_ANON</h2>
+
+<p>This is new to this module, <a href="../lib/Exporter.html">Exporter</a> does not support it.</p>
+
+<p>This allows you to export symbols that are not actually in your package symbol table. The keys should be the symbol names, the values are the references for the symbols.</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">%EXPORT_ANON</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">'&amp;foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'foo'</span> <span class="operator">}</span>
+        <span class="string">'$foo'</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">$foo</span><span class="operator">,</span>
+        <span class="operator">...</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="EXPORT_GEN">%EXPORT_GEN</h2>
+
+<p>This is new to this module, <a href="../lib/Exporter.html">Exporter</a> does not support it.</p>
+
+<p>This allows you to export symbols that are generated on export. The key should be the name of a symbol. The value should be a coderef that produces a reference that will be exported.</p>
+
+<p>When the generators are called they will receive 2 arguments, the package the symbol is being exported into, and the symbol being imported (name may or may not include sigil for subs).</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">%EXPORT_GEN</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">'&amp;foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$from_package</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$into_package</span><span class="operator">,</span> <span class="variable">$symbol_name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="operator">...</span>
+            <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+        <span class="operator">},</span>
+        <span class="operator">...</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="EXPORT_MAGIC">%EXPORT_MAGIC</h2>
+
+<p>This is new to this module. <a href="../lib/Exporter.html">Exporter</a> does not support it.</p>
+
+<p>This allows you to define custom actions to run AFTER an export has been injected into the consumers namespace. This is a good place to enable parser hooks like with <a>Devel::Declare</a>. These will NOT be run if a consumer uses a custom assignment callback.</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">%EXPORT_MAGIC</span> <span class="operator">=</span> <span class="operator">(</span>
+        <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$from</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>    <span class="comment"># Should be the package doing the exporting</span>
+            <span class="keyword">my</span> <span class="variable">%args</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+            <span class="keyword">my</span> <span class="variable">$into</span>      <span class="operator">=</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">into</span><span class="operator">}</span><span class="operator">;</span>         <span class="comment"># Package symbol was exported into</span>
+            <span class="keyword">my</span> <span class="variable">$orig_name</span> <span class="operator">=</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">orig_name</span><span class="operator">}</span><span class="operator">;</span>    <span class="comment"># Original name of the export (in the exporter)</span>
+            <span class="keyword">my</span> <span class="variable">$new_name</span>  <span class="operator">=</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">new_name</span><span class="operator">}</span><span class="operator">;</span>     <span class="comment"># Name the symbol was imported as</span>
+            <span class="keyword">my</span> <span class="variable">$ref</span>       <span class="operator">=</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">ref</span><span class="operator">}</span><span class="operator">;</span>          <span class="comment"># The reference to the symbol</span>
+    
+            <span class="operator">...;</span> <span class="comment"># whatever you want, return is ignored.</span>
+        <span class="operator">},</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="CLASS-METHODS">CLASS METHODS</h1>
+
+<dl>
+
+<dt id="Importer-import-from">Importer-&gt;import($from)</dt>
+<dd>
+
+</dd>
+<dt id="Importer-import-from-version">Importer-&gt;import($from, $version)</dt>
+<dd>
+
+</dd>
+<dt id="Importer-import-from-imports">Importer-&gt;import($from, @imports)</dt>
+<dd>
+
+</dd>
+<dt id="Importer-import-from-from_version-imports">Importer-&gt;import($from, $from_version, @imports)</dt>
+<dd>
+
+</dd>
+<dt id="Importer-import-importer_version-from">Importer-&gt;import($importer_version, $from, ...)</dt>
+<dd>
+
+<p>This is the magic behind <code>use Importer ...</code>.</p>
+
+</dd>
+<dt id="Importer-import_into-from-into-imports">Importer-&gt;import_into($from, $into, @imports)</dt>
+<dd>
+
+</dd>
+<dt id="Importer-import_into-from-level-imports">Importer-&gt;import_into($from, $level, @imports)</dt>
+<dd>
+
+<p>You can use this to import symbols from <code>$from</code> into <code>$into</code>. <code>$into</code> may either be a package name, or a caller level to get the name from.</p>
+
+</dd>
+<dt id="Importer-unimport">Importer-&gt;unimport()</dt>
+<dd>
+
+</dd>
+<dt id="Importer-unimport-sub_name">Importer-&gt;unimport(@sub_name)</dt>
+<dd>
+
+<p>This is the magic behind <code>no Importer ...</code>.</p>
+
+</dd>
+<dt id="Importer-unimport_from-from-sub_names">Importer-&gt;unimport_from($from, @sub_names)</dt>
+<dd>
+
+</dd>
+<dt id="Importer-unimport_from-level-sub_names">Importer-&gt;unimport_from($level, @sub_names)</dt>
+<dd>
+
+<p>This lets you remove imported symbols from <code>$from</code>. <code>$from</code> my be a package name, or a caller level.</p>
+
+</dd>
+<dt id="my-exports-Importer-get-from-imports">my $exports = Importer-&gt;get($from, @imports)</dt>
+<dd>
+
+<p>This returns hashref of <code><span class="operator">{</span> <span class="variable">$name</span> <span class="operator">=&gt;</span> <span class="variable">$ref</span> <span class="operator">}</span>
+</code> for all the specified imports.</p>
+
+<p><code>$from</code> should be the package from which to get the exports.</p>
+
+</dd>
+<dt id="my-export_refs-Importer-get_list-from-imports">my @export_refs = Importer-&gt;get_list($from, @imports)</dt>
+<dd>
+
+<p>This returns a list of references for each import specified. Only the export references are returned, the names are not.</p>
+
+<p><code>$from</code> should be the package from which to get the exports.</p>
+
+</dd>
+<dt id="export_ref-Importer-get_one-from-import">$export_ref = Importer-&gt;get_one($from, $import)</dt>
+<dd>
+
+<p>This returns a single reference to a single export. If you provide multiple imports then only the LAST one will be used.</p>
+
+<p><code>$from</code> should be the package from which to get the exports.</p>
+
+</dd>
+</dl>
+
+<h1 id="USING-WITH-OTHER-EXPORTER-IMPLEMENTATIONS">USING WITH OTHER EXPORTER IMPLEMENTATIONS</h1>
+
+<p>If you want your module to work with Importer, but you use something other than <a href="../lib/Exporter.html">Exporter</a> to define your exports, you can make it work be defining the <code>IMPORTER_MENU</code> method in your package. As well other exporters can be updated to support Importer by putting this sub in your package. <b>IMPORTER_MENU() must be defined in your package, not a base class!</b></p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> IMPORTER_MENU </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$into</span><span class="operator">,</span> <span class="variable">$caller</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="string">export</span>       <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@EXPORT</span><span class="operator">,</span>          <span class="comment"># Default exports</span>
+            <span class="string">export_ok</span>    <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@EXPORT_OK</span><span class="operator">,</span>       <span class="comment"># Other allowed exports</span>
+            <span class="string">export_tags</span>  <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%EXPORT_TAGS</span><span class="operator">,</span>     <span class="comment"># Define tags</span>
+            <span class="string">export_fail</span>  <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">@EXPORT_FAIL</span><span class="operator">,</span>     <span class="comment"># For subs that may not always be available</span>
+            <span class="string">export_anon</span>  <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%EXPORT_ANON</span><span class="operator">,</span>     <span class="comment"># Anonymous symbols to export</span>
+            <span class="string">export_magic</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%EXPORT_MAGIC</span><span class="operator">,</span>    <span class="comment"># Magic to apply after a symbol is exported</span>
+    
+            <span class="string">generate</span>   <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">GENERATE</span><span class="operator">,</span>          <span class="comment"># Sub to generate dynamic exports</span>
+                                               <span class="comment"># OR</span>
+            <span class="string">export_gen</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%EXPORT_GEN</span><span class="operator">,</span>        <span class="comment"># Hash of builders, key is symbol</span>
+                                               <span class="comment"># name, value is sub that generates</span>
+                                               <span class="comment"># the symbol ref.</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> GENERATE </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$symbol</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+    
+        <span class="keyword">return</span> <span class="variable">$ref</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>All exports must be listed in either <code>@EXPORT</code> or <code>@EXPORT_OK</code>, or be keys in <code>%EXPORT_GEN</code> or <code>%EXPORT_ANON</code> to be allowed. &#39;export_tags&#39;, &#39;export_fail&#39;, &#39;export_anon&#39;, &#39;export_gen&#39;, and &#39;generate&#39; are optional. You cannot combine &#39;generate&#39; and &#39;export_gen&#39;.</p>
+
+<p><b>Note:</b> If your GENERATE sub needs the <code>$class</code>, <code>$into</code>, or <code>$caller</code> then your <code>IMPORTER_MENU()</code> method will need to build an anonymous sub that closes over them:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> IMPORTER_MENU </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$into</span><span class="operator">,</span> <span class="variable">$caller</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">...</span>
+            <span class="string">generate</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">GENERATE</span><span class="operator">(</span><span class="variable">$into</span><span class="operator">,</span> <span class="variable">$caller</span><span class="operator">,</span> <span class="variable">@_</span><span class="operator">)</span> <span class="operator">},</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="OO-Interface">OO Interface</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$imp</span> <span class="operator">=</span> <span class="variable">Importer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">from</span> <span class="operator">=&gt;</span> <span class="string">'Some::Exporter'</span><span class="operator">);</span>
+    
+    <span class="variable">$imp</span><span class="operator">-&gt;</span><span class="variable">do_import</span><span class="operator">(</span><span class="string">'Destination::Package'</span><span class="operator">);</span>
+    <span class="variable">$imp</span><span class="operator">-&gt;</span><span class="variable">do_import</span><span class="operator">(</span><span class="string">'Another::Destination'</span><span class="operator">,</span> <span class="variable">@symbols</span><span class="operator">);</span>
+</code></pre>
+
+<p>Or, maybe more useful:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$imp</span> <span class="operator">=</span> <span class="variable">Importer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">from</span> <span class="operator">=&gt;</span> <span class="string">'Carp'</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$croak</span> <span class="operator">=</span> <span class="variable">$imp</span><span class="operator">-&gt;</span><span class="variable">get_one</span><span class="operator">(</span><span class="string">'croak'</span><span class="operator">);</span>
+    <span class="variable">$croak</span><span class="operator">-&gt;(</span><span class="string">"This will croak"</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="OBJECT-CONSTRUCTION">OBJECT CONSTRUCTION</h2>
+
+<dl>
+
+<dt id="imp-Importer-new-from-Some::Exporter">$imp = Importer-&gt;new(from =&gt; &#39;Some::Exporter&#39;)</dt>
+<dd>
+
+</dd>
+<dt id="imp-Importer-new-from-Some::Exporter-caller-package-file-line">$imp = Importer-&gt;new(from =&gt; &#39;Some::Exporter&#39;, caller =&gt; [$package, $file, $line])</dt>
+<dd>
+
+<p>This is how you create a new Importer instance. <code>from =&gt; &#39;Some::Exporter&#39;</code> is the only required argument. You may also specify the <code>caller =&gt; [...]</code> arrayref, which will be used only for error reporting. If you do not specify a caller then Importer will attempt to find the caller dynamically every time it needs it (this is slow and expensive, but necessary if you intend to re-use the object.)</p>
+
+</dd>
+</dl>
+
+<h2 id="OBJECT-METHODS">OBJECT METHODS</h2>
+
+<dl>
+
+<dt id="imp-do_import-into">$imp-&gt;do_import($into)</dt>
+<dd>
+
+</dd>
+<dt id="imp-do_import-into-symbols">$imp-&gt;do_import($into, @symbols)</dt>
+<dd>
+
+<p>This will import from the objects <code>from</code> package into the <code>$into</code> package. You can provide a list of <code>@symbols</code>, or you can leave it empty for the defaults.</p>
+
+</dd>
+<dt id="imp-do_unimport">$imp-&gt;do_unimport()</dt>
+<dd>
+
+</dd>
+<dt id="imp-do_unimport-symbols">$imp-&gt;do_unimport(@symbols)</dt>
+<dd>
+
+<p>This will remove imported symbols from the objects <code>from</code> package. If you specify a list of <code>@symbols</code> then only the specified symbols will be removed, otherwise all symbols imported using Importer will be removed.</p>
+
+<p><b>Note:</b> Please be aware of the difference between <code>do_import()</code> and <code>do_unimport()</code>. For import &#39;from&#39; us used as the origin, in unimport it is used as the target. This means you cannot re-use an instance to import and then unimport.</p>
+
+</dd>
+<dt id="into-versions-exclude-symbols-set-imp-parse_args-Dest::Package">($into, $versions, $exclude, $symbols, $set) = $imp-&gt;parse_args(&#39;Dest::Package&#39;)</dt>
+<dd>
+
+</dd>
+<dt id="into-versions-exclude-symbols-set-imp-parse_args-Dest::Package-symbols">($into, $versions, $exclude, $symbols, $set) = $imp-&gt;parse_args(&#39;Dest::Package&#39;, @symbols)</dt>
+<dd>
+
+<p>This parses arguments. The first argument must be the destination package. Other arguments can be a mix of symbol names, tags, patterns, version numbers, and exclusions.</p>
+
+</dd>
+<dt id="caller_ref-imp-get_caller">$caller_ref = $imp-&gt;get_caller()</dt>
+<dd>
+
+<p>This will find the caller. This is mainly used for error reporting. IF the object was constructed with a caller then that is what is returned, otherwise this will scan the stack looking for the first call that does not originate from a package that ISA Importer.</p>
+
+</dd>
+<dt id="imp-carp-warning">$imp-&gt;carp($warning)</dt>
+<dd>
+
+<p>Warn at the callers level.</p>
+
+</dd>
+<dt id="imp-croak-exception">$imp-&gt;croak($exception)</dt>
+<dd>
+
+<p>Die at the callers level.</p>
+
+</dd>
+<dt id="from_package-imp-from">$from_package = $imp-&gt;from()</dt>
+<dd>
+
+<p>Get the <code>from</code> package that was specified at construction.</p>
+
+</dd>
+<dt id="file-imp-from_file">$file = $imp-&gt;from_file()</dt>
+<dd>
+
+<p>Get the filename for the <code>from</code> package.</p>
+
+</dd>
+<dt id="imp-load_from">$imp-&gt;load_from()</dt>
+<dd>
+
+<p>This will load the <code>from</code> package if it has not been loaded already. This uses some magic to ensure errors in the load process are reported to the <code>caller</code>.</p>
+
+</dd>
+<dt id="menu_hr-imp-menu-into">$menu_hr = $imp-&gt;menu($into)</dt>
+<dd>
+
+<p>Get the export menu built from, or provided by the <code>from</code> package. This is cached after the first time it is called. Use <code>$imp-&gt;reload_menu()</code> to refresh it.</p>
+
+<p>The menu structure looks like this:</p>
+
+<pre><code>    <span class="variable">$menu</span> <span class="operator">=</span> <span class="operator">{</span>
+        <span class="comment"># every valid export has a key in the lookup hashref, value is always</span>
+        <span class="comment"># 1, key always includes the sigil</span>
+        <span class="string">lookup</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="string">'&amp;symbol_a'</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">'$symbol_b'</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+    
+        <span class="comment"># most exports are listed here, symbol name with sigil is key, value is</span>
+        <span class="comment"># a reference to the symbol. If a symbol is missing it may be generated.</span>
+        <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="string">'&amp;symbol_a'</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">symbol_a</span><span class="operator">,</span> <span class="string">'$symbol_b'</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">$symbol_b</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+    
+        <span class="comment"># Hashref of tags, tag name (without ':' prefix) is key, value is an</span>
+        <span class="comment"># arrayref of symbol names, subs may have a sigil, but are not required</span>
+        <span class="comment"># to.</span>
+        <span class="string">tags</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">DEFAULT</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="operator">...</span><span class="operator">]</span><span class="operator">,</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="operator">...</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+    
+        <span class="comment"># Magic to apply</span>
+        <span class="string">magic</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">},</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">,</span>
+    
+        <span class="comment"># This is a hashref just like 'lookup'. Keys are symbols which may not</span>
+        <span class="comment"># always be available. If there are no symbols in this category then</span>
+        <span class="comment"># the value of the 'fail' key will be undef instead of a hashref.</span>
+        <span class="string">fail</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">'&amp;iffy_symbol'</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">'\&amp;only_on_linux'</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="comment"># OR fail =&gt; undef,</span>
+    
+        <span class="comment"># If present, this subroutine knows how to generate references for the</span>
+        <span class="comment"># symbols listed in 'lookup', but missing from 'exports'. References</span>
+        <span class="comment"># this returns are NEVER cached.</span>
+        <span class="string">generate</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">my</span> <span class="variable">$sym_name</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span> <span class="operator">...;</span> <span class="keyword">return</span> <span class="variable">$symbol_ref</span> <span class="operator">},</span>
+    <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="imp-reload_menu-into">$imp-&gt;reload_menu($into)</dt>
+<dd>
+
+<p>This will reload the export menu from the <code>from</code> package.</p>
+
+</dd>
+<dt id="my-exports-imp-get-imports">my $exports = $imp-&gt;get(@imports)</dt>
+<dd>
+
+<p>This returns hashref of <code><span class="operator">{</span> <span class="variable">$name</span> <span class="operator">=&gt;</span> <span class="variable">$ref</span> <span class="operator">}</span>
+</code> for all the specified imports.</p>
+
+</dd>
+<dt id="my-export_refs-imp-get_list-imports">my @export_refs = $imp-&gt;get_list(@imports)</dt>
+<dd>
+
+<p>This returns a list of references for each import specified. Only the export references are returned, the names are not.</p>
+
+</dd>
+<dt id="export_ref-imp-get_one-import">$export_ref = $imp-&gt;get_one($import)</dt>
+<dd>
+
+<p>This returns a single reference to a single export. If you provide multiple imports then only the LAST one will be used.</p>
+
+</dd>
+</dl>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<p>These can be imported:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Importer'</span> <span class="operator">=&gt;</span> <span class="string">qw/import optimal_import/</span><span class="operator">;</span>
+</code></pre>
+
+<dl>
+
+<dt id="bool-optimal_import-from-into-caller-imports">$bool = optimal_import($from, $into, \@caller, @imports)</dt>
+<dd>
+
+<p>This function will attempt to import <code>@imports</code> from the <code>$from</code> package into the <code>$into</code> package. <code>@caller</code> needs to have a package name, filename, and line number. If this function fails then no exporting will actually happen.</p>
+
+<p>If the import is successful this will return true.</p>
+
+<p>If the import is unsuccessful this will return false, and no modifications to the symbol table will occur.</p>
+
+</dd>
+<dt id="class-import-imports">$class-&gt;import(@imports)</dt>
+<dd>
+
+<p>If you write class intended to be used with <a href="../lib/Importer.html">Importer</a>, but also need to provide a legacy <code>import()</code> method for direct consumers of your class, you can import this <code>import()</code> method.</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">My::Exporter</span><span class="operator">;</span>
+    
+    <span class="comment"># This will give you 'import()' much like 'use base "Exporter";'</span>
+    <span class="keyword">use</span> <span class="variable">Importer</span> <span class="string">'Importer'</span> <span class="operator">=&gt;</span> <span class="string">qw/import/</span><span class="operator">;</span>
+    
+    <span class="operator">...</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Importer can be found at <a href="http://github.com/exodist/Importer">http://github.com/exodist/Importer</a>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2015 Chad Granum &lt;exodist7@gmail.com&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <a href="http://dev.perl.org/licenses/">http://dev.perl.org/licenses/</a></p>
+
+
+</body>
+
+</html>
+
+

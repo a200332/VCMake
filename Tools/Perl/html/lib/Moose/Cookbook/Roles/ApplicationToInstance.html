@@ -1,0 +1,154 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONCLUSION">CONCLUSION</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Cookbook::Roles::ApplicationToInstance - Applying a role to an object instance</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::Role::Job::Manager</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">List::Util</span> <span class="string">qw( first )</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'employees'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'ArrayRef[Employee]'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> assign_work </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$work</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$employee</span> <span class="operator">=</span> <span class="variable">first</span> <span class="operator">{</span> <span class="operator">!</span><span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">has_work</span> <span class="operator">}</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">employees</span> <span class="operator">}</span><span class="operator">;</span>
+  
+      <span class="keyword">die</span> <span class="string">'All my employees have work to do!'</span> <span class="keyword">unless</span> <span class="variable">$employee</span><span class="operator">;</span>
+  
+      <span class="variable">$employee</span><span class="operator">-&gt;</span><span class="variable">work</span><span class="operator">(</span><span class="variable">$work</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$lisa</span> <span class="operator">=</span> <span class="variable">Employee</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'Lisa'</span> <span class="operator">);</span>
+  <span class="variable">MyApp::Role::Job::Manager</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">apply</span><span class="operator">(</span><span class="variable">$lisa</span><span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$homer</span> <span class="operator">=</span> <span class="variable">Employee</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'Homer'</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$bart</span>  <span class="operator">=</span> <span class="variable">Employee</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'Bart'</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$marge</span> <span class="operator">=</span> <span class="variable">Employee</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'Marge'</span> <span class="operator">);</span>
+  
+  <span class="variable">$lisa</span><span class="operator">-&gt;</span><span class="variable">employees</span><span class="operator">(</span> <span class="operator">[</span> <span class="variable">$homer</span><span class="operator">,</span> <span class="variable">$bart</span><span class="operator">,</span> <span class="variable">$marge</span> <span class="operator">]</span> <span class="operator">);</span>
+  <span class="variable">$lisa</span><span class="operator">-&gt;</span><span class="variable">assign_work</span><span class="operator">(</span><span class="string">'mow the lawn'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>In this recipe, we show how a role can be applied to an object. In this specific case, we are giving an employee managerial responsibilities.</p>
+
+<p>Applying a role to an object is simple. The <a href="../../../../lib/Moose/Meta/Role.html">Moose::Meta::Role</a> object provides an <code>apply</code> method. This method will do the right thing when given an object instance.</p>
+
+<pre><code>  <span class="variable">MyApp::Role::Job::Manager</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">apply</span><span class="operator">(</span><span class="variable">$lisa</span><span class="operator">);</span>
+</code></pre>
+
+<p>We could also use the <code>apply_all_roles</code> function from <a href="../../../../lib/Moose/Util.html">Moose::Util</a>.</p>
+
+<pre><code>  <span class="variable">apply_all_roles</span><span class="operator">(</span> <span class="variable">$person</span><span class="operator">,</span> <span class="variable">MyApp::Role::Job::Manager</span><span class="operator">-&gt;</span><span class="variable">meta</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The main advantage of using <code>apply_all_roles</code> is that it can be used to apply more than one role at a time.</p>
+
+<p>We could also pass parameters to the role we&#39;re applying:</p>
+
+<pre><code>  <span class="variable">MyApp::Role::Job::Manager</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">apply</span><span class="operator">(</span>
+      <span class="variable">$lisa</span><span class="operator">,</span>
+      <span class="string">-alias</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">assign_work</span> <span class="operator">=&gt;</span> <span class="string">'get_off_your_lazy_behind'</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>We saw examples of how method exclusion and alias working in <a href="../../../../lib/Moose/Cookbook/Roles/Restartable_AdvancedComposition.html">Moose::Cookbook::Roles::Restartable_AdvancedComposition</a>.</p>
+
+<h1 id="CONCLUSION">CONCLUSION</h1>
+
+<p>Applying a role to an object instance is a useful tool for adding behavior to existing objects. In our example, it is effective used to model a promotion.</p>
+
+<p>It can also be useful as a sort of controlled monkey-patching for existing code, particularly non-Moose code. For example, you could create a debugging role and apply it to an object at runtime.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

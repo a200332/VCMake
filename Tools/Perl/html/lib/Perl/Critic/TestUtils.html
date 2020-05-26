@@ -1,0 +1,253 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#INTERFACE-SUPPORT">INTERFACE SUPPORT</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#run-file-information">.run file information</a></li>
+  <li><a href="#BUGS-AND-CAVEATS-AND-TODO-ITEMS">BUGS AND CAVEATS AND TODO ITEMS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::TestUtils - Utility functions for testing new Policies.</p>
+
+<h1 id="INTERFACE-SUPPORT">INTERFACE SUPPORT</h1>
+
+<p>This is considered to be a public module. Any changes to its interface will go through a deprecation cycle.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Perl::Critic::TestUtils</span> <span class="string">qw(critique pcritique fcritique)</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="string">'&lt;&lt;END_CODE'</span><span class="operator">;</span>
+    <span class="keyword">package</span> <span class="variable">Foo::Bar</span><span class="operator">;</span>
+    <span class="variable">$foo</span> <span class="operator">=</span> <span class="variable">frobulator</span><span class="operator">();</span>
+    <span class="variable">$baz</span> <span class="operator">=</span> <span class="variable">$foo</span> <span class="operator">**</span> <span class="number">2</span><span class="operator">;</span>
+    <span class="number">1</span><span class="operator">;</span>
+    <span class="variable">END_CODE</span>
+    
+    <span class="comment"># Critique code against all loaded policies...</span>
+    <span class="keyword">my</span> <span class="variable">$perl_critic_config</span> <span class="operator">=</span> <span class="operator">{</span> <span class="string">-severity</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">}</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$violation_count</span> <span class="operator">=</span> <span class="variable">critique</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">$code</span><span class="operator">,</span> <span class="variable">$perl_critic_config</span><span class="operator">);</span>
+    
+    <span class="comment"># Critique code against one policy...</span>
+    <span class="keyword">my</span> <span class="variable">$custom_policy</span> <span class="operator">=</span> <span class="string">'Miscellanea::ProhibitFrobulation'</span>
+    <span class="keyword">my</span> <span class="variable">$violation_count</span> <span class="operator">=</span> <span class="variable">pcritique</span><span class="operator">(</span> <span class="variable">$custom_policy</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$code</span> <span class="operator">);</span>
+    
+    <span class="comment"># Critique code against one filename-related policy...</span>
+    <span class="keyword">my</span> <span class="variable">$custom_policy</span> <span class="operator">=</span> <span class="string">'Modules::RequireFilenameMatchesPackage'</span>
+    <span class="keyword">my</span> <span class="variable">$violation_count</span> <span class="operator">=</span> <span class="variable">fcritique</span><span class="operator">(</span> <span class="variable">$custom_policy</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$code</span><span class="operator">,</span> <span class="string">'Foo/Bar.pm'</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is used by <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> only for self-testing. It provides a few handy subroutines for testing new Perl::Critic::Policy modules. Look at the test programs that ship with Perl::Critic for more examples of how to use these subroutines.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<dl>
+
+<dt id="assert_version-version">assert_version( $version )</dt>
+<dd>
+
+<p>Asserts that the <code>$version</code> passed matches the version of Perl::Critic.</p>
+
+</dd>
+<dt id="block_perlcriticrc">block_perlcriticrc()</dt>
+<dd>
+
+<p>If a user has a <i>~/.perlcriticrc</i> file, this can interfere with testing. This handy method disables the search for that file -- simply call it at the top of your <i>.t</i> program. Note that this is not easily reversible, but that should not matter.</p>
+
+</dd>
+<dt id="critique_with_violations-code_string_ref-config_ref">critique_with_violations( $code_string_ref, $config_ref )</dt>
+<dd>
+
+<p>Test a block of code against the specified Perl::Critic::Config instance (or <code>undef</code> for the default). Returns the violations that occurred.</p>
+
+</dd>
+<dt id="critique-code_string_ref-config_ref">critique( $code_string_ref, $config_ref )</dt>
+<dd>
+
+<p>Test a block of code against the specified Perl::Critic::Config instance (or <code>undef</code> for the default). Returns the number of violations that occurred.</p>
+
+</dd>
+<dt id="pcritique_with_violations-policy_name-code_string_ref-config_ref">pcritique_with_violations( $policy_name, $code_string_ref, $config_ref )</dt>
+<dd>
+
+<p>Like <code>critique_with_violations()</code>, but tests only a single policy instead of the whole bunch.</p>
+
+</dd>
+<dt id="pcritique-policy_name-code_string_ref-config_ref">pcritique( $policy_name, $code_string_ref, $config_ref )</dt>
+<dd>
+
+<p>Like <code>critique()</code>, but tests only a single policy instead of the whole bunch.</p>
+
+</dd>
+<dt id="fcritique_with_violations-policy_name-code_string_ref-filename-config_ref">fcritique_with_violations( $policy_name, $code_string_ref, $filename, $config_ref )</dt>
+<dd>
+
+<p>Like <code>pcritique_with_violations()</code>, but pretends that the code was loaded from the specified filename. This is handy for testing policies like <code>Modules::RequireFilenameMatchesPackage</code> which care about the filename that the source derived from.</p>
+
+<p>The <code>$filename</code> parameter must be a relative path, not absolute. The file and all necessary subdirectories will be created via <a href="../../../lib/File/Temp.html">File::Temp</a> and will be automatically deleted.</p>
+
+</dd>
+<dt id="fcritique-policy_name-code_string_ref-filename-config_ref">fcritique( $policy_name, $code_string_ref, $filename, $config_ref )</dt>
+<dd>
+
+<p>Like <code>pcritique()</code>, but pretends that the code was loaded from the specified filename. This is handy for testing policies like <code>Modules::RequireFilenameMatchesPackage</code> which care about the filename that the source derived from.</p>
+
+<p>The <code>$filename</code> parameter must be a relative path, not absolute. The file and all necessary subdirectories will be created via <a href="../../../lib/File/Temp.html">File::Temp</a> and will be automatically deleted.</p>
+
+</dd>
+<dt id="subtests_in_tree-dir">subtests_in_tree( $dir )</dt>
+<dd>
+
+<p>Searches the specified directory recursively for <i>.run</i> files. Each one found is parsed and a hash-of-list-of-hashes is returned. The outer hash is keyed on policy short name, like <code>Modules::RequireEndWithOne</code>. The inner hash specifies a single test to be handed to <code>pcritique()</code> or <code>fcritique()</code>, including the code string, test name, etc. See below for the syntax of the <i>.run</i> files.</p>
+
+</dd>
+<dt id="should_skip_author_tests">should_skip_author_tests()</dt>
+<dd>
+
+<p>Answers whether author tests should run.</p>
+
+</dd>
+<dt id="get_author_test_skip_message">get_author_test_skip_message()</dt>
+<dd>
+
+<p>Returns a string containing the message that should be emitted when a test is skipped due to it being an author test when author tests are not enabled.</p>
+
+</dd>
+<dt id="starting_points_including_examples">starting_points_including_examples()</dt>
+<dd>
+
+<p>Returns a list of the directories contain code that needs to be tested when it is desired that the examples be included.</p>
+
+</dd>
+<dt id="bundled_policy_names">bundled_policy_names()</dt>
+<dd>
+
+<p>Returns a list of Policy packages that come bundled with this package. This functions by searching <i>MANIFEST</i> for <i>lib/Perl/Critic/Policy/*.pm</i> and converts the results to package names.</p>
+
+</dd>
+<dt id="names_of_policies_willing_to_work-configuration">names_of_policies_willing_to_work( %configuration )</dt>
+<dd>
+
+<p>Returns a list of the packages of policies that are willing to function on the current system using the specified configuration.</p>
+
+</dd>
+</dl>
+
+<h1 id="run-file-information"><i>.run</i> file information</h1>
+
+<p>Testing a policy follows a very simple pattern:</p>
+
+<pre><code>    * Policy name
+        * Subtest name
+        * Optional parameters
+        * Number of failures expected
+        * Optional exception expected
+        * Optional filename for code</code></pre>
+
+<p>Each of the subtests for a policy is collected in a single <i>.run</i> file, with test properties as comments in front of each code block that describes how we expect Perl::Critic to react to the code. For example, say you have a policy called Variables::ProhibitVowels:</p>
+
+<pre><code>    <span class="operator">(</span><span class="variable">In</span> <span class="variable">file</span> <span class="variable">t</span><span class="operator">/</span><span class="variable">Variables</span><span class="operator">/</span><span class="variable">ProhibitVowels</span><span class="operator">.</span><span class="variable">run</span><span class="operator">)</span>
+    
+    <span class="comment">## name Basics</span>
+    <span class="comment">## failures 1</span>
+    <span class="comment">## cut</span>
+    
+    <span class="keyword">my</span> <span class="variable">$vrbl_nm</span> <span class="operator">=</span> <span class="string">'foo'</span><span class="operator">;</span>    <span class="comment"># Good, vowel-free name</span>
+    <span class="keyword">my</span> <span class="variable">$wango</span> <span class="operator">=</span> <span class="number">12</span><span class="operator">;</span>         <span class="comment"># Bad, pronouncable name</span>
+    
+    
+    <span class="comment">## name Sometimes Y</span>
+    <span class="comment">## failures 1</span>
+    <span class="comment">## cut</span>
+    
+    <span class="keyword">my</span> <span class="variable">$yllw</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>       <span class="comment"># "y" not a vowel here</span>
+    <span class="keyword">my</span> <span class="variable">$rhythm</span> <span class="operator">=</span> <span class="number">12</span><span class="operator">;</span>    <span class="comment"># But here it is</span>
+</code></pre>
+
+<p>These are called &quot;subtests&quot;, and two are shown above. The beauty of incorporating multiple subtests in a file is that the <i>.run</i> is itself a (mostly) valid Perl file, and not hidden in a HEREDOC, so your editor&#39;s color-coding still works, and it is much easier to work with the code and the POD.</p>
+
+<p>If you need to pass any configuration parameters for your subtest, do so like this:</p>
+
+<pre><code>    <span class="comment">## parms { allow_y =&gt; '0' }</span>
+</code></pre>
+
+<p>Note that all the values in this hash must be strings because that&#39;s what Perl::Critic will hand you from a <i>.perlcriticrc</i>.</p>
+
+<p>If it&#39;s a TODO subtest (probably because of some weird corner of PPI that we exercised that Adam is getting around to fixing, right?), then make a <code><span class="comment">##TODO</span>
+</code> entry.</p>
+
+<pre><code>    <span class="comment">## TODO Should pass when PPI 1.xxx comes out</span>
+</code></pre>
+
+<p>If the code is expected to trigger an exception in the policy, indicate that like so:</p>
+
+<pre><code>    <span class="comment">## error 1</span>
+</code></pre>
+
+<p>If you want to test the error message, mark it with <code>/.../</code> to indicate a <code>like()</code> test:</p>
+
+<pre><code>    <span class="comment">## error /Can't load Foo::Bar/</span>
+</code></pre>
+
+<p>If the policy you are testing cares about the filename of the code, you can indicate that <code>fcritique</code> should be used like so (see <code>fcritique</code> for more details):</p>
+
+<pre><code>    <span class="comment">## filename lib/Foo/Bar.pm</span>
+</code></pre>
+
+<p>The value of <code>parms</code> will get <code>eval</code>ed and passed to <code>pcritique()</code>, so be careful.</p>
+
+<p>In general, a subtest document runs from the <code><span class="comment">## cut</span>
+</code> that starts it to either the next <code><span class="comment">## name</span>
+</code> or the end of the file. In very rare circumstances you may need to end the test document earlier. A second <code><span class="comment">## cut</span>
+</code> will do this. The only known need for this is in <i>t/Miscellanea/RequireRcsKeywords.run</i>, where it is used to prevent the RCS keywords in the file footer from producing false positives or negatives in the last test.</p>
+
+<p>Note that nowhere within the <i>.run</i> file itself do you specify the policy that you&#39;re testing. That&#39;s implicit within the filename.</p>
+
+<h1 id="BUGS-AND-CAVEATS-AND-TODO-ITEMS">BUGS AND CAVEATS AND TODO ITEMS</h1>
+
+<p>Test that we have a t/*/*.run for each lib/*/*.pm</p>
+
+<p>Allow us to specify the nature of the failures, and which one. If there are 15 lines of code, and six of them fail, how do we know they&#39;re the right six?</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt; and the rest of the <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> team.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Chris Dolan.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

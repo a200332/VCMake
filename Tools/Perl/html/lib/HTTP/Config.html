@@ -1,0 +1,295 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Matching">Matching</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTTP::Config - Configuration for request and response objects</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 6.13</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">HTTP::Config</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$c</span> <span class="operator">=</span> <span class="variable">HTTP::Config</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$c</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span><span class="string">m_domain</span> <span class="operator">=&gt;</span> <span class="string">".example.com"</span><span class="operator">,</span> <span class="string">m_scheme</span> <span class="operator">=&gt;</span> <span class="string">"http"</span><span class="operator">,</span> <span class="string">verbose</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+ 
+ <span class="keyword">use</span> <span class="variable">HTTP::Request</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$request</span> <span class="operator">=</span> <span class="variable">HTTP::Request</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">GET</span> <span class="operator">=&gt;</span> <span class="string">"http://www.example.com"</span><span class="operator">);</span>
+ 
+ <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">my</span> <span class="variable">@m</span> <span class="operator">=</span> <span class="variable">$c</span><span class="operator">-&gt;</span><span class="variable">matching</span><span class="operator">(</span><span class="variable">$request</span><span class="operator">))</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"Yadayada\n"</span> <span class="keyword">if</span> <span class="variable">$m</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">verbose</span><span class="operator">}</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>An <code>HTTP::Config</code> object is a list of entries that can be matched against request or request/response pairs. Its purpose is to hold configuration data that can be looked up given a request or response object.</p>
+
+<p>Each configuration entry is a hash. Some keys specify matching to occur against attributes of request/response objects. Other keys can be used to hold user data.</p>
+
+<p>The following methods are provided:</p>
+
+<dl>
+
+<dt id="conf-HTTP::Config-new">$conf = HTTP::Config-&gt;new</dt>
+<dd>
+
+<p>Constructs a new empty <code>HTTP::Config</code> object and returns it.</p>
+
+</dd>
+<dt id="conf-entries">$conf-&gt;entries</dt>
+<dd>
+
+<p>Returns the list of entries in the configuration object. In scalar context returns the number of entries.</p>
+
+</dd>
+<dt id="conf-empty">$conf-&gt;empty</dt>
+<dd>
+
+<p>Return true if there are no entries in the configuration object. This is just a shorthand for <code>not $conf-&gt;entries</code>.</p>
+
+</dd>
+<dt id="conf-add-matchspec-other">$conf-&gt;add( %matchspec, %other )</dt>
+<dd>
+
+</dd>
+<dt id="conf-add-entry">$conf-&gt;add( \%entry )</dt>
+<dd>
+
+<p>Adds a new entry to the configuration. You can either pass separate key/value pairs or a hash reference.</p>
+
+</dd>
+<dt id="conf-remove-spec">$conf-&gt;remove( %spec )</dt>
+<dd>
+
+<p>Removes (and returns) the entries that have matches for all the key/value pairs in %spec. If %spec is empty this will match all entries; so it will empty the configuation object.</p>
+
+</dd>
+<dt id="conf-matching-uri-request-response">$conf-&gt;matching( $uri, $request, $response )</dt>
+<dd>
+
+</dd>
+<dt id="conf-matching-uri">$conf-&gt;matching( $uri )</dt>
+<dd>
+
+</dd>
+<dt id="conf-matching-request">$conf-&gt;matching( $request )</dt>
+<dd>
+
+</dd>
+<dt id="conf-matching-response">$conf-&gt;matching( $response )</dt>
+<dd>
+
+<p>Returns the entries that match the given $uri, $request and $response triplet.</p>
+
+<p>If called with a single $request object then the $uri is obtained by calling its &#39;uri_canonical&#39; method. If called with a single $response object, then the request object is obtained by calling its &#39;request&#39; method; and then the $uri is obtained as if a single $request was provided.</p>
+
+<p>The entries are returned with the most specific matches first. In scalar context returns the most specific match or <code>undef</code> in none match.</p>
+
+</dd>
+<dt id="conf-add_item-item-matchspec">$conf-&gt;add_item( $item, %matchspec )</dt>
+<dd>
+
+</dd>
+<dt id="conf-remove_items-spec">$conf-&gt;remove_items( %spec )</dt>
+<dd>
+
+</dd>
+<dt id="conf-matching_items-uri-request-response">$conf-&gt;matching_items( $uri, $request, $response )</dt>
+<dd>
+
+<p>Wrappers that hides the entries themselves.</p>
+
+</dd>
+</dl>
+
+<h2 id="Matching">Matching</h2>
+
+<p>The following keys on a configuration entry specify matching. For all of these you can provide an array of values instead of a single value. The entry matches if at least one of the values in the array matches.</p>
+
+<p>Entries that require match against a response object attribute will never match unless a response object was provided.</p>
+
+<dl>
+
+<dt id="m_scheme-scheme">m_scheme =&gt; $scheme</dt>
+<dd>
+
+<p>Matches if the URI uses the specified scheme; e.g. &quot;http&quot;.</p>
+
+</dd>
+<dt id="m_secure-bool">m_secure =&gt; $bool</dt>
+<dd>
+
+<p>If $bool is TRUE; matches if the URI uses a secure scheme. If $bool is FALSE; matches if the URI does not use a secure scheme. An example of a secure scheme is &quot;https&quot;.</p>
+
+</dd>
+<dt id="m_host_port-hostname:-port">m_host_port =&gt; &quot;$hostname:$port&quot;</dt>
+<dd>
+
+<p>Matches if the URI&#39;s host_port method return the specified value.</p>
+
+</dd>
+<dt id="m_host-hostname">m_host =&gt; $hostname</dt>
+<dd>
+
+<p>Matches if the URI&#39;s host method returns the specified value.</p>
+
+</dd>
+<dt id="m_port-port">m_port =&gt; $port</dt>
+<dd>
+
+<p>Matches if the URI&#39;s port method returns the specified value.</p>
+
+</dd>
+<dt id="m_domain-.-domain">m_domain =&gt; &quot;.$domain&quot;</dt>
+<dd>
+
+<p>Matches if the URI&#39;s host method return a value that within the given domain. The hostname &quot;www.example.com&quot; will for instance match the domain &quot;.com&quot;.</p>
+
+</dd>
+<dt id="m_path-path">m_path =&gt; $path</dt>
+<dd>
+
+<p>Matches if the URI&#39;s path method returns the specified value.</p>
+
+</dd>
+<dt id="m_path_prefix-path">m_path_prefix =&gt; $path</dt>
+<dd>
+
+<p>Matches if the URI&#39;s path is the specified path or has the specified path as prefix.</p>
+
+</dd>
+<dt id="m_path_match-Regexp">m_path_match =&gt; $Regexp</dt>
+<dd>
+
+<p>Matches if the regular expression matches the URI&#39;s path. Eg. qr/\.html$/.</p>
+
+</dd>
+<dt id="m_method-method">m_method =&gt; $method</dt>
+<dd>
+
+<p>Matches if the request method matches the specified value. Eg. &quot;GET&quot; or &quot;POST&quot;.</p>
+
+</dd>
+<dt id="m_code-digit">m_code =&gt; $digit</dt>
+<dd>
+
+</dd>
+<dt id="m_code-status_code">m_code =&gt; $status_code</dt>
+<dd>
+
+<p>Matches if the response status code matches. If a single digit is specified; matches for all response status codes beginning with that digit.</p>
+
+</dd>
+<dt id="m_proxy-url">m_proxy =&gt; $url</dt>
+<dd>
+
+<p>Matches if the request is to be sent to the given Proxy server.</p>
+
+</dd>
+<dt id="m_media_type">m_media_type =&gt; &quot;*/*&quot;</dt>
+<dd>
+
+</dd>
+<dt id="m_media_type-text">m_media_type =&gt; &quot;text/*&quot;</dt>
+<dd>
+
+</dd>
+<dt id="m_media_type-html">m_media_type =&gt; &quot;html&quot;</dt>
+<dd>
+
+</dd>
+<dt id="m_media_type-xhtml">m_media_type =&gt; &quot;xhtml&quot;</dt>
+<dd>
+
+</dd>
+<dt id="m_media_type-text-html">m_media_type =&gt; &quot;text/html&quot;</dt>
+<dd>
+
+<p>Matches if the response media type matches.</p>
+
+<p>With a value of &quot;html&quot; matches if $response-&gt;content_is_html returns TRUE. With a value of &quot;xhtml&quot; matches if $response-&gt;content_is_xhtml returns TRUE.</p>
+
+</dd>
+<dt id="m_uri__-method-undef">m_uri__<i>$method</i> =&gt; undef</dt>
+<dd>
+
+<p>Matches if the URI object provides the method.</p>
+
+</dd>
+<dt id="m_uri__-method-string">m_uri__<i>$method</i> =&gt; $string</dt>
+<dd>
+
+<p>Matches if the URI&#39;s $method method returns the given value.</p>
+
+</dd>
+<dt id="m_header__-field-string">m_header__<i>$field</i> =&gt; $string</dt>
+<dd>
+
+<p>Matches if either the request or the response have a header $field with the given value.</p>
+
+</dd>
+<dt id="m_response_attr__-key-undef">m_response_attr__<i>$key</i> =&gt; undef</dt>
+<dd>
+
+</dd>
+<dt id="m_response_attr__-key-string">m_response_attr__<i>$key</i> =&gt; $string</dt>
+<dd>
+
+<p>Matches if the response object has that key, or the entry has the given value.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/URI.html">URI</a>, <a href="../../lib/HTTP/Request.html">HTTP::Request</a>, <a href="../../lib/HTTP/Response.html">HTTP::Response</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Gisle Aas &lt;gisle@activestate.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 1994-2017 by Gisle Aas.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

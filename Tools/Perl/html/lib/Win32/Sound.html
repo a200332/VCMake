@@ -1,0 +1,429 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#THE-WaveOut-PACKAGE">THE WaveOut PACKAGE</a>
+    <ul>
+      <li><a href="#FUNCTIONS1">FUNCTIONS</a></li>
+      <li><a href="#THE-SOUND-FORMAT">THE SOUND FORMAT</a></li>
+      <li><a href="#EXAMPLE">EXAMPLE</a></li>
+    </ul>
+  </li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::Sound - An extension to play with Windows sounds</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::Sound</span><span class="operator">;</span>
+    <span class="variable">Win32::Sound::Volume</span><span class="operator">(</span><span class="string">'100%'</span><span class="operator">);</span>
+    <span class="variable">Win32::Sound::Play</span><span class="operator">(</span><span class="string">"file.wav"</span><span class="operator">);</span>
+    <span class="variable">Win32::Sound::Stop</span><span class="operator">();</span>
+    
+    <span class="comment"># ...and read on for more fun ;-)</span>
+</code></pre>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<dl>
+
+<dt id="Win32::Sound::Play-SOUND-FLAGS"><b>Win32::Sound::Play(SOUND, [FLAGS])</b></dt>
+<dd>
+
+<p>Plays the specified sound: SOUND can the be name of a WAV file or one of the following predefined sound names:</p>
+
+<pre><code>    SystemDefault
+    SystemAsterisk
+    SystemExclamation
+    SystemExit
+    SystemHand
+    SystemQuestion
+    SystemStart</code></pre>
+
+<p>Additionally, if the named sound could not be found, the function plays the system default sound (unless you specify the <code>SND_NODEFAULT</code> flag). If no parameters are given, this function stops the sound actually playing (see also Win32::Sound::Stop).</p>
+
+<p>FLAGS can be a combination of the following constants:</p>
+
+<dl>
+
+<dt id="SND_ASYNC"><code>SND_ASYNC</code></dt>
+<dd>
+
+<p>The sound is played asynchronously and the function returns immediately after beginning the sound (if this flag is not specified, the sound is played synchronously and the function returns when the sound ends).</p>
+
+</dd>
+<dt id="SND_LOOP"><code>SND_LOOP</code></dt>
+<dd>
+
+<p>The sound plays repeatedly until it is stopped. You must also specify <code>SND_ASYNC</code> flag.</p>
+
+</dd>
+<dt id="SND_NODEFAULT"><code>SND_NODEFAULT</code></dt>
+<dd>
+
+<p>No default sound is used. If the specified <i>sound</i> cannot be found, the function returns without playing anything.</p>
+
+</dd>
+<dt id="SND_NOSTOP"><code>SND_NOSTOP</code></dt>
+<dd>
+
+<p>If a sound is already playing, the function fails. By default, any new call to the function will stop previously playing sounds.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="Win32::Sound::Stop"><b>Win32::Sound::Stop()</b></dt>
+<dd>
+
+<p>Stops the sound currently playing.</p>
+
+</dd>
+<dt id="Win32::Sound::Volume"><b>Win32::Sound::Volume()</b></dt>
+<dd>
+
+<p>Returns the wave device volume; if called in an array context, returns left and right values. Otherwise, returns a single 32 bit value (left in the low word, right in the high word). In case of error, returns <code>undef</code> and sets $!.</p>
+
+<p>Examples:</p>
+
+<pre><code>    <span class="operator">(</span><span class="variable">$L</span><span class="operator">,</span> <span class="variable">$R</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">Win32::Sound::Volume</span><span class="operator">();</span>
+    <span class="keyword">if</span><span class="operator">(</span> <span class="keyword">not</span> <span class="keyword">defined</span> <span class="variable">Win32::Sound::Volume</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">die</span> <span class="string">"Can't get volume: $!"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::Sound::Volume-LEFT-RIGHT"><b>Win32::Sound::Volume(LEFT, [RIGHT])</b></dt>
+<dd>
+
+<p>Sets the wave device volume; if two arguments are given, sets left and right channels independently, otherwise sets them both to LEFT (eg. RIGHT=LEFT). Values range from 0 to 65535 (0xFFFF), but they can also be given as percentage (use a string containing a number followed by a percent sign).</p>
+
+<p>Returns <code>undef</code> and sets $! in case of error, a true value if successful.</p>
+
+<p>Examples:</p>
+
+<pre><code>    <span class="variable">Win32::Sound::Volume</span><span class="operator">(</span><span class="string">'50%'</span><span class="operator">);</span>
+    <span class="variable">Win32::Sound::Volume</span><span class="operator">(</span><span class="number">0xFFFF</span><span class="operator">,</span> <span class="number">0x7FFF</span><span class="operator">);</span>
+    <span class="variable">Win32::Sound::Volume</span><span class="operator">(</span><span class="string">'100%'</span><span class="operator">,</span> <span class="string">'50%'</span><span class="operator">);</span>
+    <span class="variable">Win32::Sound::Volume</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::Sound::Format-filename"><b>Win32::Sound::Format(filename)</b></dt>
+<dd>
+
+<p>Returns information about the specified WAV file format; the array contains:</p>
+
+<ul>
+
+<li><p>sample rate (in Hz)</p>
+
+</li>
+<li><p>bits per sample (8 or 16)</p>
+
+</li>
+<li><p>channels (1 for mono, 2 for stereo)</p>
+
+</li>
+</ul>
+
+<p>Example:</p>
+
+<pre><code>    <span class="operator">(</span><span class="variable">$hz</span><span class="operator">,</span> <span class="variable">$bits</span><span class="operator">,</span> <span class="variable">$channels</span><span class="operator">)</span> 
+        <span class="operator">=</span> <span class="variable">Win32::Sound::Format</span><span class="operator">(</span><span class="string">"file.wav"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::Sound::Devices"><b>Win32::Sound::Devices()</b></dt>
+<dd>
+
+<p>Returns all the available sound devices; their names contain the type of the device (WAVEOUT, WAVEIN, MIDIOUT, MIDIIN, AUX or MIXER) and a zero-based ID number: valid devices names are for example:</p>
+
+<pre><code>    WAVEOUT0
+    WAVEOUT1
+    WAVEIN0
+    MIDIOUT0
+    MIDIIN0
+    AUX0
+    AUX1
+    AUX2</code></pre>
+
+<p>There are also two special device names, <code>WAVE_MAPPER</code> and <code>MIDI_MAPPER</code> (the default devices for wave output and midi output).</p>
+
+<p>Example:</p>
+
+<pre><code>    <span class="variable">@devices</span> <span class="operator">=</span> <span class="variable">Win32::Sound::Devices</span><span class="operator">();</span>
+</code></pre>
+
+</dd>
+<dt id="Win32::Sound::DeviceInfo-DEVICE">Win32::Sound::DeviceInfo(DEVICE)</dt>
+<dd>
+
+<p>Returns an associative array of information about the sound device named DEVICE (the same format of Win32::Sound::Devices).</p>
+
+<p>The content of the array depends on the device type queried. Each device type returns <b>at least</b> the following information:</p>
+
+<pre><code>    manufacturer_id
+    product_id
+    name
+    driver_version</code></pre>
+
+<p>For additional data refer to the following table:</p>
+
+<pre><code>    WAVEIN..... formats
+                channels
+    
+    WAVEOUT.... formats
+                channels
+                support
+                
+    MIDIOUT.... technology
+                voices
+                notes
+                channels
+                support
+                
+    AUX........ technology
+                support
+                
+    MIXER...... destinations
+                support</code></pre>
+
+<p>The meaning of the fields, where not obvious, can be evinced from the Microsoft SDK documentation (too long to report here, maybe one day... :-).</p>
+
+<p>Example:</p>
+
+<pre><code>    <span class="variable">%info</span> <span class="operator">=</span> <span class="variable">Win32::Sound::DeviceInfo</span><span class="operator">(</span><span class="string">'WAVE_MAPPER'</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$info</span><span class="string">{name} version </span><span class="variable">$info</span><span class="string">{driver_version}\n"</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="THE-WaveOut-PACKAGE">THE WaveOut PACKAGE</h1>
+
+<p>Win32::Sound also provides a different, more powerful approach to wave audio data with its <code>WaveOut</code> package. It has methods to load and then play WAV files, with the additional feature of specifying the start and end range, so you can play only a portion of an audio file.</p>
+
+<p>Furthermore, it is possible to load arbitrary binary data to the soundcard to let it play and save them back into WAV files; in a few words, you can do some sound synthesis work.</p>
+
+<h2 id="FUNCTIONS1">FUNCTIONS</h2>
+
+<dl>
+
+<dt id="new-Win32::Sound::WaveOut-FILENAME">new Win32::Sound::WaveOut(FILENAME)</dt>
+<dd>
+
+</dd>
+<dt id="new-Win32::Sound::WaveOut-SAMPLERATE-BITS-CHANNELS">new Win32::Sound::WaveOut(SAMPLERATE, BITS, CHANNELS)</dt>
+<dd>
+
+</dd>
+<dt id="new-Win32::Sound::WaveOut">new Win32::Sound::WaveOut()</dt>
+<dd>
+
+<p>This function creates a <code>WaveOut</code> object; the first form opens the specified wave file (see also <code>Open()</code> ), so you can directly <code>Play()</code> it.</p>
+
+<p>The second (and third) form opens the wave output device with the format given (or if none given, defaults to 44.1kHz, 16 bits, stereo); to produce something audible you can either <code>Open()</code> a wave file or <code>Load()</code> binary data to the soundcard and then <code>Write()</code> it.</p>
+
+<p>Note that by default Win32::Sound::WaveOut will use the first soundcard (eg. WAVEOUT0). If you want to use a different one, you have to do the following:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$WAV</span> <span class="operator">=</span> <span class="variable">Win32::WaveOut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">CloseDevice</span><span class="operator">();</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">OpenDevice</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span> <span class="comment"># open WAVEOUT1</span>
+</code></pre>
+
+</dd>
+<dt id="Close">Close()</dt>
+<dd>
+
+<p>Closes the wave file currently opened.</p>
+
+</dd>
+<dt id="CloseDevice">CloseDevice()</dt>
+<dd>
+
+<p>Closes the wave output device; you can change format and reopen it with <code>OpenDevice()</code>.</p>
+
+</dd>
+<dt id="GetErrorText-ERROR">GetErrorText(ERROR)</dt>
+<dd>
+
+<p>Returns the error text associated with the specified ERROR number; note it only works for wave-output-specific errors.</p>
+
+</dd>
+<dt id="Load-DATA">Load(DATA)</dt>
+<dd>
+
+<p>Loads the DATA buffer in the soundcard. The format of the data buffer depends on the format used; for example, with 8 bit mono each sample is one character, while with 16 bit stereo each sample is four characters long (two 16 bit values for left and right channels). The sample rate defines how much samples are in one second of sound. For example, to fit one second at 44.1kHz 16 bit stereo your buffer must contain 176400 bytes (44100 * 4).</p>
+
+</dd>
+<dt id="Open-FILE">Open(FILE)</dt>
+<dd>
+
+<p>Opens the specified wave FILE.</p>
+
+</dd>
+<dt id="OpenDevice-ID">OpenDevice([ID])</dt>
+<dd>
+
+<p>Opens the wave output device with the current sound format (not needed unless you used <code>CloseDevice()</code>).</p>
+
+<p>By default it will open the first device (eg. WAVEOUT0). If you have multiple soundcards, you can specify which one to use by adding the numeric ID of the (WAVEOUT) device.</p>
+
+<p>Example:</p>
+
+<pre><code>    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">OpenDevice</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span> <span class="comment"># opens WAVEOUT1</span>
+</code></pre>
+
+<p>See also <a>Win32::Sound::Devices()</a> to list the currently available soundcards.</p>
+
+</dd>
+<dt id="Pause">Pause()</dt>
+<dd>
+
+<p>Pauses the sound currently playing; use <code>Restart()</code> to continue playing.</p>
+
+</dd>
+<dt id="Play-FROM-TO">Play( [FROM, TO] )</dt>
+<dd>
+
+<p>Plays the opened wave file. You can optionally specify a FROM - TO range, where FROM and TO are expressed in samples (or use FROM=0 for the first sample and TO=-1 for the last sample). Playback happens always asynchronously, eg. in the background.</p>
+
+</dd>
+<dt id="Position">Position()</dt>
+<dd>
+
+<p>Returns the sample number currently playing; note that the play position is not zeroed when the sound ends, so you have to call a <code>Reset()</code> between plays to receive the correct position in the current sound.</p>
+
+</dd>
+<dt id="Reset">Reset()</dt>
+<dd>
+
+<p>Stops playing and resets the play position (see <code>Position()</code>).</p>
+
+</dd>
+<dt id="Restart">Restart()</dt>
+<dd>
+
+<p>Continues playing the sound paused by <code>Pause()</code>.</p>
+
+</dd>
+<dt id="Save-FILE-DATA">Save(FILE, [DATA])</dt>
+<dd>
+
+<p>Writes the DATA buffer (if not given, uses the buffer currently loaded in the soundcard) to the specified wave FILE.</p>
+
+</dd>
+<dt id="Status">Status()</dt>
+<dd>
+
+<p>Returns 0 if the soundcard is currently playing, 1 if it&#39;s free, or <code>undef</code> on errors.</p>
+
+</dd>
+<dt id="Unload">Unload()</dt>
+<dd>
+
+<p>Frees the soundcard from the loaded data.</p>
+
+</dd>
+<dt id="Volume-LEFT-RIGHT">Volume( [LEFT, RIGHT] )</dt>
+<dd>
+
+<p>Gets or sets the volume for the wave output device. It works the same way as Win32::Sound::Volume.</p>
+
+</dd>
+<dt id="Write">Write()</dt>
+<dd>
+
+<p>Plays the data currently loaded in the soundcard; playback happens always asynchronously, eg. in the background.</p>
+
+</dd>
+</dl>
+
+<h2 id="THE-SOUND-FORMAT">THE SOUND FORMAT</h2>
+
+<p>The sound format is stored in three properties of the <code>WaveOut</code> object: <code>samplerate</code>, <code>bits</code> and <code>channels</code>. If you need to change them without creating a new object, you should close before and reopen afterwards the device.</p>
+
+<pre><code>    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">CloseDevice</span><span class="operator">();</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">samplerate</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">44100</span><span class="operator">;</span> <span class="comment"># 44.1kHz</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">bits</span><span class="operator">}</span>       <span class="operator">=</span> <span class="number">8</span><span class="operator">;</span>     <span class="comment"># 8 bit</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">channels</span><span class="operator">}</span>   <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>     <span class="comment"># mono</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">OpenDevice</span><span class="operator">();</span>
+</code></pre>
+
+<p>You can also use the properties to query the sound format currently used.</p>
+
+<h2 id="EXAMPLE">EXAMPLE</h2>
+
+<p>This small example produces a 1 second sinusoidal wave at 440Hz and saves it in <i>sinus.wav</i>:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::Sound</span><span class="operator">;</span>
+    
+    <span class="comment"># Create the object</span>
+    <span class="keyword">my</span> <span class="variable">$WAV</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Win32::Sound::WaveOut</span><span class="operator">(</span><span class="number">44100</span><span class="operator">,</span> <span class="number">8</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="string">""</span><span class="operator">;</span> 
+    <span class="keyword">my</span> <span class="variable">$counter</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$increment</span> <span class="operator">=</span> <span class="number">440</span><span class="operator">/</span><span class="number">44100</span><span class="operator">;</span>
+    
+    <span class="comment"># Generate 44100 samples ( = 1 second)</span>
+    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$i</span> <span class="operator">(</span><span class="number">1</span><span class="operator">..</span><span class="number">44100</span><span class="operator">)</span> <span class="operator">{</span>
+    
+        <span class="comment"># Calculate the pitch </span>
+        <span class="comment"># (range 0..255 for 8 bits)</span>
+        <span class="keyword">my</span> <span class="variable">$v</span> <span class="operator">=</span> <span class="keyword">sin</span><span class="operator">(</span><span class="variable">$counter</span><span class="operator">*</span><span class="number">2</span><span class="operator">*</span><span class="number">3.14</span><span class="operator">)</span> <span class="operator">*</span> <span class="number">127</span> <span class="operator">+</span> <span class="number">128</span><span class="operator">;</span>    
+    
+        <span class="comment"># "pack" it twice for left and right</span>
+        <span class="variable">$data</span> <span class="operator">.=</span> <span class="keyword">pack</span><span class="operator">(</span><span class="string">"CC"</span><span class="operator">,</span> <span class="variable">$v</span><span class="operator">,</span> <span class="variable">$v</span><span class="operator">);</span>
+    
+        <span class="variable">$counter</span> <span class="operator">+=</span> <span class="variable">$increment</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">Load</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>       <span class="comment"># get it</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">Write</span><span class="operator">();</span>           <span class="comment"># hear it</span>
+    <span class="number">1</span> <span class="keyword">until</span> <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">Status</span><span class="operator">();</span>  <span class="comment"># wait for completion</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">(</span><span class="string">"sinus.wav"</span><span class="operator">);</span> <span class="comment"># write to disk</span>
+    <span class="variable">$WAV</span><span class="operator">-&gt;</span><span class="variable">Unload</span><span class="operator">();</span>          <span class="comment"># drop it</span>
+</code></pre>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Win32::Sound version 0.52, 18 Dec 2013.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Aldo Calpini, <code>dada@perl.it</code></p>
+
+<p>Parts of the code provided and/or suggested by Dave Roth.</p>
+
+<p>Additional fixes and module maintenance kindly provided by Jan Dubois, <code>jand@activestate.com</code>.</p>
+
+
+</body>
+
+</html>
+
+

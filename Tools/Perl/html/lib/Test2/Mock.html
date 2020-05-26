@@ -1,0 +1,365 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#CONSTRUCTION">CONSTRUCTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Mock - Module for managing mocked classes and instances.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module lets you add and override methods for any package temporarily. When the instance is destroyed it will restore the package to its original state.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Mock</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$mock</span> <span class="operator">=</span> <span class="variable">Test2::Mock</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">class</span> <span class="operator">=&gt;</span> <span class="string">'MyClass'</span><span class="operator">,</span>
+        <span class="string">override</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">name</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'fred'</span> <span class="operator">},</span>
+            <span class="operator">...</span>
+        <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">add</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">is_mocked</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="number">1</span> <span class="operator">}</span>
+            <span class="operator">...</span>
+        <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">...</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># Unmock the 'name' sub</span>
+    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">restore</span><span class="operator">(</span><span class="string">'name'</span><span class="operator">);</span>
+    
+    <span class="operator">...</span>
+    
+    <span class="variable">$mock</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span> <span class="comment"># Will remove all the mocking</span>
+</code></pre>
+
+<h1 id="CONSTRUCTION">CONSTRUCTION</h1>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="mock-Test2::Mock-new-class-CLASS">$mock = Test2::Mock-&gt;new(class =&gt; $CLASS, ...)</dt>
+<dd>
+
+<p>This will create a new instance of <a href="../../lib/Test2/Mock.html">Test2::Mock</a> that manages mocking for the specified <code>$CLASS</code>.</p>
+
+<p>Any <code>Test2::Mock</code> method can be used as a constructor argument, each should be followed by an arrayref of arguments to be used within the method. For instance the <code>add()</code> method:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$mock</span> <span class="operator">=</span> <span class="variable">Test2::Mock</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">class</span> <span class="operator">=&gt;</span> <span class="string">'AClass'</span><span class="operator">,</span>
+        <span class="string">add</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'foo'</span> <span class="operator">}</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>is identical to this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$mock</span> <span class="operator">=</span> <span class="variable">Test2::Mock</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">class</span> <span class="operator">=&gt;</span> <span class="string">'AClass'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span><span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'foo'</span> <span class="operator">});</span>
+</code></pre>
+
+</dd>
+<dt id="mock-add-symbol-...-symbol2">$mock-&gt;add(&#39;symbol&#39; =&gt; ..., &#39;symbol2&#39; =&gt; ...)</dt>
+<dd>
+
+</dd>
+<dt id="mock-override-symbol1-...-symbol2">$mock-&gt;override(&#39;symbol1&#39; =&gt; ..., &#39;symbol2&#39; =&gt; ...)</dt>
+<dd>
+
+<p><code>add()</code> and <code>override()</code> are the primary ways to add/modify methods for a class. Both accept the exact same type of arguments. The difference is that <code>override</code> will fail unless the symbol you are overriding already exists, <code>add</code> on the other hand will fail if the symbol does already exist.</p>
+
+<p><b>Note:</b> Think of override as a push operation. If you call override on the same symbol multiple times it will track that. You can use <code>restore()</code> as a pop operation to go back to the previous mock. <code>reset</code> can be used to remove all the mocking for a symbol.</p>
+
+<p>Arguments must be a symbol name, with optional sigil, followed by a new specification of the symbol. If no sigil is specified then &#39;&amp;&#39; (sub) is assumed. A simple example of overriding a sub:</p>
+
+<pre><code>    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">override</span><span class="operator">(</span><span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'overridden foo'</span> <span class="operator">});</span>
+    <span class="keyword">my</span> <span class="variable">$val</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">;</span> <span class="comment"># Runs our override</span>
+    <span class="comment"># $val is now set to 'overridden foo'</span>
+</code></pre>
+
+<p>You can also simply provide a value and it will be wrapped in a sub for you:</p>
+
+<pre><code>    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">override</span><span class="operator">(</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The example above will generate a sub that always returns the string &#39;foo&#39;.</p>
+
+<p>There are three *special* values that can be used to generate accessors:</p>
+
+<pre><code>    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span>
+        <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>   <span class="comment"># Generates a read/write accessor</span>
+        <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>   <span class="comment"># Generates a read only accessor</span>
+        <span class="string">size</span> <span class="operator">=&gt;</span> <span class="string">'wo'</span><span class="operator">,</span>   <span class="comment"># Generates a write only accessor</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>If you want to have a sub that actually returns one of the three special strings, or that returns a coderef, you can use a hashref as the spec:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ref</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'my sub'</span> <span class="operator">};</span>
+    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span>
+        <span class="string">rw_string</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">val</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">ro_string</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">val</span> <span class="operator">=&gt;</span> <span class="string">'ro'</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">wo_string</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">val</span> <span class="operator">=&gt;</span> <span class="string">'wo'</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">coderef</span>   <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">val</span> <span class="operator">=&gt;</span> <span class="variable">$ref</span> <span class="operator">}</span><span class="operator">,</span> <span class="comment"># the coderef method returns $ref each time</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>You can also override/add other symbol types, such as hash:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    <span class="operator">...</span>
+    
+    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span><span class="string">'%foo'</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">);</span>
+    
+    <span class="keyword">print</span> <span class="variable">$Foo::foo</span><span class="operator">{</span><span class="string">a</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># prints '1'</span>
+</code></pre>
+
+<p>You can also tell mock to deduce the symbol type for the add/override from the reference, rules are similar to glob assignments:</p>
+
+<pre><code>    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span>
+        <span class="string">-foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'foo'</span> <span class="operator">},</span>     <span class="comment"># Adds the &amp;foo sub to the package</span>
+        <span class="string">-foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span>      <span class="comment"># Adds the %foo hash to the package</span>
+        <span class="string">-foo</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'f'</span><span class="operator">,</span> <span class="string">'o'</span><span class="operator">,</span> <span class="string">'o'</span> <span class="operator">]</span><span class="operator">,</span> <span class="comment"># Adds the @foo array to the package</span>
+        <span class="string">-foo</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="string">"foo"</span><span class="operator">,</span>            <span class="comment"># Adds the $foo scalar to the package</span>
+    <span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="mock-restore-SYMBOL">$mock-&gt;restore($SYMBOL)</dt>
+<dd>
+
+<p>Restore the symbol to what it was before the last override. If the symbol was recently added this will remove it. If the symbol has been overridden multiple times this will ONLY restore it to the previous state. Think of <code>override</code> as a push operation, and <code>restore</code> as the pop operation.</p>
+
+</dd>
+<dt id="mock-reset-SYMBOL">$mock-&gt;reset($SYMBOL)</dt>
+<dd>
+
+<p>Remove all mocking of the symbol and restore the original symbol. If the symbol was initially added then it will be completely removed.</p>
+
+</dd>
+<dt id="mock-orig-SYMBOL">$mock-&gt;orig($SYMBOL)</dt>
+<dd>
+
+<p>This will return the original symbol, before any mocking. For symbols that were added this will return undef.</p>
+
+</dd>
+<dt id="mock-current-SYMBOL">$mock-&gt;current($SYMBOL)</dt>
+<dd>
+
+<p>This will return the current symbol.</p>
+
+</dd>
+<dt id="mock-reset_all">$mock-&gt;reset_all</dt>
+<dd>
+
+<p>Remove all added symbols, and restore all overridden symbols to their originals.</p>
+
+</dd>
+<dt id="mock-add_constructor-NAME-TYPE">$mock-&gt;add_constructor($NAME =&gt; $TYPE)</dt>
+<dd>
+
+</dd>
+<dt id="mock-override_constructor-NAME-TYPE">$mock-&gt;override_constructor($NAME =&gt; $TYPE)</dt>
+<dd>
+
+<p>This can be used to inject constructors. The first argument should be the name of the constructor. The second argument specifies the constructor type.</p>
+
+<p>The <code>hash</code> type is the most common, all arguments are used to create a new hash that is blessed.</p>
+
+<pre><code>    <span class="string">hash</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable">  </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">%params</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">bless</span> <span class="operator">\</span><span class="variable">%params</span><span class="operator">,</span> <span class="variable">$class</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>The <code>array</code> type is similar to the hash type, but accepts a list instead of key/value pairs:</p>
+
+<pre><code>    <span class="string">array</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">@params</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">bless</span> <span class="operator">\</span><span class="variable">@params</span><span class="operator">,</span> <span class="variable">$class</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>The <code>ref</code> type takes a reference and blesses it. This will modify your original input argument.</p>
+
+<pre><code>    <span class="string">ref</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$params</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">bless</span> <span class="variable">$params</span><span class="operator">,</span> <span class="variable">$class</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>The <code>ref_copy</code> type will copy your reference and bless the copy:</p>
+
+<pre><code>    <span class="string">ref_copy</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$params</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$type</span> <span class="operator">=</span> <span class="variable">reftype</span><span class="operator">(</span><span class="variable">$params</span><span class="operator">);</span>
+    
+        <span class="keyword">return</span> <span class="keyword">bless</span> <span class="operator">{</span><span class="variable">%$params</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">$class</span>
+            <span class="keyword">if</span> <span class="variable">$type</span> <span class="keyword">eq</span> <span class="string">'HASH'</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="keyword">bless</span> <span class="operator">[</span><span class="variable">@$params</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">$class</span>
+            <span class="keyword">if</span> <span class="variable">$type</span> <span class="keyword">eq</span> <span class="string">'ARRAY'</span><span class="operator">;</span>
+    
+        <span class="variable">croak</span> <span class="string">"Not sure how to construct an '</span><span class="variable">$class</span><span class="string">' from '</span><span class="variable">$params</span><span class="string">'"</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+<dt id="mock-before-NAME-sub">$mock-&gt;before($NAME, sub { ... })</dt>
+<dd>
+
+<p>This will replace the original sub <code>$NAME</code> with a new sub that calls your custom code just before calling the original method. The return from your custom sub is ignored. Your sub and the original both get the unmodified arguments.</p>
+
+</dd>
+<dt id="mock-after-NAME-sub">$mock-&gt;after($NAME, sub { ... })</dt>
+<dd>
+
+<p>This is similar to before, except your callback runs after the original code. The return from your callback is ignored.</p>
+
+</dd>
+<dt id="mock-around-NAME-sub">$mock-&gt;around($NAME, sub { ... })</dt>
+<dd>
+
+<p>This gives you the chance to wrap the original sub:</p>
+
+<pre><code>    <span class="variable">$mock</span><span class="operator">-&gt;</span><span class="variable">around</span><span class="operator">(</span><span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">@args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+        <span class="variable">$orig</span><span class="operator">-&gt;(</span><span class="variable">@args</span><span class="operator">);</span>
+        <span class="operator">...</span>
+    
+        <span class="keyword">return</span> <span class="operator">...;</span>
+    <span class="operator">});</span>
+</code></pre>
+
+<p>The original sub is passed in as the first argument, even before <code>$self</code>. You are responsible for making sure your wrapper sub returns the correct thing.</p>
+
+</dd>
+<dt id="mock-autoload">$mock-&gt;autoload</dt>
+<dd>
+
+<p>This will inject an <code>AUTOLOAD</code> sub into the class. This autoload will automatically generate read-write accessors for any sub called that does not already exist.</p>
+
+</dd>
+<dt id="mock-block_load">$mock-&gt;block_load</dt>
+<dd>
+
+<p>This will prevent the real class from loading until the mock is destroyed. This will fail if the class is already loaded. This will let you mock a class completely without loading the original module.</p>
+
+</dd>
+<dt id="pm_file-mock-file">$pm_file = $mock-&gt;file</dt>
+<dd>
+
+<p>This returns the relative path to the file for the module. This corresponds to the <code>%INC</code> entry.</p>
+
+</dd>
+<dt id="bool-mock-purge_on_destroy-bool">$bool = $mock-&gt;purge_on_destroy($bool)</dt>
+<dd>
+
+<p>When true, this will cause the package stash to be completely obliterated when the mock object falls out of scope or is otherwise destroyed. You do not normally want this.</p>
+
+</dd>
+<dt id="stash-mock-stash">$stash = $mock-&gt;stash</dt>
+<dd>
+
+<p>This returns the stash for the class being mocked. This is the equivalent of:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$stash</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">%</span><span class="operator">{</span><span class="string">"${class}\::"</span><span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>This saves you from needing to turn off strict.</p>
+
+</dd>
+<dt id="class-mock-class">$class = $mock-&gt;class</dt>
+<dd>
+
+<p>The class being mocked by this instance.</p>
+
+</dd>
+<dt id="p-mock-parent">$p = $mock-&gt;parent</dt>
+<dd>
+
+<p>If you mock a class twice the first instance is the parent, the second is the child. This prevents the parent from being destroyed before the child, which would lead to a very unpleasant situation.</p>
+
+</dd>
+<dt id="c-mock-child">$c = $mock-&gt;child</dt>
+<dd>
+
+<p>Returns the child mock, if any.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

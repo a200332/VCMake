@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Subroutines::RequireFinalReturn - End every path through a subroutine with an explicit <code>return</code> statement.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Require all subroutines to terminate explicitly with one of the following: <code>return</code>, <code>carp</code>, <code>croak</code>, <code>die</code>, <code>exec</code>, <code>exit</code>, <code>goto</code>, or <code>throw</code>.</p>
+
+<p>Subroutines without explicit return statements at their ends can be confusing. It can be challenging to deduce what the return value will be.</p>
+
+<p>Furthermore, if the programmer did not mean for there to be a significant return value, and omits a return statement, some of the subroutine&#39;s inner data can leak to the outside. Consider this case:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Password</span><span class="operator">;</span>
+    <span class="comment"># every time the user guesses the password wrong, its value</span>
+    <span class="comment"># is rotated by one character</span>
+    <span class="keyword">my</span> <span class="variable">$password</span><span class="operator">;</span>
+    <span class="keyword">sub</span><span class="variable"> set_password </span><span class="operator">{</span>
+        <span class="variable">$password</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    <span class="keyword">sub</span><span class="variable"> check_password </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$guess</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$guess</span> <span class="keyword">eq</span> <span class="variable">$password</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">unlock_secrets</span><span class="operator">();</span>
+        <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+            <span class="variable">$password</span> <span class="operator">=</span> <span class="operator">(</span><span class="keyword">substr</span> <span class="variable">$password</span><span class="operator">,</span> <span class="number">1</span><span class="operator">).(</span><span class="keyword">substr</span> <span class="variable">$password</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">1</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>In this case, the last statement in check_password() is the assignment. The result of that assignment is the implicit return value, so a wrong guess returns the right password! Adding a <code><span class="keyword">return</span><span class="operator">;</span>
+</code> at the end of that subroutine solves the problem.</p>
+
+<p>The only exception allowed is an empty subroutine.</p>
+
+<p>Be careful when fixing problems identified by this Policy; don&#39;t blindly put a <code><span class="keyword">return</span><span class="operator">;</span>
+</code> statement at the end of every subroutine.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>If you&#39;ve created your own terminal functions that behave like <code>die</code> or <code>exit</code>, then you can configure Perl::Critic to recognize those functions as well. Just put something like this in your <i>.perlcriticrc</i>:</p>
+
+<pre><code>    [Subroutines::RequireFinalReturn]
+    terminal_funcs = quit abort bailout</code></pre>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>We do not look for returns inside ternary operators. That construction is too complicated to analyze right now. Besides, a better form is the return outside of the ternary like this: <code>return foo ? 1 : bar ? 2 : 3</code></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Chris Dolan.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

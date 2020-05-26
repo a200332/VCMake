@@ -1,0 +1,375 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPERATIONAL-THEORY">OPERATIONAL THEORY</a></li>
+  <li><a href="#ITERATORS">ITERATORS</a>
+    <ul>
+      <li><a href="#files-options-starting_points">files( [ \%options, ] @starting_points )</a></li>
+      <li><a href="#dirs-options-starting_points">dirs( [ \%options, ] @starting_points )</a></li>
+      <li><a href="#everything-options-starting_points">everything( [ \%options, ] @starting_points )</a></li>
+      <li><a href="#from_file-options-filename">from_file( [ \%options, ] $filename )</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT-FUNCTIONS">SUPPORT FUNCTIONS</a>
+    <ul>
+      <li><a href="#sort_standard-a-b">sort_standard( $a, $b )</a></li>
+      <li><a href="#sort_reverse-a-b">sort_reverse( $a, $b )</a></li>
+      <li><a href="#reslash-path">reslash( $path )</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONSTRUCTOR-PARAMETERS">CONSTRUCTOR PARAMETERS</a>
+    <ul>
+      <li><a href="#file_filter---file_filter">file_filter -&gt; \&amp;file_filter</a></li>
+      <li><a href="#descend_filter-descend_filter">descend_filter =&gt; \&amp;descend_filter</a></li>
+      <li><a href="#error_handler-error_handler">error_handler =&gt; \&amp;error_handler</a></li>
+      <li><a href="#warning_handler-warning_handler">warning_handler =&gt; \&amp;warning_handler</a></li>
+      <li><a href="#sort_files-0-1-sort_sub">sort_files =&gt; [ 0 | 1 | \&amp;sort_sub]</a></li>
+      <li><a href="#follow_symlinks-0-1">follow_symlinks =&gt; [ 0 | 1 ]</a></li>
+      <li><a href="#nul_separated-0-1">nul_separated =&gt; [ 0 | 1 ]</a></li>
+    </ul>
+  </li>
+  <li><a href="#PRIVATE-FUNCTIONS">PRIVATE FUNCTIONS</a>
+    <ul>
+      <li><a href="#setup-default_parms-whatever_was_passed_to_files">_setup( $default_parms, @whatever_was_passed_to_files() )</a></li>
+      <li><a href="#candidate_files-parms-dir">_candidate_files( $parms, $dir )</a></li>
+    </ul>
+  </li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#SPEED-TWEAKS">SPEED TWEAKS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#COPYRIGHT-LICENSE">COPYRIGHT &amp; LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>File::Next - File-finding iterator</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 1.16</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>File::Next is a lightweight, taint-safe file-finding module. It&#39;s lightweight and has no non-core prerequisites.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">File::Next</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$files</span> <span class="operator">=</span> <span class="variable">File::Next::files</span><span class="operator">(</span> <span class="string">'/tmp'</span> <span class="operator">);</span>
+    
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="keyword">defined</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">$files</span><span class="operator">-&gt;()</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="comment"># do something...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="OPERATIONAL-THEORY">OPERATIONAL THEORY</h1>
+
+<p>The two major functions, <i>files()</i> and <i>dirs()</i>, return an iterator that will walk through a directory tree. The simplest use case is:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">File::Next</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">File::Next::files</span><span class="operator">(</span> <span class="string">'/tmp'</span> <span class="operator">);</span>
+    
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="keyword">defined</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$file</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;()</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="variable">$file</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="comment"># Prints...</span>
+    <span class="regex">/tmp/foo</span><span class="operator">.</span><span class="variable">txt</span>
+    <span class="operator">/</span><span class="variable">tmp</span><span class="operator">/</span><span class="variable">bar</span><span class="operator">.</span><span class="variable">pl</span>
+    <span class="operator">/</span><span class="variable">tmp</span><span class="operator">/</span><span class="variable">baz</span><span class="operator">/</span><span class="number">1</span>
+    <span class="operator">/</span><span class="variable">tmp</span><span class="operator">/</span><span class="variable">baz</span><span class="operator">/</span><span class="number">2.</span><span class="variable">txt</span>
+    <span class="operator">/</span><span class="variable">tmp</span><span class="operator">/</span><span class="variable">baz</span><span class="operator">/</span><span class="variable">wango</span><span class="operator">/</span><span class="variable">tango</span><span class="operator">/</span><span class="variable">purple</span><span class="operator">.</span><span class="variable">txt</span>
+</code></pre>
+
+<p>Note that only files are returned by <code>files()</code>&#39;s iterator. Directories are ignored.</p>
+
+<p>In list context, the iterator returns a list containing <i>$dir</i>, <i>$file</i> and <i>$fullpath</i>, where <i>$fullpath</i> is what would get returned in scalar context.</p>
+
+<p>The first parameter to any of the iterator factory functions may be a hashref of options.</p>
+
+<h1 id="ITERATORS">ITERATORS</h1>
+
+<p>For the three iterators, the \%options are optional.</p>
+
+<h2 id="files-options-starting_points">files( [ \%options, ] @starting_points )</h2>
+
+<p>Returns an iterator that walks directories starting with the items in <i>@starting_points</i>. Each call to the iterator returns another regular file.</p>
+
+<h2 id="dirs-options-starting_points">dirs( [ \%options, ] @starting_points )</h2>
+
+<p>Returns an iterator that walks directories starting with the items in <i>@starting_points</i>. Each call to the iterator returns another directory.</p>
+
+<h2 id="everything-options-starting_points">everything( [ \%options, ] @starting_points )</h2>
+
+<p>Returns an iterator that walks directories starting with the items in <i>@starting_points</i>. Each call to the iterator returns another file, whether it&#39;s a regular file, directory, symlink, socket, or whatever.</p>
+
+<h2 id="from_file-options-filename">from_file( [ \%options, ] $filename )</h2>
+
+<p>Returns an iterator that iterates over each of the files specified in <i>$filename</i>. If <i>$filename</i> is <code>-</code>, then the files are read from STDIN.</p>
+
+<p>The files are assumed to be in the file one filename per line. If <i>$nul_separated</i> is passed, then the files are assumed to be NUL-separated, as by <code>find -print0</code>.</p>
+
+<p>If there are blank lines or empty filenames in the input stream, they are ignored.</p>
+
+<p>Each filename is checked to see that it is a regular file or a named pipe. If the file does not exists or is a directory, then a warning is thrown to <i>warning_handler</i>, and the file is skipped.</p>
+
+<p>The following options have no effect in <code>from_files</code>: <i>descend_filter</i>, <i>sort_files</i>, <i>follow_symlinks</i>.</p>
+
+<h1 id="SUPPORT-FUNCTIONS">SUPPORT FUNCTIONS</h1>
+
+<h2 id="sort_standard-a-b">sort_standard( $a, $b )</h2>
+
+<p>A sort function for passing as a <code>sort_files</code> option:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">File::Next::files</span><span class="operator">(</span> <span class="operator">{</span>
+        <span class="string">sort_files</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">File::Next::sort_standard</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">,</span> <span class="string">'t/swamp'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This function is the default, so the code above is identical to:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">File::Next::files</span><span class="operator">(</span> <span class="operator">{</span>
+        <span class="string">sort_files</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">,</span> <span class="string">'t/swamp'</span> <span class="operator">);</span>
+</code></pre>
+
+<h2 id="sort_reverse-a-b">sort_reverse( $a, $b )</h2>
+
+<p>Same as <code>sort_standard</code>, but in reverse.</p>
+
+<h2 id="reslash-path">reslash( $path )</h2>
+
+<p>Takes a path with all forward slashes and rebuilds it with whatever is appropriate for the platform. For example &#39;foo/bar/bat&#39; will become &#39;foo\bar\bat&#39; on Windows.</p>
+
+<p>This is really just a convenience function. I&#39;d make it private, but <i>ack</i> wants it, too.</p>
+
+<h1 id="CONSTRUCTOR-PARAMETERS">CONSTRUCTOR PARAMETERS</h1>
+
+<h2 id="file_filter---file_filter">file_filter -&gt; \&amp;file_filter</h2>
+
+<p>The file_filter lets you check to see if it&#39;s really a file you want to get back. If the file_filter returns a true value, the file will be returned; if false, it will be skipped.</p>
+
+<p>The file_filter function takes no arguments but rather does its work through a collection of variables.</p>
+
+<ul>
+
+<li><p><code>$_</code> is the current filename within that directory</p>
+
+</li>
+<li><p><code>$File::Next::dir</code> is the current directory name</p>
+
+</li>
+<li><p><code>$File::Next::name</code> is the complete pathname to the file</p>
+
+</li>
+</ul>
+
+<p>These are analogous to the same variables in <a href="../../lib/File/Find.html">File::Find</a>.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">File::Next::files</span><span class="operator">(</span> <span class="operator">{</span> <span class="string">file_filter</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">/\.</span><span class="variable">txt</span><span class="variable">$/</span> <span class="operator">}</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">'/tmp'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>By default, the <i>file_filter</i> is <code><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="number">1</span><span class="operator">}</span>
+</code>, or &quot;all files&quot;.</p>
+
+<p>This filter has no effect if your iterator is only returning directories.</p>
+
+<h2 id="descend_filter-descend_filter">descend_filter =&gt; \&amp;descend_filter</h2>
+
+<p>The descend_filter lets you check to see if the iterator should descend into a given directory. Maybe you want to skip <i>CVS</i> and <i>.svn</i> directories.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$descend_filter</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span> <span class="keyword">ne</span> <span class="string">"CVS"</span> <span class="operator">&amp;&amp;</span> <span class="variable">$_</span> <span class="keyword">ne</span> <span class="string">".svn"</span> <span class="operator">}</span>
+</code></pre>
+
+<p>The descend_filter function takes no arguments but rather does its work through a collection of variables.</p>
+
+<ul>
+
+<li><p><code>$_</code> is the current filename of the directory</p>
+
+</li>
+<li><p><code>$File::Next::dir</code> is the complete directory name</p>
+
+</li>
+</ul>
+
+<p>The descend filter is NOT applied to any directory names specified as <i>@starting_points</i> in the constructor. For example,</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">File::Next::files</span><span class="operator">(</span> <span class="operator">{</span> <span class="string">descend_filter</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="operator">{</span><span class="number">0</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">'/tmp'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>always descends into <i>/tmp</i>, as you would expect.</p>
+
+<p>By default, the <i>descend_filter</i> is <code><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="number">1</span><span class="operator">}</span>
+</code>, or &quot;always descend&quot;.</p>
+
+<h2 id="error_handler-error_handler">error_handler =&gt; \&amp;error_handler</h2>
+
+<p>If <i>error_handler</i> is set, then any errors will be sent through it. If the error is OS-related (ex. file not found, not permissions), the native error code is passed as a second argument. By default, this value is <code>CORE::die</code>. This function must NOT return.</p>
+
+<h2 id="warning_handler-warning_handler">warning_handler =&gt; \&amp;warning_handler</h2>
+
+<p>If <i>warning_handler</i> is set, then any errors will be sent through it. By default, this value is <code>CORE::warn</code>. Unlike the <i>error_handler</i>, this function must return.</p>
+
+<h2 id="sort_files-0-1-sort_sub">sort_files =&gt; [ 0 | 1 | \&amp;sort_sub]</h2>
+
+<p>If you want files sorted, pass in some true value, as in <code>sort_files =&gt; 1</code>.</p>
+
+<p>If you want a special sort order, pass in a sort function like <code><span class="string">sort_files</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$a</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="keyword">cmp</span> <span class="variable">$b</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">}</span>
+</code>. Note that the parms passed in to the sub are arrayrefs, where $a-&gt;[0] is the directory name, $a-&gt;[1] is the file name and $a-&gt;[2] is the full path. Typically you&#39;re going to be sorting on $a-&gt;[2].</p>
+
+<h2 id="follow_symlinks-0-1">follow_symlinks =&gt; [ 0 | 1 ]</h2>
+
+<p>If set to false, the iterator will ignore any files and directories that are actually symlinks. This has no effect on non-Unixy systems such as Windows. By default, this is true.</p>
+
+<p>Note that this filter does not apply to any of the <i>@starting_points</i> passed in to the constructor.</p>
+
+<p>You should not set <code>follow_symlinks =&gt; 0</code> unless you specifically need that behavior. Setting <code>follow_symlinks =&gt; 0</code> can be a speed hit, because File::Next must check to see if the file or directory you&#39;re about to follow is actually a symlink.</p>
+
+<h2 id="nul_separated-0-1">nul_separated =&gt; [ 0 | 1 ]</h2>
+
+<p>Used by the <code>from_file</code> iterator. Specifies that the files listed in the input file are separated by NUL characters, as from the <code>find</code> command with the <code>-print0</code> argument.</p>
+
+<h1 id="PRIVATE-FUNCTIONS">PRIVATE FUNCTIONS</h1>
+
+<h2 id="setup-default_parms-whatever_was_passed_to_files">_setup( $default_parms, @whatever_was_passed_to_files() )</h2>
+
+<p>Handles all the scut-work for setting up the parms passed in.</p>
+
+<p>Returns a hashref of operational options, combined between <i>$passed_parms</i> and <i>$defaults</i>, plus the queue.</p>
+
+<p>The queue prep stuff takes the strings in <i>@starting_points</i> and puts them in the format that queue needs.</p>
+
+<p>The <code>@queue</code> that gets passed around is an array that has three elements for each of the entries in the queue: $dir, $file and $fullpath. Items must be pushed and popped off the queue three at a time (spliced, really).</p>
+
+<h2 id="candidate_files-parms-dir">_candidate_files( $parms, $dir )</h2>
+
+<p>Pulls out the files/dirs that might be worth looking into in <i>$dir</i>. If <i>$dir</i> is the empty string, then search the current directory.</p>
+
+<p><i>$parms</i> is the hashref of parms passed into File::Next constructor.</p>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<dl>
+
+<dt id="File::Next::files-must-not-be-invoked-as-File::Next-files"><code>File::Next::files must not be invoked as File::Next-&gt;files</code></dt>
+<dd>
+
+</dd>
+<dt id="File::Next::dirs-must-not-be-invoked-as-File::Next-dirs"><code>File::Next::dirs must not be invoked as File::Next-&gt;dirs</code></dt>
+<dd>
+
+</dd>
+<dt id="File::Next::everything-must-not-be-invoked-as-File::Next-everything"><code>File::Next::everything must not be invoked as File::Next-&gt;everything</code></dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>The interface functions do not allow for the method invocation syntax and throw errors with the messages above. You can work around this limitation with <a href="../../lib/UNIVERSAL.html#can">&quot;can&quot; in UNIVERSAL</a>.</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$file_system_feature</span> <span class="operator">(</span><span class="string">qw(dirs files)</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$iterator</span> <span class="operator">=</span> <span class="variable">File::Next</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="variable">$file_system_feature</span><span class="operator">)-&gt;(</span><span class="variable">$options</span><span class="operator">,</span> <span class="variable">$target_directory</span><span class="operator">);</span>
+        <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">defined</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">$iterator</span><span class="operator">-&gt;()))</span> <span class="operator">{</span>
+            <span class="comment"># ...</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="SPEED-TWEAKS">SPEED TWEAKS</h1>
+
+<ul>
+
+<li><p>Don&#39;t set <code>follow_symlinks =&gt; 0</code> unless you need it.</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andy Lester, <code>&lt;andy at petdance.com&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <a href="http://github.com/petdance/file-next/issues">http://github.com/petdance/file-next/issues</a>.</p>
+
+<p>Note that File::Next does NOT use <a href="http://rt.cpan.org">http://rt.cpan.org</a> for bug tracking.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc File::Next</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>File::Next&#39;s bug queue</p>
+
+<p><a href="http://github.com/petdance/file-next/issues">http://github.com/petdance/file-next/issues</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/File-Next">http://annocpan.org/dist/File-Next</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/d/File-Next">http://cpanratings.perl.org/d/File-Next</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="http://search.cpan.org/dist/File-Next">http://search.cpan.org/dist/File-Next</a></p>
+
+</li>
+<li><p>Source code repository</p>
+
+<p><a href="http://github.com/petdance/file-next/tree/master">http://github.com/petdance/file-next/tree/master</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>All file-finding in this module is adapted from Mark Jason Dominus&#39; marvelous <i>Higher Order Perl</i>, page 126.</p>
+
+<p>Thanks also for bug fixes and typo finding to Gerhard Poul, Brian Fraser, Todd Rinaldo, Bruce Woodward, Christopher J. Madsen, Bernhard Fisseni and Rob Hoelz.</p>
+
+<h1 id="COPYRIGHT-LICENSE">COPYRIGHT &amp; LICENSE</h1>
+
+<p>Copyright 2005-2016 Andy Lester.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.</p>
+
+
+</body>
+
+</html>
+
+

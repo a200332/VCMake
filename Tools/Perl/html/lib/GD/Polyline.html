@@ -1,0 +1,351 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#The-Polyline-Object">The Polyline Object</a></li>
+  <li><a href="#Updated-Polygon-Methods">Updated Polygon Methods</a></li>
+  <li><a href="#New-Polygon-Methods">New Polygon Methods</a></li>
+  <li><a href="#New-GD::Image-Methods">New GD::Image Methods</a></li>
+  <li><a href="#Examples">Examples</a></li>
+  <li><a href="#See-Also">See Also</a></li>
+  <li><a href="#Future-Features">Future Features</a></li>
+  <li><a href="#Author">Author</a></li>
+  <li><a href="#Copyright-Information">Copyright Information</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>GD::Polyline - Polyline object and Polygon utilities (including splines) for use with GD</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">GD</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">GD::Polyline</span><span class="operator">;</span>
+        
+        <span class="comment"># create an image</span>
+        <span class="variable">$image</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Image</span> <span class="operator">(</span><span class="number">500</span><span class="operator">,</span><span class="number">300</span><span class="operator">);</span>
+        <span class="variable">$white</span>  <span class="operator">=</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">,</span><span class="number">255</span><span class="operator">);</span>
+        <span class="variable">$black</span>  <span class="operator">=</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span>  <span class="number">0</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$red</span>    <span class="operator">=</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">colorAllocate</span><span class="operator">(</span><span class="number">255</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">);</span>
+        
+        <span class="comment"># create a new polyline</span>
+        <span class="variable">$polyline</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Polyline</span><span class="operator">;</span>
+                        
+        <span class="comment"># add some points</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span>  <span class="number">0</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span>  <span class="number">0</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span> <span class="number">50</span><span class="operator">,</span><span class="number">125</span><span class="operator">);</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">);</span>
+        
+        <span class="comment"># polylines can use polygon methods (and vice versa)</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">offset</span><span class="operator">(</span><span class="number">200</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        
+        <span class="comment"># rotate 60 degrees, about the centroid</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">rotate</span><span class="operator">(</span><span class="number">3.14159</span><span class="operator">/</span><span class="number">3</span><span class="operator">,</span> <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">centroid</span><span class="operator">());</span> 
+        
+        <span class="comment"># scale about the centroid</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">scale</span><span class="operator">(</span><span class="number">1.5</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">centroid</span><span class="operator">());</span>  
+        
+        <span class="comment"># draw the polyline</span>
+        <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">polydraw</span><span class="operator">(</span><span class="variable">$polyline</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span>
+        
+        <span class="comment"># create a spline, which is also a polyine</span>
+        <span class="variable">$spline</span> <span class="operator">=</span> <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addControlPoints</span><span class="operator">-&gt;</span><span class="variable">toSpline</span><span class="operator">;</span>
+        <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">polydraw</span><span class="operator">(</span><span class="variable">$spline</span><span class="operator">,</span><span class="variable">$red</span><span class="operator">);</span>
+        
+        <span class="comment"># output the png</span>
+        <span class="keyword">binmode</span> <span class="variable">STDOUT</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">png</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>Polyline.pm</b> extends the GD module by allowing you to create polylines. Think of a polyline as &quot;an open polygon&quot;, that is, the last vertex is not connected to the first vertex (unless you expressly add the same value as both points).</p>
+
+<p>For the remainder of this doc, &quot;polyline&quot; will refer to a GD::Polyline, &quot;polygon&quot; will refer to a GD::Polygon that is not a polyline, and &quot;polything&quot; and &quot;$poly&quot; may be either.</p>
+
+<p>The big feature added to GD by this module is the means to create splines, which are approximations to curves.</p>
+
+<h1 id="The-Polyline-Object">The Polyline Object</h1>
+
+<p>GD::Polyline defines the following class:</p>
+
+<dl>
+
+<dt id="GD::Polyline"><code>GD::Polyline</code></dt>
+<dd>
+
+<p>A polyline object, used for storing lists of vertices prior to rendering a polyline into an image.</p>
+
+</dd>
+<dt id="new"><code>new</code></dt>
+<dd>
+
+<p><code>GD::Polyline-&gt;new</code> <i>class method</i></p>
+
+<p>Create an empty polyline with no vertices.</p>
+
+<pre><code>        <span class="variable">$polyline</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">GD::Polyline</span><span class="operator">;</span>
+        
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span>  <span class="number">0</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">);</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span>  <span class="number">0</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span> <span class="number">50</span><span class="operator">,</span><span class="number">100</span><span class="operator">);</span>
+        <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addPt</span><span class="operator">(</span><span class="number">100</span><span class="operator">,</span>  <span class="number">0</span><span class="operator">);</span>
+        
+        <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">polydraw</span><span class="operator">(</span><span class="variable">$polyline</span><span class="operator">,</span><span class="variable">$black</span><span class="operator">);</span>
+</code></pre>
+
+<p>In fact GD::Polyline is a subclass of GD::Polygon, so all polygon methods (such as <b>offset</b> and <b>transform</b>) may be used on polylines. Some new methods have thus been added to GD::Polygon (such as <b>rotate</b>) and a few updated/modified/enhanced (such as <b>scale</b>) <i>in this module</i>. See section &quot;New or Updated GD::Polygon Methods&quot; for more info.</p>
+
+</dd>
+</dl>
+
+<p>Note that this module is very &quot;young&quot; and should be considered subject to change in future releases, and/or possibly folded in to the existing polygon object and/or GD module.</p>
+
+<h1 id="Updated-Polygon-Methods">Updated Polygon Methods</h1>
+
+<p>The following methods (defined in GD.pm) are OVERRIDDEN if you use this module.</p>
+
+<p>All effort has been made to provide 100% backward compatibility, but if you can confirm that has not been achieved, please consider that a bug and let the the author of Polyline.pm know.</p>
+
+<dl>
+
+<dt id="scale"><code>scale</code></dt>
+<dd>
+
+<p><code>$poly-&gt;scale($sx, $sy, $cx, $cy)</code> <i>object method -- UPDATE to GD::Polygon::scale</i></p>
+
+<p>Scale a polything in along x-axis by $sx and along the y-axis by $sy, about centery point ($cx, $cy).</p>
+
+<p>Center point ($cx, $cy) is optional -- if these are omitted, the function will scale about the origin.</p>
+
+<p>To flip a polything, use a scale factor of -1. For example, to flip the polything top to bottom about line y = 100, use:</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">scale</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="operator">-</span><span class="number">1</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="number">100</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="New-Polygon-Methods">New Polygon Methods</h1>
+
+<p>The following methods are added to GD::Polygon, and thus can be used by polygons and polylines.</p>
+
+<p>Don&#39;t forget: a polyline is a GD::Polygon, so GD::Polygon methods like offset() can be used, and they can be used in GD::Image methods like filledPolygon().</p>
+
+<dl>
+
+<dt id="rotate"><code>rotate</code></dt>
+<dd>
+
+<p><code>$poly-&gt;rotate($angle, $cx, $cy)</code> <i>object method</i></p>
+
+<p>Rotate a polything through $angle (clockwise, in radians) about center point ($cx, $cy).</p>
+
+<p>Center point ($cx, $cy) is optional -- if these are omitted, the function will rotate about the origin</p>
+
+<p>In this function and other angle-oriented functions in GD::Polyline, positive $angle corresponds to clockwise rotation. This is opposite of the usual Cartesian sense, but that is because the raster is opposite of the usual Cartesian sense in that the y-axis goes &quot;down&quot;.</p>
+
+</dd>
+<dt id="centroid"><code>centroid</code></dt>
+<dd>
+
+<p><code>($cx, $cy) = $poly-&gt;centroid($scale)</code> <i>object method</i></p>
+
+<p>Calculate and return ($cx, $cy), the centroid of the vertices of the polything. For example, to rotate something 180 degrees about it&#39;s centroid:</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">rotate</span><span class="operator">(</span><span class="number">3.14159</span><span class="operator">,</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">centroid</span><span class="operator">());</span>
+</code></pre>
+
+<p>$scale is optional; if supplied, $cx and $cy are multiplied by $scale before returning. The main use of this is to shift an polything to the origin like this:</p>
+
+<pre><code>        <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">offset</span><span class="operator">(</span><span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">centroid</span><span class="operator">(-</span><span class="number">1</span><span class="operator">));</span>
+</code></pre>
+
+</dd>
+<dt id="segLength"><code>segLength</code></dt>
+<dd>
+
+<p><code>@segLengths = $poly-&gt;segLength()</code> <i>object method</i></p>
+
+<p>In array context, returns an array the lengths of the segments in the polything. Segment n is the segment from vertex n to vertex n+1. Polygons have as many segments as vertices; polylines have one fewer.</p>
+
+<p>In a scalar context, returns the sum of the array that would have been returned in the array context.</p>
+
+</dd>
+<dt id="segAngle"><code>segAngle</code></dt>
+<dd>
+
+<p><code>@segAngles = $poly-&gt;segAngle()</code> <i>object method</i></p>
+
+<p>Returns an array the angles of each segment from the x-axis. Segment n is the segment from vertex n to vertex n+1. Polygons have as many segments as vertices; polylines have one fewer.</p>
+
+<p>Returned angles will be on the interval 0 &lt;= $angle &lt; 2 * pi and angles increase in a clockwise direction.</p>
+
+</dd>
+<dt id="vertexAngle"><code>vertexAngle</code></dt>
+<dd>
+
+<p><code>@vertexAngles = $poly-&gt;vertexAngle()</code> <i>object method</i></p>
+
+<p>Returns an array of the angles between the segment into and out of each vertex. For polylines, the vertex angle at vertex 0 and the last vertex are not defined; however $vertexAngle[0] will be undef so that $vertexAngle[1] will correspond to vertex 1.</p>
+
+<p>Returned angles will be on the interval 0 &lt;= $angle &lt; 2 * pi and angles increase in a clockwise direction.</p>
+
+<p>Note that this calculation does not attempt to figure out the &quot;interior&quot; angle with respect to &quot;inside&quot; or &quot;outside&quot; the polygon, but rather, just the angle between the adjacent segments in a clockwise sense. Thus a polygon with all right angles will have vertex angles of either pi/2 or 3*pi/2, depending on the way the polygon was &quot;wound&quot;.</p>
+
+</dd>
+<dt id="toSpline"><code>toSpline</code></dt>
+<dd>
+
+<p><code>$poly-&gt;toSpline()</code> <i>object method &amp; factory method</i></p>
+
+<p>Create a new polything which is a reasonably smooth curve using cubic spline algorithms, often referred to as Bezier curves. The &quot;source&quot; polything is called the &quot;control polything&quot;. If it is a polyline, the control polyline must have 4, 7, 10, or some number of vertices of equal to 3n+1. If it is a polygon, the control polygon must have 3, 6, 9, or some number of vertices of equal to 3n.</p>
+
+<pre><code>        <span class="variable">$spline</span> <span class="operator">=</span> <span class="variable">$poly</span><span class="operator">-&gt;</span><span class="variable">toSpline</span><span class="operator">();</span>    
+        <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">polydraw</span><span class="operator">(</span><span class="variable">$spline</span><span class="operator">,</span><span class="variable">$red</span><span class="operator">);</span>
+</code></pre>
+
+<p>In brief, groups of four points from the control polyline are considered &quot;control points&quot; for a given portion of the spline: the first and fourth are &quot;anchor points&quot;, and the spline passes through them; the second and third are &quot;director points&quot;. The spline does not pass through director points, however the spline is tangent to the line segment from anchor point to adjacent director point.</p>
+
+<p>The next portion of the spline reuses the previous portion&#39;s last anchor point. The spline will have a cusp (non-continuous slope) at an anchor point, unless the anchor points and its adjacent director point are colinear.</p>
+
+<p>In the current implementation, toSpline() return a fixed number of segments in the returned polyline per set-of-four control points. In the future, this and other parameters of the algorithm may be configurable.</p>
+
+</dd>
+<dt id="addControlPoints"><code>addControlPoints</code></dt>
+<dd>
+
+<p><code>$polyline-&gt;addControlPoints()</code> <i>object method &amp; factory method</i></p>
+
+<p>So you say: &quot;OK. Splines sound cool. But how can I get my anchor points and its adjacent director point to be colinear so that I have a nice smooth curves from my polyline?&quot; Relax! For The Lazy: addControlPoints() to the rescue.</p>
+
+<p>addControlPoints() returns a polyline that can serve as the control polyline for toSpline(), which returns another polyline which is the spline. Is your head spinning yet? Think of it this way:</p>
+
+<dl>
+
+<dt id="pod">+</dt>
+<dd>
+
+<p>If you have a polyline, and you have already put your control points where you want them, call toSpline() directly. Remember, only every third vertex will be &quot;on&quot; the spline.</p>
+
+<p>You get something that looks like the spline &quot;inscribed&quot; inside the control polyline.</p>
+
+</dd>
+<dt id="pod1">+</dt>
+<dd>
+
+<p>If you have a polyline, and you want all of its vertices on the resulting spline, call addControlPoints() and then toSpline():</p>
+
+<pre><code>        <span class="variable">$control</span> <span class="operator">=</span> <span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addControlPoints</span><span class="operator">();</span>       
+        <span class="variable">$spline</span>  <span class="operator">=</span> <span class="variable">$control</span><span class="operator">-&gt;</span><span class="variable">toSpline</span><span class="operator">();</span>        
+        <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">polyline</span><span class="operator">(</span><span class="variable">$spline</span><span class="operator">,</span><span class="variable">$red</span><span class="operator">);</span>
+</code></pre>
+
+<p>You get something that looks like the control polyline &quot;inscribed&quot; inside the spline.</p>
+
+</dd>
+</dl>
+
+<p>Adding &quot;good&quot; control points is subjective; this particular algorithm reveals its author&#39;s tastes. In the future, you may be able to alter the taste slightly via parameters to the algorithm. For The Hubristic: please build a better one!</p>
+
+<p>And for The Impatient: note that addControlPoints() returns a polyline, so you can pile up the call like this, if you&#39;d like:</p>
+
+<pre><code>        <span class="variable">$image</span><span class="operator">-&gt;</span><span class="variable">polyline</span><span class="operator">(</span><span class="variable">$polyline</span><span class="operator">-&gt;</span><span class="variable">addControlPoints</span><span class="operator">()-&gt;</span><span class="variable">toSpline</span><span class="operator">(),</span><span class="variable">$mauve</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="New-GD::Image-Methods">New GD::Image Methods</h1>
+
+<dl>
+
+<dt id="polyline"><code>polyline</code></dt>
+<dd>
+
+<p><code>$image-&gt;polyline(polyline,color)</code> <i>object method</i></p>
+
+<pre><code>        $image-&gt;polyline($polyline,$black)</code></pre>
+
+<p>This draws a polyline with the specified color. Both real color indexes and the special colors gdBrushed, gdStyled and gdStyledBrushed can be specified.</p>
+
+<p>Neither the polyline() method or the polygon() method are very picky: you can call either method with either a GD::Polygon or a GD::Polyline. The <i>method</i> determines if the shape is &quot;closed&quot; or &quot;open&quot; as drawn, <i>not</i> the object type.</p>
+
+</dd>
+<dt id="polydraw"><code>polydraw</code></dt>
+<dd>
+
+<p><code>$image-&gt;polydraw(polything,color)</code> <i>object method</i></p>
+
+<pre><code>        $image-&gt;polydraw($poly,$black)</code></pre>
+
+<p>This method draws the polything as expected (polygons are closed, polylines are open) by simply checking the object type and calling either $image-&gt;polygon() or $image-&gt;polyline().</p>
+
+</dd>
+</dl>
+
+<h1 id="Examples">Examples</h1>
+
+<p>Please see file &quot;polyline-examples.pl&quot; that is included with the distribution.</p>
+
+<h1 id="See-Also">See Also</h1>
+
+<p>For more info on Bezier splines, see http://www.webreference.com/dlab/9902/bezier.html.</p>
+
+<h1 id="Future-Features">Future Features</h1>
+
+<p>On the drawing board are additional features such as:</p>
+
+<pre><code>        - polygon winding algorithms (to determine if a point is &quot;inside&quot; or &quot;outside&quot; the polygon)
+
+        - new polygon from bounding box
+        
+        - find bounding polygon (tightest fitting simple convex polygon for a given set of vertices)
+        
+        - addPts() method to add many points at once
+        
+        - clone() method for polygon
+        
+        - functions to interwork GD with SVG
+        </code></pre>
+
+<p>Please provide input on other possible features you&#39;d like to see.</p>
+
+<h1 id="Author">Author</h1>
+
+<p>This module has been written by Daniel J. Harasty. Please send questions, comments, complaints, and kudos to him at harasty@cpan.org.</p>
+
+<p>Thanks to Lincoln Stein for input and patience with me and this, my first CPAN contribution.</p>
+
+<h1 id="Copyright-Information">Copyright Information</h1>
+
+<p>The Polyline.pm module is copyright 2002, Daniel J. Harasty. It is distributed under the same terms as Perl itself. See the &quot;Artistic License&quot; in the Perl source code distribution for licensing terms.</p>
+
+<p>The latest version of Polyline.pm is available at your favorite CPAN repository and/or along with GD.pm by Lincoln D. Stein at http://stein.cshl.org/WWW/software/GD.</p>
+
+
+</body>
+
+</html>
+
+

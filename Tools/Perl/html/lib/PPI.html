@@ -1,0 +1,652 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#About-this-Document">About this Document</a></li>
+      <li><a href="#Background">Background</a></li>
+      <li><a href="#What-Does-PPI-Stand-For">What Does PPI Stand For?</a></li>
+      <li><a href="#Why-Parse-Perl">Why Parse Perl?</a></li>
+      <li><a href="#How-good-is-Good-Enough-TM">How good is Good Enough(TM)</a></li>
+      <li><a href="#Internationalisation">Internationalisation</a></li>
+      <li><a href="#Round-Trip-Safe">Round Trip Safe</a></li>
+    </ul>
+  </li>
+  <li><a href="#IMPLEMENTATION">IMPLEMENTATION</a>
+    <ul>
+      <li><a href="#General-Layout">General Layout</a></li>
+      <li><a href="#The-Tokenizer">The Tokenizer</a></li>
+      <li><a href="#The-Lexer">The Lexer</a></li>
+      <li><a href="#The-Perl-Document-Object-Model">The Perl Document Object Model</a></li>
+      <li><a href="#The-PDOM-Class-Tree">The PDOM Class Tree</a></li>
+      <li><a href="#The-Document-Statement-and-Structure">The Document, Statement and Structure</a></li>
+      <li><a href="#The-PDOM-at-Work">The PDOM at Work</a></li>
+      <li><a href="#Overview-of-the-Primary-Classes">Overview of the Primary Classes</a></li>
+    </ul>
+  </li>
+  <li><a href="#INSTALLING">INSTALLING</a></li>
+  <li><a href="#EXTENDING">EXTENDING</a></li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI - Parse, Analyze and Manipulate Perl (without perl)</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">PPI</span><span class="operator">;</span>
+  
+  <span class="comment"># Create a new empty document</span>
+  <span class="keyword">my</span> <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  
+  <span class="comment"># Create a document from source</span>
+  <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\</span><span class="string">'print "Hello World!\n"'</span><span class="operator">);</span>
+  
+  <span class="comment"># Load a Document from a file</span>
+  <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Module.pm'</span><span class="operator">);</span>
+  
+  <span class="comment"># Does it contain any POD?</span>
+  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$Document</span><span class="operator">-&gt;</span><span class="variable">find_any</span><span class="operator">(</span><span class="string">'PPI::Token::Pod'</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Module contains POD\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># Get the name of the main package</span>
+  <span class="variable">$pkg</span> <span class="operator">=</span> <span class="variable">$Document</span><span class="operator">-&gt;</span><span class="variable">find_first</span><span class="operator">(</span><span class="string">'PPI::Statement::Package'</span><span class="operator">)-&gt;</span><span class="variable">namespace</span><span class="operator">;</span>
+  
+  <span class="comment"># Remove all that nasty documentation</span>
+  <span class="variable">$Document</span><span class="operator">-&gt;</span><span class="variable">prune</span><span class="operator">(</span><span class="string">'PPI::Token::Pod'</span><span class="operator">);</span>
+  <span class="variable">$Document</span><span class="operator">-&gt;</span><span class="variable">prune</span><span class="operator">(</span><span class="string">'PPI::Token::Comment'</span><span class="operator">);</span>
+  
+  <span class="comment"># Save the file</span>
+  <span class="variable">$Document</span><span class="operator">-&gt;</span><span class="variable">save</span><span class="operator">(</span><span class="string">'Module.pm.stripped'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="About-this-Document">About this Document</h2>
+
+<p>This is the PPI manual. It describes its reason for existing, its general structure, its use, an overview of the API, and provides a few implementation samples.</p>
+
+<h2 id="Background">Background</h2>
+
+<p>The ability to read, and manipulate Perl (the language) programmatically other than with perl (the application) was one that caused difficulty for a long time.</p>
+
+<p>The cause of this problem was Perl&#39;s complex and dynamic grammar. Although there is typically not a huge diversity in the grammar of most Perl code, certain issues cause large problems when it comes to parsing.</p>
+
+<p>Indeed, quite early in Perl&#39;s history Tom Christiansen introduced the Perl community to the quote <i>&quot;Nothing but perl can parse Perl&quot;</i>, or as it is more often stated now as a truism:</p>
+
+<p><b>&quot;Only perl can parse Perl&quot;</b></p>
+
+<p>One example of the sorts of things the prevent Perl being easily parsed are function signatures, as demonstrated by the following.</p>
+
+<pre><code>  <span class="variable">@result</span> <span class="operator">=</span> <span class="operator">(</span><span class="variable">dothis</span> <span class="variable">$foo</span><span class="operator">,</span> <span class="variable">$bar</span><span class="operator">);</span>
+  
+  <span class="comment"># Which of the following is it equivalent to?</span>
+  <span class="variable">@result</span> <span class="operator">=</span> <span class="operator">(</span><span class="variable">dothis</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">),</span> <span class="variable">$bar</span><span class="operator">);</span>
+  <span class="variable">@result</span> <span class="operator">=</span> <span class="variable">dothis</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">,</span> <span class="variable">$bar</span><span class="operator">);</span>
+</code></pre>
+
+<p>The first line above can be interpreted in two different ways, depending on whether the <code>&amp;dothis</code> function is expecting one argument, or two, or several.</p>
+
+<p>A &quot;code parser&quot; (something that parses for the purpose of execution) such as perl needs information that is not found in the immediate vicinity of the statement being parsed.</p>
+
+<p>The information might not just be elsewhere in the file, it might not even be in the same file at all. It might also not be able to determine this information without the prior execution of a <code><span class="keyword">BEGIN</span> <span class="operator">{}</span>
+</code> block, or the loading and execution of one or more external modules. Or worse the &amp;dothis function may not even have been written yet.</p>
+
+<p><b>When parsing Perl as code, you must also execute it</b></p>
+
+<p>Even perl itself never really fully understands the structure of the source code after and indeed <b>as</b> it processes it, and in that sense doesn&#39;t &quot;parse&quot; Perl source into anything remotely like a structured document. This makes it of no real use for any task that needs to treat the source code as a document, and do so reliably and robustly.</p>
+
+<p>For more information on why it is impossible to parse perl, see Randal Schwartz&#39;s seminal response to the question of &quot;Why can&#39;t you parse Perl&quot;.</p>
+
+<p><a href="http://www.perlmonks.org/index.pl?node_id=44722">http://www.perlmonks.org/index.pl?node_id=44722</a></p>
+
+<p>The purpose of PPI is <b>not</b> to parse Perl <i>Code</i>, but to parse Perl <i>Documents</i>. By treating the problem this way, we are able to parse a single file containing Perl source code &quot;isolated&quot; from any other resources, such as libraries upon which the code may depend, and without needing to run an instance of perl alongside or inside the parser.</p>
+
+<p>Historically, using an embedded perl parser was widely considered to be the most likely avenue for finding a solution to parsing Perl. It has been investigated from time to time, but attempts have generally failed or suffered from sufficiently bad corner cases that they were abandoned.</p>
+
+<h2 id="What-Does-PPI-Stand-For">What Does PPI Stand For?</h2>
+
+<p><code>PPI</code> is an acronym for the longer original module name <code>Parse::Perl::Isolated</code>. And in the spirit or the silly acronym games played by certain unnamed Open Source projects you may have <i>hurd</i> of, it also a reverse backronym of &quot;I Parse Perl&quot;.</p>
+
+<p>Of course, I could just be lying and have just made that second bit up 10 minutes before the release of PPI 1.000. Besides, <b>all</b> the cool Perl packages have TLAs (Three Letter Acronyms). It&#39;s a rule or something.</p>
+
+<p>Why don&#39;t you just think of it as the <b>Perl Parsing Interface</b> for simplicity.</p>
+
+<p>The original name was shortened to prevent the author (and you the users) from contracting RSI by having to type crazy things like <code>Parse::Perl::Isolated::Token::QuoteLike::Backtick</code> 100 times a day.</p>
+
+<p>In acknowledgment that someone may some day come up with a valid solution for the grammar problem it was decided at the commencement of the project to leave the <code>Parse::Perl</code> namespace free for any such effort.</p>
+
+<p>Since that time I&#39;ve been able to prove to my own satisfaction that it <b>is</b> truly impossible to accurately parse Perl as both code and document at once. For the academics, parsing Perl suffers from the &quot;Halting Problem&quot;.</p>
+
+<h2 id="Why-Parse-Perl">Why Parse Perl?</h2>
+
+<p>Once you can accept that we will never be able to parse Perl well enough to meet the standards of things that treat Perl as code, it is worth re-examining <code>why</code> we want to &quot;parse&quot; Perl at all.</p>
+
+<p>What are the things that people might want a &quot;Perl parser&quot; for.</p>
+
+<dl>
+
+<dt id="Documentation">Documentation</dt>
+<dd>
+
+<p>Analyzing the contents of a Perl document to automatically generate documentation, in parallel to, or as a replacement for, POD documentation.</p>
+
+<p>Allow an indexer to locate and process all the comments and documentation from code for &quot;full text search&quot; applications.</p>
+
+</dd>
+<dt id="Structural-and-Quality-Analysis">Structural and Quality Analysis</dt>
+<dd>
+
+<p>Determine quality or other metrics across a body of code, and identify situations relating to particular phrases, techniques or locations.</p>
+
+<p>Index functions, variables and packages within Perl code, and doing search and graph (in the node/edge sense) analysis of large code bases.</p>
+
+<p><a href="../lib/Perl/Critic.html">Perl::Critic</a>, based on PPI, is a large, thriving tool for bug detection and style analysis of Perl code.</p>
+
+</dd>
+<dt id="Refactoring">Refactoring</dt>
+<dd>
+
+<p>Make structural, syntax, or other changes to code in an automated manner, either independently or in assistance to an editor. This sort of task list includes backporting, forward porting, partial evaluation, &quot;improving&quot; code, or whatever. All the sort of things you&#39;d want from a <a>Perl::Editor</a>.</p>
+
+</dd>
+<dt id="Layout">Layout</dt>
+<dd>
+
+<p>Change the layout of code without changing its meaning. This includes techniques such as tidying (like <a>perltidy</a>), obfuscation, compressing and &quot;squishing&quot;, or to implement formatting preferences or policies.</p>
+
+</dd>
+<dt id="Presentation">Presentation</dt>
+<dd>
+
+<p>This includes methods of improving the presentation of code, without changing the content of the code. Modify, improve, syntax colour etc the presentation of a Perl document. Generating &quot;IntelliText&quot;-like functions.</p>
+
+</dd>
+</dl>
+
+<p>If we treat this as a baseline for the sort of things we are going to have to build on top of Perl, then it becomes possible to identify a standard for how good a Perl parser needs to be.</p>
+
+<h2 id="How-good-is-Good-Enough-TM">How good is Good Enough(TM)</h2>
+
+<p>PPI seeks to be good enough to achieve all of the above tasks, or to provide a sufficiently good API on which to allow others to implement modules in these and related areas.</p>
+
+<p>However, there are going to be limits to this process. Because PPI cannot adapt to changing grammars, any code written using source filters should not be assumed to be parsable.</p>
+
+<p>At one extreme, this includes anything munged by <a>Acme::Bleach</a>, as well as (arguably) more common cases like <a href="../lib/PPIx/Regexp/Structure/Switch.html">Switch</a>. We do not pretend to be able to always parse code using these modules, although as long as it still follows a format that looks like Perl syntax, it may be possible to extend the lexer to handle them.</p>
+
+<p>The ability to extend PPI to handle lexical additions to the language is on the drawing board to be done some time post-1.0</p>
+
+<p>The goal for success was originally to be able to successfully parse 99% of all Perl documents contained in CPAN. This means the entire file in each case.</p>
+
+<p>PPI has succeeded in this goal far beyond the expectations of even the author. At time of writing there are only 28 non-Acme Perl modules in CPAN that PPI is incapable of parsing. Most of these are so badly broken they do not compile as Perl code anyway.</p>
+
+<p>So unless you are actively going out of your way to break PPI, you should expect that it will handle your code just fine.</p>
+
+<h2 id="Internationalisation">Internationalisation</h2>
+
+<p>PPI provides partial support for internationalisation and localisation.</p>
+
+<p>Specifically, it allows the use characters from the Latin-1 character set to be used in quotes, comments, and POD. Primarily, this covers languages from Europe and South America.</p>
+
+<p>PPI does <b>not</b> currently provide support for Unicode. If you need Unicode support and would like to help, contact the author. (contact details below)</p>
+
+<h2 id="Round-Trip-Safe">Round Trip Safe</h2>
+
+<p>When PPI parses a file it builds <b>everything</b> into the model, including whitespace. This is needed in order to make the Document fully &quot;Round Trip&quot; safe.</p>
+
+<p>The general concept behind a &quot;Round Trip&quot; parser is that it knows what it is parsing is somewhat uncertain, and so <b>expects</b> to get things wrong from time to time. In the cases where it parses code wrongly the tree will serialize back out to the same string of code that was read in, repairing the parser&#39;s mistake as it heads back out to the file.</p>
+
+<p>The end result is that if you parse in a file and serialize it back out without changing the tree, you are guaranteed to get the same file you started with. PPI does this correctly and reliably for 100% of all known cases.</p>
+
+<p><b>What goes in, will come out. Every time.</b></p>
+
+<p>The one minor exception at this time is that if the newlines for your file are wrong (meaning not matching the platform newline format), PPI will localise them for you. (It isn&#39;t to be convenient, supporting arbitrary newlines would make some of the code more complicated)</p>
+
+<p>Better control of the newline type is on the wish list though, and anyone wanting to help out is encouraged to contact the author.</p>
+
+<h1 id="IMPLEMENTATION">IMPLEMENTATION</h1>
+
+<h2 id="General-Layout">General Layout</h2>
+
+<p>PPI is built upon two primary &quot;parsing&quot; components, <a href="../lib/PPI/Tokenizer.html">PPI::Tokenizer</a> and <a href="../lib/PPI/Lexer.html">PPI::Lexer</a>, and a large tree of about 50 classes which implement the various the <i>Perl Document Object Model</i> (PDOM).</p>
+
+<p>The PDOM is conceptually similar in style and intent to the regular DOM or other code Abstract Syntax Trees (ASTs), but contains some differences to handle perl-specific cases, and to assist in treating the code as a document. Please note that it is <b>not</b> an implementation of the official Document Object Model specification, only somewhat similar to it.</p>
+
+<p>On top of the Tokenizer, Lexer and the classes of the PDOM, sit a number of classes intended to make life a little easier when dealing with PDOM trees.</p>
+
+<p>Both the major parsing components were hand-coded from scratch with only plain Perl code and a few small utility modules. There are no grammar or patterns mini-languages, no YACC or LEX style tools and only a small number of regular expressions.</p>
+
+<p>This is primarily because of the sheer volume of accumulated cruft that exists in Perl. Not even perl itself is capable of parsing Perl documents (remember, it just parses and executes it as code).</p>
+
+<p>As a result, PPI needed to be cruftier than perl itself. Feel free to shudder at this point, and hope you never have to understand the Tokenizer codebase. Speaking of which...</p>
+
+<h2 id="The-Tokenizer">The Tokenizer</h2>
+
+<p>The Tokenizer takes source code and converts it into a series of tokens. It does this using a slow but thorough character by character manual process, rather than using a pattern system or complex regexes.</p>
+
+<p>Or at least it does so conceptually. If you were to actually trace the code you would find it&#39;s not truly character by character due to a number of regexps and optimisations throughout the code. This lets the Tokenizer &quot;skip ahead&quot; when it can find shortcuts, so it tends to jump around a line a bit wildly at times.</p>
+
+<p>In practice, the number of times the Tokenizer will <b>actually</b> move the character cursor itself is only about 5% - 10% higher than the number of tokens contained in the file. This makes it about as optimal as it can be made without implementing it in something other than Perl.</p>
+
+<p>In 2001 when PPI was started, this structure made PPI quite slow, and not really suitable for interactive tasks. This situation has improved greatly with multi-gigahertz processors, but can still be painful when working with very large files.</p>
+
+<p>The target parsing rate for PPI is about 5000 lines per gigacycle. It is currently believed to be at about 1500, and main avenue for making it to the target speed has now become <a>PPI::XS</a>, a drop-in XS accelerator for PPI.</p>
+
+<p>Since <a>PPI::XS</a> has only just gotten off the ground and is currently only at proof-of-concept stage, this may take a little while. Anyone interested in helping out with <a>PPI::XS</a> is <b>highly</b> encouraged to contact the author. In fact, the design of <a>PPI::XS</a> means it&#39;s possible to port one function at a time safely and reliably. So every little bit will help.</p>
+
+<h2 id="The-Lexer">The Lexer</h2>
+
+<p>The Lexer takes a token stream, and converts it to a lexical tree. Because we are parsing Perl <b>documents</b> this includes whitespace, comments, and all number of weird things that have no relevance when code is actually executed.</p>
+
+<p>An instantiated <a href="../lib/PPI/Lexer.html">PPI::Lexer</a> consumes <a href="../lib/PPI/Tokenizer.html">PPI::Tokenizer</a> objects and produces <a href="../lib/PPI/Document.html">PPI::Document</a> objects. However you should probably never be working with the Lexer directly. You should just be able to create <a href="../lib/PPI/Document.html">PPI::Document</a> objects and work with them directly.</p>
+
+<h2 id="The-Perl-Document-Object-Model">The Perl Document Object Model</h2>
+
+<p>The PDOM is a structured collection of data classes that together provide a correct and scalable model for documents that follow the standard Perl syntax.</p>
+
+<h2 id="The-PDOM-Class-Tree">The PDOM Class Tree</h2>
+
+<p>The following lists all of the 67 current PDOM classes, listing with indentation based on inheritance.</p>
+
+<pre><code>   PPI::Element
+      PPI::Node
+         PPI::Document
+            PPI::Document::Fragment
+         PPI::Statement
+            PPI::Statement::Package
+            PPI::Statement::Include
+            PPI::Statement::Sub
+               PPI::Statement::Scheduled
+            PPI::Statement::Compound
+            PPI::Statement::Break
+            PPI::Statement::Given
+            PPI::Statement::When
+            PPI::Statement::Data
+            PPI::Statement::End
+            PPI::Statement::Expression
+               PPI::Statement::Variable
+            PPI::Statement::Null
+            PPI::Statement::UnmatchedBrace
+            PPI::Statement::Unknown
+         PPI::Structure
+            PPI::Structure::Block
+            PPI::Structure::Subscript
+            PPI::Structure::Constructor
+            PPI::Structure::Condition
+            PPI::Structure::List
+            PPI::Structure::For
+            PPI::Structure::Given
+            PPI::Structure::When
+            PPI::Structure::Unknown
+      PPI::Token
+         PPI::Token::Whitespace
+         PPI::Token::Comment
+         PPI::Token::Pod
+         PPI::Token::Number
+            PPI::Token::Number::Binary
+            PPI::Token::Number::Octal
+            PPI::Token::Number::Hex
+            PPI::Token::Number::Float
+               PPI::Token::Number::Exp
+            PPI::Token::Number::Version
+         PPI::Token::Word
+         PPI::Token::DashedWord
+         PPI::Token::Symbol
+            PPI::Token::Magic
+         PPI::Token::ArrayIndex
+         PPI::Token::Operator
+         PPI::Token::Quote
+            PPI::Token::Quote::Single
+            PPI::Token::Quote::Double
+            PPI::Token::Quote::Literal
+            PPI::Token::Quote::Interpolate
+         PPI::Token::QuoteLike
+            PPI::Token::QuoteLike::Backtick
+            PPI::Token::QuoteLike::Command
+            PPI::Token::QuoteLike::Regexp
+            PPI::Token::QuoteLike::Words
+            PPI::Token::QuoteLike::Readline
+         PPI::Token::Regexp
+            PPI::Token::Regexp::Match
+            PPI::Token::Regexp::Substitute
+            PPI::Token::Regexp::Transliterate
+         PPI::Token::HereDoc
+         PPI::Token::Cast
+         PPI::Token::Structure
+         PPI::Token::Label
+         PPI::Token::Separator
+         PPI::Token::Data
+         PPI::Token::End
+         PPI::Token::Prototype
+         PPI::Token::Attribute
+         PPI::Token::Unknown</code></pre>
+
+<p>To summarize the above layout, all PDOM objects inherit from the <a href="../lib/PPI/Element.html">PPI::Element</a> class.</p>
+
+<p>Under this are <a href="../lib/PPI/Token.html">PPI::Token</a>, strings of content with a known type, and <a href="../lib/PPI/Node.html">PPI::Node</a>, syntactically significant containers that hold other Elements.</p>
+
+<p>The three most important of these are the <a href="../lib/PPI/Document.html">PPI::Document</a>, the <a href="../lib/PPI/Statement.html">PPI::Statement</a> and the <a href="../lib/PPI/Structure.html">PPI::Structure</a> classes.</p>
+
+<h2 id="The-Document-Statement-and-Structure">The Document, Statement and Structure</h2>
+
+<p>At the top of all complete PDOM trees is a <a href="../lib/PPI/Document.html">PPI::Document</a> object. It represents a complete file of Perl source code as you might find it on disk.</p>
+
+<p>There are some specialised types of document, such as <a href="../lib/PPI/Document/File.html">PPI::Document::File</a> and <a href="../lib/PPI/Document/Normalized.html">PPI::Document::Normalized</a> but for the purposes of the PDOM they are all just considered to be the same thing.</p>
+
+<p>Each Document will contain a number of <b>Statements</b>, <b>Structures</b> and <b>Tokens</b>.</p>
+
+<p>A <a href="../lib/PPI/Statement.html">PPI::Statement</a> is any series of Tokens and Structures that are treated as a single contiguous statement by perl itself. You should note that a Statement is as close as PPI can get to &quot;parsing&quot; the code in the sense that perl-itself parses Perl code when it is building the op-tree.</p>
+
+<p>Because of the isolation and Perl&#39;s syntax, it is provably impossible for PPI to accurately determine precedence of operators or which tokens are implicit arguments to a sub call.</p>
+
+<p>So rather than lead you on with a bad guess that has a strong chance of being wrong, PPI does not attempt to determine precedence or sub parameters at all.</p>
+
+<p>At a fundamental level, it only knows that this series of elements represents a single Statement as perl sees it, but it can do so with enough certainty that it can be trusted.</p>
+
+<p>However, for specific Statement types the PDOM is able to derive additional useful information about their meaning. For the best, most useful, and most heavily used example, see <a href="../lib/PPI/Statement/Include.html">PPI::Statement::Include</a>.</p>
+
+<p>A <a href="../lib/PPI/Structure.html">PPI::Structure</a> is any series of tokens contained within matching braces. This includes code blocks, conditions, function argument braces, anonymous array and hash constructors, lists, scoping braces and all other syntactic structures represented by a matching pair of braces, including (although it may not seem obvious at first) <code>&lt;READLINE&gt;</code> braces.</p>
+
+<p>Each Structure contains none, one, or many Tokens and Structures (the rules for which vary for the different Structure subclasses)</p>
+
+<p>Under the PDOM structure rules, a Statement can <b>never</b> directly contain another child Statement, a Structure can <b>never</b> directly contain another child Structure, and a Document can <b>never</b> contain another Document anywhere in the tree.</p>
+
+<p>Aside from these three rules, the PDOM tree is extremely flexible.</p>
+
+<h2 id="The-PDOM-at-Work">The PDOM at Work</h2>
+
+<p>To demonstrate the PDOM in use lets start with an example showing how the tree might look for the following chunk of simple Perl code.</p>
+
+<pre><code>  <span class="comment">#!/usr/bin/perl</span>
+  
+  <span class="keyword">print</span><span class="operator">(</span> <span class="string">"Hello World!"</span> <span class="operator">);</span>
+  
+  <span class="keyword">exit</span><span class="operator">();</span>
+</code></pre>
+
+<p>Translated into a PDOM tree it would have the following structure (as shown via the included <a href="../lib/PPI/Dumper.html">PPI::Dumper</a>).</p>
+
+<pre><code>  <span class="variable">PPI::Document</span>
+    <span class="variable">PPI::Token::Comment</span>                <span class="string">'#!/usr/bin/perl\n'</span>
+    <span class="variable">PPI::Token::Whitespace</span>             <span class="string">'\n'</span>
+    <span class="variable">PPI::Statement</span>
+      <span class="variable">PPI::Token::Word</span>                 <span class="string">'print'</span>
+      <span class="variable">PPI::Structure::List</span>             <span class="operator">(</span> <span class="operator">...</span> <span class="operator">)</span>
+        <span class="variable">PPI::Token::Whitespace</span>         <span class="string">' '</span>
+        <span class="variable">PPI::Statement::Expression</span>
+          <span class="variable">PPI::Token::Quote::Double</span>    <span class="string">'"Hello World!"'</span>
+        <span class="variable">PPI::Token::Whitespace</span>         <span class="string">' '</span>
+      <span class="variable">PPI::Token::Structure</span>            <span class="string">';'</span>
+    <span class="variable">PPI::Token::Whitespace</span>             <span class="string">'\n'</span>
+    <span class="variable">PPI::Token::Whitespace</span>             <span class="string">'\n'</span>
+    <span class="variable">PPI::Statement</span>
+      <span class="variable">PPI::Token::Word</span>                 <span class="string">'exit'</span>
+      <span class="variable">PPI::Structure::List</span>             <span class="operator">(</span> <span class="operator">...</span> <span class="operator">)</span>
+      <span class="variable">PPI::Token::Structure</span>            <span class="string">';'</span>
+    <span class="variable">PPI::Token::Whitespace</span>             <span class="string">'\n'</span>
+</code></pre>
+
+<p>Please note that in this example, strings are only listed for the <b>actual</b> <a href="../lib/PPI/Token.html">PPI::Token</a> that contains that string. Structures are listed with the type of brace characters it represents noted.</p>
+
+<p>The <a href="../lib/PPI/Dumper.html">PPI::Dumper</a> module can be used to generate similar trees yourself.</p>
+
+<p>We can make that PDOM dump a little easier to read if we strip out all the whitespace. Here it is again, sans the distracting whitespace tokens.</p>
+
+<pre><code>  <span class="variable">PPI::Document</span>
+    <span class="variable">PPI::Token::Comment</span>                <span class="string">'#!/usr/bin/perl\n'</span>
+    <span class="variable">PPI::Statement</span>
+      <span class="variable">PPI::Token::Word</span>                 <span class="string">'print'</span>
+      <span class="variable">PPI::Structure::List</span>             <span class="operator">(</span> <span class="operator">...</span> <span class="operator">)</span>
+        <span class="variable">PPI::Statement::Expression</span>
+          <span class="variable">PPI::Token::Quote::Double</span>    <span class="string">'"Hello World!"'</span>
+      <span class="variable">PPI::Token::Structure</span>            <span class="string">';'</span>
+    <span class="variable">PPI::Statement</span>
+      <span class="variable">PPI::Token::Word</span>                 <span class="string">'exit'</span>
+      <span class="variable">PPI::Structure::List</span>             <span class="operator">(</span> <span class="operator">...</span> <span class="operator">)</span>
+      <span class="variable">PPI::Token::Structure</span>            <span class="string">';'</span>
+</code></pre>
+
+<p>As you can see, the tree can get fairly deep at time, especially when every isolated token in a bracket becomes its own statement. This is needed to allow anything inside the tree the ability to grow. It also makes the search and analysis algorithms much more flexible.</p>
+
+<p>Because of the depth and complexity of PDOM trees, a vast number of very easy to use methods have been added wherever possible to help people working with PDOM trees do normal tasks relatively quickly and efficiently.</p>
+
+<h2 id="Overview-of-the-Primary-Classes">Overview of the Primary Classes</h2>
+
+<p>The main PPI classes, and links to their own documentation, are listed here in alphabetical order.</p>
+
+<dl>
+
+<dt id="PPI::Document"><a href="../lib/PPI/Document.html">PPI::Document</a></dt>
+<dd>
+
+<p>The Document object, the root of the PDOM.</p>
+
+</dd>
+<dt id="PPI::Document::Fragment"><a href="../lib/PPI/Document/Fragment.html">PPI::Document::Fragment</a></dt>
+<dd>
+
+<p>A cohesive fragment of a larger Document. Although not of any real current use, it is needed for use in certain internal tree manipulation algorithms.</p>
+
+<p>For example, doing things like cut/copy/paste etc. Very similar to a <a href="../lib/PPI/Document.html">PPI::Document</a>, but has some additional methods and does not represent a lexical scope boundary.</p>
+
+<p>A document fragment is also non-serializable, and so cannot be written out to a file.</p>
+
+</dd>
+<dt id="PPI::Dumper"><a href="../lib/PPI/Dumper.html">PPI::Dumper</a></dt>
+<dd>
+
+<p>A simple class for dumping readable debugging versions of PDOM structures, such as in the demonstration above.</p>
+
+</dd>
+<dt id="PPI::Element"><a href="../lib/PPI/Element.html">PPI::Element</a></dt>
+<dd>
+
+<p>The Element class is the abstract base class for all objects within the PDOM</p>
+
+</dd>
+<dt id="PPI::Find"><a href="../lib/PPI/Find.html">PPI::Find</a></dt>
+<dd>
+
+<p>Implements an instantiable object form of a PDOM tree search.</p>
+
+</dd>
+<dt id="PPI::Lexer"><a href="../lib/PPI/Lexer.html">PPI::Lexer</a></dt>
+<dd>
+
+<p>The PPI Lexer. Converts Token streams into PDOM trees.</p>
+
+</dd>
+<dt id="PPI::Node"><a href="../lib/PPI/Node.html">PPI::Node</a></dt>
+<dd>
+
+<p>The Node object, the abstract base class for all PDOM objects that can contain other Elements, such as the Document, Statement and Structure objects.</p>
+
+</dd>
+<dt id="PPI::Statement"><a href="../lib/PPI/Statement.html">PPI::Statement</a></dt>
+<dd>
+
+<p>The base class for all Perl statements. Generic &quot;evaluate for side-effects&quot; statements are of this actual type. Other more interesting statement types belong to one of its children.</p>
+
+<p>See its own documentation for a longer description and list of all of the different statement types and sub-classes.</p>
+
+</dd>
+<dt id="PPI::Structure"><a href="../lib/PPI/Structure.html">PPI::Structure</a></dt>
+<dd>
+
+<p>The abstract base class for all structures. A Structure is a language construct consisting of matching braces containing a set of other elements.</p>
+
+<p>See the <a href="../lib/PPI/Structure.html">PPI::Structure</a> documentation for a description and list of all of the different structure types and sub-classes.</p>
+
+</dd>
+<dt id="PPI::Token"><a href="../lib/PPI/Token.html">PPI::Token</a></dt>
+<dd>
+
+<p>A token is the basic unit of content. At its most basic, a Token is just a string tagged with metadata (its class, and some additional flags in some cases).</p>
+
+</dd>
+<dt id="PPI::Token::_QuoteEngine"><a href="../lib/PPI/Token/_QuoteEngine.html">PPI::Token::_QuoteEngine</a></dt>
+<dd>
+
+<p>The <a href="../lib/PPI/Token/Quote.html">PPI::Token::Quote</a> and <a href="../lib/PPI/Token/QuoteLike.html">PPI::Token::QuoteLike</a> classes provide abstract base classes for the many and varied types of quote and quote-like things in Perl. However, much of the actual quote login is implemented in a separate quote engine, based at <a href="../lib/PPI/Token/_QuoteEngine.html">PPI::Token::_QuoteEngine</a>.</p>
+
+<p>Classes that inherit from <a href="../lib/PPI/Token/Quote.html">PPI::Token::Quote</a>, <a href="../lib/PPI/Token/QuoteLike.html">PPI::Token::QuoteLike</a> and <a href="../lib/PPI/Token/Regexp.html">PPI::Token::Regexp</a> are generally parsed only by the Quote Engine.</p>
+
+</dd>
+<dt id="PPI::Tokenizer"><a href="../lib/PPI/Tokenizer.html">PPI::Tokenizer</a></dt>
+<dd>
+
+<p>The PPI Tokenizer. One Tokenizer consumes a chunk of text and provides access to a stream of <a href="../lib/PPI/Token.html">PPI::Token</a> objects.</p>
+
+<p>The Tokenizer is very very complicated, to the point where even the author treads carefully when working with it.</p>
+
+<p>Most of the complication is the result of optimizations which have tripled the tokenization speed, at the expense of maintainability. We cope with the spaghetti by heavily commenting everything.</p>
+
+</dd>
+<dt id="PPI::Transform"><a href="../lib/PPI/Transform.html">PPI::Transform</a></dt>
+<dd>
+
+<p>The Perl Document Transformation API. Provides a standard interface and abstract base class for objects and classes that manipulate Documents.</p>
+
+</dd>
+</dl>
+
+<h1 id="INSTALLING">INSTALLING</h1>
+
+<p>The core PPI distribution is pure Perl and has been kept as tight as possible and with as few dependencies as possible.</p>
+
+<p>It should download and install normally on any platform from within the CPAN and CPANPLUS applications, or directly using the distribution tarball. If installing by hand, you may need to install a few small utility modules first. The exact ones will depend on your version of perl.</p>
+
+<p>There are no special install instructions for PPI, and the normal <code>Perl Makefile.PL</code>, <code>make</code>, <code>make test</code>, <code>make install</code> instructions apply.</p>
+
+<h1 id="EXTENDING">EXTENDING</h1>
+
+<p>The PPI namespace itself is reserved for use by PPI itself. You are recommended to use the PPIx:: namespace for PPI-specific modifications or prototypes thereof, or Perl:: for modules which provide a general Perl language-related functions.</p>
+
+<p>If what you wish to implement looks like it fits into the PPIx:: namespace, you should consider contacting the PPI maintainers on GitHub first, as what you want may already be in progress, or you may wish to consider contributing to PPI itself.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>- Many more analysis and utility methods for PDOM classes</p>
+
+<p>- Creation of a PPI::Tutorial document</p>
+
+<p>- Add many more key functions to PPI::XS</p>
+
+<p>- We can <b>always</b> write more and better unit tests</p>
+
+<p>- Complete the full implementation of -&gt;literal (1.200)</p>
+
+<p>- Full understanding of scoping (due 1.300)</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>The most recent version of PPI is available at the following address.</p>
+
+<p><a href="http://search.cpan.org/~mithaldu/PPI/">http://search.cpan.org/~mithaldu/PPI/</a></p>
+
+<p>PPI source is maintained in a GitHub repository at the following address.</p>
+
+<p><a href="https://github.com/adamkennedy/PPI">https://github.com/adamkennedy/PPI</a></p>
+
+<p>Contributions via GitHub pull request are welcome.</p>
+
+<p>Bug fixes in the form of pull requests or bug reports with new (failing) unit tests have the best chance of being addressed by busy maintainers, and are <b>strongly</b> encouraged.</p>
+
+<p>If you cannot provide a test or fix, or don&#39;t have time to do so, then regular bug reports are still accepted and appreciated via the GitHub bug tracker.</p>
+
+<p><a href="https://github.com/adamkennedy/PPI/issues">https://github.com/adamkennedy/PPI/issues</a></p>
+
+<p>The <code>ppidump</code> utility that is part of the <a href="../lib/Perl/Critic.html">Perl::Critic</a> distribution is a useful tool for demonstrating how PPI is parsing (or misparsing) small code snippets, and for providing information for bug reports.</p>
+
+<p>For other issues, questions, or commercial or media-related enquiries, contact the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</h1>
+
+<p>A huge thank you to Phase N Australia (<a href="http://phase-n.com/">http://phase-n.com/</a>) for permitting the original open sourcing and release of this distribution from what was originally several thousand hours of commercial work.</p>
+
+<p>Another big thank you to The Perl Foundation (<a href="http://www.perlfoundation.org/">http://www.perlfoundation.org/</a>) for funding for the final big refactoring and completion run.</p>
+
+<p>Also, to the various co-maintainers that have contributed both large and small with tests and patches and especially to those rare few who have deep-dived into the guts to (gasp) add a feature.</p>
+
+<pre><code>  - Dan Brook       : PPIx::XPath, Acme::PerlML
+  - Audrey Tang     : &quot;Line Noise&quot; Testing
+  - Arjen Laarhoven : Three-element -&gt;location support
+  - Elliot Shank    : Perl 5.10 support, five-element -&gt;location</code></pre>
+
+<p>And finally, thanks to those brave ( and foolish :) ) souls willing to dive in and use, test drive and provide feedback on PPI before version 1.000, in some cases before it made it to beta quality, and still did extremely distasteful things (like eating 50 meg of RAM a second).</p>
+
+<p>I owe you all a beer. Corner me somewhere and collect at your convenience. If I missed someone who wasn&#39;t in my email history, thank you too :)</p>
+
+<pre><code>  # In approximate order of appearance
+  - Claes Jacobsson
+  - Michael Schwern
+  - Jeff T. Parsons
+  - CPAN Author &quot;CHOCOLATEBOY&quot;
+  - Robert Rotherberg
+  - CPAN Author &quot;PODMASTER&quot;
+  - Richard Soderberg
+  - Nadim ibn Hamouda el Khemir
+  - Graciliano M. P.
+  - Leon Brocard
+  - Jody Belka
+  - Curtis Ovid
+  - Yuval Kogman
+  - Michael Schilli
+  - Slaven Rezic
+  - Lars Thegler
+  - Tony Stubblebine
+  - Tatsuhiko Miyagawa
+  - CPAN Author &quot;CHROMATIC&quot;
+  - Matisse Enzer
+  - Roy Fulbright
+  - Dan Brook
+  - Johnny Lee
+  - Johan Lindstrom</code></pre>
+
+<p>And to single one person out, thanks go to Randal Schwartz who spent a great number of hours in IRC over a critical 6 month period explaining why Perl is impossibly unparsable and constantly shoving evil and ugly corner cases in my face. He remained a tireless devil&#39;s advocate, and without his support this project genuinely could never have been completed.</p>
+
+<p>So for my schooling in the Deep Magiks, you have my deepest gratitude Randal.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

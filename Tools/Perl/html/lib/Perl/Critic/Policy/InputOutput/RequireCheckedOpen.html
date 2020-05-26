@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::InputOutput::RequireCheckedOpen - Write <code><span class="keyword">my</span> <span class="variable">$error</span> <span class="operator">=</span> <span class="keyword">open</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$filename</span><span class="operator">;</span>
+</code> instead of <code><span class="keyword">open</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$filename</span><span class="operator">;</span>
+</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The perl builtin I/O function <code>open</code> returns a false value on failure. That value should always be checked to ensure that the open was successful.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$error</span> <span class="operator">=</span> <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$filehandle</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$filename</span> <span class="operator">);</span>                  <span class="comment"># ok</span>
+    <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$filehandle</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$filename</span> <span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"unable to open: $!"</span><span class="operator">;</span>  <span class="comment"># ok</span>
+    <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$filehandle</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$filename</span> <span class="operator">);</span>                              <span class="comment"># not ok</span>
+    
+    <span class="keyword">use</span> <span class="variable">autodie</span><span class="operator">;</span>
+    <span class="keyword">open</span> <span class="variable">$filehandle</span><span class="operator">,</span> <span class="variable">$mode</span><span class="operator">,</span> <span class="variable">$filename</span><span class="operator">;</span>                                 <span class="comment"># ok</span>
+</code></pre>
+
+<p>You can use <a href="../../../../../lib/autodie.html">autodie</a>, <a href="../../../../../lib/Fatal.html">Fatal</a>, or <a>Fatal::Exception</a> to get around this. Currently, <a href="../../../../../lib/autodie.html">autodie</a> is not properly treated as a pragma; its lexical effects aren&#39;t taken into account.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>If you create a module that exports <code>autodie</code> you can tell this policy about it with the <code>autodie_modules</code> setting:</p>
+
+<pre><code>    [InputOutput::RequireCheckedSyscalls]
+    autodie_modules = My::Thing</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andrew Moore &lt;amoore@mooresystems.com&gt;</p>
+
+<h1 id="ACKNOWLEDGMENTS">ACKNOWLEDGMENTS</h1>
+
+<p>This policy module is based heavily on policies written by Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2007-2011 Andrew Moore. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

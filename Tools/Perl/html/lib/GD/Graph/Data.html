@@ -1,0 +1,294 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#data-GD::Graph::Data-new">$data = GD::Graph::Data-&gt;new()</a></li>
+      <li><a href="#data-set_x-np-value">$data-&gt;set_x($np, $value);</a></li>
+      <li><a href="#data-get_x-np">$data-&gt;get_x($np)</a></li>
+      <li><a href="#data-set_y-nd-np-value">$data-&gt;set_y($nd, $np, $value);</a></li>
+      <li><a href="#data-get_y-nd-np">$data-&gt;get_y($nd, $np)</a></li>
+      <li><a href="#data-get_y_cumulative-nd-np">$data-&gt;get_y_cumulative($nd, $np)</a></li>
+      <li><a href="#data-get_min_max_x">$data-&gt;get_min_max_x</a></li>
+      <li><a href="#data-get_min_max_y-nd">$data-&gt;get_min_max_y($nd)</a></li>
+      <li><a href="#data-get_min_max_y_all">$data-&gt;get_min_max_y_all()</a></li>
+      <li><a href="#data-add_point-X-Y1-Y2">$data-&gt;add_point($X, $Y1, $Y2 ...)</a></li>
+      <li><a href="#data-num_sets">$data-&gt;num_sets()</a></li>
+      <li><a href="#data-num_points">$data-&gt;num_points()</a></li>
+      <li><a href="#data-x_values">$data-&gt;x_values()</a></li>
+      <li><a href="#data-y_values-nd">$data-&gt;y_values($nd)</a></li>
+      <li><a href="#data-reset-OR-GD::Graph::Data-reset">$data-&gt;reset() OR GD::Graph::Data-&gt;reset()</a></li>
+      <li><a href="#data-make_strict">$data-&gt;make_strict()</a></li>
+      <li><a href="#data-cumulate-preserve_undef-boolean">$data-&gt;cumulate(preserve_undef =&gt; boolean)</a></li>
+      <li><a href="#data-wanted-indexes">$data-&gt;wanted(indexes)</a></li>
+      <li><a href="#data-reverse">$data-&gt;reverse</a></li>
+      <li><a href="#data-copy_from-data_ref">$data-&gt;copy_from($data_ref)</a></li>
+      <li><a href="#data-copy">$data-&gt;copy()</a></li>
+      <li><a href="#data-read-arguments">$data-&gt;read(arguments)</a></li>
+      <li><a href="#data-error-OR-GD::Graph::Data-error">$data-&gt;error() OR GD::Graph::Data-&gt;error()</a></li>
+      <li><a href="#data-has_error-OR-GD::Graph::Data-has_error">$data-&gt;has_error() OR GD::Graph::Data-&gt;has_error()</a></li>
+    </ul>
+  </li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a>
+    <ul>
+      <li><a href="#Copyright">Copyright</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>GD::Graph::Data - Data set encapsulation for GD::Graph</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>use GD::Graph::Data;</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module encapsulates the data structure that is needed for GD::Graph and friends. An object of this class contains a list of X values, and a number of lists of corresponding Y values. This only really makes sense if the Y values are numerical, but you can basically store anything. Undefined values have a special meaning to GD::Graph, so they are treated with care when stored.</p>
+
+<p>Many of the methods of this module are intended for internal use by GD::Graph and the module itself, and will most likely not be useful to you. Many won&#39;t even <i>seem</i> useful to you...</p>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">GD::Graph::Data</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">GD::Graph::bars</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">GD::Graph::Data</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  
+  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'/data/sales.dat'</span><span class="operator">,</span> <span class="string">delimiter</span> <span class="operator">=&gt;</span> <span class="string">','</span><span class="operator">);</span>
+  <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">(</span><span class="string">wanted</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">2</span><span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> <span class="number">5</span><span class="operator">]</span><span class="operator">);</span>
+  
+  <span class="comment"># Add the newer figures from the database</span>
+  <span class="keyword">use</span> <span class="variable">DBI</span><span class="operator">;</span>
+  <span class="comment"># do DBI things, like connecting to the database, statement</span>
+  <span class="comment"># preparation and execution</span>
+  
+  <span class="keyword">while</span> <span class="operator">(</span><span class="variable">@row</span> <span class="operator">=</span> <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">fetchrow_array</span><span class="operator">)</span>
+  <span class="operator">{</span>
+      <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">add_point</span><span class="operator">(</span><span class="variable">@row</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">my</span> <span class="variable">$chart</span> <span class="operator">=</span> <span class="variable">GD::Graph::bars</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="keyword">my</span> <span class="variable">$gd</span> <span class="operator">=</span> <span class="variable">$chart</span><span class="operator">-&gt;</span><span class="variable">plot</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>or for quick changes to legacy code</p>
+
+<pre><code>  <span class="comment"># Legacy code builds array like this</span>
+  <span class="variable">@data</span> <span class="operator">=</span> <span class="operator">(</span> <span class="operator">[</span><span class="string">qw(Jan Feb Mar)</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">5</span><span class="operator">,</span> <span class="number">4</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">6</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">7</span><span class="operator">]</span> <span class="operator">);</span>
+  
+  <span class="comment"># And we quickly need to do some manipulations on that</span>
+  <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">GD::Graph::Data</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">copy_from</span><span class="operator">(\</span><span class="variable">@data</span><span class="operator">);</span>
+  
+  <span class="comment"># And now do all the new stuff that's wanted.</span>
+  <span class="keyword">while</span> <span class="operator">(</span><span class="variable">@foo</span> <span class="operator">=</span> <span class="variable">bar_baz</span><span class="operator">())</span>
+  <span class="operator">{</span>
+      <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">add_point</span><span class="operator">(</span><span class="variable">@foo</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="data-GD::Graph::Data-new">$data = GD::Graph::Data-&gt;new()</h2>
+
+<p>Create a new GD::Graph::Data object.</p>
+
+<h2 id="data-set_x-np-value">$data-&gt;set_x($np, $value);</h2>
+
+<p>Set the X value of point <i>$np</i> to <i>$value</i>. Points are numbered starting with 0. You probably will never need this. Returns undef on failure.</p>
+
+<h2 id="data-get_x-np">$data-&gt;get_x($np)</h2>
+
+<p>Get the X value of point <i>$np</i>. See <a href="#set_x">&quot;set_x&quot;</a>.</p>
+
+<h2 id="data-set_y-nd-np-value">$data-&gt;set_y($nd, $np, $value);</h2>
+
+<p>Set the Y value of point <i>$np</i> in data set <i>$nd</i> to <i>$value</i>. Points are numbered starting with 0, data sets are numbered starting with 1. You probably will never need this. Returns undef on failure.</p>
+
+<h2 id="data-get_y-nd-np">$data-&gt;get_y($nd, $np)</h2>
+
+<p>Get the Y value of point <i>$np</i> in data set <i>$nd</i>. See <a href="#set_y">&quot;set_y&quot;</a>. This will return undef on an error, but the fact that it returns undef does not mean there was an error (since undefined values can be stored, and therefore returned).</p>
+
+<h2 id="data-get_y_cumulative-nd-np">$data-&gt;get_y_cumulative($nd, $np)</h2>
+
+<p>Get the cumulative value of point <i>$np</i> in data set&lt;$nd&gt;. The cumulative value is obtained by adding all the values of the points <i>$np</i> in the data sets 1 to <i>$nd</i>.</p>
+
+<h2 id="data-get_min_max_x">$data-&gt;get_min_max_x</h2>
+
+<p>Returns a list of the minimum and maximum x value or the empty list on failure.</p>
+
+<h2 id="data-get_min_max_y-nd">$data-&gt;get_min_max_y($nd)</h2>
+
+<p>Returns a list of the minimum and maximum y value in data set $nd or the empty list on failure.</p>
+
+<h2 id="data-get_min_max_y_all">$data-&gt;get_min_max_y_all()</h2>
+
+<p>Returns a list of the minimum and maximum y value in all data sets or the empty list on failure.</p>
+
+<h2 id="data-add_point-X-Y1-Y2">$data-&gt;add_point($X, $Y1, $Y2 ...)</h2>
+
+<p>Adds a point to the data set. The base for the addition is the current number of X values. This means that if you have a data set with the contents</p>
+
+<pre><code>  (X1,  X2)
+  (Y11, Y12)
+  (Y21)
+  (Y31, Y32, Y33, Y34)</code></pre>
+
+<p>a $data-&gt;add_point(Xx, Y1x, Y2x, Y3x, Y4x) will result in</p>
+
+<pre><code>  (X1,    X2,    Xx )
+  (Y11,   Y12,   Y1x)
+  (Y21,   undef, Y2x)
+  (Y31,   Y32,   Y3x,  Y34)
+  (undef, undef, Y4x)</code></pre>
+
+<p>In other words: beware how you use this. As long as you make sure that all data sets are of equal length, this method is safe to use.</p>
+
+<h2 id="data-num_sets">$data-&gt;num_sets()</h2>
+
+<p>Returns the number of data sets.</p>
+
+<h2 id="data-num_points">$data-&gt;num_points()</h2>
+
+<p>In list context, returns a list with its first element the number of X values, and the subsequent elements the number of respective Y values for each data set. In scalar context returns the number of points that have an X value set, i.e. the number of data sets that would result from a call to <code>make_strict</code>.</p>
+
+<h2 id="data-x_values">$data-&gt;x_values()</h2>
+
+<p>Return a list of all the X values.</p>
+
+<h2 id="data-y_values-nd">$data-&gt;y_values($nd)</h2>
+
+<p>Return a list of the Y values for data set <i>$nd</i>. Data sets are numbered from 1. Returns the empty list if $nd is out of range, or if the data set at $nd is empty.</p>
+
+<h2 id="data-reset-OR-GD::Graph::Data-reset">$data-&gt;reset() OR GD::Graph::Data-&gt;reset()</h2>
+
+<p>As an object method: Reset the data container, get rid of all data and error messages. As a class method: get rid of accumulated error messages and possible other crud.</p>
+
+<h2 id="data-make_strict">$data-&gt;make_strict()</h2>
+
+<p>Make all data set lists the same length as the X list by truncating data sets that are too long, and filling data sets that are too short with undef values. always returns a true value.</p>
+
+<h2 id="data-cumulate-preserve_undef-boolean">$data-&gt;cumulate(preserve_undef =&gt; boolean)</h2>
+
+<p>The <b>cumulate</b> parameter will summarise the Y value sets as follows: the first Y value list will be unchanged, the second will contain a sum of the first and second, the third will contain the sum of first, second and third, and so on. Returns undef on failure.</p>
+
+<p>if the argument <i>preserve_undef</i> is set to a true value, then the sum of exclusively undefined values will be preserved as an undefined value. If it is not present or a false value, undef will be treated as zero. Note that this still will leave undefined values in the first data set alone.</p>
+
+<p>Note: Any non-numerical defined Y values will be treated as 0, but you really shouldn&#39;t be using this to store that sort of Y data.</p>
+
+<h2 id="data-wanted-indexes">$data-&gt;wanted(indexes)</h2>
+
+<p>Removes all data sets except the ones in the argument list. It will also reorder the data sets in the order given. Returns undef on failure.</p>
+
+<p>To remove all data sets except the first, sixth and second, in that order:</p>
+
+<pre><code>  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">wanted</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="number">6</span><span class="operator">,</span> <span class="number">2</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="data-reverse">$data-&gt;reverse</h2>
+
+<p>Reverse the order of the data sets.</p>
+
+<h2 id="data-copy_from-data_ref">$data-&gt;copy_from($data_ref)</h2>
+
+<p>Copy an &#39;old&#39; style GD::Graph data structure or another GD::Graph::Data object into this object. This will remove the current data. Returns undef on failure.</p>
+
+<h2 id="data-copy">$data-&gt;copy()</h2>
+
+<p>Returns a copy of the object, or undef on failure.</p>
+
+<h2 id="data-read-arguments">$data-&gt;read(<i>arguments</i>)</h2>
+
+<p>Read a data set from a file. This will remove the current data. returns undef on failure. This method uses the standard module Text::ParseWords to parse lines. If you don&#39;t have this for some odd reason, don&#39;t use this method, or your program will die.</p>
+
+<p><b>Data file format</b>: The default data file format is tab separated data (which can be changed with the delimiter argument). Comment lines are any lines that start with a #. In the following example I have replaced literal tabs with &lt;tab&gt; for clarity</p>
+
+<pre><code>  # This is a comment, and will be ignored
+  Jan&lt;tab&gt;12&lt;tab&gt;24
+  Feb&lt;tab&gt;13&lt;tab&gt;37
+  # March is missing
+  Mar&lt;tab&gt;&lt;tab&gt;
+  Apr&lt;tab&gt;9&lt;tab&gt;18</code></pre>
+
+<p>Valid arguments are:</p>
+
+<p><i>file</i>, mandatory. The file name of the file to read from, or a reference to a file handle or glob.</p>
+
+<pre><code>  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'/data/foo.dat'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">*DATA</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="variable">$file_handle</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+</code></pre>
+
+<p><i>no_comment</i>, optional. Give this a true value if you don&#39;t want lines with an initial # to be skipped.</p>
+
+<pre><code>  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'/data/foo.dat'</span><span class="operator">,</span> <span class="string">no_comment</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p><i>delimiter</i>, optional. A regular expression that will become the delimiter instead of a single tab.</p>
+
+<pre><code>  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'/data/foo.dat'</span><span class="operator">,</span> <span class="string">delimiter</span> <span class="operator">=&gt;</span> <span class="string">'\s+'</span><span class="operator">);</span>
+  <span class="variable">$data</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'/data/foo.dat'</span><span class="operator">,</span> <span class="string">delimiter</span> <span class="operator">=&gt;</span> <span class="string">qr/\s+/</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="data-error-OR-GD::Graph::Data-error">$data-&gt;error() OR GD::Graph::Data-&gt;error()</h2>
+
+<p>Returns a list of all the errors that the current object has accumulated. In scalar context, returns the last error. If called as a class method it works at a class level.</p>
+
+<p>This method is inherited, see <a href="../../../lib/GD/Graph/Error.html">GD::Graph::Error</a> for more information.</p>
+
+<h2 id="data-has_error-OR-GD::Graph::Data-has_error">$data-&gt;has_error() OR GD::Graph::Data-&gt;has_error()</h2>
+
+<p>Returns true if the object (or class) has errors pending, false if not. In some cases (see <a href="#copy">&quot;copy&quot;</a>) this is the best way to check for errors.</p>
+
+<p>This method is inherited, see <a href="../../../lib/GD/Graph/Error.html">GD::Graph::Error</a> for more information.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>As with all Modules for Perl: Please stick to using the interface. If you try to fiddle too much with knowledge of the internals of this module, you could get burned. I may change them at any time. Specifically, I probably won&#39;t always keep this implemented as an array reference.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Martien Verbruggen &lt;mgjv@tradingpost.com.au&gt;</p>
+
+<h2 id="Copyright">Copyright</h2>
+
+<p>(c) Martien Verbruggen.</p>
+
+<p>All rights reserved. This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/GD/Graph.html">GD::Graph</a>, <a href="../../../lib/GD/Graph/Error.html">GD::Graph::Error</a></p>
+
+
+</body>
+
+</html>
+
+

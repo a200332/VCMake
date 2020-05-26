@@ -1,0 +1,114 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#THREAD-SUPPORT">THREAD SUPPORT</a></li>
+  <li><a href="#STORABLE-SUPPORT">STORABLE SUPPORT</a></li>
+  <li><a href="#RELIC-SUPPORT">RELIC SUPPORT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#MAINTAINER">MAINTAINER</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Tie::RefHash - use references as hash keys</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">require</span> <span class="number">5.004</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Tie::RefHash</span><span class="operator">;</span>
+    <span class="keyword">tie</span> <span class="variable">HASHVARIABLE</span><span class="operator">,</span> <span class="string">'Tie::RefHash'</span><span class="operator">,</span> <span class="variable">LIST</span><span class="operator">;</span>
+    <span class="keyword">tie</span> <span class="variable">HASHVARIABLE</span><span class="operator">,</span> <span class="string">'Tie::RefHash::Nestable'</span><span class="operator">,</span> <span class="variable">LIST</span><span class="operator">;</span>
+    
+    <span class="keyword">untie</span> <span class="variable">HASHVARIABLE</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides the ability to use references as hash keys if you first <code>tie</code> the hash variable to this module. Normally, only the keys of the tied hash itself are preserved as references; to use references as keys in hashes-of-hashes, use Tie::RefHash::Nestable, included as part of Tie::RefHash.</p>
+
+<p>It is implemented using the standard perl TIEHASH interface. Please see the <code>tie</code> entry in perlfunc(1) and perltie(1) for more information.</p>
+
+<p>The Nestable version works by looking for hash references being stored and converting them to tied hashes so that they too can have references as keys. This will happen without warning whenever you store a reference to one of your own hashes in the tied hash.</p>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Tie::RefHash</span><span class="operator">;</span>
+    <span class="keyword">tie</span> <span class="variable">%h</span><span class="operator">,</span> <span class="string">'Tie::RefHash'</span><span class="operator">;</span>
+    <span class="variable">$a</span> <span class="operator">=</span> <span class="operator">[]</span><span class="operator">;</span>
+    <span class="variable">$b</span> <span class="operator">=</span> <span class="operator">{}</span><span class="operator">;</span>
+    <span class="variable">$c</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">*main</span><span class="operator">;</span>
+    <span class="variable">$d</span> <span class="operator">=</span> <span class="operator">\</span><span class="string">"gunk"</span><span class="operator">;</span>
+    <span class="variable">$e</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'foo'</span> <span class="operator">};</span>
+    <span class="variable">%h</span> <span class="operator">=</span> <span class="operator">(</span><span class="variable">$a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="variable">$b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="variable">$c</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">,</span> <span class="variable">$d</span> <span class="operator">=&gt;</span> <span class="number">4</span><span class="operator">,</span> <span class="variable">$e</span> <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">);</span>
+    <span class="variable">$a</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=</span> <span class="string">'foo'</span><span class="operator">;</span>
+    <span class="variable">$b</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">'bar'</span><span class="operator">;</span>
+    <span class="keyword">for</span> <span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%h</span><span class="operator">)</span> <span class="operator">{</span>
+       <span class="keyword">print</span> <span class="keyword">ref</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">tie</span> <span class="variable">%h</span><span class="operator">,</span> <span class="string">'Tie::RefHash::Nestable'</span><span class="operator">;</span>
+    <span class="variable">$h</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$b</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+    <span class="keyword">for</span> <span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%h</span><span class="operator">,</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$h</span><span class="operator">{</span><span class="variable">$a</span><span class="operator">}}</span><span class="operator">)</span> <span class="operator">{</span>
+       <span class="keyword">print</span> <span class="keyword">ref</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="THREAD-SUPPORT">THREAD SUPPORT</h1>
+
+<p><a href="../../lib/Tie/RefHash.html">Tie::RefHash</a> fully supports threading using the <code>CLONE</code> method.</p>
+
+<h1 id="STORABLE-SUPPORT">STORABLE SUPPORT</h1>
+
+<p><a href="../../lib/Storable.html">Storable</a> hooks are provided for semantically correct serialization and cloning of tied refhashes.</p>
+
+<h1 id="RELIC-SUPPORT">RELIC SUPPORT</h1>
+
+<p>This version of Tie::RefHash seems to no longer work with 5.004. This has not been throughly investigated. Patches welcome ;-)</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<p>Yuval Kogman &lt;nothingmuch@woobling.org&gt;</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Gurusamy Sarathy gsar@activestate.com</p>
+
+<p>&#39;Nestable&#39; by Ed Avis ed@membled.com</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>perl(1), perlfunc(1), perltie(1)</p>
+
+
+</body>
+
+</html>
+
+

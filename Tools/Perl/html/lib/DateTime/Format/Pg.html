@@ -1,0 +1,340 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONSTRUCTORS">CONSTRUCTORS</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#PARSING-METHODS">PARSING METHODS</a></li>
+      <li><a href="#FORMATTING-METHODS">FORMATTING METHODS</a></li>
+    </ul>
+  </li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a>
+    <ul>
+      <li><a href="#TIME-ZONES">TIME ZONES</a></li>
+      <li><a href="#EUROPEAN-DATES">EUROPEAN DATES</a></li>
+      <li><a href="#INTERVAL-ELEMENTS">INTERVAL ELEMENTS</a></li>
+      <li><a href="#NEGATIVE-INTERVALS">NEGATIVE INTERVALS</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#AUTHOR-EMERITUS">AUTHOR EMERITUS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Pg - Parse and format PostgreSQL dates and times</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">DateTime::Format::Pg</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Pg</span><span class="operator">-&gt;</span><span class="variable">parse_datetime</span><span class="operator">(</span> <span class="string">'2003-01-16 23:12:01'</span> <span class="operator">);</span>
+  
+  <span class="comment"># 2003-01-16 23:12:01</span>
+  <span class="variable">DateTime::Format::Pg</span><span class="operator">-&gt;</span><span class="variable">format_datetime</span><span class="operator">(</span><span class="variable">$dt</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module understands the formats used by PostgreSQL for its DATE, TIME, TIMESTAMP, and INTERVAL data types. It can be used to parse these formats in order to create <code>DateTime</code> or <code>DateTime::Duration</code> objects, and it can take a <code>DateTime</code> or <code>DateTime::Duration</code> object and produce a string representing it in a format accepted by PostgreSQL.</p>
+
+<h1 id="CONSTRUCTORS">CONSTRUCTORS</h1>
+
+<p>The following methods can be used to create <code>DateTime::Format::Pg</code> objects.</p>
+
+<ul>
+
+<li><p>new( name =&gt; value, ... )</p>
+
+<p>Creates a new <code>DateTime::Format::Pg</code> instance. This is generally not required for simple operations. If you wish to use a different parsing style from the default then it is more comfortable to create an object.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Pg</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()</span>
+  <span class="keyword">my</span> <span class="variable">$copy</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'european'</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method accepts the following options:</p>
+
+<ul>
+
+<li><p>european</p>
+
+<p>If european is set to non-zero, dates are assumed to be in european dd/mm/yyyy format. The default is to assume US mm/dd/yyyy format (because this is the default for PostgreSQL).</p>
+
+<p>This option only has an effect if PostgreSQL is set to output dates in the &#39;PostgreSQL&#39; (DATE only) and &#39;SQL&#39; (DATE and TIMESTAMP) styles.</p>
+
+<p>Note that you don&#39;t have to set this option if the PostgreSQL server has been set to use the &#39;ISO&#39; format, which is the default.</p>
+
+</li>
+<li><p>server_tz</p>
+
+<p>This option can be set to a <code>DateTime::TimeZone</code> object or a string that contains a time zone name.</p>
+
+<p>This value must be set to the same value as the PostgreSQL server&#39;s time zone in order to parse TIMESTAMP WITH TIMEZONE values in the &#39;PostgreSQL&#39;, &#39;SQL&#39;, and &#39;German&#39; formats correctly.</p>
+
+<p>Note that you don&#39;t have to set this option if the PostgreSQL server has been set to use the &#39;ISO&#39; format, which is the default.</p>
+
+</li>
+</ul>
+
+</li>
+<li><p>clone()</p>
+
+<p>This method is provided for those who prefer to explicitly clone via a method called <code>clone()</code>.</p>
+
+<pre><code>   <span class="keyword">my</span> <span class="variable">$clone</span> <span class="operator">=</span> <span class="variable">$original</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">();</span>
+</code></pre>
+
+<p>If called as a class method it will die.</p>
+
+</li>
+</ul>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provides the following methods. The parse_datetime, parse_duration, format_datetime, and format_duration methods are general-purpose methods provided for compatibility with other <code>DateTime::Format</code> modules.</p>
+
+<p>The other methods are specific to the corresponding PostgreSQL date/time data types. The names of these methods are derived from the name of the PostgreSQL data type. (Note: Prior to PostgreSQL 7.3, the TIMESTAMP type was equivalent to the TIMESTAMP WITH TIME ZONE type. This data type corresponds to the format/parse_timestamp_with_time_zone method but not to the format/parse_timestamp method.)</p>
+
+<h2 id="PARSING-METHODS">PARSING METHODS</h2>
+
+<p>This class provides the following parsing methods.</p>
+
+<p>As a general rule, the parsing methods accept input in any format that the PostgreSQL server can produce. However, if PostgreSQL&#39;s DateStyle is set to &#39;SQL&#39; or &#39;PostgreSQL&#39;, dates can only be parsed correctly if the &#39;european&#39; option is set correctly (i.e. same as the PostgreSQL server). The same is true for time zones and the &#39;australian_timezones&#39; option in all modes but &#39;ISO&#39;.</p>
+
+<p>The default DateStyle, &#39;ISO&#39;, will always produce unambiguous results and is also parsed most efficiently by this parser class. I strongly recommend using this setting unless you have a good reason not to.</p>
+
+<ul>
+
+<li><p>parse_datetime($string,...)</p>
+
+<p>Given a string containing a date and/or time representation, this method will return a new <code>DateTime</code> object.</p>
+
+<p>If the input string does not contain a date, it is set to 1970-01-01. If the input string does not contain a time, it is set to 00:00:00. If the input string does not contain a time zone, it is set to the floating time zone.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_timestamptz($string,...)</p>
+
+</li>
+<li><p>parse_timestamp_with_time_zone($string,...)</p>
+
+<p>Given a string containing a timestamp (date and time) representation, this method will return a new <code>DateTime</code> object. This method is suitable for the TIMESTAMPTZ (or TIMESTAMP WITH TIME ZONE) type.</p>
+
+<p>If the input string does not contain a time zone, it is set to the floating time zone.</p>
+
+<p>Please note that PostgreSQL does not actually store a time zone along with the TIMESTAMP WITH TIME ZONE (or TIMESTAMPTZ) type but will just return a time stamp converted for the server&#39;s local time zone.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_timestamp($string,...)</p>
+
+</li>
+<li><p>parse_timestamp_without_time_zone($string,...)</p>
+
+<p>Similar to the functions above, but always returns a <code>DateTime</code> object with a floating time zone. This method is suitable for the TIMESTAMP (or TIMESTAMP WITHOUT TIME ZONE) type.</p>
+
+<p>If the server does return a time zone, it is ignored.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_timetz($string,...)</p>
+
+</li>
+<li><p>parse_time_with_time_zone($string,...)</p>
+
+<p>Given a string containing a time representation, this method will return a new <code>DateTime</code> object. The date is set to 1970-01-01. This method is suitable for the TIMETZ (or TIME WITH TIME ZONE) type.</p>
+
+<p>If the input string does not contain a time zone, it is set to the floating time zone.</p>
+
+<p>Please note that PostgreSQL stores a numerical offset with its TIME WITH TIME ZONE (or TIMETZ) type. It does not store a time zone name (such as &#39;Europe/Rome&#39;).</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_time($string,...)</p>
+
+</li>
+<li><p>parse_time_without_time_zone($string,...)</p>
+
+<p>Similar to the functions above, but always returns an <code>DateTime</code> object with a floating time zone. If the server returns a time zone, it is ignored. This method is suitable for use with the TIME (or TIME WITHOUT TIME ZONE) type.</p>
+
+<p>This ensures that the resulting <code>DateTime</code> object will always have the time zone expected by your application.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_date($string,...)</p>
+
+<p>Given a string containing a date representation, this method will return a new <code>DateTime</code> object. The time is set to 00:00:00 (floating time zone). This method is suitable for the DATE type.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+<li><p>parse_duration($string)</p>
+
+</li>
+<li><p>parse_interval($string)</p>
+
+<p>Given a string containing a duration (SQL type INTERVAL) representation, this method will return a new <code>DateTime::Duration</code> object.</p>
+
+<p>If given an improperly formatted string, this method may die.</p>
+
+</li>
+</ul>
+
+<h2 id="FORMATTING-METHODS">FORMATTING METHODS</h2>
+
+<p>This class provides the following formatting methods.</p>
+
+<p>The output is always in the format mandated by the SQL standard (derived from ISO 8601), which is parsed by PostgreSQL unambiguously in all DateStyle modes.</p>
+
+<ul>
+
+<li><p>format_datetime($datetime,...)</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string appropriate as input for all date and date/time types of PostgreSQL. It will contain date and time.</p>
+
+<p>If the time zone of the <code>DateTime</code> part is floating, the resulting string will contain no time zone, which will result in the server&#39;s time zone being used. Otherwise, the numerical offset of the time zone is used.</p>
+
+</li>
+<li><p>format_time($datetime,...)</p>
+
+</li>
+<li><p>format_time_without_time_zone($datetime,...)</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string appropriate as input for the TIME type (also known as TIME WITHOUT TIME ZONE), which will contain the local time of the <code>DateTime</code> object and no time zone.</p>
+
+</li>
+<li><p>format_timetz($datetime)</p>
+
+</li>
+<li><p>format_time_with_time_zone($datetime)</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string appropriate as input for the TIME WITH TIME ZONE type (also known as TIMETZ), which will contain the local part of the <code>DateTime</code> object and a numerical time zone.</p>
+
+<p>You should not use the TIME WITH TIME ZONE type to store dates with floating time zones. If the time zone of the <code>DateTime</code> part is floating, the resulting string will contain no time zone, which will result in the server&#39;s time zone being used.</p>
+
+</li>
+<li><p>format_date($datetime)</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string appropriate as input for the DATE type, which will contain the date part of the <code>DateTime</code> object.</p>
+
+</li>
+<li><p>format_timestamp($datetime)</p>
+
+</li>
+<li><p>format_timestamp_without_time_zone($datetime)</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string appropriate as input for the TIMESTAMP type (also known as TIMESTAMP WITHOUT TIME ZONE), which will contain the local time of the <code>DateTime</code> object and no time zone.</p>
+
+</li>
+<li><p>format_timestamptz($datetime)</p>
+
+</li>
+<li><p>format_timestamp_with_time_zone($datetime)</p>
+
+<p>Given a <code>DateTime</code> object, this method returns a string appropriate as input for the TIMESTAMP WITH TIME ZONE type, which will contain the local part of the <code>DateTime</code> object and a numerical time zone.</p>
+
+<p>You should not use the TIMESTAMP WITH TIME ZONE type to store dates with floating time zones. If the time zone of the <code>DateTime</code> part is floating, the resulting string will contain no time zone, which will result in the server&#39;s time zone being used.</p>
+
+</li>
+<li><p>format_duration($du)</p>
+
+</li>
+<li><p>format_interval($du)</p>
+
+<p>Given a <code>DateTime::Duration</code> object, this method returns a string appropriate as input for the INTERVAL type.</p>
+
+</li>
+</ul>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>Some output formats of PostgreSQL have limitations that can only be passed on by this class.</p>
+
+<p>As a general rules, none of these limitations apply to the &#39;ISO&#39; output format. It is strongly recommended to use this format (and to use PostgreSQL&#39;s to_char function when another output format that&#39;s not supposed to be handled by a parser of this class is desired). &#39;ISO&#39; is the default but you are advised to explicitly set it at the beginning of the session by issuing a SET DATESTYLE TO &#39;ISO&#39;; command in case the server administrator changes that setting.</p>
+
+<p>When formatting DateTime objects, this class always uses a format that&#39;s handled unambiguously by PostgreSQL.</p>
+
+<h2 id="TIME-ZONES">TIME ZONES</h2>
+
+<p>If DateStyle is set to &#39;PostgreSQL&#39;, &#39;SQL&#39;, or &#39;German&#39;, PostgreSQL does not send numerical time zones for the TIMESTAMPTZ (or TIMESTAMP WITH TIME ZONE) type. Unfortunately, the time zone names used instead can be ambiguous: For example, &#39;EST&#39; can mean -0500, +1000, or +1100.</p>
+
+<p>You must set the &#39;server_tz&#39; variable to a time zone that is identical to that of the PostgreSQL server. If the server is set to a different time zone (or the underlying operating system interprets the time zone differently), the parser will return wrong times.</p>
+
+<p>You can avoid such problems by setting the server&#39;s time zone to UTC using the SET TIME ZONE &#39;UTC&#39; command and setting &#39;server_tz&#39; parameter to &#39;UTC&#39; (or by using the ISO output format, of course).</p>
+
+<h2 id="EUROPEAN-DATES">EUROPEAN DATES</h2>
+
+<p>For the SQL (for DATE and TIMSTAMP[TZ]) and the PostgreSQL (for DATE) output format, the server can send dates in both European-style &#39;dd/mm/yyyy&#39; and in US-style &#39;mm/dd/yyyy&#39; format. In order to parse these dates correctly, you have to pass the &#39;european&#39; option to the constructor or to the <code>parse_xxx</code> routines.</p>
+
+<p>This problem does not occur when using the ISO or German output format (and for PostgreSQL with TIMESTAMP[TZ] as month names are used then).</p>
+
+<h2 id="INTERVAL-ELEMENTS">INTERVAL ELEMENTS</h2>
+
+<p><code>DateTime::Duration</code> stores months, days, minutes and seconds separately. PostgreSQL only stores months and seconds and disregards the irregular length of days due to DST switching and the irregular length of minutes due to leap seconds. Therefore, it is not possible to store <code>DateTime::Duration</code> objects as SQL INTERVALs without the loss of some information.</p>
+
+<h2 id="NEGATIVE-INTERVALS">NEGATIVE INTERVALS</h2>
+
+<p>In the SQL and German output formats, the server does not send an indication of the sign with intervals. This means that &#39;1 month ago&#39; and &#39;1 month&#39; are both returned as &#39;1 mon&#39;.</p>
+
+<p>This problem can only be avoided by using the &#39;ISO&#39; or &#39;PostgreSQL&#39; output format.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support for this module is provided via the datetime@perl.org email list. See http://lists.perl.org/ for more details.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Daisuke Maki &lt;daisuke@endeworks.jp&gt;</p>
+
+<h1 id="AUTHOR-EMERITUS">AUTHOR EMERITUS</h1>
+
+<p>Claus A. Faerber &lt;perl@faerber.muc.de&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2003 Claus A. Faerber. Copyright (c) 2005-2007 Daisuke Maki</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>datetime@perl.org mailing list</p>
+
+<p>http://datetime.perl.org/</p>
+
+
+</body>
+
+</html>
+
+

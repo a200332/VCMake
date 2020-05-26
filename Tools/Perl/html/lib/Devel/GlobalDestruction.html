@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Devel::GlobalDestruction - Provides function returning the equivalent of <code><span class="operator">${^</span><span class="variable">GLOBAL_PHASE</span><span class="operator">}</span> <span class="keyword">eq</span> <span class="string">'DESTRUCT'</span>
+</code> for older perls.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Devel::GlobalDestruction</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">namespace::clean</span><span class="operator">;</span> <span class="comment"># to avoid having an "in_global_destruction" method</span>
+    
+    <span class="keyword">sub</span><span class="variable"> DESTROY </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">in_global_destruction</span><span class="operator">;</span>
+    
+        <span class="variable">do_something_a_little_tricky</span><span class="operator">();</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl&#39;s global destruction is a little tricky to deal with WRT finalizers because it&#39;s not ordered and objects can sometimes disappear.</p>
+
+<p>Writing defensive destructors is hard and annoying, and usually if global destruction is happening you only need the destructors that free up non process local resources to actually execute.</p>
+
+<p>For these constructors you can avoid the mess by simply bailing out if global destruction is in effect.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>This module uses <a href="../../lib/Sub/Exporter/Progressive.html">Sub::Exporter::Progressive</a> so the exports may be renamed, aliased, etc. if <a href="../../lib/Sub/Exporter.html">Sub::Exporter</a> is present.</p>
+
+<dl>
+
+<dt id="in_global_destruction">in_global_destruction</dt>
+<dd>
+
+<p>Returns true if the interpreter is in global destruction. In perl 5.14+, this returns <code><span class="operator">${^</span><span class="variable">GLOBAL_PHASE</span><span class="operator">}</span> <span class="keyword">eq</span> <span class="string">'DESTRUCT'</span>
+</code>, and on earlier perls, detects it using the value of <code>PL_main_cv</code> or <code>PL_dirty</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Yuval Kogman &lt;nothingmuch@woobling.org&gt;</p>
+
+<p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+<p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+<p>Peter Rabbitson &lt;ribasushi@cpan.org&gt;</p>
+
+<p>Arthur Axel &#39;fREW&#39; Schmidt &lt;frioux@gmail.com&gt;</p>
+
+<p>Elizabeth Mattijsen &lt;liz@dijkmat.nl&gt;</p>
+
+<p>Greham Knop &lt;haarg@haarg.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<pre><code>    Copyright (c) 2008 Yuval Kogman. All rights reserved
+    This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.</code></pre>
+
+
+</body>
+
+</html>
+
+

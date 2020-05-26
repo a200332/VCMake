@@ -1,0 +1,333 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#BOILERPLATE">BOILERPLATE</a>
+    <ul>
+      <li><a href="#THE-TEST-FILE">THE TEST FILE</a></li>
+      <li><a href="#DIST-CONFIG">DIST CONFIG</a>
+        <ul>
+          <li><a href="#Dist::Zilla">Dist::Zilla</a></li>
+          <li><a href="#ExtUtils::MakeMaker">ExtUtils::MakeMaker</a></li>
+          <li><a href="#Module::Install">Module::Install</a></li>
+          <li><a href="#Module::Build">Module::Build</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#MAKING-ASSERTIONS">MAKING ASSERTIONS</a></li>
+  <li><a href="#RUNNING-THE-TEST">RUNNING THE TEST</a>
+    <ul>
+      <li><a href="#RUN-DIRECTLY">RUN DIRECTLY</a></li>
+      <li><a href="#USING-YATH">USING YATH</a></li>
+      <li><a href="#USING-PROVE">USING PROVE</a></li>
+    </ul>
+  </li>
+  <li><a href="#THE-PLAN">THE &quot;PLAN&quot;</a></li>
+  <li><a href="#ADDITIONAL-ASSERTION-TOOLS">ADDITIONAL ASSERTION TOOLS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Manual::Testing::Introduction - Introduction to testing with Test2.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This tutorial is a beginners introduction to testing. This will take you through writing a test file, making assertions, and running your test.</p>
+
+<h1 id="BOILERPLATE">BOILERPLATE</h1>
+
+<h2 id="THE-TEST-FILE">THE TEST FILE</h2>
+
+<p>Test files typically are placed inside the <code>t/</code> directory, and end with the <code>.t</code> file extension.</p>
+
+<p><code>t/example.t</code>:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span><span class="operator">;</span>
+    
+    <span class="comment"># Assertions will go here</span>
+    
+    <span class="variable">done_testing</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is all the boilerplate you need.</p>
+
+<dl>
+
+<dt id="use-Test2::V0">use Test2::V0;</dt>
+<dd>
+
+<p>This loads a collection of testing tools that will be described later in the tutorial. This will also turn on <code>strict</code> and <code>warnings</code> for you.</p>
+
+</dd>
+<dt id="done_testing">done_testing;</dt>
+<dd>
+
+<p>This should always be at the end of your test files. This tells <a href="../../../../lib/Test2.html">Test2</a> that you are done making assertions. This is important as <code>test2</code> will assume the test did not complete successfully without this, or some other form of test &quot;plan&quot;.</p>
+
+</dd>
+</dl>
+
+<h2 id="DIST-CONFIG">DIST CONFIG</h2>
+
+<p>You should always list bundles and tools directly. You should not simply list <a href="../../../../lib/Test2/Suite.html">Test2::Suite</a> and call it done, bundles and tools may be moved out of <a href="../../../../lib/Test2/Suite.html">Test2::Suite</a> to their own dists at any time.</p>
+
+<h3 id="Dist::Zilla">Dist::Zilla</h3>
+
+<pre><code>    [Prereqs / TestRequires]
+    Test2::V0 = 0.000060</code></pre>
+
+<h3 id="ExtUtils::MakeMaker">ExtUtils::MakeMaker</h3>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">%WriteMakefileArgs</span> <span class="operator">=</span> <span class="operator">(</span>
+      <span class="operator">...,</span>
+      <span class="string">"TEST_REQUIRES"</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="string">"Test2::V0"</span> <span class="operator">=&gt;</span> <span class="string">"0.000060"</span>
+      <span class="operator">}</span><span class="operator">,</span>
+      <span class="operator">...</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h3 id="Module::Install">Module::Install</h3>
+
+<pre><code>    <span class="variable">test_requires</span> <span class="string">'Test2::V0'</span> <span class="operator">=&gt;</span> <span class="string">'0.000060'</span><span class="operator">;</span>
+</code></pre>
+
+<h3 id="Module::Build">Module::Build</h3>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$build</span> <span class="operator">=</span> <span class="variable">Module::Build</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="operator">...,</span>
+        <span class="string">test_requires</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">"Test2::V0"</span> <span class="operator">=&gt;</span> <span class="string">"0.000060"</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">...</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="MAKING-ASSERTIONS">MAKING ASSERTIONS</h1>
+
+<p>The most simple tool for making assertions is <code>ok()</code>. <code>ok()</code> lets you assert that a condition is true.</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span><span class="variable">$CONDITION</span><span class="operator">,</span> <span class="string">"Description of the condition"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Here is a complete <code>t/example.t</code>:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span><span class="operator">;</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"1 is true, so this will pass"</span><span class="operator">);</span>
+    
+    <span class="variable">done_testing</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="RUNNING-THE-TEST">RUNNING THE TEST</h1>
+
+<p>Test files are simply scripts. Just like any other script you can run the test directly with perl. Another option is to use a test &quot;harness&quot; which runs the test for you, and provides extra information and checks the scripts exit value for you.</p>
+
+<h2 id="RUN-DIRECTLY">RUN DIRECTLY</h2>
+
+<pre><code>    $ perl -Ilib t/example.t</code></pre>
+
+<p>Which should produce output like this:</p>
+
+<pre><code>    # Seeded srand with seed &#39;20161028&#39; from local date.
+    ok 1 - 1 is true, so this will pass
+    1..1</code></pre>
+
+<p>If the test had failed (<code>ok(0, ...)</code>) it would look like this:</p>
+
+<pre><code>    # Seeded srand with seed &#39;20161028&#39; from local date.
+    not ok 1 - 0 is false, so this will fail
+    1..1</code></pre>
+
+<p>Test2 will also set the exit value of the script, a successful run will have an exit value of 0, a failed run will have a non-zero exit value.</p>
+
+<h2 id="USING-YATH">USING YATH</h2>
+
+<p>The <code>yath</code> command line tool is provided by <a>Test2::Harness</a> which you may need to install yourself from cpan. <code>yath</code> is the harness written specifically for <a href="../../../../lib/Test2.html">Test2</a>.</p>
+
+<pre><code>    $ yath -Ilib t/example.t</code></pre>
+
+<p>This will produce output similar to this:</p>
+
+<pre><code>    ( PASSED )  job  1    t/example.t
+
+    ================================================================================
+
+    Run ID: 1508027909
+
+    All tests were successful!</code></pre>
+
+<p>You can also request verbose output with the <code>-v</code> flag:</p>
+
+<pre><code>    $ yath -Ilib -v t/example.t</code></pre>
+
+<p>Which produces:</p>
+
+<pre><code>    ( LAUNCH )  job  1    example.t
+    (  NOTE  )  job  1    Seeded srand with seed &#39;20171014&#39; from local date.
+    [  PASS  ]  job  1  + 1 is true, so this will pass
+    [  PLAN  ]  job  1    Expected asserions: 1
+    ( PASSED )  job  1    example.t
+
+    ================================================================================
+
+    Run ID: 1508028002
+
+    All tests were successful!</code></pre>
+
+<h2 id="USING-PROVE">USING PROVE</h2>
+
+<p>The <code>prove</code> command line tool is provided by the <a href="../../../../lib/Test/Harness.html">Test::Harness</a> module which comes with most versions of perl. <a href="../../../../lib/Test/Harness.html">Test::Harness</a> is dual-life, which means you can also install the latest version from cpan.</p>
+
+<pre><code>    $ prove -Ilib t/example.t</code></pre>
+
+<p>This will produce output like this:</p>
+
+<pre><code>    example.t .. ok
+    All tests successful.
+    Files=1, Tests=1,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.05 cusr  0.00 csys =  0.06 CPU)
+    Result: PASS</code></pre>
+
+<p>You can also request verbose output with the <code>-v</code> flag:</p>
+
+<pre><code>    $ prove -Ilib -v t/example.t</code></pre>
+
+<p>The verbose output looks like this:</p>
+
+<pre><code>    example.t ..
+    # Seeded srand with seed &#39;20161028&#39; from local date.
+    ok 1 - 1 is true, so this will pass
+    1..1
+    ok
+    All tests successful.
+    Files=1, Tests=1,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.06 cusr  0.00 csys =  0.08 CPU)
+    Result: PASS</code></pre>
+
+<h1 id="THE-PLAN">THE &quot;PLAN&quot;</h1>
+
+<p>All tests need a &quot;plan&quot;. The job of a plan is to make sure you ran all the tests you expected. The plan prevents a passing result from a test that exits before all the tests are run.</p>
+
+<p>There are 2 primary ways to set the plan:</p>
+
+<dl>
+
+<dt id="done_testing1">done_testing()</dt>
+<dd>
+
+<p>The most common, and recommended way to set a plan is to add <code>done_testing</code> at the end of your test file. This will automatically calculate the plan for you at the end of the test. If the test were to exit early then <code>done_testing</code> would not run and no plan would be found, forcing a failure.</p>
+
+</dd>
+<dt id="plan-COUNT">plan($COUNT)</dt>
+<dd>
+
+<p>The <code>plan()</code> function allows you to specify an exact number of assertions you want to run. If you run too many or too few assertions then the plan will not match and it will be counted as a failure. The primary problem with this way of planning is that you need to add up the number of assertions, and adjust the count whenever you update the test file.</p>
+
+<p><code>plan()</code> must be used before all assertions, or after all assertions, it cannot be done in the middle of making assertions.</p>
+
+</dd>
+</dl>
+
+<h1 id="ADDITIONAL-ASSERTION-TOOLS">ADDITIONAL ASSERTION TOOLS</h1>
+
+<p>The <a href="../../../../lib/Test2/V0.html">Test2::V0</a> bundle provides a lot more than <code>ok()</code>, <code>plan()</code>, and <code>done_testing()</code>. The biggest tools to note are:</p>
+
+<dl>
+
+<dt id="is-a-b-description">is($a, $b, $description)</dt>
+<dd>
+
+<p><code>is()</code> allows you to compare 2 structures and insure they are identical. You can use it for simple string comparisons, or even deep data structure comparisons.</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="string">"foo"</span><span class="operator">,</span> <span class="string">"foo"</span><span class="operator">,</span> <span class="string">"Both strings are identical"</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="string">"foo"</span><span class="operator">,</span> <span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">"foo"</span><span class="operator">,</span> <span class="number">1</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Both arrays contain the same elements"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="like-a-b-description">like($a, $b, $description)</dt>
+<dd>
+
+<p><code>like()</code> is similar to <code>is()</code> except that it only checks items listed on the right, it ignores any extra values found on the left.</p>
+
+<pre><code>    <span class="variable">like</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">4</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Passes, the extra element on the left is ignored"</span><span class="operator">);</span>
+</code></pre>
+
+<p>You can also used regular expressions on the right hand side:</p>
+
+<pre><code>    <span class="variable">like</span><span class="operator">(</span><span class="string">"foo bar baz"</span><span class="operator">,</span> <span class="string">qr/bar/</span><span class="operator">,</span> <span class="string">"The string matches the regex, this passes"</span><span class="operator">);</span>
+</code></pre>
+
+<p>You can also nest the regexes:</p>
+
+<pre><code>    <span class="variable">like</span><span class="operator">(</span><span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="string">'foo bar baz'</span><span class="operator">,</span> <span class="number">3</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="string">qr/bar/</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"This passes"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Test2/Manual.html">Test2::Manual</a> - Primary index of the manual.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Manual can be found at <i>http://github.com/Test-More/Test2-Manual/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

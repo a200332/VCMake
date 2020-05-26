@@ -1,0 +1,1553 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#IMPORTANT-LINKS">IMPORTANT LINKS</a></li>
+  <li><a href="#CONSTRUCTOR-AND-STARTUP">CONSTRUCTOR AND STARTUP</a>
+    <ul>
+      <li><a href="#new">new()</a></li>
+      <li><a href="#mech-agent_alias-alias">$mech-&gt;agent_alias( $alias )</a></li>
+      <li><a href="#known_agent_aliases">known_agent_aliases()</a></li>
+    </ul>
+  </li>
+  <li><a href="#PAGE-FETCHING-METHODS">PAGE-FETCHING METHODS</a>
+    <ul>
+      <li><a href="#mech-get-uri">$mech-&gt;get( $uri )</a></li>
+      <li><a href="#mech-put-uri-content-content">$mech-&gt;put( $uri, content =&gt; $content )</a></li>
+      <li><a href="#mech-reload">$mech-&gt;reload()</a></li>
+      <li><a href="#mech-back">$mech-&gt;back()</a></li>
+      <li><a href="#mech-history_count">$mech-&gt;history_count()</a></li>
+      <li><a href="#mech-history-n">$mech-&gt;history($n)</a></li>
+    </ul>
+  </li>
+  <li><a href="#STATUS-METHODS">STATUS METHODS</a>
+    <ul>
+      <li><a href="#mech-success">$mech-&gt;success()</a></li>
+      <li><a href="#mech-uri">$mech-&gt;uri()</a></li>
+      <li><a href="#mech-response-mech-res">$mech-&gt;response() / $mech-&gt;res()</a></li>
+      <li><a href="#mech-status">$mech-&gt;status()</a></li>
+      <li><a href="#mech-ct-mech-content_type">$mech-&gt;ct() / $mech-&gt;content_type()</a></li>
+      <li><a href="#mech-base">$mech-&gt;base()</a></li>
+      <li><a href="#mech-forms">$mech-&gt;forms()</a></li>
+      <li><a href="#mech-current_form">$mech-&gt;current_form()</a></li>
+      <li><a href="#mech-links">$mech-&gt;links()</a></li>
+      <li><a href="#mech-is_html">$mech-&gt;is_html()</a></li>
+      <li><a href="#mech-title">$mech-&gt;title()</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONTENT-HANDLING-METHODS">CONTENT-HANDLING METHODS</a>
+    <ul>
+      <li><a href="#mech-content">$mech-&gt;content(...)</a></li>
+      <li><a href="#mech-text">$mech-&gt;text()</a></li>
+    </ul>
+  </li>
+  <li><a href="#LINK-METHODS">LINK METHODS</a>
+    <ul>
+      <li><a href="#mech-links1">$mech-&gt;links()</a></li>
+      <li><a href="#mech-follow_link">$mech-&gt;follow_link(...)</a></li>
+      <li><a href="#mech-find_link">$mech-&gt;find_link( ... )</a></li>
+      <li><a href="#mech-find_all_links">$mech-&gt;find_all_links( ... )</a></li>
+      <li><a href="#mech-find_all_inputs-...-criteria">$mech-&gt;find_all_inputs( ... criteria ... )</a></li>
+      <li><a href="#mech-find_all_submits-...-criteria">$mech-&gt;find_all_submits( ... criteria ... )</a></li>
+    </ul>
+  </li>
+  <li><a href="#IMAGE-METHODS">IMAGE METHODS</a>
+    <ul>
+      <li><a href="#mech-images">$mech-&gt;images</a></li>
+      <li><a href="#mech-find_image">$mech-&gt;find_image()</a></li>
+      <li><a href="#mech-find_all_images">$mech-&gt;find_all_images( ... )</a></li>
+    </ul>
+  </li>
+  <li><a href="#FORM-METHODS">FORM METHODS</a>
+    <ul>
+      <li><a href="#mech-forms1">$mech-&gt;forms</a></li>
+      <li><a href="#mech-form_number-number">$mech-&gt;form_number($number)</a></li>
+      <li><a href="#mech-form_name-name">$mech-&gt;form_name( $name )</a></li>
+      <li><a href="#mech-form_id-name">$mech-&gt;form_id( $name )</a></li>
+      <li><a href="#mech-all_forms_with_fields-fields">$mech-&gt;all_forms_with_fields( @fields )</a></li>
+      <li><a href="#mech-form_with_fields-fields">$mech-&gt;form_with_fields( @fields )</a></li>
+      <li><a href="#mech-all_forms_with-attr1-value1-attr2-value2">$mech-&gt;all_forms_with( $attr1 =&gt; $value1, $attr2 =&gt; $value2, ... )</a></li>
+      <li><a href="#mech-form_with-attr1-value1-attr2-value2">$mech-&gt;form_with( $attr1 =&gt; $value1, $attr2 =&gt; $value2, ... )</a></li>
+    </ul>
+  </li>
+  <li><a href="#FIELD-METHODS">FIELD METHODS</a>
+    <ul>
+      <li><a href="#mech-field-name-value-number">$mech-&gt;field( $name, $value, $number )</a></li>
+      <li><a href="#mech-field-name-values-number">$mech-&gt;field( $name, \@values, $number )</a></li>
+      <li><a href="#mech-select-name-value">$mech-&gt;select($name, $value)</a></li>
+      <li><a href="#mech-select-name-values">$mech-&gt;select($name, \@values)</a></li>
+      <li><a href="#mech-set_fields-name-value">$mech-&gt;set_fields( $name =&gt; $value ... )</a></li>
+      <li><a href="#mech-set_visible-criteria">$mech-&gt;set_visible( @criteria )</a></li>
+      <li><a href="#mech-tick-name-value-set">$mech-&gt;tick( $name, $value [, $set] )</a></li>
+      <li><a href="#mech-untick-name-value">$mech-&gt;untick($name, $value)</a></li>
+      <li><a href="#mech-value-name-number">$mech-&gt;value( $name [, $number] )</a></li>
+      <li><a href="#mech-click-button-x-y">$mech-&gt;click( $button [, $x, $y] )</a></li>
+      <li><a href="#mech-click_button">$mech-&gt;click_button( ... )</a></li>
+      <li><a href="#mech-submit">$mech-&gt;submit()</a></li>
+      <li><a href="#mech-submit_form">$mech-&gt;submit_form( ... )</a></li>
+    </ul>
+  </li>
+  <li><a href="#MISCELLANEOUS-METHODS">MISCELLANEOUS METHODS</a>
+    <ul>
+      <li><a href="#mech-add_header-name-value-name-value">$mech-&gt;add_header( name =&gt; $value [, name =&gt; $value... ] )</a></li>
+      <li><a href="#mech-delete_header-name-name">$mech-&gt;delete_header( name [, name ... ] )</a></li>
+      <li><a href="#mech-quiet-true-false">$mech-&gt;quiet(true/false)</a></li>
+      <li><a href="#mech-stack_depth-max_depth">$mech-&gt;stack_depth( $max_depth )</a></li>
+      <li><a href="#mech-save_content-filename-opts">$mech-&gt;save_content( $filename, %opts )</a></li>
+      <li><a href="#mech-dump_headers-fh">$mech-&gt;dump_headers( [$fh] )</a></li>
+      <li><a href="#mech-dump_links-fh-absolute">$mech-&gt;dump_links( [[$fh], $absolute] )</a></li>
+      <li><a href="#mech-dump_images-fh-absolute">$mech-&gt;dump_images( [[$fh], $absolute] )</a></li>
+      <li><a href="#mech-dump_forms-fh">$mech-&gt;dump_forms( [$fh] )</a></li>
+      <li><a href="#mech-dump_text-fh">$mech-&gt;dump_text( [$fh] )</a></li>
+    </ul>
+  </li>
+  <li><a href="#OVERRIDDEN-LWP::UserAgent-METHODS">OVERRIDDEN LWP::UserAgent METHODS</a>
+    <ul>
+      <li><a href="#mech-clone">$mech-&gt;clone()</a></li>
+      <li><a href="#mech-redirect_ok">$mech-&gt;redirect_ok()</a></li>
+      <li><a href="#mech-request-request-arg-size">$mech-&gt;request( $request [, $arg [, $size]])</a></li>
+      <li><a href="#mech-update_html-html">$mech-&gt;update_html( $html )</a></li>
+      <li><a href="#mech-credentials-username-password">$mech-&gt;credentials( $username, $password )</a></li>
+      <li><a href="#mech-get_basic_credentials-realm-uri-isproxy">$mech-&gt;get_basic_credentials( $realm, $uri, $isproxy )</a></li>
+      <li><a href="#mech-clear_credentials">$mech-&gt;clear_credentials()</a></li>
+    </ul>
+  </li>
+  <li><a href="#INHERITED-UNCHANGED-LWP::UserAgent-METHODS">INHERITED UNCHANGED LWP::UserAgent METHODS</a>
+    <ul>
+      <li><a href="#mech-head">$mech-&gt;head()</a></li>
+      <li><a href="#mech-post">$mech-&gt;post()</a></li>
+      <li><a href="#mech-mirror">$mech-&gt;mirror()</a></li>
+      <li><a href="#mech-simple_request">$mech-&gt;simple_request()</a></li>
+      <li><a href="#mech-is_protocol_supported">$mech-&gt;is_protocol_supported()</a></li>
+      <li><a href="#mech-prepare_request">$mech-&gt;prepare_request()</a></li>
+      <li><a href="#mech-progress">$mech-&gt;progress()</a></li>
+    </ul>
+  </li>
+  <li><a href="#INTERNAL-ONLY-METHODS">INTERNAL-ONLY METHODS</a>
+    <ul>
+      <li><a href="#mech-_update_page-request-response">$mech-&gt;_update_page($request, $response)</a></li>
+      <li><a href="#mech-_modify_request-req">$mech-&gt;_modify_request( $req )</a></li>
+      <li><a href="#mech-_make_request">$mech-&gt;_make_request()</a></li>
+      <li><a href="#mech-_reset_page">$mech-&gt;_reset_page()</a></li>
+      <li><a href="#mech-_extract_links">$mech-&gt;_extract_links()</a></li>
+      <li><a href="#mech-_push_page_stack">$mech-&gt;_push_page_stack()</a></li>
+      <li><a href="#warn-messages">warn( @messages )</a></li>
+      <li><a href="#die-messages">die( @messages )</a></li>
+    </ul>
+  </li>
+  <li><a href="#WWW::MECHANIZES-GIT-REPOSITORY">WWW::MECHANIZE&#39;S GIT REPOSITORY</a></li>
+  <li><a href="#OTHER-DOCUMENTATION">OTHER DOCUMENTATION</a>
+    <ul>
+      <li><a href="#Spidering-Hacks-by-Kevin-Hemenway-and-Tara-Calishain">Spidering Hacks, by Kevin Hemenway and Tara Calishain</a></li>
+    </ul>
+  </li>
+  <li><a href="#ONLINE-RESOURCES-AND-SUPPORT">ONLINE RESOURCES AND SUPPORT</a></li>
+  <li><a href="#ARTICLES-ABOUT-WWW::MECHANIZE">ARTICLES ABOUT WWW::MECHANIZE</a>
+    <ul>
+      <li><a href="#Other-modules-that-use-Mechanize">Other modules that use Mechanize</a></li>
+    </ul>
+  </li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>WWW::Mechanize - Handy web browsing in a Perl object</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.86</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>WWW::Mechanize supports performing a sequence of page fetches including following links and submitting forms. Each fetched page is parsed and its links and forms are extracted. A link or a form can be selected, form fields can be filled and the next page can be fetched. Mech also stores a history of the URLs you&#39;ve visited, which can be queried and revisited.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">WWW::Mechanize</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$mech</span> <span class="operator">=</span> <span class="variable">WWW::Mechanize</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+    
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">);</span>
+    
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">n</span> <span class="operator">=&gt;</span> <span class="number">3</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">text_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/download this/i</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">url</span> <span class="operator">=&gt;</span> <span class="string">'http://host.com/index.html'</span> <span class="operator">);</span>
+    
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">submit_form</span><span class="operator">(</span>
+        <span class="string">form_number</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">,</span>
+        <span class="string">fields</span>      <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">username</span>    <span class="operator">=&gt;</span> <span class="string">'mungo'</span><span class="operator">,</span>
+            <span class="string">password</span>    <span class="operator">=&gt;</span> <span class="string">'lost-and-alone'</span><span class="operator">,</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">submit_form</span><span class="operator">(</span>
+        <span class="string">form_name</span> <span class="operator">=&gt;</span> <span class="string">'search'</span><span class="operator">,</span>
+        <span class="string">fields</span>    <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">query</span>  <span class="operator">=&gt;</span> <span class="string">'pot of gold'</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">button</span>    <span class="operator">=&gt;</span> <span class="string">'Search Now'</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>WWW::Mechanize</code>, or Mech for short, is a Perl module for stateful programmatic web browsing, used for automating interaction with websites.</p>
+
+<p>Features include:</p>
+
+<ul>
+
+<li><p>All HTTP methods</p>
+
+</li>
+<li><p>High-level hyperlink and HTML form support, without having to parse HTML yourself</p>
+
+</li>
+<li><p>SSL support</p>
+
+</li>
+<li><p>Automatic cookies</p>
+
+</li>
+<li><p>Custom HTTP headers</p>
+
+</li>
+<li><p>Automatic handling of redirections</p>
+
+</li>
+<li><p>Proxies</p>
+
+</li>
+<li><p>HTTP authentication</p>
+
+</li>
+</ul>
+
+<p>Mech is well suited for use in testing web applications. If you use one of the Test::*, like <a>Test::HTML::Lint</a> modules, you can check the fetched content and use that as input to a test call.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::More</span><span class="operator">;</span>
+    <span class="variable">like</span><span class="operator">(</span> <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">(),</span> <span class="string">qr/</span><span class="variable">$expected</span><span class="string">/</span><span class="operator">,</span> <span class="string">"Got expected content"</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Each page fetch stores its URL in a history stack which you can traverse.</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">back</span><span class="operator">();</span>
+</code></pre>
+
+<p>If you want finer control over your page fetching, you can use these methods. <code>follow_link</code> and <code>submit_form</code> are just high level wrappers around them.</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_link</span><span class="operator">(</span> <span class="string">n</span> <span class="operator">=&gt;</span> <span class="variable">$number</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">form_number</span><span class="operator">(</span> <span class="variable">$number</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">form_name</span><span class="operator">(</span> <span class="variable">$name</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">field</span><span class="operator">(</span> <span class="variable">$name</span><span class="operator">,</span> <span class="variable">$value</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">set_fields</span><span class="operator">(</span> <span class="variable">%field_values</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">set_visible</span><span class="operator">(</span> <span class="variable">@criteria</span> <span class="operator">);</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">click</span><span class="operator">(</span> <span class="variable">$button</span> <span class="operator">);</span>
+</code></pre>
+
+<p><a href="../../lib/WWW/Mechanize.html">WWW::Mechanize</a> is a proper subclass of <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> and you can also use any of <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>&#39;s methods.</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">add_header</span><span class="operator">(</span><span class="variable">$name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span><span class="operator">);</span>
+</code></pre>
+
+<p>Please note that Mech does NOT support JavaScript, you need additional software for that. Please check <a href="../../lib/WWW/Mechanize/FAQ.html#JavaScript">&quot;JavaScript&quot; in WWW::Mechanize::FAQ</a> for more.</p>
+
+<h1 id="IMPORTANT-LINKS">IMPORTANT LINKS</h1>
+
+<ul>
+
+<li><p><a href="https://github.com/libwww-perl/WWW-Mechanize/issues">https://github.com/libwww-perl/WWW-Mechanize/issues</a></p>
+
+<p>The queue for bugs &amp; enhancements in WWW::Mechanize and Test::WWW::Mechanize. Please note that the queue at <a href="http://rt.cpan.org">http://rt.cpan.org</a> is no longer maintained.</p>
+
+</li>
+<li><p><a href="http://search.cpan.org/dist/WWW-Mechanize/">http://search.cpan.org/dist/WWW-Mechanize/</a></p>
+
+<p>The CPAN documentation page for Mechanize.</p>
+
+</li>
+<li><p><a href="http://search.cpan.org/dist/WWW-Mechanize/lib/WWW/Mechanize/FAQ.pod">http://search.cpan.org/dist/WWW-Mechanize/lib/WWW/Mechanize/FAQ.pod</a></p>
+
+<p>Frequently asked questions. Make sure you read here FIRST.</p>
+
+</li>
+</ul>
+
+<h1 id="CONSTRUCTOR-AND-STARTUP">CONSTRUCTOR AND STARTUP</h1>
+
+<h2 id="new">new()</h2>
+
+<p>Creates and returns a new WWW::Mechanize object, hereafter referred to as the &quot;agent&quot;.</p>
+
+<pre><code>    my $mech = WWW::Mechanize-&gt;new()</code></pre>
+
+<p>The constructor for WWW::Mechanize overrides two of the parms to the LWP::UserAgent constructor:</p>
+
+<pre><code>    <span class="string">agent</span> <span class="operator">=&gt;</span> <span class="string">'WWW-Mechanize/#.##'</span>
+    <span class="string">cookie_jar</span> <span class="operator">=&gt;</span> <span class="operator">{}</span>    <span class="comment"># an empty, memory-only HTTP::Cookies object</span>
+</code></pre>
+
+<p>You can override these overrides by passing parms to the constructor, as in:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$mech</span> <span class="operator">=</span> <span class="variable">WWW::Mechanize</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">agent</span> <span class="operator">=&gt;</span> <span class="string">'wonderbot 1.01'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If you want none of the overhead of a cookie jar, or don&#39;t want your bot accepting cookies, you have to explicitly disallow it, like so:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$mech</span> <span class="operator">=</span> <span class="variable">WWW::Mechanize</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">cookie_jar</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Here are the parms that WWW::Mechanize recognizes. These do not include parms that <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> recognizes.</p>
+
+<ul>
+
+<li><p><code>autocheck =&gt; [0|1]</code></p>
+
+<p>Checks each request made to see if it was successful. This saves you the trouble of manually checking yourself. Any errors found are errors, not warnings.</p>
+
+<p>The default value is ON, unless it&#39;s being subclassed, in which case it is OFF. This means that standalone <a href="../../lib/WWW/Mechanize.html">WWW::Mechanize</a> instances have autocheck turned on, which is protective for the vast majority of Mech users who don&#39;t bother checking the return value of get() and post() and can&#39;t figure why their code fails. However, if <a href="../../lib/WWW/Mechanize.html">WWW::Mechanize</a> is subclassed, such as for <a>Test::WWW::Mechanize</a> or <a>Test::WWW::Mechanize::Catalyst</a>, this may not be an appropriate default, so it&#39;s off.</p>
+
+</li>
+<li><p><code>noproxy =&gt; [0|1]</code></p>
+
+<p>Turn off the automatic call to the <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> <code>env_proxy</code> function.</p>
+
+<p>This needs to be explicitly turned off if you&#39;re using <a>Crypt::SSLeay</a> to access a https site via a proxy server. Note: you still need to set your HTTPS_PROXY environment variable as appropriate.</p>
+
+</li>
+<li><p><code>onwarn =&gt; \&amp;func</code></p>
+
+<p>Reference to a <code>warn</code>-compatible function, such as <code><a href="../../lib/Carp.html">Carp</a>::carp</code>, that is called when a warning needs to be shown.</p>
+
+<p>If this is set to <code>undef</code>, no warnings will ever be shown. However, it&#39;s probably better to use the <code>quiet</code> method to control that behavior.</p>
+
+<p>If this value is not passed, Mech uses <code>Carp::carp</code> if <a href="../../lib/Carp.html">Carp</a> is installed, or <code>CORE::warn</code> if not.</p>
+
+</li>
+<li><p><code>onerror =&gt; \&amp;func</code></p>
+
+<p>Reference to a <code>die</code>-compatible function, such as <code><a href="../../lib/Carp.html">Carp</a>::croak</code>, that is called when there&#39;s a fatal error.</p>
+
+<p>If this is set to <code>undef</code>, no errors will ever be shown.</p>
+
+<p>If this value is not passed, Mech uses <code>Carp::croak</code> if <a href="../../lib/Carp.html">Carp</a> is installed, or <code>CORE::die</code> if not.</p>
+
+</li>
+<li><p><code>quiet =&gt; [0|1]</code></p>
+
+<p>Don&#39;t complain on warnings. Setting <code>quiet =&gt; 1</code> is the same as calling <code>$mech-&gt;quiet(1)</code>. Default is off.</p>
+
+</li>
+<li><p><code>stack_depth =&gt; $value</code></p>
+
+<p>Sets the depth of the page stack that keeps track of all the downloaded pages. Default is effectively infinite stack size. If the stack is eating up your memory, then set this to a smaller number, say 5 or 10. Setting this to zero means Mech will keep no history.</p>
+
+</li>
+</ul>
+
+<p>To support forms, WWW::Mechanize&#39;s constructor pushes POST on to the agent&#39;s <code>requests_redirectable</code> list (see also <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.)</p>
+
+<h2 id="mech-agent_alias-alias">$mech-&gt;agent_alias( $alias )</h2>
+
+<p>Sets the user agent string to the expanded version from a table of actual user strings. <i>$alias</i> can be one of the following:</p>
+
+<ul>
+
+<li><p>Windows IE 6</p>
+
+</li>
+<li><p>Windows Mozilla</p>
+
+</li>
+<li><p>Mac Safari</p>
+
+</li>
+<li><p>Mac Mozilla</p>
+
+</li>
+<li><p>Linux Mozilla</p>
+
+</li>
+<li><p>Linux Konqueror</p>
+
+</li>
+</ul>
+
+<p>then it will be replaced with a more interesting one. For instance,</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">agent_alias</span><span class="operator">(</span> <span class="string">'Windows IE 6'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>sets your User-Agent to</p>
+
+<pre><code>    <span class="variable">Mozilla</span><span class="operator">/</span><span class="number">4.0</span> <span class="operator">(</span><span class="variable">compatible</span><span class="operator">;</span> <span class="variable">MSIE</span> <span class="number">6.0</span><span class="operator">;</span> <span class="variable">Windows</span> <span class="variable">NT</span> <span class="number">5.1</span><span class="operator">)</span>
+</code></pre>
+
+<p>The list of valid aliases can be returned from <code>known_agent_aliases()</code>. The current list is:</p>
+
+<ul>
+
+<li><p>Windows IE 6</p>
+
+</li>
+<li><p>Windows Mozilla</p>
+
+</li>
+<li><p>Mac Safari</p>
+
+</li>
+<li><p>Mac Mozilla</p>
+
+</li>
+<li><p>Linux Mozilla</p>
+
+</li>
+<li><p>Linux Konqueror</p>
+
+</li>
+</ul>
+
+<h2 id="known_agent_aliases">known_agent_aliases()</h2>
+
+<p>Returns a list of all the agent aliases that Mech knows about.</p>
+
+<h1 id="PAGE-FETCHING-METHODS">PAGE-FETCHING METHODS</h1>
+
+<h2 id="mech-get-uri">$mech-&gt;get( $uri )</h2>
+
+<p>Given a URL/URI, fetches it. Returns an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object. <i>$uri</i> can be a well-formed URL string, a <a href="../../lib/URI.html">URI</a> object, or a <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> object.</p>
+
+<p>The results are stored internally in the agent object, but you don&#39;t know that. Just use the accessors listed below. Poking at the internals is deprecated and subject to change in the future.</p>
+
+<p><code>get()</code> is a well-behaved overloaded version of the method in <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>. This lets you do things like</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span> <span class="variable">$uri</span><span class="operator">,</span> <span class="string">':content_file'</span> <span class="operator">=&gt;</span> <span class="variable">$tempfile</span> <span class="operator">);</span>
+</code></pre>
+
+<p>and you can rest assured that the parms will get filtered down appropriately.</p>
+
+<p><b>NOTE:</b> Because <code>:content_file</code> causes the page contents to be stored in a file instead of the response object, some Mech functions that expect it to be there won&#39;t work as expected. Use with caution.</p>
+
+<h2 id="mech-put-uri-content-content">$mech-&gt;put( $uri, content =&gt; $content )</h2>
+
+<p>PUTs <i>$content</i> to $uri. Returns an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object. <i>$uri</i> can be a well-formed URI string, a <a href="../../lib/URI.html">URI</a> object, or a <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> object.</p>
+
+<h2 id="mech-reload">$mech-&gt;reload()</h2>
+
+<p>Acts like the reload button in a browser: repeats the current request. The history (as per the <a href="#back">&quot;back&quot;</a> method) is not altered.</p>
+
+<p>Returns the <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object from the reload, or <code>undef</code> if there&#39;s no current request.</p>
+
+<h2 id="mech-back">$mech-&gt;back()</h2>
+
+<p>The equivalent of hitting the &quot;back&quot; button in a browser. Returns to the previous page. Won&#39;t go back past the first page. (Really, what would it do if it could?)</p>
+
+<p>Returns true if it could go back, or false if not.</p>
+
+<h2 id="mech-history_count">$mech-&gt;history_count()</h2>
+
+<p>This returns the number of items in the browser history. This number <i>does</i> include the most recently made request.</p>
+
+<h2 id="mech-history-n">$mech-&gt;history($n)</h2>
+
+<p>This returns the <i>n</i>th item in history. The 0th item is the most recent request and response, which would be acted on by methods like <code>find_link()</code>. The 1th item is the state you&#39;d return to if you called <code>back()</code>.</p>
+
+<p>The maximum useful value for <code>$n</code> is <code>$mech-&gt;history_count - 1</code>. Requests beyond that bound will return <code>undef</code>.</p>
+
+<p>History items are returned as hash references, in the form:</p>
+
+<pre><code>  <span class="operator">{</span> <span class="string">req</span> <span class="operator">=&gt;</span> <span class="variable">$http_request</span><span class="operator">,</span> <span class="string">res</span> <span class="operator">=&gt;</span> <span class="variable">$http_response</span> <span class="operator">}</span>
+</code></pre>
+
+<h1 id="STATUS-METHODS">STATUS METHODS</h1>
+
+<h2 id="mech-success">$mech-&gt;success()</h2>
+
+<p>Returns a boolean telling whether the last request was successful. If there hasn&#39;t been an operation yet, returns false.</p>
+
+<p>This is a convenience function that wraps <code>$mech-&gt;res-&gt;is_success</code>.</p>
+
+<h2 id="mech-uri">$mech-&gt;uri()</h2>
+
+<p>Returns the current URI as a <a href="../../lib/URI.html">URI</a> object. This object stringifies to the URI itself.</p>
+
+<h2 id="mech-response-mech-res">$mech-&gt;response() / $mech-&gt;res()</h2>
+
+<p>Return the current response as an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<p>Synonym for <code>$mech-&gt;response()</code></p>
+
+<h2 id="mech-status">$mech-&gt;status()</h2>
+
+<p>Returns the HTTP status code of the response. This is a 3-digit number like 200 for OK, 404 for not found, and so on.</p>
+
+<h2 id="mech-ct-mech-content_type">$mech-&gt;ct() / $mech-&gt;content_type()</h2>
+
+<p>Returns the content type of the response.</p>
+
+<h2 id="mech-base">$mech-&gt;base()</h2>
+
+<p>Returns the base URI for the current response</p>
+
+<h2 id="mech-forms">$mech-&gt;forms()</h2>
+
+<p>When called in a list context, returns a list of the forms found in the last fetched page. In a scalar context, returns a reference to an array with those forms. The forms returned are all <a href="../../lib/HTML/Form.html">HTML::Form</a> objects.</p>
+
+<h2 id="mech-current_form">$mech-&gt;current_form()</h2>
+
+<p>Returns the current form as an <a href="../../lib/HTML/Form.html">HTML::Form</a> object.</p>
+
+<h2 id="mech-links">$mech-&gt;links()</h2>
+
+<p>When called in a list context, returns a list of the links found in the last fetched page. In a scalar context it returns a reference to an array with those links. Each link is a <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> object.</p>
+
+<h2 id="mech-is_html">$mech-&gt;is_html()</h2>
+
+<p>Returns true/false on whether our content is HTML, according to the HTTP headers.</p>
+
+<h2 id="mech-title">$mech-&gt;title()</h2>
+
+<p>Returns the contents of the <code>&lt;TITLE&gt;</code> tag, as parsed by <a href="../../lib/HTML/HeadParser.html">HTML::HeadParser</a>. Returns undef if the content is not HTML.</p>
+
+<h1 id="CONTENT-HANDLING-METHODS">CONTENT-HANDLING METHODS</h1>
+
+<h2 id="mech-content">$mech-&gt;content(...)</h2>
+
+<p>Returns the content that the mech uses internally for the last page fetched. Ordinarily this is the same as <code>$mech-&gt;response()-&gt;decoded_content()</code>, but this may differ for HTML documents if <a href="#mech--update_html-html">update_html</a> is overloaded (in which case the value passed to the base-class implementation of same will be returned), and/or extra named arguments are passed to <i>content()</i>:</p>
+
+<dl>
+
+<dt id="mech-content-format-text"><i>$mech-&gt;content( format =&gt; &#39;text&#39; )</i></dt>
+<dd>
+
+<p>Returns a text-only version of the page, with all HTML markup stripped. This feature requires <i>HTML::TreeBuilder</i> to be installed, or a fatal error will be thrown. This works only if the contents are HTML.</p>
+
+</dd>
+<dt id="mech-content-base_href-base_href-undef"><i>$mech-&gt;content( base_href =&gt; [$base_href|undef] )</i></dt>
+<dd>
+
+<p>Returns the HTML document, modified to contain a <code>&lt;base href=&quot;$base_href&quot;&gt;</code> mark-up in the header. <i>$base_href</i> is <code>$mech-&gt;base()</code> if not specified. This is handy to pass the HTML to e.g. <a>HTML::Display</a>. This works only if the contents are HTML.</p>
+
+</dd>
+<dt id="mech-content-raw-1"><i>$mech-&gt;content( raw =&gt; 1 )</i></dt>
+<dd>
+
+<p>Returns <code>$self-&gt;response()-&gt;content()</code>, i.e. the raw contents from the response.</p>
+
+</dd>
+<dt id="mech-content-decoded_by_headers-1"><i>$mech-&gt;content( decoded_by_headers =&gt; 1 )</i></dt>
+<dd>
+
+<p>Returns the content after applying all <code>Content-Encoding</code> headers but with not additional mangling.</p>
+
+</dd>
+<dt id="mech-content-charset-charset"><i>$mech-&gt;content( charset =&gt; $charset )</i></dt>
+<dd>
+
+<p>Returns <code>$self-&gt;response()-&gt;decoded_content(charset =&gt; $charset)</code> (see <a href="../../lib/HTTP/Response.html">HTTP::Response</a> for details).</p>
+
+</dd>
+</dl>
+
+<p>To preserve backwards compatibility, additional parameters will be ignored unless none of <code>raw | decoded_by_headers | charset</code> is specified and the text is HTML, in which case an error will be triggered.</p>
+
+<h2 id="mech-text">$mech-&gt;text()</h2>
+
+<p>Returns the text of the current HTML content. If the content isn&#39;t HTML, $mech will die.</p>
+
+<p>The text is extracted by parsing the content, and then the extracted text is cached, so don&#39;t worry about performance of calling this repeatedly.</p>
+
+<h1 id="LINK-METHODS">LINK METHODS</h1>
+
+<h2 id="mech-links1">$mech-&gt;links()</h2>
+
+<p>Lists all the links on the current page. Each link is a WWW::Mechanize::Link object. In list context, returns a list of all links. In scalar context, returns an array reference of all links.</p>
+
+<h2 id="mech-follow_link">$mech-&gt;follow_link(...)</h2>
+
+<p>Follows a specified link on the page. You specify the match to be found using the same parms that <code><a>find_link()</a></code> uses.</p>
+
+<p>Here some examples:</p>
+
+<ul>
+
+<li><p>3rd link called &quot;download&quot;</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">text</span> <span class="operator">=&gt;</span> <span class="string">'download'</span><span class="operator">,</span> <span class="string">n</span> <span class="operator">=&gt;</span> <span class="number">3</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>first link where the URL has &quot;download&quot; in it, regardless of case:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">url_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/download/i</span> <span class="operator">);</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">url_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/(?i:download)/</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>3rd link on the page</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">n</span> <span class="operator">=&gt;</span> <span class="number">3</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>the link with the url</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">url</span> <span class="operator">=&gt;</span> <span class="string">'/other/page'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">follow_link</span><span class="operator">(</span> <span class="string">url</span> <span class="operator">=&gt;</span> <span class="string">'http://example.com/page'</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+</ul>
+
+<p>Returns the result of the GET method (an HTTP::Response object) if a link was found. If the page has no links, or the specified link couldn&#39;t be found, returns undef.</p>
+
+<h2 id="mech-find_link">$mech-&gt;find_link( ... )</h2>
+
+<p>Finds a link in the currently fetched page. It returns a <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> object which describes the link. (You&#39;ll probably be most interested in the <code>url()</code> property.) If it fails to find a link it returns undef.</p>
+
+<p>You can take the URL part and pass it to the <code>get()</code> method. If that&#39;s your plan, you might as well use the <code>follow_link()</code> method directly, since it does the <code>get()</code> for you automatically.</p>
+
+<p>Note that <code>&lt;FRAME SRC=&quot;...&quot;&gt;</code> tags are parsed out of the the HTML and treated as links so this method works with them.</p>
+
+<p>You can select which link to find by passing in one or more of these key/value pairs:</p>
+
+<ul>
+
+<li><p><code>text =&gt; &#39;string&#39;,</code> and <code>text_regex =&gt; qr/regex/,</code></p>
+
+<p><code>text</code> matches the text of the link against <i>string</i>, which must be an exact match. To select a link with text that is exactly &quot;download&quot;, use</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_link</span><span class="operator">(</span> <span class="string">text</span> <span class="operator">=&gt;</span> <span class="string">'download'</span> <span class="operator">);</span>
+</code></pre>
+
+<p><code>text_regex</code> matches the text of the link against <i>regex</i>. To select a link with text that has &quot;download&quot; anywhere in it, regardless of case, use</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_link</span><span class="operator">(</span> <span class="string">text_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/download/i</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Note that the text extracted from the page&#39;s links are trimmed. For example, <code>&lt;a&gt; foo &lt;/a&gt;</code> is stored as &#39;foo&#39;, and searching for leading or trailing spaces will fail.</p>
+
+</li>
+<li><p><code>url =&gt; &#39;string&#39;,</code> and <code>url_regex =&gt; qr/regex/,</code></p>
+
+<p>Matches the URL of the link against <i>string</i> or <i>regex</i>, as appropriate. The URL may be a relative URL, like <i>foo/bar.html</i>, depending on how it&#39;s coded on the page.</p>
+
+</li>
+<li><p><code>url_abs =&gt; string</code> and <code>url_abs_regex =&gt; regex</code></p>
+
+<p>Matches the absolute URL of the link against <i>string</i> or <i>regex</i>, as appropriate. The URL will be an absolute URL, even if it&#39;s relative in the page.</p>
+
+</li>
+<li><p><code>name =&gt; string</code> and <code>name_regex =&gt; regex</code></p>
+
+<p>Matches the name of the link against <i>string</i> or <i>regex</i>, as appropriate.</p>
+
+</li>
+<li><p><code>id =&gt; string</code> and <code>id_regex =&gt; regex</code></p>
+
+<p>Matches the attribute &#39;id&#39; of the link against <i>string</i> or <i>regex</i>, as appropriate.</p>
+
+</li>
+<li><p><code>class =&gt; string</code> and <code>class_regex =&gt; regex</code></p>
+
+<p>Matches the attribute &#39;class&#39; of the link against <i>string</i> or <i>regex</i>, as appropriate.</p>
+
+</li>
+<li><p><code>tag =&gt; string</code> and <code>tag_regex =&gt; regex</code></p>
+
+<p>Matches the tag that the link came from against <i>string</i> or <i>regex</i>, as appropriate. The <code>tag_regex</code> is probably most useful to check for more than one tag, as in:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_link</span><span class="operator">(</span> <span class="string">tag_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/^(a|frame)$/</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The tags and attributes looked at are defined below, at <a href="#mech--find_link-:-link-format">&quot;$mech-&gt;find_link() : link format&quot;</a>.</p>
+
+</li>
+</ul>
+
+<p>If <code>n</code> is not specified, it defaults to 1. Therefore, if you don&#39;t specify any parms, this method defaults to finding the first link on the page.</p>
+
+<p>Note that you can specify multiple text or URL parameters, which will be ANDed together. For example, to find the first link with text of &quot;News&quot; and with &quot;cnn.com&quot; in the URL, use:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_link</span><span class="operator">(</span> <span class="string">text</span> <span class="operator">=&gt;</span> <span class="string">'News'</span><span class="operator">,</span> <span class="string">url_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/cnn\.com/</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The return value is a reference to an array containing a <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> object for every link in <code>$self-&gt;content</code>.</p>
+
+<p>The links come from the following:</p>
+
+<dl>
+
+<dt id="a-href"><code>&lt;a href=...&gt;</code></dt>
+<dd>
+
+</dd>
+<dt id="area-href"><code>&lt;area href=...&gt;</code></dt>
+<dd>
+
+</dd>
+<dt id="frame-src"><code>&lt;frame src=...&gt;</code></dt>
+<dd>
+
+</dd>
+<dt id="iframe-src"><code>&lt;iframe src=...&gt;</code></dt>
+<dd>
+
+</dd>
+<dt id="link-href"><code>&lt;link href=...&gt;</code></dt>
+<dd>
+
+</dd>
+<dt id="meta-content"><code>&lt;meta content=...&gt;</code></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="mech-find_all_links">$mech-&gt;find_all_links( ... )</h2>
+
+<p>Returns all the links on the current page that match the criteria. The method for specifying link criteria is the same as in <code><a href="#find_link">&quot;find_link()&quot;</a></code>. Each of the links returned is a <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> object.</p>
+
+<p>In list context, <code>find_all_links()</code> returns a list of the links. Otherwise, it returns a reference to the list of links.</p>
+
+<p><code>find_all_links()</code> with no parameters returns all links in the page.</p>
+
+<h2 id="mech-find_all_inputs-...-criteria">$mech-&gt;find_all_inputs( ... criteria ... )</h2>
+
+<p>find_all_inputs() returns an array of all the input controls in the current form whose properties match all of the regexes passed in. The controls returned are all descended from HTML::Form::Input.</p>
+
+<p>If no criteria are passed, all inputs will be returned.</p>
+
+<p>If there is no current page, there is no form on the current page, or there are no submit controls in the current form then the return will be an empty array.</p>
+
+<p>You may use a regex or a literal string:</p>
+
+<pre><code>    <span class="comment"># get all textarea controls whose names begin with "customer"</span>
+    <span class="keyword">my</span> <span class="variable">@customer_text_inputs</span> <span class="operator">=</span> <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_all_inputs</span><span class="operator">(</span>
+        <span class="string">type</span>       <span class="operator">=&gt;</span> <span class="string">'textarea'</span><span class="operator">,</span>
+        <span class="string">name_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/^customer/</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># get all text or textarea controls called "customer"</span>
+    <span class="keyword">my</span> <span class="variable">@customer_text_inputs</span> <span class="operator">=</span> <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_all_inputs</span><span class="operator">(</span>
+        <span class="string">type_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/^(text|textarea)$/</span><span class="operator">,</span>
+        <span class="string">name</span>       <span class="operator">=&gt;</span> <span class="string">'customer'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="mech-find_all_submits-...-criteria">$mech-&gt;find_all_submits( ... criteria ... )</h2>
+
+<p><code>find_all_submits()</code> does the same thing as <code>find_all_inputs()</code> except that it only returns controls that are submit controls, ignoring other types of input controls like text and checkboxes.</p>
+
+<h1 id="IMAGE-METHODS">IMAGE METHODS</h1>
+
+<h2 id="mech-images">$mech-&gt;images</h2>
+
+<p>Lists all the images on the current page. Each image is a WWW::Mechanize::Image object. In list context, returns a list of all images. In scalar context, returns an array reference of all images.</p>
+
+<h2 id="mech-find_image">$mech-&gt;find_image()</h2>
+
+<p>Finds an image in the current page. It returns a <a href="../../lib/WWW/Mechanize/Image.html">WWW::Mechanize::Image</a> object which describes the image. If it fails to find an image it returns undef.</p>
+
+<p>You can select which image to find by passing in one or more of these key/value pairs:</p>
+
+<ul>
+
+<li><p><code>alt =&gt; &#39;string&#39;</code> and <code>alt_regex =&gt; qr/regex/,</code></p>
+
+<p><code>alt</code> matches the ALT attribute of the image against <i>string</i>, which must be an exact match. To select a image with an ALT tag that is exactly &quot;download&quot;, use</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_image</span><span class="operator">(</span> <span class="string">alt</span> <span class="operator">=&gt;</span> <span class="string">'download'</span> <span class="operator">);</span>
+</code></pre>
+
+<p><code>alt_regex</code> matches the ALT attribute of the image against a regular expression. To select an image with an ALT attribute that has &quot;download&quot; anywhere in it, regardless of case, use</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_image</span><span class="operator">(</span> <span class="string">alt_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/download/i</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p><code>url =&gt; &#39;string&#39;,</code> and <code>url_regex =&gt; qr/regex/,</code></p>
+
+<p>Matches the URL of the image against <i>string</i> or <i>regex</i>, as appropriate. The URL may be a relative URL, like <i>foo/bar.html</i>, depending on how it&#39;s coded on the page.</p>
+
+</li>
+<li><p><code>url_abs =&gt; string</code> and <code>url_abs_regex =&gt; regex</code></p>
+
+<p>Matches the absolute URL of the image against <i>string</i> or <i>regex</i>, as appropriate. The URL will be an absolute URL, even if it&#39;s relative in the page.</p>
+
+</li>
+<li><p><code>tag =&gt; string</code> and <code>tag_regex =&gt; regex</code></p>
+
+<p>Matches the tag that the image came from against <i>string</i> or <i>regex</i>, as appropriate. The <code>tag_regex</code> is probably most useful to check for more than one tag, as in:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_image</span><span class="operator">(</span> <span class="string">tag_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/^(img|input)$/</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The tags supported are <code>&lt;img&gt;</code> and <code>&lt;input&gt;</code>.</p>
+
+</li>
+</ul>
+
+<p>If <code>n</code> is not specified, it defaults to 1. Therefore, if you don&#39;t specify any parms, this method defaults to finding the first image on the page.</p>
+
+<p>Note that you can specify multiple ALT or URL parameters, which will be ANDed together. For example, to find the first image with ALT text of &quot;News&quot; and with &quot;cnn.com&quot; in the URL, use:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">find_image</span><span class="operator">(</span> <span class="string">image</span> <span class="operator">=&gt;</span> <span class="string">'News'</span><span class="operator">,</span> <span class="string">url_regex</span> <span class="operator">=&gt;</span> <span class="string">qr/cnn\.com/</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The return value is a reference to an array containing a <a href="../../lib/WWW/Mechanize/Image.html">WWW::Mechanize::Image</a> object for every image in <code>$self-&gt;content</code>.</p>
+
+<h2 id="mech-find_all_images">$mech-&gt;find_all_images( ... )</h2>
+
+<p>Returns all the images on the current page that match the criteria. The method for specifying image criteria is the same as in <code><a href="#find_image">&quot;find_image()&quot;</a></code>. Each of the images returned is a <a href="../../lib/WWW/Mechanize/Image.html">WWW::Mechanize::Image</a> object.</p>
+
+<p>In list context, <code>find_all_images()</code> returns a list of the images. Otherwise, it returns a reference to the list of images.</p>
+
+<p><code>find_all_images()</code> with no parameters returns all images in the page.</p>
+
+<h1 id="FORM-METHODS">FORM METHODS</h1>
+
+<p>These methods let you work with the forms on a page. The idea is to choose a form that you&#39;ll later work with using the field methods below.</p>
+
+<h2 id="mech-forms1">$mech-&gt;forms</h2>
+
+<p>Lists all the forms on the current page. Each form is an <a href="../../lib/HTML/Form.html">HTML::Form</a> object. In list context, returns a list of all forms. In scalar context, returns an array reference of all forms.</p>
+
+<h2 id="mech-form_number-number">$mech-&gt;form_number($number)</h2>
+
+<p>Selects the <i>number</i>th form on the page as the target for subsequent calls to <code><a href="#field">&quot;field()&quot;</a></code> and <code><a href="#click">&quot;click()&quot;</a></code>. Also returns the form that was selected.</p>
+
+<p>If it is found, the form is returned as an <a href="../../lib/HTML/Form.html">HTML::Form</a> object and set internally for later use with Mech&#39;s form methods such as <code><a href="#field">&quot;field()&quot;</a></code> and <code><a href="#click">&quot;click()&quot;</a></code>.</p>
+
+<p>Emits a warning and returns undef if no form is found.</p>
+
+<p>The first form is number 1, not zero.</p>
+
+<h2 id="mech-form_name-name">$mech-&gt;form_name( $name )</h2>
+
+<p>Selects a form by name. If there is more than one form on the page with that name, then the first one is used, and a warning is generated.</p>
+
+<p>If it is found, the form is returned as an <a href="../../lib/HTML/Form.html">HTML::Form</a> object and set internally for later use with Mech&#39;s form methods such as <code><a href="#field">&quot;field()&quot;</a></code> and <code><a href="#click">&quot;click()&quot;</a></code>.</p>
+
+<p>Returns undef if no form is found.</p>
+
+<h2 id="mech-form_id-name">$mech-&gt;form_id( $name )</h2>
+
+<p>Selects a form by ID. If there is more than one form on the page with that ID, then the first one is used, and a warning is generated.</p>
+
+<p>If it is found, the form is returned as an <a href="../../lib/HTML/Form.html">HTML::Form</a> object and set internally for later use with Mech&#39;s form methods such as <code><a href="#field">&quot;field()&quot;</a></code> and <code><a href="#click">&quot;click()&quot;</a></code>.</p>
+
+<p>If no form is found it returns <code>undef</code>. This will also trigger a warning, unless <code>quiet</code> is enabled.</p>
+
+<h2 id="mech-all_forms_with_fields-fields">$mech-&gt;all_forms_with_fields( @fields )</h2>
+
+<p>Selects a form by passing in a list of field names it must contain. All matching forms (perhaps none) are returned as a list of <a href="../../lib/HTML/Form.html">HTML::Form</a> objects.</p>
+
+<h2 id="mech-form_with_fields-fields">$mech-&gt;form_with_fields( @fields )</h2>
+
+<p>Selects a form by passing in a list of field names it must contain. If there is more than one form on the page with that matches, then the first one is used, and a warning is generated.</p>
+
+<p>If it is found, the form is returned as an <a href="../../lib/HTML/Form.html">HTML::Form</a> object and set internally for later used with Mech&#39;s form methods such as <code><a href="#field">&quot;field()&quot;</a></code> and <code><a href="#click">&quot;click()&quot;</a></code>.</p>
+
+<p>Returns undef and emits a warning if no form is found.</p>
+
+<p>Note that this functionality requires libwww-perl 5.69 or higher.</p>
+
+<h2 id="mech-all_forms_with-attr1-value1-attr2-value2">$mech-&gt;all_forms_with( $attr1 =&gt; $value1, $attr2 =&gt; $value2, ... )</h2>
+
+<p>Searches for forms with arbitrary attribute/value pairs within the &lt;form&gt; tag. (Currently does not work for attribute <code>action</code> due to implementation details of <a href="../../lib/HTML/Form.html">HTML::Form</a>.) When given more than one pair, all criteria must match. Using <code>undef</code> as value means that the attribute in question may not be present.</p>
+
+<p>All matching forms (perhaps none) are returned as a list of <a href="../../lib/HTML/Form.html">HTML::Form</a> objects.</p>
+
+<h2 id="mech-form_with-attr1-value1-attr2-value2">$mech-&gt;form_with( $attr1 =&gt; $value1, $attr2 =&gt; $value2, ... )</h2>
+
+<p>Searches for forms with arbitrary attribute/value pairs within the &lt;form&gt; tag. (Currently does not work for attribute <code>action</code> due to implementation details of <a href="../../lib/HTML/Form.html">HTML::Form</a>.) When given more than one pair, all criteria must match. Using <code>undef</code> as value means that the attribute in question may not be present.</p>
+
+<p>If it is found, the form is returned as an <a href="../../lib/HTML/Form.html">HTML::Form</a> object and set internally for later used with Mech&#39;s form methods such as <code><a href="#field">&quot;field()&quot;</a></code> and <code><a href="#click">&quot;click()&quot;</a></code>.</p>
+
+<p>Returns undef if no form is found.</p>
+
+<h1 id="FIELD-METHODS">FIELD METHODS</h1>
+
+<p>These methods allow you to set the values of fields in a given form.</p>
+
+<h2 id="mech-field-name-value-number">$mech-&gt;field( $name, $value, $number )</h2>
+
+<h2 id="mech-field-name-values-number">$mech-&gt;field( $name, \@values, $number )</h2>
+
+<p>Given the name of a field, set its value to the value specified. This applies to the current form (as set by the <a href="#form_name">&quot;form_name()&quot;</a> or <a href="#form_number">&quot;form_number()&quot;</a> method or defaulting to the first form on the page).</p>
+
+<p>The optional <i>$number</i> parameter is used to distinguish between two fields with the same name. The fields are numbered from 1.</p>
+
+<h2 id="mech-select-name-value">$mech-&gt;select($name, $value)</h2>
+
+<h2 id="mech-select-name-values">$mech-&gt;select($name, \@values)</h2>
+
+<p>Given the name of a <code>select</code> field, set its value to the value specified. If the field is not <code>&lt;select multiple&gt;</code> and the <code>$value</code> is an array, only the <b>first</b> value will be set. [Note: the documentation previously claimed that only the last value would be set, but this was incorrect.] Passing <code>$value</code> as a hash with an <code>n</code> key selects an item by number (e.g. <code><span class="operator">{</span><span class="string">n</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">}</span>
+</code> or <code><span class="operator">{</span><span class="string">n</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">2</span><span class="operator">,</span><span class="number">4</span><span class="operator">]</span><span class="operator">}</span>
+</code>). The numbering starts at 1. This applies to the current form.</p>
+
+<p>If you have a field with <code>&lt;select multiple&gt;</code> and you pass a single <code>$value</code>, then <code>$value</code> will be added to the list of fields selected, without clearing the others. However, if you pass an array reference, then all previously selected values will be cleared.</p>
+
+<p>Returns true on successfully setting the value. On failure, returns false and calls <code>$self&gt;warn()</code> with an error message.</p>
+
+<h2 id="mech-set_fields-name-value">$mech-&gt;set_fields( $name =&gt; $value ... )</h2>
+
+<p>This method sets multiple fields of the current form. It takes a list of field name and value pairs. If there is more than one field with the same name, the first one found is set. If you want to select which of the duplicate field to set, use a value which is an anonymous array which has the field value and its number as the 2 elements.</p>
+
+<pre><code>        <span class="comment"># set the second foo field</span>
+        <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">set_fields</span><span class="operator">(</span> <span class="variable">$name</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="number">2</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The fields are numbered from 1.</p>
+
+<p>This applies to the current form.</p>
+
+<h2 id="mech-set_visible-criteria">$mech-&gt;set_visible( @criteria )</h2>
+
+<p>This method sets fields of the current form without having to know their names. So if you have a login screen that wants a username and password, you do not have to fetch the form and inspect the source (or use the <i>mech-dump</i> utility, installed with WWW::Mechanize) to see what the field names are; you can just say</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">set_visible</span><span class="operator">(</span> <span class="variable">$username</span><span class="operator">,</span> <span class="variable">$password</span> <span class="operator">);</span>
+</code></pre>
+
+<p>and the first and second fields will be set accordingly. The method is called set_<i>visible</i> because it acts only on visible fields; hidden form inputs are not considered. The order of the fields is the order in which they appear in the HTML source which is nearly always the order anyone viewing the page would think they are in, but some creative work with tables could change that; caveat user.</p>
+
+<p>Each element in <code>@criteria</code> is either a field value or a field specifier. A field value is a scalar. A field specifier allows you to specify the <i>type</i> of input field you want to set and is denoted with an arrayref containing two elements. So you could specify the first radio button with</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">set_visible</span><span class="operator">(</span> <span class="operator">[</span> <span class="string">radio</span> <span class="operator">=&gt;</span> <span class="string">'KCRW'</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Field values and specifiers can be intermixed, hence</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">set_visible</span><span class="operator">(</span> <span class="string">'fred'</span><span class="operator">,</span> <span class="string">'secret'</span><span class="operator">,</span> <span class="operator">[</span> <span class="string">option</span> <span class="operator">=&gt;</span> <span class="string">'Checking'</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>would set the first two fields to &quot;fred&quot; and &quot;secret&quot;, and the <i>next</i> <code>OPTION</code> menu field to &quot;Checking&quot;.</p>
+
+<p>The possible field specifier types are: &quot;text&quot;, &quot;password&quot;, &quot;hidden&quot;, &quot;textarea&quot;, &quot;file&quot;, &quot;image&quot;, &quot;submit&quot;, &quot;radio&quot;, &quot;checkbox&quot; and &quot;option&quot;.</p>
+
+<p><code>set_visible</code> returns the number of values set.</p>
+
+<h2 id="mech-tick-name-value-set">$mech-&gt;tick( $name, $value [, $set] )</h2>
+
+<p>&quot;Ticks&quot; the first checkbox that has both the name and value associated with it on the current form. Dies if there is no named check box for that value. Passing in a false value as the third optional argument will cause the checkbox to be unticked.</p>
+
+<h2 id="mech-untick-name-value">$mech-&gt;untick($name, $value)</h2>
+
+<p>Causes the checkbox to be unticked. Shorthand for <code>tick($name,$value,undef)</code></p>
+
+<h2 id="mech-value-name-number">$mech-&gt;value( $name [, $number] )</h2>
+
+<p>Given the name of a field, return its value. This applies to the current form.</p>
+
+<p>The optional <i>$number</i> parameter is used to distinguish between two fields with the same name. The fields are numbered from 1.</p>
+
+<p>If the field is of type file (file upload field), the value is always cleared to prevent remote sites from downloading your local files. To upload a file, specify its file name explicitly.</p>
+
+<h2 id="mech-click-button-x-y">$mech-&gt;click( $button [, $x, $y] )</h2>
+
+<p>Has the effect of clicking a button on the current form. The first argument is the name of the button to be clicked. The second and third arguments (optional) allow you to specify the (x,y) coordinates of the click.</p>
+
+<p>If there is only one button on the form, <code>$mech-&gt;click()</code> with no arguments simply clicks that one button.</p>
+
+<p>Returns an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<h2 id="mech-click_button">$mech-&gt;click_button( ... )</h2>
+
+<p>Has the effect of clicking a button on the current form by specifying its name, value, or index. Its arguments are a list of key/value pairs. Only one of name, number, input or value must be specified in the keys.</p>
+
+<ul>
+
+<li><p><code>name =&gt; name</code></p>
+
+<p>Clicks the button named <i>name</i> in the current form.</p>
+
+</li>
+<li><p><code>id =&gt; id</code></p>
+
+<p>Clicks the button with the id <i>id</i> in the current form.</p>
+
+</li>
+<li><p><code>number =&gt; n</code></p>
+
+<p>Clicks the <i>n</i>th button in the current form. Numbering starts at 1.</p>
+
+</li>
+<li><p><code>value =&gt; value</code></p>
+
+<p>Clicks the button with the value <i>value</i> in the current form.</p>
+
+</li>
+<li><p><code>input =&gt; $inputobject</code></p>
+
+<p>Clicks on the button referenced by $inputobject, an instance of <a>HTML::Form::SubmitInput</a> obtained e.g. from</p>
+
+<pre><code>    $mech-&gt;current_form()-&gt;find_input( undef, &#39;submit&#39; )</code></pre>
+
+<p>$inputobject must belong to the current form.</p>
+
+</li>
+<li><p><code>x =&gt; x</code></p>
+
+</li>
+<li><p><code>y =&gt; y</code></p>
+
+<p>These arguments (optional) allow you to specify the (x,y) coordinates of the click.</p>
+
+</li>
+</ul>
+
+<h2 id="mech-submit">$mech-&gt;submit()</h2>
+
+<p>Submits the current form, without specifying a button to click. Actually, no button is clicked at all.</p>
+
+<p>Returns an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<p>This used to be a synonym for <code>$mech-&gt;click( &#39;submit&#39; )</code>, but is no longer so.</p>
+
+<h2 id="mech-submit_form">$mech-&gt;submit_form( ... )</h2>
+
+<p>This method lets you select a form from the previously fetched page, fill in its fields, and submit it. It combines the form_number/form_name, set_fields and click methods into one higher level call. Its arguments are a list of key/value pairs, all of which are optional.</p>
+
+<ul>
+
+<li><p><code>fields =&gt; \%fields</code></p>
+
+<p>Specifies the fields to be filled in the current form.</p>
+
+</li>
+<li><p><code>with_fields =&gt; \%fields</code></p>
+
+<p>Probably all you need for the common case. It combines a smart form selector and data setting in one operation. It selects the first form that contains all fields mentioned in <code>\%fields</code>. This is nice because you don&#39;t need to know the name or number of the form to do this.</p>
+
+<p>(calls <code><a href="#form_with_fields">&quot;form_with_fields()&quot;</a></code> and <code><a href="#set_fields">&quot;set_fields()&quot;</a></code>).</p>
+
+<p>If you choose this, the form_number, form_name, form_id and fields options will be ignored.</p>
+
+</li>
+<li><p><code>form_number =&gt; n</code></p>
+
+<p>Selects the <i>n</i>th form (calls <code><a href="#form_number">&quot;form_number()&quot;</a></code>). If this parm is not specified, the currently-selected form is used.</p>
+
+</li>
+<li><p><code>form_name =&gt; name</code></p>
+
+<p>Selects the form named <i>name</i> (calls <code><a href="#form_name">&quot;form_name()&quot;</a></code>)</p>
+
+</li>
+<li><p><code>form_id =&gt; ID</code></p>
+
+<p>Selects the form with ID <i>ID</i> (calls <code><a href="#form_id">&quot;form_id()&quot;</a></code>)</p>
+
+</li>
+<li><p><code>button =&gt; button</code></p>
+
+<p>Clicks on button <i>button</i> (calls <code><a href="#click">&quot;click()&quot;</a></code>)</p>
+
+</li>
+<li><p><code>x =&gt; x, y =&gt; y</code></p>
+
+<p>Sets the x or y values for <code><a href="#click">&quot;click()&quot;</a></code></p>
+
+</li>
+<li><p><code>strict_forms =&gt; bool</code></p>
+
+<p>Sets the HTML::Form strict flag which causes form submission to croak if any of the passed fields don&#39;t exist on the page, and/or a value doesn&#39;t exist in a select element. By default HTML::Form defaults this value to false.</p>
+
+</li>
+</ul>
+
+<p>If no form is selected, the first form found is used.</p>
+
+<p>If <i>button</i> is not passed, then the <code><a href="#submit">&quot;submit()&quot;</a></code> method is used instead.</p>
+
+<p>If you want to submit a file and get its content from a scalar rather than a file in the filesystem, you can use:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">submit_form</span><span class="operator">(</span><span class="string">with_fields</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">logfile</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">[</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="string">'whatever'</span><span class="operator">,</span> <span class="string">Content</span> <span class="operator">=&gt;</span> <span class="variable">$content</span> <span class="operator">]</span><span class="operator">,</span> <span class="number">1</span> <span class="operator">]</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Returns an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<h1 id="MISCELLANEOUS-METHODS">MISCELLANEOUS METHODS</h1>
+
+<h2 id="mech-add_header-name-value-name-value">$mech-&gt;add_header( name =&gt; $value [, name =&gt; $value... ] )</h2>
+
+<p>Sets HTTP headers for the agent to add or remove from the HTTP request.</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">add_header</span><span class="operator">(</span> <span class="string">Encoding</span> <span class="operator">=&gt;</span> <span class="string">'text/klingon'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If a <i>value</i> is <code>undef</code>, then that header will be removed from any future requests. For example, to never send a Referer header:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">add_header</span><span class="operator">(</span> <span class="string">Referer</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If you want to delete a header, use <code>delete_header</code>.</p>
+
+<p>Returns the number of name/value pairs added.</p>
+
+<p><b>NOTE</b>: This method was very different in WWW::Mechanize before 1.00. Back then, the headers were stored in a package hash, not as a member of the object instance. Calling <code>add_header()</code> would modify the headers for every WWW::Mechanize object, even after your object no longer existed.</p>
+
+<h2 id="mech-delete_header-name-name">$mech-&gt;delete_header( name [, name ... ] )</h2>
+
+<p>Removes HTTP headers from the agent&#39;s list of special headers. For instance, you might need to do something like:</p>
+
+<pre><code>    <span class="comment"># Don't send a Referer for this URL</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">add_header</span><span class="operator">(</span> <span class="string">Referer</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span> <span class="operator">);</span>
+    
+    <span class="comment"># Get the URL</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span> <span class="variable">$url</span> <span class="operator">);</span>
+    
+    <span class="comment"># Back to the default behavior</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">delete_header</span><span class="operator">(</span> <span class="string">'Referer'</span> <span class="operator">);</span>
+</code></pre>
+
+<h2 id="mech-quiet-true-false">$mech-&gt;quiet(true/false)</h2>
+
+<p>Allows you to suppress warnings to the screen.</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">quiet</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span> <span class="comment"># turns on warnings (the default)</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">quiet</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span> <span class="comment"># turns off warnings</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">quiet</span><span class="operator">();</span>  <span class="comment"># returns the current quietness status</span>
+</code></pre>
+
+<h2 id="mech-stack_depth-max_depth">$mech-&gt;stack_depth( $max_depth )</h2>
+
+<p>Get or set the page stack depth. Use this if you&#39;re doing a lot of page scraping and running out of memory.</p>
+
+<p>A value of 0 means &quot;no history at all.&quot; By default, the max stack depth is humongously large, effectively keeping all history.</p>
+
+<h2 id="mech-save_content-filename-opts">$mech-&gt;save_content( $filename, %opts )</h2>
+
+<p>Dumps the contents of <code>$mech-&gt;content</code> into <i>$filename</i>. <i>$filename</i> will be overwritten. Dies if there are any errors.</p>
+
+<p>If the content type does not begin with &quot;text/&quot;, then the content is saved in binary mode (i.e. <code>binmode()</code> is set on the output filehandle).</p>
+
+<p>Additional arguments can be passed as <i>key</i>/<i>value</i> pairs:</p>
+
+<dl>
+
+<dt id="mech-save_content-filename-binary-1"><i>$mech-&gt;save_content( $filename, binary =&gt; 1 )</i></dt>
+<dd>
+
+<p>Filehandle is set with <code>binmode</code> to <code>:raw</code> and contents are taken calling <code>$self-&gt;content(decoded_by_headers =&gt; 1)</code>. Same as calling:</p>
+
+<pre><code>    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">save_content</span><span class="operator">(</span> <span class="variable">$filename</span><span class="operator">,</span> <span class="string">binmode</span> <span class="operator">=&gt;</span> <span class="string">':raw'</span><span class="operator">,</span>
+                         <span class="string">decoded_by_headers</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This <i>should</i> be the safest way to save contents verbatim.</p>
+
+</dd>
+<dt id="mech-save_content-filename-binmode-binmode"><i>$mech-&gt;save_content( $filename, binmode =&gt; $binmode )</i></dt>
+<dd>
+
+<p>Filehandle is set to binary mode. If <code>$binmode</code> begins with &#39;:&#39;, it is passed as a parameter to <code>binmode</code>:</p>
+
+<pre><code>    <span class="keyword">binmode</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="variable">$binmode</span><span class="operator">;</span>
+</code></pre>
+
+<p>otherwise the filehandle is set to binary mode if <code>$binmode</code> is true:</p>
+
+<pre><code>    <span class="keyword">binmode</span> <span class="variable">$fh</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="all-other-arguments"><i>all other arguments</i></dt>
+<dd>
+
+<p>are passed as-is to <code>$mech-&gt;content(%opts)</code>. In particular, <code>decoded_by_headers</code> might come handy if you want to revert the effect of line compression performed by the web server but without further interpreting the contents (e.g. decoding it according to the charset).</p>
+
+</dd>
+</dl>
+
+<h2 id="mech-dump_headers-fh">$mech-&gt;dump_headers( [$fh] )</h2>
+
+<p>Prints a dump of the HTTP response headers for the most recent response. If <i>$fh</i> is not specified or is undef, it dumps to STDOUT.</p>
+
+<p>Unlike the rest of the dump_* methods, $fh can be a scalar. It will be used as a file name.</p>
+
+<h2 id="mech-dump_links-fh-absolute">$mech-&gt;dump_links( [[$fh], $absolute] )</h2>
+
+<p>Prints a dump of the links on the current page to <i>$fh</i>. If <i>$fh</i> is not specified or is undef, it dumps to STDOUT.</p>
+
+<p>If <i>$absolute</i> is true, links displayed are absolute, not relative.</p>
+
+<h2 id="mech-dump_images-fh-absolute">$mech-&gt;dump_images( [[$fh], $absolute] )</h2>
+
+<p>Prints a dump of the images on the current page to <i>$fh</i>. If <i>$fh</i> is not specified or is undef, it dumps to STDOUT.</p>
+
+<p>If <i>$absolute</i> is true, links displayed are absolute, not relative.</p>
+
+<h2 id="mech-dump_forms-fh">$mech-&gt;dump_forms( [$fh] )</h2>
+
+<p>Prints a dump of the forms on the current page to <i>$fh</i>. If <i>$fh</i> is not specified or is undef, it dumps to STDOUT.</p>
+
+<h2 id="mech-dump_text-fh">$mech-&gt;dump_text( [$fh] )</h2>
+
+<p>Prints a dump of the text on the current page to <i>$fh</i>. If <i>$fh</i> is not specified or is undef, it dumps to STDOUT.</p>
+
+<h1 id="OVERRIDDEN-LWP::UserAgent-METHODS">OVERRIDDEN LWP::UserAgent METHODS</h1>
+
+<h2 id="mech-clone">$mech-&gt;clone()</h2>
+
+<p>Clone the mech object. The clone will be using the same cookie jar as the original mech.</p>
+
+<h2 id="mech-redirect_ok">$mech-&gt;redirect_ok()</h2>
+
+<p>An overloaded version of <code>redirect_ok()</code> in <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>. This method is used to determine whether a redirection in the request should be followed.</p>
+
+<p>Note that WWW::Mechanize&#39;s constructor pushes POST on to the agent&#39;s <code>requests_redirectable</code> list.</p>
+
+<h2 id="mech-request-request-arg-size">$mech-&gt;request( $request [, $arg [, $size]])</h2>
+
+<p>Overloaded version of <code>request()</code> in <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>. Performs the actual request. Normally, if you&#39;re using WWW::Mechanize, it&#39;s because you don&#39;t want to deal with this level of stuff anyway.</p>
+
+<p>Note that <code>$request</code> will be modified.</p>
+
+<p>Returns an <a href="../../lib/HTTP/Response.html">HTTP::Response</a> object.</p>
+
+<h2 id="mech-update_html-html">$mech-&gt;update_html( $html )</h2>
+
+<p>Allows you to replace the HTML that the mech has found. Updates the forms and links parse-trees that the mech uses internally.</p>
+
+<p>Say you have a page that you know has malformed output, and you want to update it so the links come out correctly:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$html</span> <span class="operator">=</span> <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">;</span>
+    <span class="variable">$html</span> <span class="operator">=~</span> <span class="regex">s[&lt;/option&gt;.{0,3}&lt;/td&gt;][&lt;/option&gt;&lt;/select&gt;&lt;/td&gt;]isg</span><span class="operator">;</span>
+    <span class="variable">$mech</span><span class="operator">-&gt;</span><span class="variable">update_html</span><span class="operator">(</span> <span class="variable">$html</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is also used internally by the mech itself to update its own HTML content when loading a page. This means that if you would like to <i>systematically</i> perform the above HTML substitution, you would overload <i>update_html</i> in a subclass thusly:</p>
+
+<pre><code>   <span class="keyword">package</span> <span class="variable">MyMech</span><span class="operator">;</span>
+   <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'WWW::Mechanize'</span><span class="operator">;</span>
+   
+   <span class="keyword">sub</span><span class="variable"> update_html </span><span class="operator">{</span>
+       <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$html</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+       <span class="variable">$html</span> <span class="operator">=~</span> <span class="regex">s[&lt;/option&gt;.{0,3}&lt;/td&gt;][&lt;/option&gt;&lt;/select&gt;&lt;/td&gt;]isg</span><span class="operator">;</span>
+       <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">WWW::Mechanize::update_html</span><span class="operator">(</span> <span class="variable">$html</span> <span class="operator">);</span>
+   <span class="operator">}</span>
+</code></pre>
+
+<p>If you do this, then the mech will use the tidied-up HTML instead of the original both when parsing for its own needs, and for returning to you through <a href="#content">&quot;content&quot;</a>.</p>
+
+<p>Overloading this method is also the recommended way of implementing extra validation steps (e.g. link checkers) for every HTML page received. <a href="#warn">&quot;warn&quot;</a> and <a href="#die">&quot;die&quot;</a> would then come in handy to signal validation errors.</p>
+
+<h2 id="mech-credentials-username-password">$mech-&gt;credentials( $username, $password )</h2>
+
+<p>Provide credentials to be used for HTTP Basic authentication for all sites and realms until further notice.</p>
+
+<p>The four argument form described in <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> is still supported.</p>
+
+<h2 id="mech-get_basic_credentials-realm-uri-isproxy">$mech-&gt;get_basic_credentials( $realm, $uri, $isproxy )</h2>
+
+<p>Returns the credentials for the realm and URI.</p>
+
+<h2 id="mech-clear_credentials">$mech-&gt;clear_credentials()</h2>
+
+<p>Remove any credentials set up with <code>credentials()</code>.</p>
+
+<h1 id="INHERITED-UNCHANGED-LWP::UserAgent-METHODS">INHERITED UNCHANGED LWP::UserAgent METHODS</h1>
+
+<p>As a subclass of <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>, WWW::Mechanize inherits all of <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>&#39;s methods. Many of which are overridden or extended. The following methods are inherited unchanged. View the <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> documentation for their implementation descriptions.</p>
+
+<p>This is not meant to be an inclusive list. LWP::UA may have added others.</p>
+
+<h2 id="mech-head">$mech-&gt;head()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h2 id="mech-post">$mech-&gt;post()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h2 id="mech-mirror">$mech-&gt;mirror()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h2 id="mech-simple_request">$mech-&gt;simple_request()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h2 id="mech-is_protocol_supported">$mech-&gt;is_protocol_supported()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h2 id="mech-prepare_request">$mech-&gt;prepare_request()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h2 id="mech-progress">$mech-&gt;progress()</h2>
+
+<p>Inherited from <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>.</p>
+
+<h1 id="INTERNAL-ONLY-METHODS">INTERNAL-ONLY METHODS</h1>
+
+<p>These methods are only used internally. You probably don&#39;t need to know about them.</p>
+
+<h2 id="mech-_update_page-request-response">$mech-&gt;_update_page($request, $response)</h2>
+
+<p>Updates all internal variables in $mech as if $request was just performed, and returns $response. The page stack is <b>not</b> altered by this method, it is up to caller (e.g. <a href="#request">&quot;request&quot;</a>) to do that.</p>
+
+<h2 id="mech-_modify_request-req">$mech-&gt;_modify_request( $req )</h2>
+
+<p>Modifies a <a href="../../lib/HTTP/Request.html">HTTP::Request</a> before the request is sent out, for both GET and POST requests.</p>
+
+<p>We add a <code>Referer</code> header, as well as header to note that we can accept gzip encoded content, if <a href="../../lib/Compress/Zlib.html">Compress::Zlib</a> is installed.</p>
+
+<h2 id="mech-_make_request">$mech-&gt;_make_request()</h2>
+
+<p>Convenience method to make it easier for subclasses like <a>WWW::Mechanize::Cached</a> to intercept the request.</p>
+
+<h2 id="mech-_reset_page">$mech-&gt;_reset_page()</h2>
+
+<p>Resets the internal fields that track page parsed stuff.</p>
+
+<h2 id="mech-_extract_links">$mech-&gt;_extract_links()</h2>
+
+<p>Extracts links from the content of a webpage, and populates the <code><span class="operator">{</span><span class="variable">links</span><span class="operator">}</span>
+</code> property with <a href="../../lib/WWW/Mechanize/Link.html">WWW::Mechanize::Link</a> objects.</p>
+
+<h2 id="mech-_push_page_stack">$mech-&gt;_push_page_stack()</h2>
+
+<p>The agent keeps a stack of visited pages, which it can pop when it needs to go BACK and so on.</p>
+
+<p>The current page needs to be pushed onto the stack before we get a new page, and the stack needs to be popped when BACK occurs.</p>
+
+<p>Neither of these take any arguments, they just operate on the $mech object.</p>
+
+<h2 id="warn-messages">warn( @messages )</h2>
+
+<p>Centralized warning method, for diagnostics and non-fatal problems. Defaults to calling <code>CORE::warn</code>, but may be overridden by setting <code>onwarn</code> in the constructor.</p>
+
+<h2 id="die-messages">die( @messages )</h2>
+
+<p>Centralized error method. Defaults to calling <code>CORE::die</code>, but may be overridden by setting <code>onerror</code> in the constructor.</p>
+
+<h1 id="WWW::MECHANIZES-GIT-REPOSITORY">WWW::MECHANIZE&#39;S GIT REPOSITORY</h1>
+
+<p>WWW::Mechanize is hosted at GitHub.</p>
+
+<p>Repository: <a href="https://github.com/libwww-perl/WWW-Mechanize">https://github.com/libwww-perl/WWW-Mechanize</a>. Bugs: <a href="https://github.com/libwww-perl/WWW-Mechanize/issues">https://github.com/libwww-perl/WWW-Mechanize/issues</a>.</p>
+
+<h1 id="OTHER-DOCUMENTATION">OTHER DOCUMENTATION</h1>
+
+<h2 id="Spidering-Hacks-by-Kevin-Hemenway-and-Tara-Calishain"><i>Spidering Hacks</i>, by Kevin Hemenway and Tara Calishain</h2>
+
+<p><i>Spidering Hacks</i> from O&#39;Reilly (<a href="http://www.oreilly.com/catalog/spiderhks/">http://www.oreilly.com/catalog/spiderhks/</a>) is a great book for anyone wanting to know more about screen-scraping and spidering.</p>
+
+<p>There are six hacks that use Mech or a Mech derivative:</p>
+
+<dl>
+
+<dt id="WWW::Mechanize-101">#21 WWW::Mechanize 101</dt>
+<dd>
+
+</dd>
+<dt id="Scraping-with-WWW::Mechanize">#22 Scraping with WWW::Mechanize</dt>
+<dd>
+
+</dd>
+<dt id="Downloading-Images-from-Webshots">#36 Downloading Images from Webshots</dt>
+<dd>
+
+</dd>
+<dt id="Archiving-Yahoo-Groups-Messages-with-WWW::Yahoo::Groups">#44 Archiving Yahoo! Groups Messages with WWW::Yahoo::Groups</dt>
+<dd>
+
+</dd>
+<dt id="Super-Author-Searching">#64 Super Author Searching</dt>
+<dd>
+
+</dd>
+<dt id="Scraping-TV-Listings">#73 Scraping TV Listings</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>The book was also positively reviewed on Slashdot: <a href="http://books.slashdot.org/article.pl?sid=03/12/11/2126256">http://books.slashdot.org/article.pl?sid=03/12/11/2126256</a></p>
+
+<h1 id="ONLINE-RESOURCES-AND-SUPPORT">ONLINE RESOURCES AND SUPPORT</h1>
+
+<ul>
+
+<li><p>WWW::Mechanize mailing list</p>
+
+<p>The Mech mailing list is at <a href="http://groups.google.com/group/www-mechanize-users">http://groups.google.com/group/www-mechanize-users</a> and is specific to Mechanize, unlike the LWP mailing list below. Although it is a users list, all development discussion takes place here, too.</p>
+
+</li>
+<li><p>LWP mailing list</p>
+
+<p>The LWP mailing list is at <a href="http://lists.perl.org/showlist.cgi?name=libwww">http://lists.perl.org/showlist.cgi?name=libwww</a>, and is more user-oriented and well-populated than the WWW::Mechanize list.</p>
+
+</li>
+<li><p>Perlmonks</p>
+
+<p><a href="http://perlmonks.org">http://perlmonks.org</a> is an excellent community of support, and many questions about Mech have already been answered there.</p>
+
+</li>
+<li><p><a href="../../lib/WWW/Mechanize/Examples.html">WWW::Mechanize::Examples</a></p>
+
+<p>A random array of examples submitted by users, included with the Mechanize distribution.</p>
+
+</li>
+</ul>
+
+<h1 id="ARTICLES-ABOUT-WWW::MECHANIZE">ARTICLES ABOUT WWW::MECHANIZE</h1>
+
+<ul>
+
+<li><p><a href="http://www.ibm.com/developerworks/linux/library/wa-perlsecure/">http://www.ibm.com/developerworks/linux/library/wa-perlsecure/</a></p>
+
+<p>IBM article &quot;Secure Web site access with Perl&quot;</p>
+
+</li>
+<li><p><a href="http://www.oreilly.com/catalog/googlehks2/chapter/hack84.pdf">http://www.oreilly.com/catalog/googlehks2/chapter/hack84.pdf</a></p>
+
+<p>Leland Johnson&#39;s hack #84 in <i>Google Hacks, 2nd Edition</i> is an example of a production script that uses WWW::Mechanize and HTML::TableContentParser. It takes in keywords and returns the estimated price of these keywords on Google&#39;s AdWords program.</p>
+
+</li>
+<li><p><a href="http://www.perl.com/pub/a/2004/06/04/recorder.html">http://www.perl.com/pub/a/2004/06/04/recorder.html</a></p>
+
+<p>Linda Julien writes about using HTTP::Recorder to create WWW::Mechanize scripts.</p>
+
+</li>
+<li><p><a href="http://www.developer.com/lang/other/article.php/3454041">http://www.developer.com/lang/other/article.php/3454041</a></p>
+
+<p>Jason Gilmore&#39;s article on using WWW::Mechanize for scraping sales information from Amazon and eBay.</p>
+
+</li>
+<li><p><a href="http://www.perl.com/pub/a/2003/01/22/mechanize.html">http://www.perl.com/pub/a/2003/01/22/mechanize.html</a></p>
+
+<p>Chris Ball&#39;s article about using WWW::Mechanize for scraping TV listings.</p>
+
+</li>
+<li><p><a href="http://www.stonehenge.com/merlyn/LinuxMag/col47.html">http://www.stonehenge.com/merlyn/LinuxMag/col47.html</a></p>
+
+<p>Randal Schwartz&#39;s article on scraping Yahoo News for images. It&#39;s already out of date: He manually walks the list of links hunting for matches, which wouldn&#39;t have been necessary if the <code>find_link()</code> method existed at press time.</p>
+
+</li>
+<li><p><a href="http://www.perladvent.org/2002/16th/">http://www.perladvent.org/2002/16th/</a></p>
+
+<p>WWW::Mechanize on the Perl Advent Calendar, by Mark Fowler.</p>
+
+</li>
+<li><p><a href="http://www.linux-magazin.de/Ausgaben/2004/03/Datenruessel/%28language%29/ger-DE">http://www.linux-magazin.de/Ausgaben/2004/03/Datenruessel/%28language%29/ger-DE</a></p>
+
+<p>Michael Schilli&#39;s article on Mech and <a>WWW::Mechanize::Shell</a> for the German magazine <i>Linux Magazin</i>.</p>
+
+</li>
+</ul>
+
+<h2 id="Other-modules-that-use-Mechanize">Other modules that use Mechanize</h2>
+
+<p>Here are modules that use or subclass Mechanize. Let me know of any others:</p>
+
+<ul>
+
+<li><p><a>Finance::Bank::LloydsTSB</a></p>
+
+</li>
+<li><p><a>HTTP::Recorder</a></p>
+
+<p>Acts as a proxy for web interaction, and then generates WWW::Mechanize scripts.</p>
+
+</li>
+<li><p><a>Win32::IE::Mechanize</a></p>
+
+<p>Just like Mech, but using Microsoft Internet Explorer to do the work.</p>
+
+</li>
+<li><p><a>WWW::Bugzilla</a></p>
+
+</li>
+<li><p><a>WWW::CheckSite</a></p>
+
+</li>
+<li><p><a>WWW::Google::Groups</a></p>
+
+</li>
+<li><p><a>WWW::Hotmail</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::Cached</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::Cached::GZip</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::FormFiller</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::Shell</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::Sleepy</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::SpamCop</a></p>
+
+</li>
+<li><p><a>WWW::Mechanize::Timed</a></p>
+
+</li>
+<li><p><a>WWW::SourceForge</a></p>
+
+</li>
+<li><p><a>WWW::Yahoo::Groups</a></p>
+
+</li>
+<li><p><a>WWW::Scripter</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Thanks to the numerous people who have helped out on WWW::Mechanize in one way or another, including Kirrily Robert for the original <code>WWW::Automate</code>, Lyle Hopkins, Damien Clark, Ansgar Burchardt, Gisle Aas, Jeremy Ary, Hilary Holz, Rafael Kitover, Norbert Buchmuller, Dave Page, David Sainty, H.Merijn Brand, Matt Lawrence, Michael Schwern, Adriano Ferreira, Miyagawa, Peteris Krumins, Rafael Kitover, David Steinbrunner, Kevin Falcone, Mike O&#39;Regan, Mark Stosberg, Uri Guttman, Peter Scott, Phillipe Bruhat, Ian Langworth, John Beppu, Gavin Estey, Jim Brandt, Ask Bjoern Hansen, Greg Davies, Ed Silva, Mark-Jason Dominus, Autrijus Tang, Mark Fowler, Stuart Children, Max Maischein, Meng Wong, Prakash Kailasa, Abigail, Jan Pazdziora, Dominique Quatravaux, Scott Lanning, Rob Casey, Leland Johnson, Joshua Gatcomb, Julien Beasley, Abe Timmerman, Peter Stevens, Pete Krawczyk, Tad McClellan, and the late great Iain Truskett.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andy Lester &lt;andy at petdance.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2004-2016 by Andy Lester.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

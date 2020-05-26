@@ -1,0 +1,435 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#DIFF-STYLES">DIFF STYLES</a></li>
+  <li><a href="#UNICODE">UNICODE</a></li>
+  <li><a href="#DEPLOYING">DEPLOYING</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a>
+    <ul>
+      <li><a href="#Test-or-Test::More">Test or Test::More</a></li>
+      <li><a href="#Exporting">Exporting</a></li>
+      <li><a href="#Unicode">Unicode</a></li>
+      <li><a href="#Data::Dumper-and-older-Perls">Data::Dumper and older Perls.</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test::Differences - Test strings and data structures and show differences if not ok</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>0.62</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">Test</span><span class="operator">;</span>    <span class="comment">## Or use Test::More</span>
+   <span class="keyword">use</span> <span class="variable">Test::Differences</span><span class="operator">;</span>
+   
+   <span class="variable">eq_or_diff</span> <span class="variable">$got</span><span class="operator">,</span>  <span class="string">"a\nb\nc\n"</span><span class="operator">,</span>   <span class="string">"testing strings"</span><span class="operator">;</span>
+   <span class="variable">eq_or_diff</span> <span class="operator">\</span><span class="variable">@got</span><span class="operator">,</span> <span class="operator">[</span><span class="string">qw( a b c )</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"testing arrays"</span><span class="operator">;</span>
+   
+   <span class="comment">## Passing options:</span>
+   <span class="variable">eq_or_diff</span> <span class="variable">$got</span><span class="operator">,</span> <span class="variable">$expected</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">context</span> <span class="operator">=&gt;</span> <span class="number">300</span> <span class="operator">}</span><span class="operator">;</span>  <span class="comment">## options</span>
+   
+   <span class="comment">## Using with DBI-like data structures</span>
+   
+   <span class="keyword">use</span> <span class="variable">DBI</span><span class="operator">;</span>
+   
+   <span class="operator">...</span> <span class="keyword">open</span> <span class="variable">connection</span> <span class="operator">&amp;</span> <span class="variable">prepare</span> <span class="variable">statement</span> <span class="keyword">and</span> <span class="variable">@expected_</span><span class="operator">...</span> <span class="variable">here</span><span class="operator">...</span>
+   
+   <span class="variable">eq_or_diff</span> <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">fetchall_arrayref</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">@expected_arrays</span>  <span class="string">"testing DBI arrays"</span><span class="operator">;</span>
+   <span class="variable">eq_or_diff</span> <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">fetchall_hashref</span><span class="operator">,</span>  <span class="operator">\</span><span class="variable">@expected_hashes</span><span class="operator">,</span> <span class="string">"testing DBI hashes"</span><span class="operator">;</span>
+   
+   <span class="comment">## To force textual or data line numbering (text lines are numbered 1..):</span>
+   <span class="variable">eq_or_diff_text</span> <span class="operator">...;</span>
+   <span class="variable">eq_or_diff_data</span> <span class="operator">...;</span>
+</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<p>This module exports three test functions and four diff-style functions:</p>
+
+<ul>
+
+<li><p>Test functions</p>
+
+<ul>
+
+<li><p><code>eq_or_diff</code></p>
+
+</li>
+<li><p><code>eq_or_diff_data</code></p>
+
+</li>
+<li><p><code>eq_or_diff_text</code></p>
+
+</li>
+</ul>
+
+</li>
+<li><p>Diff style functions</p>
+
+<ul>
+
+<li><p><code>table_diff</code> (the default)</p>
+
+</li>
+<li><p><code>unified_diff</code></p>
+
+</li>
+<li><p><code>oldstyle_diff</code></p>
+
+</li>
+<li><p><code>context_diff</code></p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>When the code you&#39;re testing returns multiple lines, records or data structures and they&#39;re just plain wrong, an equivalent to the Unix <code>diff</code> utility may be just what&#39;s needed. Here&#39;s output from an example test script that checks two text documents and then two (trivial) data structures:</p>
+
+<pre><code> t/99example....1..3
+ not ok 1 - differences in text
+ #     Failed test ((eval 2) at line 14)
+ #     +---+----------------+----------------+
+ #     | Ln|Got             |Expected        |
+ #     +---+----------------+----------------+
+ #     |  1|this is line 1  |this is line 1  |
+ #     *  2|this is line 2  |this is line b  *
+ #     |  3|this is line 3  |this is line 3  |
+ #     +---+----------------+----------------+
+ not ok 2 - differences in whitespace
+ #     Failed test ((eval 2) at line 20)
+ #     +---+------------------+------------------+
+ #     | Ln|Got               |Expected          |
+ #     +---+------------------+------------------+
+ #     |  1|        indented  |        indented  |
+ #     *  2|        indented  |\tindented        *
+ #     |  3|        indented  |        indented  |
+ #     +---+------------------+------------------+
+ not ok 3
+ #     Failed test ((eval 2) at line 22)
+ #     +----+-------------------------------------+----------------------------+
+ #     | Elt|Got                                  |Expected                    |
+ #     +----+-------------------------------------+----------------------------+
+ #     *   0|bless( [                             |[                           *
+ #     *   1|  &#39;Move along, nothing to see here&#39;  |  &#39;Dry, humorless message&#39;  *
+ #     *   2|], &#39;Test::Builder&#39; )                 |]                           *
+ #     +----+-------------------------------------+----------------------------+
+ # Looks like you failed 3 tests of 3.</code></pre>
+
+<p>eq_or_diff_...() compares two strings or (limited) data structures and either emits an ok indication or a side-by-side diff. Test::Differences is designed to be used with Test.pm and with Test::Simple, Test::More, and other Test::Builder based testing modules. As the SYNOPSIS shows, another testing module must be used as the basis for your test suite.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<p>The options to <code>eq_or_diff</code> give some fine-grained control over the output.</p>
+
+<ul>
+
+<li><p><code>context</code></p>
+
+<p>This allows you to control the amount of context shown:</p>
+
+<pre><code>   <span class="variable">eq_or_diff</span> <span class="variable">$got</span><span class="operator">,</span> <span class="variable">$expected</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">context</span> <span class="operator">=&gt;</span> <span class="number">50000</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>will show you lots and lots of context. Normally, eq_or_diff() uses some heuristics to determine whether to show 3 lines of context (like a normal unified diff) or 25 lines.</p>
+
+</li>
+<li><p><code>data_type</code></p>
+
+<p><code>text</code> or <code>data</code>. See <code>eq_or_diff_text</code> and <code>eq_or_diff_data</code> to understand this. You can usually ignore this.</p>
+
+</li>
+<li><p><code>Sortkeys</code></p>
+
+<p>If passed, whatever value is added is used as the argument for <a href="../../lib/Data/Dumper.html">Data::Dumper</a> Sortkeys option. See the <a href="../../lib/Data/Dumper.html">Data::Dumper</a> docs to understand how you can control the Sortkeys behavior.</p>
+
+</li>
+<li><p><code>filename_a</code> and <code>filename_b</code></p>
+
+<p>The column headers to use in the output. They default to &#39;Got&#39; and &#39;Expected&#39;.</p>
+
+</li>
+</ul>
+
+<h1 id="DIFF-STYLES">DIFF STYLES</h1>
+
+<p>For extremely long strings, a table diff can wrap on your screen and be hard to read. If you are comfortable with different diff formats, you can switch to a format more suitable for your data. These are the four formats supported by the <a href="../../lib/Text/Diff.html">Text::Diff</a> module and are set with the following functions:</p>
+
+<ul>
+
+<li><p><code>table_diff</code> (the default)</p>
+
+</li>
+<li><p><code>unified_diff</code></p>
+
+</li>
+<li><p><code>oldstyle_diff</code></p>
+
+</li>
+<li><p><code>context_diff</code></p>
+
+</li>
+</ul>
+
+<p>You can run the following to understand the different diff output styles:</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Test::More</span> <span class="string">'no_plan'</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">Test::Differences</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$long_string</span> <span class="operator">=</span> <span class="keyword">join</span> <span class="string">''</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">..</span><span class="number">40</span><span class="operator">;</span>
+ 
+ <span class="variable">TODO</span><span class="operator">:</span> <span class="operator">{</span>
+     <span class="keyword">local</span> <span class="variable">$TODO</span> <span class="operator">=</span> <span class="string">'Testing diff styles'</span><span class="operator">;</span>
+ 
+     <span class="comment"># this is the default and does not need to explicitly set unless you need</span>
+     <span class="comment"># to reset it back from another diff type</span>
+     <span class="variable">table_diff</span><span class="operator">;</span>
+     <span class="variable">eq_or_diff</span> <span class="variable">$long_string</span><span class="operator">,</span> <span class="string">"-</span><span class="variable">$long_string</span><span class="string">"</span><span class="operator">,</span> <span class="string">'table diff'</span><span class="operator">;</span>
+ 
+     <span class="variable">unified_diff</span><span class="operator">;</span>
+     <span class="variable">eq_or_diff</span> <span class="variable">$long_string</span><span class="operator">,</span> <span class="string">"-</span><span class="variable">$long_string</span><span class="string">"</span><span class="operator">,</span> <span class="string">'unified diff'</span><span class="operator">;</span>
+ 
+     <span class="variable">context_diff</span><span class="operator">;</span>
+     <span class="variable">eq_or_diff</span> <span class="variable">$long_string</span><span class="operator">,</span> <span class="string">"-</span><span class="variable">$long_string</span><span class="string">"</span><span class="operator">,</span> <span class="string">'context diff'</span><span class="operator">;</span>
+ 
+     <span class="variable">oldstyle_diff</span><span class="operator">;</span>
+     <span class="variable">eq_or_diff</span> <span class="variable">$long_string</span><span class="operator">,</span> <span class="string">"-</span><span class="variable">$long_string</span><span class="string">"</span><span class="operator">,</span> <span class="string">'oldstyle diff'</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="UNICODE">UNICODE</h1>
+
+<p>Generally you&#39;ll find that the following test output is disappointing.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::Differences</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$want</span> <span class="operator">=</span> <span class="operator">{</span> <span class="string">'Traditional Chinese'</span> <span class="operator">=&gt;</span> <span class="string">'ä¸­å'</span> <span class="operator">}</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$have</span> <span class="operator">=</span> <span class="operator">{</span> <span class="string">'Traditional Chinese'</span> <span class="operator">=&gt;</span> <span class="string">'ä¸­å½'</span> <span class="operator">}</span><span class="operator">;</span>
+    
+    <span class="variable">eq_or_diff</span> <span class="variable">$have</span><span class="operator">,</span> <span class="variable">$want</span><span class="operator">,</span> <span class="string">'Unicode, baby'</span><span class="operator">;</span>
+</code></pre>
+
+<p>The output looks like this:</p>
+
+<pre><code>    #   Failed test &#39;Unicode, baby&#39;
+    #   at t/unicode.t line 12.
+    # +----+----------------------------+----------------------------+
+    # | Elt|Got                         |Expected                    |
+    # +----+----------------------------+----------------------------+
+    # |   0|&#39;Traditional Chinese&#39;       |&#39;Traditional Chinese&#39;       |
+    # *   1|&#39;\xe4\xb8\xad\xe5\x9b\xbd&#39;  |&#39;\xe4\xb8\xad\xe5\x9c\x8b&#39;  *
+    # +----+----------------------------+----------------------------+
+    # Looks like you failed 1 test of 1.
+    Dubious, test returned 1 (wstat 256, 0x100)</code></pre>
+
+<p>This is generally not helpful and someone points out that you didn&#39;t declare your test program as being utf8, so you do that:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::Differences</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">utf8</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$want</span> <span class="operator">=</span> <span class="operator">{</span> <span class="string">'Traditional Chinese'</span> <span class="operator">=&gt;</span> <span class="string">'ä¸­å'</span> <span class="operator">}</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$have</span> <span class="operator">=</span> <span class="operator">{</span> <span class="string">'Traditional Chinese'</span> <span class="operator">=&gt;</span> <span class="string">'ä¸­å½'</span> <span class="operator">}</span><span class="operator">;</span>
+    
+    <span class="variable">eq_or_diff</span> <span class="variable">$have</span><span class="operator">,</span> <span class="variable">$want</span><span class="operator">,</span> <span class="string">'Unicode, baby'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Here&#39;s what you get:</p>
+
+<pre><code>    <span class="comment">#   Failed test 'Unicode, baby'</span>
+    <span class="comment">#   at t/unicode.t line 12.</span>
+    <span class="comment"># +----+-----------------------+-----------------------+</span>
+    <span class="comment"># | Elt|Got                    |Expected               |</span>
+    <span class="comment"># +----+-----------------------+-----------------------+</span>
+    <span class="comment"># |   0|'Traditional Chinese'  |'Traditional Chinese'  |</span>
+    <span class="comment"># *   1|'\x{4e2d}\x{56fd}'     |'\x{4e2d}\x{570b}'     *</span>
+    <span class="comment"># +----+-----------------------+-----------------------+</span>
+    <span class="comment"># Looks like you failed 1 test of 1.</span>
+    <span class="variable">Dubious</span><span class="operator">,</span> <span class="variable">test</span> <span class="variable">returned</span> <span class="number">1</span> <span class="operator">(</span><span class="variable">wstat</span> <span class="number">256</span><span class="operator">,</span> <span class="number">0x100</span><span class="operator">)</span>
+    <span class="variable">Failed</span> <span class="number">1</span><span class="operator">/</span><span class="number">1</span> <span class="variable">subtests</span>
+</code></pre>
+
+<p>That&#39;s better, but still awful. However, if you have <code>Text::Diff</code> 0.40 or higher installed, you can add this to your code:</p>
+
+<pre><code>    <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">$ENV</span><span class="operator">{</span><span class="string">DIFF_OUTPUT_UNICODE</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Make sure you do this <i>before</i> you load <a href="../../lib/Text/Diff.html">Text::Diff</a>. Then this is the output:</p>
+
+<pre><code>    <span class="comment"># +----+-----------------------+-----------------------+</span>
+    <span class="comment"># | Elt|Got                    |Expected               |</span>
+    <span class="comment"># +----+-----------------------+-----------------------+</span>
+    <span class="comment"># |   0|'Traditional Chinese'  |'Traditional Chinese'  |</span>
+    <span class="comment"># *   1|'ä¸­å½'                 |'ä¸­å'                 *</span>
+    <span class="comment"># +----+-----------------------+-----------------------+</span>
+</code></pre>
+
+<h1 id="DEPLOYING">DEPLOYING</h1>
+
+<p>There are several basic ways of deploying Test::Differences requiring more or less labor by you or your users.</p>
+
+<ul>
+
+<li><p>Fallback to <code>is_deeply</code>.</p>
+
+<p>This is your best option if you want this module to be optional.</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Test::More</span><span class="operator">;</span>
+ <span class="keyword">BEGIN</span> <span class="operator">{</span>
+     <span class="keyword">if</span> <span class="operator">(!</span><span class="keyword">eval</span> <span class="string">q{ use Test::Differences; 1 }</span><span class="operator">)</span> <span class="operator">{</span>
+         <span class="variable">*eq_or_diff</span> <span class="operator">=</span> <span class="operator">\&amp;</span><span class="variable">is_deeply</span><span class="operator">;</span>
+     <span class="operator">}</span>
+ <span class="operator">}</span>
+</code></pre>
+
+</li>
+<li><p></p>
+
+<pre><code> <span class="keyword">eval</span> <span class="string">"use Test::Differences"</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you want to detect the presence of Test::Differences on the fly, something like the following code might do the trick for you:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test</span> <span class="string">qw( !ok )</span><span class="operator">;</span>   <span class="comment">## get all syms *except* ok</span>
+    
+    <span class="keyword">eval</span> <span class="string">"use Test::Differences"</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> ok </span><span class="operator">{</span>
+        <span class="keyword">goto</span> <span class="operator">&amp;</span><span class="variable">eq_or_diff</span> <span class="keyword">if</span> <span class="keyword">defined</span> <span class="operator">&amp;</span><span class="variable">eq_or_diff</span> <span class="operator">&amp;&amp;</span> <span class="variable">@_</span> <span class="operator">&gt;</span> <span class="number">1</span><span class="operator">;</span>
+        <span class="variable">@_</span> <span class="operator">=</span> <span class="keyword">map</span> <span class="keyword">ref</span> <span class="variable">$_</span> <span class="operator">?</span> <span class="variable">Dumper</span><span class="operator">(</span> <span class="variable">@_</span> <span class="operator">)</span> <span class="operator">:</span> <span class="variable">$_</span><span class="operator">,</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">goto</span> <span class="variable">Test:</span>:&amp;<span class="variable">ok</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">plan</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+    
+    <span class="variable">ok</span> <span class="string">"a"</span><span class="operator">,</span> <span class="string">"b"</span><span class="operator">;</span>
+</code></pre>
+
+</li>
+<li><p>PREREQ_PM =&gt; { .... &quot;Test::Differences&quot; =&gt; 0, ... }</p>
+
+<p>This method will let CPAN and CPANPLUS users download it automatically. It will discomfit those users who choose/have to download all packages manually.</p>
+
+</li>
+<li><p>t/lib/Test/Differences.pm, t/lib/Text/Diff.pm, ...</p>
+
+<p>By placing Test::Differences and its prerequisites in the t/lib directory, you avoid forcing your users to download the Test::Differences manually if they aren&#39;t using CPAN or CPANPLUS.</p>
+
+<p>If you put a <code><span class="keyword">use</span> <span class="variable">lib</span> <span class="string">"t/lib"</span><span class="operator">;</span>
+</code> in the top of each test suite before the <code><span class="keyword">use</span> <span class="variable">Test::Differences</span><span class="operator">;</span>
+</code>, <code>make test</code> should work well.</p>
+
+<p>You might want to check once in a while for new Test::Differences releases if you do this.</p>
+
+</li>
+</ul>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<h2 id="Test-or-Test::More"><code>Test</code> or <code>Test::More</code></h2>
+
+<p>This module &quot;mixes in&quot; with Test.pm or any of the test libraries based on Test::Builder (Test::Simple, Test::More, etc). It does this by peeking to see whether Test.pm or Test/Builder.pm is in %INC, so if you are not using one of those, it will print a warning and play dumb by not emitting test numbers (or incrementing them). If you are using one of these, it should interoperate nicely.</p>
+
+<h2 id="Exporting">Exporting</h2>
+
+<p>Exports all 3 functions by default (and by design). Use</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test::Differences</span> <span class="operator">();</span>
+</code></pre>
+
+<p>to suppress this behavior if you don&#39;t like the namespace pollution.</p>
+
+<p>This module will not override functions like ok(), is(), is_deeply(), etc. If it did, then you could <code><span class="keyword">eval</span> <span class="string">"use Test::Differences qw( is_deeply );"</span>
+</code> to get automatic upgrading to diffing behaviors without the <code>sub my_ok</code> shown above. Test::Differences intentionally does not provide this behavior because this would mean that Test::Differences would need to emulate every popular test module out there, which would require far more coding and maintenance that I&#39;m willing to do. Use the eval and my_ok deployment shown above if you want some level of automation.</p>
+
+<h2 id="Unicode">Unicode</h2>
+
+<p>Perls before 5.6.0 don&#39;t support characters &gt; 255 at all, and 5.6.0 seems broken. This means that you might get odd results using perl5.6.0 with unicode strings.</p>
+
+<h2 id="Data::Dumper-and-older-Perls"><code>Data::Dumper</code> and older Perls.</h2>
+
+<p>Relies on Data::Dumper (for now), which, prior to perl5.8, will not always report hashes in the same order. <code> $Data::Dumper::Sortkeys </code> <i>is</i> set to 1, so on more recent versions of Data::Dumper, this should not occur. Check CPAN to see if it&#39;s been peeled out of the main perl distribution and backported. Reported by Ilya Martynov &lt;ilya@martynov.org&gt;, although the Sortkeys &quot;future perfect&quot; workaround has been set in anticipation of a new Data::Dumper for a while. Note that the two hashes should report the same here:</p>
+
+<pre><code>    <span class="keyword">not</span> <span class="variable">ok</span> <span class="number">5</span>
+    <span class="comment">#     Failed test (t/ctrl/05-home.t at line 51)</span>
+    <span class="comment"># +----+------------------------+----+------------------------+</span>
+    <span class="comment"># | Elt|Got                     | Elt|Expected                |</span>
+    <span class="comment"># +----+------------------------+----+------------------------+</span>
+    <span class="comment"># |   0|{                       |   0|{                       |</span>
+    <span class="comment"># |   1|  'password' =&gt; '',     |   1|  'password' =&gt; '',     |</span>
+    <span class="comment"># *   2|  'method' =&gt; 'login',  *    |                        |</span>
+    <span class="comment"># |   3|  'ctrl' =&gt; 'home',     |   2|  'ctrl' =&gt; 'home',     |</span>
+    <span class="comment"># |    |                        *   3|  'method' =&gt; 'login',  *</span>
+    <span class="comment"># |   4|  'email' =&gt; 'test'     |   4|  'email' =&gt; 'test'     |</span>
+    <span class="comment"># |   5|}                       |   5|}                       |</span>
+    <span class="comment"># +----+------------------------+----+------------------------+</span>
+</code></pre>
+
+<p>Data::Dumper also overlooks the difference between</p>
+
+<pre><code>    <span class="variable">$a</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">$a</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="variable">$a</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">$a</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>   <span class="comment"># $a[0] = \$a[1]</span>
+</code></pre>
+
+<p>and</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">$y</span><span class="operator">;</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">$x</span><span class="operator">;</span>
+    <span class="variable">@a</span> <span class="operator">=</span> <span class="operator">(</span> <span class="variable">$x</span><span class="operator">,</span> <span class="variable">$y</span> <span class="operator">);</span>  <span class="comment"># $a[0] = \$y, not \$a[1]</span>
+</code></pre>
+
+<p>The former involves two scalars, the latter 4: $x, $y, and @a[0,1]. This was carefully explained to me in words of two syllables or less by Yves Orton &lt;demerphq@hotmail.com&gt;. The plan to address this is to allow you to select Data::Denter or some other module of your choice as an option.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<pre><code>    Barrie Slaymaker &lt;barries@slaysys.com&gt; - original author
+
+    Curtis &quot;Ovid&quot; Poe &lt;ovid@cpan.org&gt;
+
+    David Cantrell &lt;david@cantrell.org.uk&gt;</code></pre>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>Copyright 2001-2008 Barrie Slaymaker, All Rights Reserved.</p>
+
+<p>You may use this software under the terms of the GNU public license, any version, or the Artistic license.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,143 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Method">Method</a></li>
+    </ul>
+  </li>
+  <li><a href="#FILES">FILES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>IO::Socket::SSL::PublicSuffix - provide access to Mozilla&#39;s list of effective TLD names</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="comment"># use builtin default</span>
+    <span class="keyword">use</span> <span class="variable">IO::Socket::SSL::PublicSuffix</span><span class="operator">;</span>
+    <span class="variable">$ps</span> <span class="operator">=</span> <span class="variable">IO::Socket::SSL::PublicSuffix</span><span class="operator">-&gt;</span><span class="variable">default</span><span class="operator">;</span>
+    
+    <span class="comment"># load from string</span>
+    <span class="variable">$ps</span> <span class="operator">=</span> <span class="variable">IO::Socket::SSL::PublicSuffix</span><span class="operator">-&gt;</span><span class="variable">from_string</span><span class="operator">(</span><span class="string">"*.uk\n*"</span><span class="operator">);</span>
+    
+    <span class="comment"># load from file or file handle</span>
+    <span class="variable">$ps</span> <span class="operator">=</span> <span class="variable">IO::Socket::SSL::PublicSuffix</span><span class="operator">-&gt;</span><span class="variable">from_file</span><span class="operator">(</span><span class="variable">$filename</span><span class="operator">);</span>
+    <span class="variable">$ps</span> <span class="operator">=</span> <span class="variable">IO::Socket::SSL::PublicSuffix</span><span class="operator">-&gt;</span><span class="variable">from_file</span><span class="operator">(\</span><span class="variable">*STDIN</span><span class="operator">);</span>
+    
+    
+    <span class="comment"># --- string in -&gt; string out</span>
+    <span class="comment"># $rest -&gt; whatever.host</span>
+    <span class="comment"># $tld  -&gt; co.uk</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$rest</span><span class="operator">,</span><span class="variable">$tld</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$ps</span><span class="operator">-&gt;</span><span class="variable">public_suffix</span><span class="operator">(</span><span class="string">'whatever.host.co.uk'</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$tld</span> <span class="operator">=</span> <span class="variable">$ps</span><span class="operator">-&gt;</span><span class="variable">public_suffix</span><span class="operator">(</span><span class="string">'whatever.host.co.uk'</span><span class="operator">);</span>
+    
+    <span class="comment"># $root_domain -&gt; host.co.uk</span>
+    <span class="keyword">my</span> <span class="variable">$root_domain</span> <span class="operator">=</span> <span class="variable">$ps</span><span class="operator">-&gt;</span><span class="variable">public_suffix</span><span class="operator">(</span><span class="string">'whatever.host.co.uk'</span><span class="operator">,</span> <span class="number">1</span><span class="operator">);</span>
+    
+    <span class="comment"># --- array in -&gt; array out</span>
+    <span class="comment"># $rest -&gt; [qw(whatever host)]</span>
+    <span class="comment"># $tld  -&gt; [qw(co uk)]</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$rest</span><span class="operator">,</span><span class="variable">$tld</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$ps</span><span class="operator">-&gt;</span><span class="variable">public_suffix</span><span class="operator">(</span><span class="operator">[</span><span class="string">qw(whatever host co uk)</span><span class="operator">]</span><span class="operator">);</span>
+    
+     <span class="operator">----</span>
+    
+    <span class="comment"># To update this file with the current list:</span>
+    <span class="variable">perl</span> <span class="operator">-</span><span class="variable">MIO::Socket::SSL::PublicSuffix</span> <span class="keyword">-e</span> <span class="string">'IO::Socket::SSL::PublicSuffix::update_self_from_url()'</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module uses the list of effective top level domain names from the mozilla project to determine the public top level domain for a given hostname.</p>
+
+<h2 id="Method">Method</h2>
+
+<dl>
+
+<dt id="class-default-args">class-&gt;default(%args)</dt>
+<dd>
+
+<p>Returns object with builtin default. <code>min_suffix</code> can be given in <code>%args</code> to specify the minimal suffix, default is 1.</p>
+
+</dd>
+<dt id="class-from_string-string-args">class-&gt;from_string(string,%args)</dt>
+<dd>
+
+<p>Returns object with configuration from string. See method <code>default</code> for <code>%args</code>.</p>
+
+</dd>
+<dt id="class-from_file-file-name-file-handle-args">class-&gt;from_file( file name| file handle, %args )</dt>
+<dd>
+
+<p>Returns object with configuration from file or file handle. See method <code>default</code> for <code>%args</code>.</p>
+
+</dd>
+<dt id="self-public_suffix-host-host-add">$self-&gt;public_suffix( $host|\@host, [ $add ] )</dt>
+<dd>
+
+<p>In array context the function returns the non-tld part and the tld part of the given hostname, in scalar context only the tld part. It adds <code>$add</code> parts of the non-tld part to the tld, e.g. with <code>$add=1</code> it will return the root domain.</p>
+
+<p>If there were no explicit matches against the public suffix configuration it will fall back to a suffix of length 1.</p>
+
+<p>The function accepts a string or an array-ref (e.g. host split by <code>.</code>). In the first case it will return string(s), in the latter case array-ref(s).</p>
+
+<p>International hostnames or labels can be in ASCII (IDNA form starting with <code>xn--</code>) or unicode. In the latter case an IDNA handling library like <a>Net::IDN:::Encode</a>, <a>Net::LibIDN</a> or recent versions of <a href="../../../../lib/URI.html">URI</a> need to be installed.</p>
+
+</dd>
+<dt id="self-class--can_idn">($self|class)-&gt;can_idn</dt>
+<dd>
+
+<p>Returns true if IDN support is available.</p>
+
+</dd>
+</dl>
+
+<h1 id="FILES">FILES</h1>
+
+<p>http://publicsuffix.org/list/effective_tld_names.dat</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Domain::PublicSuffix, Mozilla::PublicSuffix</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<pre><code> Q: Why yet another module, we already have L&lt;Domain::PublicSuffix&gt; and
+    L&lt;Mozilla::PublicSuffix&gt;.
+ A: Because the public suffix data change more often than these modules do,
+    IO::Socket::SSL needs this list and it is more easy this way to keep it
+    up-to-date.</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Steffen Ullrich</p>
+
+
+</body>
+
+</html>
+
+

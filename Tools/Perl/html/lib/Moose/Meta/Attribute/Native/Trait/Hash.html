@@ -1,0 +1,238 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#PROVIDED-METHODS">PROVIDED METHODS</a>
+    <ul>
+      <li><a href="#get-key-key2-key3">get($key, $key2, $key3...)</a></li>
+      <li><a href="#set-key-value-key2-value2">set($key =&gt; $value, $key2 =&gt; $value2...)</a></li>
+      <li><a href="#delete-key-key2-key3">delete($key, $key2, $key3...)</a></li>
+      <li><a href="#keys">keys</a></li>
+      <li><a href="#exists-key">exists($key)</a></li>
+      <li><a href="#defined-key">defined($key)</a></li>
+      <li><a href="#values">values</a></li>
+      <li><a href="#kv">kv</a></li>
+      <li><a href="#elements">elements</a></li>
+      <li><a href="#clear">clear</a></li>
+      <li><a href="#count">count</a></li>
+      <li><a href="#is_empty">is_empty</a></li>
+      <li><a href="#accessor-key">accessor($key)</a></li>
+      <li><a href="#accessor-key-value">accessor($key, $value)</a></li>
+      <li><a href="#shallow_clone">shallow_clone</a></li>
+      <li><a href="#Why-no-each">Why no each?</a></li>
+      <li><a href="#Moose::Meta::Attribute-meta">Moose::Meta::Attribute-&gt;meta</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Meta::Attribute::Native::Trait::Hash - Helper trait for HashRef attributes</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Stuff</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'options'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">traits</span>    <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Hash'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">is</span>        <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>       <span class="operator">=&gt;</span> <span class="string">'HashRef[Str]'</span><span class="operator">,</span>
+      <span class="string">default</span>   <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">{}</span> <span class="operator">},</span>
+      <span class="string">handles</span>   <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">set_option</span>     <span class="operator">=&gt;</span> <span class="string">'set'</span><span class="operator">,</span>
+          <span class="string">get_option</span>     <span class="operator">=&gt;</span> <span class="string">'get'</span><span class="operator">,</span>
+          <span class="string">has_no_options</span> <span class="operator">=&gt;</span> <span class="string">'is_empty'</span><span class="operator">,</span>
+          <span class="string">num_options</span>    <span class="operator">=&gt;</span> <span class="string">'count'</span><span class="operator">,</span>
+          <span class="string">delete_option</span>  <span class="operator">=&gt;</span> <span class="string">'delete'</span><span class="operator">,</span>
+          <span class="string">option_pairs</span>   <span class="operator">=&gt;</span> <span class="string">'kv'</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This trait provides native delegation methods for hash references.</p>
+
+<h1 id="PROVIDED-METHODS">PROVIDED METHODS</h1>
+
+<h2 id="get-key-key2-key3">get($key, $key2, $key3...)</h2>
+
+<p>Returns values from the hash.</p>
+
+<p>In list context it returns a list of values in the hash for the given keys. In scalar context it returns the value for the last key specified.</p>
+
+<p>This method requires at least one argument.</p>
+
+<h2 id="set-key-value-key2-value2">set($key =&gt; $value, $key2 =&gt; $value2...)</h2>
+
+<p>Sets the elements in the hash to the given values. It returns the new values set for each key, in the same order as the keys passed to the method.</p>
+
+<p>This method requires at least two arguments, and expects an even number of arguments.</p>
+
+<h2 id="delete-key-key2-key3">delete($key, $key2, $key3...)</h2>
+
+<p>Removes the elements with the given keys.</p>
+
+<p>In list context it returns a list of values in the hash for the deleted keys. In scalar context it returns the value for the last key specified.</p>
+
+<h2 id="keys">keys</h2>
+
+<p>Returns the list of keys in the hash.</p>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="exists-key">exists($key)</h2>
+
+<p>Returns true if the given key is present in the hash.</p>
+
+<p>This method requires a single argument.</p>
+
+<h2 id="defined-key">defined($key)</h2>
+
+<p>Returns true if the value of a given key is defined.</p>
+
+<p>This method requires a single argument.</p>
+
+<h2 id="values">values</h2>
+
+<p>Returns the list of values in the hash.</p>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="kv">kv</h2>
+
+<p>Returns the key/value pairs in the hash as an array of array references.</p>
+
+<pre><code>  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$pair</span> <span class="operator">(</span> <span class="variable">$object</span><span class="operator">-&gt;</span><span class="variable">option_pairs</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"</span><span class="variable">$pair</span><span class="string">-&gt;[0] = </span><span class="variable">$pair</span><span class="string">-&gt;[1]\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="elements">elements</h2>
+
+<p>Returns the key/value pairs in the hash as a flattened list..</p>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="clear">clear</h2>
+
+<p>Resets the hash to an empty value, like <code>%hash = ()</code>.</p>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="count">count</h2>
+
+<p>Returns the number of elements in the hash. Also useful to check for a nonempty hash, because <code>count</code> returns a true (nonzero) value if there is something in the hash: <code>has_options =&gt; &#39;count&#39;</code>.</p>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="is_empty">is_empty</h2>
+
+<p>If the hash is populated, returns false. Otherwise, returns true.</p>
+
+<p>This method does not accept any arguments.</p>
+
+<h2 id="accessor-key">accessor($key)</h2>
+
+<h2 id="accessor-key-value">accessor($key, $value)</h2>
+
+<p>If passed one argument, returns the value of the specified key. If passed two arguments, sets the value of the specified key.</p>
+
+<p>When called as a setter, this method returns the value that was set.</p>
+
+<h2 id="shallow_clone">shallow_clone</h2>
+
+<p>This method returns a shallow clone of the hash reference. The return value is a reference to a new hash with the same keys and values. It is <i>shallow</i> because any values that were references in the original will be the <i>same</i> references in the clone.</p>
+
+<h2 id="Why-no-each">Why no <code>each</code>?</h2>
+
+<p>We have deliberately omitted a method for <code>each</code>, due to its stateful interaction with the hash iterator. Using <code>keys</code> or <code>kv</code> is much safer.</p>
+
+<h2 id="Moose::Meta::Attribute-meta">Moose::Meta::Attribute-&gt;meta</h2>
+
+<p>This will return a <a href="../../../../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> instance for this class.</p>
+
+<p>It should also be noted that <a href="../../../../../../lib/Class/MOP.html">Class::MOP</a> will actually bootstrap this module by installing a number of attribute meta-objects into its metaclass.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../../../../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

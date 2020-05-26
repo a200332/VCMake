@@ -1,0 +1,303 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Iterators">Iterators</a></li>
+    </ul>
+  </li>
+  <li><a href="#ENVIRONMENT">ENVIRONMENT</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::CPAN - Get information and files from CPAN</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">ActiveState::CPAN</span> <span class="operator">();</span>
+ <span class="keyword">my</span> <span class="variable">$cpan</span> <span class="operator">=</span> <span class="variable">ActiveState::CPAN</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>ActiveState::CPAN provides an interface for fetching files off CPAN and for extracting information from the various meta and index files. The following methods are provided:</p>
+
+<dl>
+
+<dt id="cpan-ActiveState::CPAN-new-options">$cpan = ActiveState::CPAN-&gt;new( %options )</dt>
+<dd>
+
+<p>This constructs a new ActiveState::CPAN object. The following options are recognized:</p>
+
+<dl>
+
+<dt id="mirror-url_or_path">mirror =&gt; $url_or_path</dt>
+<dd>
+
+<p>Give the URL of the CPAN mirror to fetch files from. The module works best with a local CPAN mirror and this option might also be given as a path to the local mirror. If not provided, then the CPAN_ROOT environment variable is consulted, and finally a set of hardcoded URLs are used.</p>
+
+</dd>
+<dt id="cache-path">cache =&gt; $path</dt>
+<dd>
+
+<p>The cache is a directory containing a partial mirror of CPAN. If files are requested from remote mirrors or backpan they will be stored in the cache and served back from here the next time they are requested.</p>
+
+<p>You need to specify a cache if you rely on $cpan-&gt;get_file() to return file system path names for all CPAN paths.</p>
+
+</dd>
+<dt id="backpan-url">backpan =&gt; $url</dt>
+<dd>
+
+<p>Give the URL of the backpan server to use to fetch files that have expired from CPAN. The default is &quot;http://backpan.cpantesters.org/&quot;.</p>
+
+<p>An explict <code>undef</code> can be passed to disable the fallback on Backpan.</p>
+
+</dd>
+<dt id="verbose-bool">verbose =&gt; $bool</dt>
+<dd>
+
+<p>If TRUE print trace messages to STDOUT about operations are taken, like downloads from remote servers. Default is TRUE.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="cpan-clear_cache">$cpan-&gt;clear_cache</dt>
+<dd>
+
+<p>This will delete all the files in the cache directory. Use with care. This is a noop if you did not pass the <code>cache</code> option to the constructor.</p>
+
+</dd>
+<dt id="cpan-local_mirror">$cpan-&gt;local_mirror</dt>
+<dd>
+
+<p>Returns the file system path to the local mirror used. Returns <code>undef</code> if there is no local mirror.</p>
+
+</dd>
+<dt id="cpan-author-author_id">$cpan-&gt;author( $author_id )</dt>
+<dd>
+
+<p>Returns the email alias for the given CPAN author. The alias is on the form:</p>
+
+<pre><code>    Gisle Aas &lt;gisle@aas.no&gt;</code></pre>
+
+</dd>
+<dt id="cpan-authors">$cpan-&gt;authors</dt>
+<dd>
+
+<p>Returns a reference to a hash that maps author ids to email aliases.</p>
+
+</dd>
+<dt id="cpan-packages-opt">$cpan-&gt;packages( %opt )</dt>
+<dd>
+
+<p>This returns the list of packages on CPAN. The packages are returned as a reference to a hash with the following keys:</p>
+
+<dl>
+
+<dt id="name">name</dt>
+<dd>
+
+<p>This is the bare name of the package. It&#39;s a string like &quot;libwww-perl&quot;.</p>
+
+</dd>
+<dt id="version">version</dt>
+<dd>
+
+<p>This is the version number of the package. It&#39;s a string like &quot;5.812&quot;.</p>
+
+</dd>
+<dt id="maturity">maturity</dt>
+<dd>
+
+<p>The maturity of the distribution. This will be either &quot;released&quot; or &quot;developer&quot;.</p>
+
+</dd>
+<dt id="author">author</dt>
+<dd>
+
+<p>This is the CPAN author id owning the package. It&#39;s a string like &quot;GAAS&quot;.</p>
+
+</dd>
+<dt id="extension">extension</dt>
+<dd>
+
+<p>This is the file suffix of the package file. It&#39;s a string like &quot;tar.gz&quot;</p>
+
+</dd>
+<dt id="path">path</dt>
+<dd>
+
+<p>This is the CPAN relative path of the package file. It&#39;s a string like &quot;authors/id/G/GA/GAAS/libwww-perl-5.812.tar.gz&quot;.</p>
+
+</dd>
+</dl>
+
+<p>The passed in options determine what packages are returned. The recognized options are:</p>
+
+<dl>
+
+<dt id="indexed-1">indexed =&gt; 1</dt>
+<dd>
+
+<p>If passed with a TRUE value only list packages with indexed modules (as determined by the CPAN indexer).</p>
+
+</dd>
+<dt id="recent-1">recent =&gt; 1</dt>
+<dd>
+
+<p>The most recently uploaded packages are returned first.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="cpan-packages_iter-opt">$cpan-&gt;packages_iter( %opt )</dt>
+<dd>
+
+<p>This returns an iterator that returns the packages on CPAN. The iterator returns the name, version, maturity, author, extension and path of the package. In scalar context the path is returned.</p>
+
+<p>The recognized options are the same as for packages() described above.</p>
+
+</dd>
+<dt id="cpan-package_info-path">$cpan-&gt;package_info( $path )</dt>
+<dd>
+
+<p>Returns a hash reference like the ones that package() returns. In list context it returns separate values like package iterator does.</p>
+
+</dd>
+<dt id="cpan-modules_iter">$cpan-&gt;modules_iter()</dt>
+<dd>
+
+<p>This returns an iterator that returns the indexed modules on CPAN. The iterator returns module name, module version and the CPAN relative package path. In scalar context the module name is returned.</p>
+
+</dd>
+<dt id="cpan-files-opt">$cpan-&gt;files( %opt )</dt>
+<dd>
+
+<p>This returns the list of path names of the files on CPAN. Symlinks are not returned. The options passed in can be used to select what path names are returned. The recognized options are:</p>
+
+<dl>
+
+<dt id="matching-qr">matching =&gt; qr/.../</dt>
+<dd>
+
+<p>Only list path names that match the given regular expression.</p>
+
+</dd>
+<dt id="package-1">package =&gt; 1</dt>
+<dd>
+
+<p>If passed with a TRUE value only list package files, also called CPAN distributions. These have normally names that end in <i>.tar.gz</i>.</p>
+
+</dd>
+<dt id="author-author_id">author =&gt; $author_id</dt>
+<dd>
+
+<p>Only list files uploaded by the given CPAN author. The $author_id is a string like &quot;GAAS&quot;.</p>
+
+</dd>
+<dt id="order_by-field">order_by =&gt; $field</dt>
+<dd>
+
+</dd>
+<dt id="order_by-field-desc">order_by =&gt; &quot;$field desc&quot;</dt>
+<dd>
+
+<p>Return the files sorted by the given field, which can be one of &quot;path&quot;, &quot;size&quot;, &quot;mtime&quot;. Append the string &quot; desc&quot; to the field name to sort in descending order. For example:</p>
+
+<pre><code>   order_by =&gt; &quot;mtime desc&quot;</code></pre>
+
+<p>will return the most recently uploaded files first.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="cpan-files_iter-opt">$cpan-&gt;files_iter( %opt )</dt>
+<dd>
+
+<p>This returns an iterator that returns the files on CPAN. Symlinks are not returned. The iterator returns the path name, the size and the last modified timestamp. In scalar context only the path name is returned.</p>
+
+<p>The recognized options are the same as for files() described above.</p>
+
+<p>The timestamp is in ISO 8601 compact format: YYYYMMDDThhmmss (with a literal &quot;T&quot;).</p>
+
+</dd>
+<dt id="cpan-get-path">$cpan-&gt;get( $path )</dt>
+<dd>
+
+<p>Returns the full content of the given file or undef if the file can&#39;t be found. Compressed files are automatically uncompressed.</p>
+
+</dd>
+<dt id="cpan-get_file-path">$cpan-&gt;get_file( $path )</dt>
+<dd>
+
+<p>Returns the file sytem path that corresponds to the given CPAN path. This will either be the path to a local CPAN mirror or a path within the cache. If there is no cache configured, then this function might return <code>undef</code>.</p>
+
+</dd>
+<dt id="cpan-open-path">$cpan-&gt;open( $path )</dt>
+<dd>
+
+<p>Opens the given CPAN file and returns a file handle to it. Croaks if the file can&#39;t be found or opened. Compressed files are automatically uncompressed.</p>
+
+</dd>
+<dt id="cpan-unpack-path">$cpan-&gt;unpack( $path )</dt>
+<dd>
+
+</dd>
+<dt id="cpan-unpack-path-dir">$cpan-&gt;unpack( $path, $dir )</dt>
+<dd>
+
+<p>Will unpack a CPAN package to the given directory. If $dir isn&#39;t provided it defaults to the basename of $path. It returns the path to the unpacked directory ($dir) and croaks if it gets into trouble.</p>
+
+</dd>
+</dl>
+
+<h2 id="Iterators">Iterators</h2>
+
+<p>The methods with names that end with <code>_iter</code> return iterators. Iterators are functions that return the next element in a sequence each time they are called, and return nothing once the sequence is exhausted. Example usage:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$next</span> <span class="operator">=</span> <span class="variable">$cpan</span><span class="operator">-&gt;</span><span class="variable">files_iter</span><span class="operator">(</span><span class="string">author</span> <span class="operator">=&gt;</span> <span class="string">"GAAS"</span><span class="operator">,</span> <span class="string">package</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">my</span><span class="operator">(</span><span class="variable">$path</span><span class="operator">,</span> <span class="variable">$size</span><span class="operator">,</span> <span class="variable">$mtime</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$next</span><span class="operator">-&gt;())</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="string">"</span><span class="variable">$path</span><span class="string"> </span><span class="variable">$size</span><span class="string"> </span><span class="variable">$mtime</span><span class="string">\n"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>More information about iterators at <a>Iterator::Simple</a>. This module also contains some utilities for wrapping and combining iterators.</p>
+
+<h1 id="ENVIRONMENT">ENVIRONMENT</h1>
+
+<p>If the CPAN_ROOT environment variable is set it will be used as the primary mirror. It can be an URL or the name of a directory.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>none.</p>
+
+
+</body>
+
+</html>
+
+

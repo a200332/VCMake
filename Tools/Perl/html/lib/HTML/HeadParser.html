@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTML::HeadParser - Parse &lt;HEAD&gt; section of a HTML document</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">require</span> <span class="variable">HTML::HeadParser</span><span class="operator">;</span>
+ <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">HTML::HeadParser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="variable">$text</span><span class="operator">)</span> <span class="keyword">and</span>  <span class="keyword">print</span> <span class="string">"not finished"</span><span class="operator">;</span>
+ 
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">header</span><span class="operator">(</span><span class="string">'Title'</span><span class="operator">)</span>          <span class="comment"># to access &lt;title&gt;....&lt;/title&gt;</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">header</span><span class="operator">(</span><span class="string">'Content-Base'</span><span class="operator">)</span>   <span class="comment"># to access &lt;base href="http://..."&gt;</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">header</span><span class="operator">(</span><span class="string">'Foo'</span><span class="operator">)</span>            <span class="comment"># to access &lt;meta http-equiv="Foo" content="..."&gt;</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">header</span><span class="operator">(</span><span class="string">'X-Meta-Author'</span><span class="operator">)</span>  <span class="comment"># to access &lt;meta name="author" content="..."&gt;</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">header</span><span class="operator">(</span><span class="string">'X-Meta-Charset'</span><span class="operator">)</span> <span class="comment"># to access &lt;meta charset="..."&gt;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>HTML::HeadParser</code> is a specialized (and lightweight) <code>HTML::Parser</code> that will only parse the &lt;HEAD&gt;...&lt;/HEAD&gt; section of an HTML document. The parse() method will return a FALSE value as soon as some &lt;BODY&gt; element or body text are found, and should not be called again after this.</p>
+
+<p>Note that the <code>HTML::HeadParser</code> might get confused if raw undecoded UTF-8 is passed to the parse() method. Make sure the strings are properly decoded before passing them on.</p>
+
+<p>The <code>HTML::HeadParser</code> keeps a reference to a header object, and the parser will update this header object as the various elements of the &lt;HEAD&gt; section of the HTML document are recognized. The following header fields are affected:</p>
+
+<dl>
+
+<dt id="Content-Base">Content-Base:</dt>
+<dd>
+
+<p>The <i>Content-Base</i> header is initialized from the &lt;base href=&quot;...&quot;&gt; element.</p>
+
+</dd>
+<dt id="Title">Title:</dt>
+<dd>
+
+<p>The <i>Title</i> header is initialized from the &lt;title&gt;...&lt;/title&gt; element.</p>
+
+</dd>
+<dt id="Isindex">Isindex:</dt>
+<dd>
+
+<p>The <i>Isindex</i> header will be added if there is a &lt;isindex&gt; element in the &lt;head&gt;. The header value is initialized from the <i>prompt</i> attribute if it is present. If no <i>prompt</i> attribute is given it will have &#39;?&#39; as the value.</p>
+
+</dd>
+<dt id="X-Meta-Foo">X-Meta-Foo:</dt>
+<dd>
+
+<p>All &lt;meta&gt; elements containing a <code>name</code> attribute will result in headers using the prefix <code>X-Meta-</code> appended with the value of the <code>name</code> attribute as the name of the header, and the value of the <code>content</code> attribute as the pushed header value.</p>
+
+<p>&lt;meta&gt; elements containing a <code>http-equiv</code> attribute will result in headers as in above, but without the <code>X-Meta-</code> prefix in the header name.</p>
+
+<p>&lt;meta&gt; elements containing a <code>charset</code> attribute will result in an <code>X-Meta-Charset</code> header, using the value of the <code>charset</code> attribute as the pushed header value.</p>
+
+<p>The &#39;:&#39; character can&#39;t be represented in header field names, so if the meta element contains this char it&#39;s substituted with &#39;-&#39; before forming the field name.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>The following methods (in addition to those provided by the superclass) are available:</p>
+
+<dl>
+
+<dt id="hp-HTML::HeadParser-new">$hp = HTML::HeadParser-&gt;new</dt>
+<dd>
+
+</dd>
+<dt id="hp-HTML::HeadParser-new-header">$hp = HTML::HeadParser-&gt;new( $header )</dt>
+<dd>
+
+<p>The object constructor. The optional $header argument should be a reference to an object that implement the header() and push_header() methods as defined by the <code>HTTP::Headers</code> class. Normally it will be of some class that is a or delegates to the <code>HTTP::Headers</code> class.</p>
+
+<p>If no $header is given <code>HTML::HeadParser</code> will create an <code>HTTP::Headers</code> object by itself (initially empty).</p>
+
+</dd>
+<dt id="hp-header">$hp-&gt;header;</dt>
+<dd>
+
+<p>Returns a reference to the header object.</p>
+
+</dd>
+<dt id="hp-header-key">$hp-&gt;header( $key )</dt>
+<dd>
+
+<p>Returns a header value. It is just a shorter way to write <code>$hp-&gt;header-&gt;header($key)</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<pre><code> <span class="variable">$h</span> <span class="operator">=</span> <span class="variable">HTTP::Headers</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">HTML::HeadParser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$h</span><span class="operator">);</span>
+ <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(&lt;&lt;</span><span class="default">EOT</span><span class="operator">);</span><span class="string">
+ &lt;title&gt;Stupid example&lt;/title&gt;
+ &lt;base href="http://www.linpro.no/lwp/"&gt;
+ Normal text starts here.
+ </span><span class="default">EOT</span>
+ <span class="keyword">undef</span> <span class="variable">$p</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">title</span><span class="operator">;</span>   <span class="comment"># should print "Stupid example"</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/HTML/Parser.html">HTML::Parser</a>, <a href="../../lib/HTTP/Headers.html">HTTP::Headers</a></p>
+
+<p>The <code>HTTP::Headers</code> class is distributed as part of the <i>libwww-perl</i> package. If you don&#39;t have that distribution installed you need to provide the $header argument to the <code>HTML::HeadParser</code> constructor with your own object that implements the documented protocol.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 1996-2001 Gisle Aas. All rights reserved.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

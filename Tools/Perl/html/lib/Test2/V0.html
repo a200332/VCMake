@@ -1,0 +1,665 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#NAMING-USING-DEPENDING">NAMING, USING, DEPENDING</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#RESOLVING-CONFLICTS-WITH-MOOSE">RESOLVING CONFLICTS WITH MOOSE</a>
+    <ul>
+      <li><a href="#TAGS">TAGS</a></li>
+      <li><a href="#RENAMING-ON-IMPORT">RENAMING ON IMPORT</a></li>
+    </ul>
+  </li>
+  <li><a href="#PRAGMAS">PRAGMAS</a>
+    <ul>
+      <li><a href="#STRICT">STRICT</a></li>
+      <li><a href="#WARNINGS">WARNINGS</a></li>
+      <li><a href="#UTF8">UTF8</a></li>
+    </ul>
+  </li>
+  <li><a href="#PLUGINS">PLUGINS</a>
+    <ul>
+      <li><a href="#SRAND">SRAND</a></li>
+      <li><a href="#UTF81">UTF8</a></li>
+      <li><a href="#EXIT-SUMMARY">EXIT SUMMARY</a></li>
+    </ul>
+  </li>
+  <li><a href="#API-FUNCTIONS">API FUNCTIONS</a></li>
+  <li><a href="#TOOLS">TOOLS</a>
+    <ul>
+      <li><a href="#TARGET">TARGET</a></li>
+      <li><a href="#DEFER">DEFER</a></li>
+      <li><a href="#BASIC">BASIC</a></li>
+      <li><a href="#COMPARE">COMPARE</a></li>
+      <li><a href="#CLASSIC-COMPARE">CLASSIC COMPARE</a></li>
+      <li><a href="#SUBTEST">SUBTEST</a></li>
+      <li><a href="#CLASS1">CLASS</a></li>
+      <li><a href="#ENCODING">ENCODING</a></li>
+      <li><a href="#EXPORTS">EXPORTS</a></li>
+      <li><a href="#REF">REF</a></li>
+      <li><a href="#MOCK">MOCK</a></li>
+      <li><a href="#EXCEPTION">EXCEPTION</a></li>
+      <li><a href="#WARNINGS1">WARNINGS</a></li>
+    </ul>
+  </li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::V0 - 0Th edition of the Test2 recommended bundle.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is the big-daddy bundle. This bundle includes nearly every tool, and several plugins, that the Test2 author uses. This bundle is used extensively to test <a href="../../lib/Test2/Suite.html">Test2::Suite</a> itself.</p>
+
+<h1 id="NAMING-USING-DEPENDING">NAMING, USING, DEPENDING</h1>
+
+<p>This bundle should not change in a <i>severely</i> incompatible way. Some minor breaking changes, specially bugfixes, may be allowed. If breaking changes are needed then a new <code>Test2::V#</code> module should be released instead.</p>
+
+<p>As new <code>V#</code> modules are released old ones <i>may</i> be moved to different cpan distributions. You should always use a specific bundle version and list that version in your distributions testing requirements. You should never simply list <a href="../../lib/Test2/Suite.html">Test2::Suite</a> as your modules dep, instead list the specific bundle, or tools and plugins you use directly in your metadata.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+    
+    <span class="operator">...</span>
+    
+    <span class="variable">done_testing</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="RESOLVING-CONFLICTS-WITH-MOOSE">RESOLVING CONFLICTS WITH MOOSE</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="string">'!meta'</span><span class="operator">;</span>
+</code></pre>
+
+<p><a href="../../lib/Moose.html">Moose</a> and <a href="../../lib/Test2/V0.html">Test2::V0</a> both export very different <code>meta()</code> subs. Adding <code>&#39;!meta&#39;</code> to the import args will prevent the sub from being imported. This bundle also exports the sub under the name <code>meta_check()</code> so you can use that spelling as an alternative.</p>
+
+<h2 id="TAGS">TAGS</h2>
+
+<dl>
+
+<dt id="DEFAULT">:DEFAULT</dt>
+<dd>
+
+<p>The following are both identical:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="string">':DEFAULT'</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="RENAMING-ON-IMPORT">RENAMING ON IMPORT</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="string">':DEFAULT'</span><span class="operator">,</span> <span class="string">'!ok'</span><span class="operator">,</span> <span class="string">ok</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'my_ok'</span><span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>This bundle uses <a href="../../lib/Importer.html">Importer</a> for exporting, as such you can use any arguments it accepts.</p>
+
+<p>Explanation:</p>
+
+<dl>
+
+<dt id="ok">&#39;!ok&#39;</dt>
+<dd>
+
+<p>Do not export <code>ok()</code></p>
+
+</dd>
+<dt id="ok--as-my_ok">ok =&gt; {-as =&gt; &#39;my_ok&#39;}</dt>
+<dd>
+
+<p>Actually, go ahead and import <code>ok()</code> but under the name <code>my_ok()</code>.</p>
+
+</dd>
+</dl>
+
+<p>If you did not add the <code>&#39;!ok&#39;</code> argument then you would have both <code>ok()</code> and <code>my_ok()</code></p>
+
+<h1 id="PRAGMAS">PRAGMAS</h1>
+
+<p>All of these can be disabled via individual import arguments, or by the <code>-no_pragmas</code> argument.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="operator">-</span><span class="string">no_pragmas</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="STRICT">STRICT</h2>
+
+<p><a href="../../lib/strict.html">strict</a> is turned on for you. You can disable this with the <code>-no_strict</code> or <code>-no_pragmas</code> import arguments:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="operator">-</span><span class="string">no_strict</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="WARNINGS">WARNINGS</h2>
+
+<p><a href="../../lib/warnings.html">warnings</a> are turned on for you. You can disable this with the <code>-no_warnings</code> or <code>-no_pragmas</code> import arguments:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="operator">-</span><span class="string">no_warnings</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="UTF8">UTF8</h2>
+
+<p>This is actually done via the <a href="../../lib/Test2/Plugin/UTF8.html">Test2::Plugin::UTF8</a> plugin, see the <a href="#PLUGINS">&quot;PLUGINS&quot;</a> section for details.</p>
+
+<p><b>Note:</b> <code>-no_pragmas =&gt; 1</code> will turn off the entire plugin.</p>
+
+<h1 id="PLUGINS">PLUGINS</h1>
+
+<h2 id="SRAND">SRAND</h2>
+
+<p>See <a href="../../lib/Test2/Plugin/SRand.html">Test2::Plugin::SRand</a>.</p>
+
+<p>This will set the random seed to today&#39;s date. You can provide an alternate seed with the <code>-srand</code> import option:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="operator">-</span><span class="string">srand</span> <span class="operator">=&gt;</span> <span class="number">1234</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="UTF81">UTF8</h2>
+
+<p>See <a href="../../lib/Test2/Plugin/UTF8.html">Test2::Plugin::UTF8</a>.</p>
+
+<p>This will set the file, and all output handles (including formatter handles), to utf8. This will turn on the utf8 pragma for the current scope.</p>
+
+<p>This can be disabled using the <code>-no_utf8 =&gt; 1</code> or <code>-no_pragmas =&gt; 1</code> import arguments.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="operator">-</span><span class="string">no_utf8</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="EXIT-SUMMARY">EXIT SUMMARY</h2>
+
+<p>See <a href="../../lib/Test2/Plugin/ExitSummary.html">Test2::Plugin::ExitSummary</a>.</p>
+
+<p>This plugin has no configuration.</p>
+
+<h1 id="API-FUNCTIONS">API FUNCTIONS</h1>
+
+<p>See <a href="../../lib/Test2/API.html">Test2::API</a> for these</p>
+
+<dl>
+
+<dt id="ctx-context">$ctx = context()</dt>
+<dd>
+
+</dd>
+<dt id="events-intercept">$events = intercept { ... }</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="TOOLS">TOOLS</h1>
+
+<h2 id="TARGET">TARGET</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Target.html">Test2::Tools::Target</a>.</p>
+
+<p>You can specify a target class with the <code>-target</code> import argument. If you do not provide a target then <code>$CLASS</code> and <code>CLASS()</code> will not be imported.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::V0</span> <span class="operator">-</span><span class="string">target</span> <span class="operator">=&gt;</span> <span class="string">'My::Class'</span><span class="operator">;</span>
+    
+    <span class="keyword">print</span> <span class="variable">$CLASS</span><span class="operator">;</span>  <span class="comment"># My::Class</span>
+    <span class="keyword">print</span> <span class="variable">CLASS</span><span class="operator">();</span> <span class="comment"># My::Class</span>
+</code></pre>
+
+<dl>
+
+<dt id="CLASS">$CLASS</dt>
+<dd>
+
+<p>Package variable that contains the target class name.</p>
+
+</dd>
+<dt id="class-CLASS">$class = CLASS()</dt>
+<dd>
+
+<p>Constant function that returns the target class name.</p>
+
+</dd>
+</dl>
+
+<h2 id="DEFER">DEFER</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Defer.html">Test2::Tools::Defer</a>.</p>
+
+<dl>
+
+<dt id="def-func-args">def $func =&gt; @args;</dt>
+<dd>
+
+</dd>
+<dt id="do_def">do_def()</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="BASIC">BASIC</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Basic.html">Test2::Tools::Basic</a>.</p>
+
+<dl>
+
+<dt id="ok-bool-name">ok($bool, $name)</dt>
+<dd>
+
+</dd>
+<dt id="pass-name">pass($name)</dt>
+<dd>
+
+</dd>
+<dt id="fail-name">fail($name)</dt>
+<dd>
+
+</dd>
+<dt id="diag-message">diag($message)</dt>
+<dd>
+
+</dd>
+<dt id="note-message">note($message)</dt>
+<dd>
+
+</dd>
+<dt id="todo-todo-reason">$todo = todo($reason)</dt>
+<dd>
+
+</dd>
+<dt id="todo-reason-sub">todo $reason =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="skip-reason-count">skip($reason, $count)</dt>
+<dd>
+
+</dd>
+<dt id="plan-count">plan($count)</dt>
+<dd>
+
+</dd>
+<dt id="skip_all-reason">skip_all($reason)</dt>
+<dd>
+
+</dd>
+<dt id="done_testing">done_testing()</dt>
+<dd>
+
+</dd>
+<dt id="bail_out-reason">bail_out($reason)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="COMPARE">COMPARE</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Compare.html">Test2::Tools::Compare</a>.</p>
+
+<dl>
+
+<dt id="is-got-want-name">is($got, $want, $name)</dt>
+<dd>
+
+</dd>
+<dt id="isnt-got-do_not_want-name">isnt($got, $do_not_want, $name)</dt>
+<dd>
+
+</dd>
+<dt id="like-got-qr-match-name">like($got, qr/match/, $name)</dt>
+<dd>
+
+</dd>
+<dt id="unlike-got-qr-mismatch-name">unlike($got, qr/mismatch/, $name)</dt>
+<dd>
+
+</dd>
+<dt id="check-match-qr-pattern">$check = match(qr/pattern/)</dt>
+<dd>
+
+</dd>
+<dt id="check-mismatch-qr-pattern">$check = mismatch(qr/pattern/)</dt>
+<dd>
+
+</dd>
+<dt id="check-validator-sub-return-bool">$check = validator(sub { return $bool })</dt>
+<dd>
+
+</dd>
+<dt id="check-hash">$check = hash { ... }</dt>
+<dd>
+
+</dd>
+<dt id="check-array">$check = array { ... }</dt>
+<dd>
+
+</dd>
+<dt id="check-bag">$check = bag { ... }</dt>
+<dd>
+
+</dd>
+<dt id="check-object">$check = object { ... }</dt>
+<dd>
+
+</dd>
+<dt id="check-meta">$check = meta { ... }</dt>
+<dd>
+
+</dd>
+<dt id="check-number-num">$check = number($num)</dt>
+<dd>
+
+</dd>
+<dt id="check-string-str">$check = string($str)</dt>
+<dd>
+
+</dd>
+<dt id="check-in_set-things">$check = in_set(@things)</dt>
+<dd>
+
+</dd>
+<dt id="check-not_in_set-things">$check = not_in_set(@things)</dt>
+<dd>
+
+</dd>
+<dt id="check-check_set-things">$check = check_set(@things)</dt>
+<dd>
+
+</dd>
+<dt id="check-item-thing">$check = item($thing)</dt>
+<dd>
+
+</dd>
+<dt id="check-item-idx-thing">$check = item($idx =&gt; $thing)</dt>
+<dd>
+
+</dd>
+<dt id="check-field-name-val">$check = field($name =&gt; $val)</dt>
+<dd>
+
+</dd>
+<dt id="check-call-method-expect">$check = call($method =&gt; $expect)</dt>
+<dd>
+
+</dd>
+<dt id="check-call_list-method-expect">$check = call_list($method =&gt; $expect)</dt>
+<dd>
+
+</dd>
+<dt id="check-call_hash-method-expect">$check = call_hash($method =&gt; $expect)</dt>
+<dd>
+
+</dd>
+<dt id="check-prop-name-expect">$check = prop($name =&gt; $expect)</dt>
+<dd>
+
+</dd>
+<dt id="check-check-thing">$check = check($thing)</dt>
+<dd>
+
+</dd>
+<dt id="check-T">$check = T()</dt>
+<dd>
+
+</dd>
+<dt id="check-F">$check = F()</dt>
+<dd>
+
+</dd>
+<dt id="check-D">$check = D()</dt>
+<dd>
+
+</dd>
+<dt id="check-DF">$check = DF()</dt>
+<dd>
+
+</dd>
+<dt id="check-DNE">$check = DNE()</dt>
+<dd>
+
+</dd>
+<dt id="check-FDNE">$check = FDNE()</dt>
+<dd>
+
+</dd>
+<dt id="check-exact_ref-ref">$check = exact_ref($ref)</dt>
+<dd>
+
+</dd>
+<dt id="end">end()</dt>
+<dd>
+
+</dd>
+<dt id="etc">etc()</dt>
+<dd>
+
+</dd>
+<dt id="filter_items-grep-...-_">filter_items { grep { ... } @_ }</dt>
+<dd>
+
+</dd>
+<dt id="check-event-type">$check = event $type =&gt; ...</dt>
+<dd>
+
+</dd>
+<dt id="checks-fail_events-type">@checks = fail_events $type =&gt; ...</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="CLASSIC-COMPARE">CLASSIC COMPARE</h2>
+
+<p>See <a href="../../lib/Test2/Tools/ClassicCompare.html">Test2::Tools::ClassicCompare</a>.</p>
+
+<dl>
+
+<dt id="cmp_ok-got-op-want-name">cmp_ok($got, $op, $want, $name)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="SUBTEST">SUBTEST</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Subtest.html">Test2::Tools::Subtest</a>.</p>
+
+<dl>
+
+<dt id="subtest-name-sub">subtest $name =&gt; sub { ... }</dt>
+<dd>
+
+<p>(Note: This is called <code>subtest_buffered()</code> in the Tools module.)</p>
+
+</dd>
+</dl>
+
+<h2 id="CLASS1">CLASS</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Class.html">Test2::Tools::Class</a>.</p>
+
+<dl>
+
+<dt id="can_ok-thing-methods">can_ok($thing, @methods)</dt>
+<dd>
+
+</dd>
+<dt id="isa_ok-thing-classes">isa_ok($thing, @classes)</dt>
+<dd>
+
+</dd>
+<dt id="DOES_ok-thing-roles">DOES_ok($thing, @roles)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="ENCODING">ENCODING</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Encoding.html">Test2::Tools::Encoding</a>.</p>
+
+<dl>
+
+<dt id="set_encoding-encoding">set_encoding($encoding)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="EXPORTS">EXPORTS</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Exports.html">Test2::Tools::Exports</a>.</p>
+
+<dl>
+
+<dt id="imported_ok-function-scalar">imported_ok(&#39;function&#39;, &#39;$scalar&#39;, ...)</dt>
+<dd>
+
+</dd>
+<dt id="not_imported_ok-function-scalar">not_imported_ok(&#39;function&#39;, &#39;$scalar&#39;, ...)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="REF">REF</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Ref.html">Test2::Tools::Ref</a>.</p>
+
+<dl>
+
+<dt id="ref_ok-ref-type">ref_ok($ref, $type)</dt>
+<dd>
+
+</dd>
+<dt id="ref_is-got-want">ref_is($got, $want)</dt>
+<dd>
+
+</dd>
+<dt id="ref_is_not-got-do_not_want">ref_is_not($got, $do_not_want)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="MOCK">MOCK</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Mock.html">Test2::Tools::Mock</a>.</p>
+
+<dl>
+
+<dt id="control-mock">$control = mock ...</dt>
+<dd>
+
+</dd>
+<dt id="bool-mocked-thing">$bool = mocked($thing)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="EXCEPTION">EXCEPTION</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Exception.html">Test2::Tools::Exception</a>.</p>
+
+<dl>
+
+<dt id="exception-dies">$exception = dies { ... }</dt>
+<dd>
+
+</dd>
+<dt id="bool-lives">$bool = lives { ... }</dt>
+<dd>
+
+</dd>
+<dt id="bool-try_ok">$bool = try_ok { ... }</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="WARNINGS1">WARNINGS</h2>
+
+<p>See <a href="../../lib/Test2/Tools/Warnings.html">Test2::Tools::Warnings</a>.</p>
+
+<dl>
+
+<dt id="count-warns">$count = warns { ... }</dt>
+<dd>
+
+</dd>
+<dt id="warning-warning">$warning = warning { ... }</dt>
+<dd>
+
+</dd>
+<dt id="warnings_ref-warnings">$warnings_ref = warnings { ... }</dt>
+<dd>
+
+</dd>
+<dt id="bool-no_warnings">$bool = no_warnings { ... }</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

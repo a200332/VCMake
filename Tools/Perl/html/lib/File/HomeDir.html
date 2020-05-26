@@ -1,0 +1,349 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Platform-Neutrality">Platform Neutrality</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#my_home">my_home</a></li>
+      <li><a href="#my_desktop">my_desktop</a></li>
+      <li><a href="#my_documents">my_documents</a></li>
+      <li><a href="#my_music">my_music</a></li>
+      <li><a href="#my_pictures">my_pictures</a></li>
+      <li><a href="#my_videos">my_videos</a></li>
+      <li><a href="#my_data">my_data</a></li>
+      <li><a href="#my_dist_config">my_dist_config</a></li>
+      <li><a href="#my_dist_data">my_dist_data</a></li>
+      <li><a href="#users_home">users_home</a></li>
+      <li><a href="#users_documents">users_documents</a></li>
+      <li><a href="#users_data">users_data</a></li>
+    </ul>
+  </li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#home">home</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>File::HomeDir - Find your home and other directories on any platform</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">File::HomeDir</span><span class="operator">;</span>
+  
+  <span class="comment"># Modern Interface (Current User)</span>
+  <span class="variable">$home</span>     <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_home</span><span class="operator">;</span>
+  <span class="variable">$desktop</span>  <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_desktop</span><span class="operator">;</span>
+  <span class="variable">$docs</span>     <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_documents</span><span class="operator">;</span>
+  <span class="variable">$music</span>    <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_music</span><span class="operator">;</span>
+  <span class="variable">$pics</span>     <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_pictures</span><span class="operator">;</span>
+  <span class="variable">$videos</span>   <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_videos</span><span class="operator">;</span>
+  <span class="variable">$data</span>     <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_data</span><span class="operator">;</span>
+  <span class="variable">$dist</span>     <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_data</span><span class="operator">(</span><span class="string">'File-HomeDir'</span><span class="operator">);</span>
+  <span class="variable">$dist</span>     <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_config</span><span class="operator">(</span><span class="string">'File-HomeDir'</span><span class="operator">);</span>
+  
+  <span class="comment"># Modern Interface (Other Users)</span>
+  <span class="variable">$home</span>    <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_home</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$desktop</span> <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_desktop</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$docs</span>    <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_documents</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$music</span>   <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_music</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$pics</span>    <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_pictures</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$video</span>   <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_videos</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$data</span>    <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_data</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>File::HomeDir</b> is a module for locating the directories that are &quot;owned&quot; by a user (typicaly your user) and to solve the various issues that arise trying to find them consistently across a wide variety of platforms.</p>
+
+<p>The end result is a single API that can find your resources on any platform, making it relatively trivial to create Perl software that works elegantly and correctly no matter where you run it.</p>
+
+<p>This module provides two main interfaces.</p>
+
+<p>The first is a modern <a href="../../lib/File/Spec.html">File::Spec</a>-style interface with a consistent OO API and different implementation modules to support various platforms. You are <b>strongly</b> recommended to use this interface.</p>
+
+<p>The second interface is for legacy support of the original 0.07 interface that exported a <code>home()</code> function by default and tied the <code>%~</code> variable.</p>
+
+<p>It is generally not recommended that you use this interface, but due to back-compatibility reasons they will remain supported until at least 2010.</p>
+
+<p>The <code>%~</code> interface has been deprecated. Documentation was removed in 2009, Unit test were removed in 2011, usage will issue warnings from 2012, and the interface will be removed entirely in 2015 (in line with the general Perl toolchain convention of a 10 year support period for legacy APIs that are potentially or actually in common use).</p>
+
+<h2 id="Platform-Neutrality">Platform Neutrality</h2>
+
+<p>In the Unix world, many different types of data can be mixed together in your home directory (although on some Unix platforms this is no longer the case, particularly for &quot;desktop&quot;-oriented platforms).</p>
+
+<p>On some non-Unix platforms, separate directories are allocated for different types of data and have been for a long time.</p>
+
+<p>When writing applications on top of <b>File::HomeDir</b>, you should thus always try to use the most specific method you can. User documents should be saved in <code>my_documents</code>, data that supports an application but isn&#39;t normally editing by the user directory should go into <code>my_data</code>.</p>
+
+<p>On platforms that do not make any distinction, all these different methods will harmlessly degrade to the main home directory, but on platforms that care <b>File::HomeDir</b> will always try to Do The Right Thing(tm).</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>Two types of methods are provided. The <code>my_method</code> series of methods for finding resources for the current user, and the <code>users_method</code> (read as &quot;user&#39;s method&quot;) series for finding resources for arbitrary users.</p>
+
+<p>This split is necessary, as on most platforms it is <b>much</b> easier to find information about the current user compared to other users, and indeed on a number you cannot find out information such as <code>users_desktop</code> at all, due to security restrictions.</p>
+
+<p>All methods will double check (using a <code>-d</code> test) that a directory actually exists before returning it, so you may trust in the values that are returned (subject to the usual caveats of race conditions of directories being deleted at the moment between a directory being returned and you using it).</p>
+
+<p>However, because in some cases platforms may not support the concept of home directories at all, any method may return <code>undef</code> (both in scalar and list context) to indicate that there is no matching directory on the system.</p>
+
+<p>For example, most untrusted &#39;nobody&#39;-type users do not have a home directory. So any modules that are used in a CGI application that at some level of recursion use your code, will result in calls to File::HomeDir returning undef, even for a basic home() call.</p>
+
+<h2 id="my_home">my_home</h2>
+
+<p>The <code>my_home</code> method takes no arguments and returns the main home/profile directory for the current user.</p>
+
+<p>If the distinction is important to you, the term &quot;current&quot; refers to the real user, and not the effective user.</p>
+
+<p>This is also the case for all of the other &quot;my&quot; methods.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a home directory, or dies on error.</p>
+
+<h2 id="my_desktop">my_desktop</h2>
+
+<p>The <code>my_desktop</code> method takes no arguments and returns the &quot;desktop&quot; directory for the current user.</p>
+
+<p>Due to the diversity and complexity of implementions required to deal with implementing the required functionality fully and completely, the <code>my_desktop</code> method may or may not be implemented on each platform.</p>
+
+<p>That said, I am extremely interested in code to implement <code>my_desktop</code> on Unix, as long as it is capable of dealing (as the Windows implementation does) with internationalisation. It should also avoid false positive results by making sure it only returns the appropriate directories for the appropriate platforms.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a desktop directory, or dies on error.</p>
+
+<h2 id="my_documents">my_documents</h2>
+
+<p>The <code>my_documents</code> method takes no arguments and returns the directory (for the current user) where the user&#39;s documents are stored.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a documents directory, or dies on error.</p>
+
+<h2 id="my_music">my_music</h2>
+
+<p>The <code>my_music</code> method takes no arguments and returns the directory where the current user&#39;s music is stored.</p>
+
+<p>No bias is made to any particular music type or music program, rather the concept of a directory to hold the user&#39;s music is made at the level of the underlying operating system or (at least) desktop environment.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a suitable directory, or dies on error.</p>
+
+<h2 id="my_pictures">my_pictures</h2>
+
+<p>The <code>my_pictures</code> method takes no arguments and returns the directory where the current user&#39;s pictures are stored.</p>
+
+<p>No bias is made to any particular picture type or picture program, rather the concept of a directory to hold the user&#39;s pictures is made at the level of the underlying operating system or (at least) desktop environment.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a suitable directory, or dies on error.</p>
+
+<h2 id="my_videos">my_videos</h2>
+
+<p>The <code>my_videos</code> method takes no arguments and returns the directory where the current user&#39;s videos are stored.</p>
+
+<p>No bias is made to any particular video type or video program, rather the concept of a directory to hold the user&#39;s videos is made at the level of the underlying operating system or (at least) desktop environment.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a suitable directory, or dies on error.</p>
+
+<h2 id="my_data">my_data</h2>
+
+<p>The <code>my_data</code> method takes no arguments and returns the directory where local applications should stored their internal data for the current user.</p>
+
+<p>Generally an application would create a subdirectory such as <code>.foo</code>, beneath this directory, and store its data there. By creating your directory this way, you get an accurate result on the maximum number of platforms. But see the documentation about <code>my_dist_config()</code> or <code>my_dist_data()</code> below.</p>
+
+<p>For example, on Unix you get <code>~/.foo</code> and on Win32 you get <code>~/Local Settings/Application Data/.foo</code></p>
+
+<p>Returns the directory path as a string, <code>undef</code> if the current user does not have a data directory, or dies on error.</p>
+
+<h2 id="my_dist_config">my_dist_config</h2>
+
+<pre><code>  <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_config</span><span class="operator">(</span> <span class="variable">$dist</span> <span class="operator">[</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%params</span><span class="operator">]</span> <span class="operator">);</span>
+  
+  <span class="comment"># For example...</span>
+  
+  <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_config</span><span class="operator">(</span> <span class="string">'File-HomeDir'</span> <span class="operator">);</span>
+  <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_config</span><span class="operator">(</span> <span class="string">'File-HomeDir'</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">create</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The <code>my_dist_config</code> method takes a distribution name as argument and returns an application-specific directory where they should store their internal configuration.</p>
+
+<p>The base directory will be either <code>my_config</code> if the platform supports it, or <code>my_documents</code> otherwise. The subdirectory itself will be <code>BASE/Perl/Dist-Name</code>. If the base directory is the user&#39;s homedir, <code>my_dist_config</code> will be in <code>~/.perl/Dist-Name</code> (and thus be hidden on all Unixes).</p>
+
+<p>The optional last argument is a hash reference to tweak the method behaviour. The following hash keys are recognized:</p>
+
+<ul>
+
+<li><p>create</p>
+
+<p>Passing a true value to this key will force the creation of the directory if it doesn&#39;t exist (remember that <code>File::HomeDir</code>&#39;s policy is to return <code>undef</code> if the directory doesn&#39;t exist).</p>
+
+<p>Defaults to false, meaning no automatic creation of directory.</p>
+
+</li>
+</ul>
+
+<h2 id="my_dist_data">my_dist_data</h2>
+
+<pre><code>  <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_data</span><span class="operator">(</span> <span class="variable">$dist</span> <span class="operator">[</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%params</span><span class="operator">]</span> <span class="operator">);</span>
+  
+  <span class="comment"># For example...</span>
+  
+  <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_data</span><span class="operator">(</span> <span class="string">'File-HomeDir'</span> <span class="operator">);</span>
+  <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">my_dist_data</span><span class="operator">(</span> <span class="string">'File-HomeDir'</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">create</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The <code>my_dist_data</code> method takes a distribution name as argument and returns an application-specific directory where they should store their internal data.</p>
+
+<p>This directory will be of course a subdirectory of <code>my_data</code>. Platforms supporting data-specific directories will use <code>DATA_DIR/perl/dist/Dist-Name</code> following the common &quot;DATA/vendor/application&quot; pattern. If the <code>my_data</code> directory is the user&#39;s homedir, <code>my_dist_data</code> will be in <code>~/.perl/dist/Dist-Name</code> (and thus be hidden on all Unixes).</p>
+
+<p>The optional last argument is a hash reference to tweak the method behaviour. The following hash keys are recognized:</p>
+
+<ul>
+
+<li><p>create</p>
+
+<p>Passing a true value to this key will force the creation of the directory if it doesn&#39;t exist (remember that <code>File::HomeDir</code>&#39;s policy is to return <code>undef</code> if the directory doesn&#39;t exist).</p>
+
+<p>Defaults to false, meaning no automatic creation of directory.</p>
+
+</li>
+</ul>
+
+<h2 id="users_home">users_home</h2>
+
+<pre><code>  <span class="variable">$home</span> <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_home</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>users_home</code> method takes a single param and is used to locate the parent home/profile directory for an identified user on the system.</p>
+
+<p>While most of the time this identifier would be some form of user name, it is permitted to vary per-platform to support user ids or UUIDs as applicable for that platform.</p>
+
+<p>Returns the directory path as a string, <code>undef</code> if that user does not have a home directory, or dies on error.</p>
+
+<h2 id="users_documents">users_documents</h2>
+
+<pre><code>  <span class="variable">$docs</span> <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_documents</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns the directory path as a string, <code>undef</code> if that user does not have a documents directory, or dies on error.</p>
+
+<h2 id="users_data">users_data</h2>
+
+<pre><code>  <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">File::HomeDir</span><span class="operator">-&gt;</span><span class="variable">users_data</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns the directory path as a string, <code>undef</code> if that user does not have a data directory, or dies on error.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="home">home</h2>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">File::HomeDir</span><span class="operator">;</span>
+  <span class="variable">$home</span> <span class="operator">=</span> <span class="variable">home</span><span class="operator">();</span>
+  <span class="variable">$home</span> <span class="operator">=</span> <span class="variable">home</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+  <span class="variable">$home</span> <span class="operator">=</span> <span class="variable">File::HomeDir::home</span><span class="operator">();</span>
+  <span class="variable">$home</span> <span class="operator">=</span> <span class="variable">File::HomeDir::home</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>home</code> function is exported by default and is provided for compatibility with legacy applications. In new applications, you should use the newer method-based interface above.</p>
+
+<p>Returns the directory path to a named user&#39;s home/profile directory.</p>
+
+<p>If provided no param, returns the directory path to the current user&#39;s home/profile directory.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<ul>
+
+<li><p>Add more granularity to Unix, and add support to VMS and other esoteric platforms, so we can consider going core.</p>
+
+</li>
+<li><p>Add consistent support for users_* methods</p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>This module is stored in an Open Repository at the following address.</p>
+
+<p><a href="http://svn.ali.as/cpan/trunk/File-HomeDir">http://svn.ali.as/cpan/trunk/File-HomeDir</a></p>
+
+<p>Write access to the repository is made available automatically to any published CPAN author, and to most other volunteers on request.</p>
+
+<p>If you are able to submit your bug report in the form of new (failing) unit tests, or can apply your fix directly instead of submitting a patch, you are <b>strongly</b> encouraged to do so as the author currently maintains over 100 modules and it can take some time to deal with non-Critical bug reports or patches.</p>
+
+<p>This will guarantee that your issue will be addressed in the next release of the module.</p>
+
+<p>If you cannot provide a direct test or fix, or don&#39;t have time to do so, then regular bug reports are still accepted and appreciated via the CPAN bug tracker.</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-HomeDir">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-HomeDir</a></p>
+
+<p>For other issues, for commercial enhancement or support, or to have your write access enabled for the repository, contact the author at the email address above.</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>The biggest acknowledgement goes to Chris Nandor, who wielded his legendary Mac-fu and turned my initial fairly ordinary Darwin implementation into something that actually worked properly everywhere, and then donated a Mac OS X license to allow it to be maintained properly.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<p>Sean M. Burke &lt;sburke@cpan.org&gt;</p>
+
+<p>Chris Nandor &lt;cnandor@cpan.org&gt;</p>
+
+<p>Stephen Steneker &lt;stennie@cpan.org&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/File/ShareDir.html">File::ShareDir</a>, <a>File::HomeDir::Win32</a> (legacy)</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2005 - 2012 Adam Kennedy.</p>
+
+<p>Some parts copyright 2000 Sean M. Burke.</p>
+
+<p>Some parts copyright 2006 Chris Nandor.</p>
+
+<p>Some parts copyright 2006 Stephen Steneker.</p>
+
+<p>Some parts copyright 2009-2011 J&eacute;r&ocirc;me Quelin.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

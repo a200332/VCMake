@@ -1,0 +1,179 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::Indenter - Keep track of indentation levels</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">ActiveState::Indenter</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">ActiveState::Indenter</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">*STDOUT</span><span class="operator">);</span>
+ <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">"if (foo()) {\n"</span><span class="operator">)</span>
+ <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">over</span><span class="operator">;</span>
+ <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">"# do something\n"</span><span class="operator">);</span>
+ <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">back</span><span class="operator">;</span>
+ <span class="variable">$fh</span><span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">(</span><span class="string">"}\n"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The ActiveState::Indenter works like an output file handle but will insert whitespace in the printed stream reflecting the current indentation level. It is useful for printing out nicely formatted programs.</p>
+
+<p>The following methods are available:</p>
+
+<dl>
+
+<dt id="fh-ActiveState::Indenter-new-filehandle">$fh = ActiveState::Indenter-&gt;new( $filehandle )</dt>
+<dd>
+
+<p>The object constructor takes a file handle as argument. It will create a new indenter object that prints to the given file handle.</p>
+
+<p>The $filehandle can actually be any object that implement a print() method.</p>
+
+</dd>
+<dt id="fh-handle">$fh-&gt;handle</dt>
+<dd>
+
+<p>Returns back the filehandle passed to the constructor.</p>
+
+</dd>
+<dt id="fh-line_width">$fh-&gt;line_width</dt>
+<dd>
+
+</dd>
+<dt id="fh-line_width-new_width">$fh-&gt;line_width( $new_width )</dt>
+<dd>
+
+<p>This get/set the current line width. The line width is used by the soft_space() method. The default is 70.</p>
+
+</dd>
+<dt id="fh-indent_offset">$fh-&gt;indent_offset</dt>
+<dd>
+
+</dd>
+<dt id="fh-indent_offset-new_offset">$fh-&gt;indent_offset( $new_offset )</dt>
+<dd>
+
+<p>This get/set the standard indentation offset. The default is 4.</p>
+
+</dd>
+<dt id="fh-print-string">$fh-&gt;print( $string )</dt>
+<dd>
+
+<p>The print() will print the string given as argument to the wrapped file handle but with suitable additional leading space added. The indenter object will never buffer output, so all content of the string will have reached the file when print returns.</p>
+
+</dd>
+<dt id="fh-soft_space">$fh-&gt;soft_space</dt>
+<dd>
+
+<p>This will print a space character &quot; &quot; if there is more room on the line, or a newline otherwise.</p>
+
+</dd>
+<dt id="col-fh-indent">$col = $fh-&gt;indent</dt>
+<dd>
+
+<p>This returns the current indentation column.</p>
+
+</dd>
+<dt id="fh-over">$fh-&gt;over</dt>
+<dd>
+
+</dd>
+<dt id="fh-over-offset">$fh-&gt;over( $offset )</dt>
+<dd>
+
+<p>This increase the indentation column with the given amount. Without argument the standard amount is used.</p>
+
+</dd>
+<dt id="fh-over_cur">$fh-&gt;over_cur</dt>
+<dd>
+
+<p>This sets the indentation column the same as the current column.</p>
+
+</dd>
+<dt id="fh-over_abs-col">$fh-&gt;over_abs( $col )</dt>
+<dd>
+
+<p>This set the indentation column to the number given.</p>
+
+</dd>
+<dt id="fh-back">$fh-&gt;back</dt>
+<dd>
+
+<p>Returns to the previous indentation column.</p>
+
+</dd>
+<dt id="col-fh-column">$col = $fh-&gt;column</dt>
+<dd>
+
+<p>Returns the current column position.</p>
+
+</dd>
+<dt id="line-fh-line">$line = $fh-&gt;line</dt>
+<dd>
+
+</dd>
+<dt id="fh-line-new_line">$fh-&gt;line( $new_line )</dt>
+<dd>
+
+<p>This get/set the current line number.</p>
+
+</dd>
+<dt id="n-fh-depth">$n = $fh-&gt;depth</dt>
+<dd>
+
+<p>Returns the current indentation depth.</p>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (C) 2003 ActiveState Corp. All rights reserved.</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-220">Around line 220:</dt>
+<dd>
+
+<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

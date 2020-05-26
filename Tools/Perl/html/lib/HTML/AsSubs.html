@@ -1,0 +1,167 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ACKNOWLEDGEMENT">ACKNOWLEDGEMENT</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a>
+    <ul>
+      <li><a href="#html-head-title-base-link-meta-isindex-nextid-script-style-body-h1-h2-h3-h4-h5-h6-p-pre-div-blockquote-a-img-br-hr-ol-ul-dir-menu-li-dl-dt-dd-dfn-cite-code-em-kbd-samp-strong-var-address-span-b-i-u-tt-center-font-big-small-strike-sub-sup-table-tr-td-th-caption-form-input-select-option-textarea-object-applet-param-map-area-frame-frameset-noframe">html head title base link meta isindex nextid script style body h1 h2 h3 h4 h5 h6 p pre div blockquote a img br hr ol ul dir menu li dl dt dd dfn cite code em kbd samp strong var address span b i u tt center font big small strike sub sup table tr td th caption form input select option textarea object applet param map area frame frameset noframe</a></li>
+    </ul>
+  </li>
+  <li><a href="#Private-Functions">Private Functions</a>
+    <ul>
+      <li><a href="#elem">_elem()</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTML::AsSubs - functions that construct a HTML syntax tree</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes version 5.07 of HTML::AsSubs, released August 31, 2017 as part of <a href="../../lib/HTML/Tree.html">HTML-Tree</a>.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">HTML::AsSubs</span><span class="operator">;</span>
+ <span class="variable">$h</span> <span class="operator">=</span> <span class="variable">body</span><span class="operator">(</span>
+           <span class="variable">h1</span><span class="operator">(</span><span class="string">"This is the heading"</span><span class="operator">),</span>
+           <span class="variable">p</span><span class="operator">(</span><span class="string">"This is the first paragraph which contains a "</span><span class="operator">,</span>
+             <span class="variable">a</span><span class="operator">(</span><span class="operator">{</span><span class="string">href</span><span class="operator">=&gt;</span><span class="string">'link.html'</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"link"</span><span class="operator">),</span>
+             <span class="string">" and an "</span><span class="operator">,</span>
+             <span class="variable">img</span><span class="operator">(</span><span class="operator">{</span><span class="string">src</span><span class="operator">=&gt;</span><span class="string">'img.gif'</span><span class="operator">,</span> <span class="string">alt</span><span class="operator">=&gt;</span><span class="string">'image'</span><span class="operator">}</span><span class="operator">),</span>
+             <span class="string">"."</span>
+            <span class="operator">),</span>
+          <span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">as_HTML</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module exports functions that can be used to construct various HTML elements. The functions are named after the tags of the corresponding HTML element and are all written in lower case. If the first argument is a hash reference then it will be used to initialize the attributes of this element. The remaining arguments are regarded as content.</p>
+
+<p>For a similar idea (i.e., it&#39;s another case where the syntax tree of the Perl source mirrors the syntax tree of the HTML produced), see HTML::Element&#39;s <code>new_from_lol</code> method.</p>
+
+<p>For what I now think is a cleaner implementation of this same idea, see the excellent module <code>XML::Generator</code>, which is what I suggest for actual real-life use. (I suggest this over <code>HTML::AsSubs</code> and over <code>CGI.pm</code>&#39;s HTML-making functions.)</p>
+
+<h1 id="ACKNOWLEDGEMENT">ACKNOWLEDGEMENT</h1>
+
+<p>This module was inspired by the following message:</p>
+
+<pre><code> <span class="variable">Date</span><span class="operator">:</span> <span class="variable">Tue</span><span class="operator">,</span> <span class="number">4</span> <span class="variable">Oct</span> <span class="number">1994</span> <span class="number">16</span><span class="operator">:</span><span class="number">11</span><span class="operator">:</span><span class="number">30</span> <span class="operator">+</span><span class="number">0100</span>
+ <span class="variable">Subject</span><span class="operator">:</span> <span class="variable">Wow</span><span class="operator">!</span> <span class="variable">I</span> <span class="variable">have</span> <span class="variable">a</span> <span class="variable">large</span> <span class="variable">lightbulb</span> <span class="variable">above</span> <span class="keyword">my</span> <span class="variable">head</span><span class="operator">!</span>
+ 
+ <span class="variable">Take</span> <span class="variable">a</span> <span class="variable">moment</span> <span class="variable">to</span> <span class="variable">consider</span> <span class="variable">these</span> <span class="variable">lines</span><span class="operator">:</span>
+ 
+ <span class="variable">%OVERLOAD</span><span class="operator">=(</span> <span class="string">'""'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">""</span><span class="operator">,</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]}</span><span class="operator">)</span> <span class="operator">}</span> <span class="operator">);</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> html </span><span class="operator">{</span> <span class="keyword">my</span><span class="operator">(</span><span class="variable">$type</span><span class="operator">)=</span><span class="keyword">shift</span><span class="operator">;</span> <span class="keyword">bless</span> <span class="operator">[</span><span class="string">"&lt;</span><span class="variable">$type</span><span class="string">&gt;"</span><span class="operator">,</span> <span class="variable">@_</span><span class="operator">,</span> <span class="string">"&lt;/</span><span class="variable">$type</span><span class="string">&gt;"</span><span class="operator">]</span><span class="operator">;</span> <span class="operator">}</span>
+ 
+ <span class="operator">:-)</span>  <span class="variable">I</span> <span class="variable">*love</span><span class="operator">*</span> <span class="variable">Perl</span> <span class="number">5</span><span class="operator">!</span>  <span class="variable">Thankyou</span> <span class="variable">Larry</span> <span class="keyword">and</span> <span class="variable">Ilya</span><span class="operator">.</span>
+ 
+ <span class="variable">Regards</span><span class="operator">,</span>
+ <span class="variable">Tim</span> <span class="variable">Bunce</span><span class="operator">.</span>
+ 
+ <span class="variable">p</span><span class="operator">.</span><span class="regex">s. If you didn't get it, think about recursive data types: html(html())
+ p.p.s</span><span class="operator">.</span> <span class="variable">I'll</span> <span class="variable">turn</span> <span class="variable">this</span> <span class="variable">into</span> <span class="variable">a</span> <span class="variable">much</span> <span class="variable">more</span> <span class="variable">practical</span> <span class="variable">example</span> <span class="variable">in</span> <span class="variable">a</span> <span class="variable">day</span> <span class="keyword">or</span> <span class="variable">two</span><span class="operator">.</span>
+ <span class="variable">p</span><span class="operator">.</span><span class="variable">p</span><span class="operator">.</span><span class="variable">p</span><span class="operator">.</span><span class="regex">s. It's a pity that overloads are not inherited. Is this a bug?
+ </span>
+</code></pre>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>The exported link() function overrides the builtin link() function. The exported tr() function must be called using &amp;tr(...) syntax because it clashes with the builtin tr/../../ operator.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/HTML/Element.html">HTML::Element</a>, <a>XML::Generator</a></p>
+
+<h2 id="html-head-title-base-link-meta-isindex-nextid-script-style-body-h1-h2-h3-h4-h5-h6-p-pre-div-blockquote-a-img-br-hr-ol-ul-dir-menu-li-dl-dt-dd-dfn-cite-code-em-kbd-samp-strong-var-address-span-b-i-u-tt-center-font-big-small-strike-sub-sup-table-tr-td-th-caption-form-input-select-option-textarea-object-applet-param-map-area-frame-frameset-noframe">html head title base link meta isindex nextid script style body h1 h2 h3 h4 h5 h6 p pre div blockquote a img br hr ol ul dir menu li dl dt dd dfn cite code em kbd samp strong var address span b i u tt center font big small strike sub sup table tr td th caption form input select option textarea object applet param map area frame frameset noframe</h2>
+
+<p>A bunch of methods for creating tags.</p>
+
+<h1 id="Private-Functions">Private Functions</h1>
+
+<h2 id="elem">_elem()</h2>
+
+<p>The _elem() function is wrapped by all the html &#39;tag&#39; functions. It takes a tag-name, optional hashref of attributes and a list of content as parameters.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Current maintainers:</p>
+
+<ul>
+
+<li><p>Christopher J. Madsen <span style="white-space: nowrap;"><code>&lt;perl AT cjmweb.net&gt;</code></span></p>
+
+</li>
+<li><p>Jeff Fearn <span style="white-space: nowrap;"><code>&lt;jfearn AT cpan.org&gt;</code></span></p>
+
+</li>
+</ul>
+
+<p>Original HTML-Tree author:</p>
+
+<ul>
+
+<li><p>Gisle Aas</p>
+
+</li>
+</ul>
+
+<p>Former maintainers:</p>
+
+<ul>
+
+<li><p>Sean M. Burke</p>
+
+</li>
+<li><p>Andy Lester</p>
+
+</li>
+<li><p>Pete Krawczyk <span style="white-space: nowrap;"><code>&lt;petek AT cpan.org&gt;</code></span></p>
+
+</li>
+</ul>
+
+<p>You can follow or contribute to HTML-Tree&#39;s development at <a href="https://github.com/kentfredric/HTML-Tree">https://github.com/kentfredric/HTML-Tree</a>.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright 1995-1998 Gisle Aas, 1999-2004 Sean M. Burke, 2005 Andy Lester, 2006 Pete Krawczyk, 2010 Jeff Fearn, 2012 Christopher J. Madsen.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The programs in this library are distributed in the hope that they will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+
+</body>
+
+</html>
+
+

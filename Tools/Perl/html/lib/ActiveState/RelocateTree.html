@@ -1,0 +1,237 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::RelocateTree - copy tree substituting paths at the same time</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">ActiveState::RelocateTree</span> <span class="string">qw(relocate)</span><span class="operator">;</span>
+   <span class="variable">relocate</span><span class="operator">(</span><span class="string">from</span> <span class="operator">=&gt;</span> <span class="string">'C:\Perl'</span><span class="operator">,</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'D:\lang\perl'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>When a perl installation is copied into a new location, some of its files need to be modified accordingly. The <code>ActiveState::RelocateTree</code> module provide functions that helps you do this.</p>
+
+<p>The following functions are provided. None of them are exported by default.</p>
+
+<dl>
+
+<dt id="relocate-options">relocate( %options )</dt>
+<dd>
+
+<p>This is the main entry point that applications will use. The following options are recognized:</p>
+
+<dl>
+
+<dt id="to"><code>to</code></dt>
+<dd>
+
+<p>The tree which must be transformed. Unless the <code>inplace</code> option is true, it will copy the tree at <code>from</code> to <code>to</code> before transforming it. This option is the only one required. The other options have reasonable defaults, so in most cases this is the only option you need to provide.</p>
+
+</dd>
+<dt id="from"><code>from</code></dt>
+<dd>
+
+<p>The path from which to copy the perl tree. Defaults to <code><span class="variable">$Config</span><span class="operator">{</span><span class="string">prefix</span><span class="operator">}</span>
+</code>, the home of the currently executing perl interpreter.</p>
+
+</dd>
+<dt id="search"><code>search</code></dt>
+<dd>
+
+<p>This is the path which will be searched for and replaced in <code>to</code>. This defaults to the value of <code>from</code>.</p>
+
+</dd>
+<dt id="replace"><code>replace</code></dt>
+<dd>
+
+<p>The replacement value for <code>search</code>. This defaults to the value of <code>to</code>.</p>
+
+</dd>
+<dt id="inplace"><code>inplace</code></dt>
+<dd>
+
+<p>If the tree at <code>to</code> already exists and you just want to transform it in-situ, use this option. It skips the copying step and just transforms the tree. If <code>from</code> equals <code>to</code>, it is set to true and cannot be unset. Otherwise it defaults to false.</p>
+
+</dd>
+<dt id="killorig"><code>killorig</code></dt>
+<dd>
+
+<p>If you&#39;re really moving the tree, this option will remove <code>from</code> after copying and transforming <code>to</code>. Use with care! Defaults to false.</p>
+
+</dd>
+<dt id="bak"><code>bak</code></dt>
+<dd>
+
+<p>While relocating the tree, relocate() creates a backup file for each file being edited. This option allows you to specify the extension of backup files. Defaults to <code>.~1~</code>.</p>
+
+</dd>
+<dt id="savebaks"><code>savebaks</code></dt>
+<dd>
+
+<p>Normally relocate() deletes the backup files before returning. <code>savebaks</code> skips that step, leaving the backup files alone. Defaults to false (backups are deleted).</p>
+
+</dd>
+<dt id="textonly"><code>textonly</code></dt>
+<dd>
+
+<p>Normally relocate() edits both text and binary files. Text files are replaced using a normal search-and-replace algorithm, but binary files are NULL-padded so that all offsets remain the same. By default, <code>textonly</code> is false, i.e. relocate() operates on both text and binary files.</p>
+
+</dd>
+<dt id="ranlib"><code>ranlib</code></dt>
+<dd>
+
+<p>If <code>ranlib</code> is true, relocate() will call <code>ranlib</code> on binary files which look like library files (have the <code><span class="variable">$Config</span><span class="operator">{</span><span class="string">_a</span><span class="operator">}</span>
+</code> extension). Defaults to true.</p>
+
+</dd>
+<dt id="verbose"><code>verbose</code></dt>
+<dd>
+
+<p>If <code>verbose</code> is true, relocate() emits warning messages as it performs certain operations. This may be useful for debugging, or for command-line tools, where user feedback is a good thing.</p>
+
+</dd>
+<dt id="quiet"><code>quiet</code></dt>
+<dd>
+
+<p>Normally, relocate() prints out some status messages even with <code>verbose</code> disabled. If <code>quiet</code> is true, all messages (except error messages) are temporarily silenced. This option overrides <code>verbose</code>, so there isn&#39;t much point calling relocate() with both <code>quiet</code> and <code>verbose</code> set. By default, <code>quiet</code> is false.</p>
+
+</dd>
+<dt id="filelist"><code>filelist</code></dt>
+<dd>
+
+<p>If specified, relocate() will write a list of the files modified to <code>filelist</code>, one filename per line. The lines are prefixed with &quot;B &quot; for binary files and &quot;T &quot; for text files.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="move_tree-from-to">move_tree( $from, $to )</dt>
+<dd>
+
+</dd>
+<dt id="move_tree-from-to-delete_after-verbose">move_tree( $from, $to, $delete_after, $verbose )</dt>
+<dd>
+
+<p>This function will copy the directory tree at $from to the location $to.</p>
+
+<p>If $delete_after is TRUE, then tree at $from will be removed after the copy completes. If $verbose is TRUE, then print a message when deleting the $from tree.</p>
+
+</dd>
+<dt id="check-file-regexp-is_binary">check( $file, $regexp, $is_binary )</dt>
+<dd>
+
+<p>Returns TRUE if there are occurrences of $regexp in $file. It is used by relocate() to search for files which should be edited. If $is_binary is TRUE, then read the file in binmode.</p>
+
+</dd>
+<dt id="edit-regexp-from-dest-bak-are_binary-files">edit( $regexp, $from, $dest, $bak, $are_binary, @files )</dt>
+<dd>
+
+<p>edit() is designed to rip though a set of files, efficiently replacing $from with $dest. It operates on the whole set of files, which all need to be of the same type (binary or text). It accepts the following parameters:</p>
+
+<dl>
+
+<dt id="regexp">$regexp</dt>
+<dd>
+
+<p>The regular expression to search for. Matching text will be replaced with $dest.</p>
+
+</dd>
+<dt id="from1">$from</dt>
+<dd>
+
+<p>The path to search for and replace. If $are_binary is true, this is used to calculate the amount of NUL-padding required to preserve the length of strings. It is not used otherwise.</p>
+
+</dd>
+<dt id="dest">$dest</dt>
+<dd>
+
+<p>The replacement string. If $are_binary is true and $dest is shorter than $from, then it inserts a NULL-pad to preserve the original length of the strings.</p>
+
+</dd>
+<dt id="bak1">$bak</dt>
+<dd>
+
+<p>The extension to use when storing backup files.</p>
+
+</dd>
+<dt id="are_binary">$are_binary</dt>
+<dd>
+
+<p>A boolean: if true, the files are edited with binary semantics: the filehandles are set to binmode, and strings are NULL-padded. Otherwise a plain-old substitution occurs.</p>
+
+</dd>
+<dt id="files">@files</dt>
+<dd>
+
+<p>A list of files to edit.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="spongedir-name">spongedir( $name )</dt>
+<dd>
+
+<p>Returns the spongedir associated with a particular product. The $name is the spongedir you&#39;re interested in. It&#39;s case-insensitive. The following spongedirs are known:</p>
+
+<dl>
+
+<dt id="ppm">ppm</dt>
+<dd>
+
+<p>The sponge directory to be used in PPM packages.</p>
+
+</dd>
+<dt id="thisperl">thisperl</dt>
+<dd>
+
+<p>The original directory in which this copy of Perl was built. This allows relocate() to detect when a replacement path will not fit into the binary.</p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../bin/reloc_perl.html">reloc_perl</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2002 ActiveState Software Inc. All Rights Reserved.</p>
+
+
+</body>
+
+</html>
+
+

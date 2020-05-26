@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#defining_string">__defining_string</a></li>
+      <li><a href="#make_group_type_matcher">__make_group_type_matcher</a></li>
+      <li><a href="#match_setup">__match_setup</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Regexp::Token::GroupType - Represent a grouping parenthesis type.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">;</span>
+ <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'qr{(?i:foo)}smx'</span> <span class="operator">)</span>
+     <span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>PPIx::Regexp::Token::GroupType</code> is a <a href="../../../../lib/PPIx/Regexp/Token.html">PPIx::Regexp::Token</a>.</p>
+
+<p><code>PPIx::Regexp::Token::GroupType</code> is the parent of <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Assertion.html">PPIx::Regexp::Token::GroupType::Assertion</a>, <a href="../../../../lib/PPIx/Regexp/Token/GroupType/BranchReset.html">PPIx::Regexp::Token::GroupType::BranchReset</a>, <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Code.html">PPIx::Regexp::Token::GroupType::Code</a>, <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Modifier.html">PPIx::Regexp::Token::GroupType::Modifier</a>, <a href="../../../../lib/PPIx/Regexp/Token/GroupType/NamedCapture.html">PPIx::Regexp::Token::GroupType::NamedCapture</a>, <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Subexpression.html">PPIx::Regexp::Token::GroupType::Subexpression</a> and <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Switch.html">PPIx::Regexp::Token::GroupType::Switch</a>.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class represents any of the magic sequences of characters that can follow an open parenthesis. This particular class is intended to be abstract.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provides no public methods beyond those provided by its superclass.</p>
+
+<h2 id="defining_string">__defining_string</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$string</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">__defining_string</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method is private to the <code>PPIx-Regexp</code> package, and is documented for the author&#39;s benefit only. It may be changed or revoked without notice.</p>
+
+<p>This method returns an array of strings that define the specific group type. These strings will normally start with <code>&#39;?&#39;</code>.</p>
+
+<p>Optionally, the first returned item may be a hash reference. The only supported key is <code><span class="operator">{</span><span class="variable">suffix</span><span class="operator">}</span>
+</code>, which is a string to be suffixed to each of the regular expressions made by <code>__make_group_type_matcher()</code> out of the defining strings, inside a <code>(?= ... )</code>, so that it is not included in the match.</p>
+
+<p>This method <b>must</b> be overridden, unless <code>__make_group_type_matcher()</code> is. The override <b>must</b> return the same thing each time, since the results of <code>__make_group_type_matcher()</code> are cached.</p>
+
+<h2 id="make_group_type_matcher">__make_group_type_matcher</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$hash_ref</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">__make_group_type_matcher</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method is private to the <code>PPIx-Regexp</code> package, and is documented for the author&#39;s benefit only. It may be changed or revoked without notice.</p>
+
+<p>This method returns a reference to a hash. The keys are regexp delimiter characters which appear in the defining strings for the group type. For each key, the value is a reference to an array of <code>Regexp</code> objects, properly escaped for the key character. Key <code>&#39;&#39;</code> provides the regular expressions to be used if the regexp delimiter does not appear in any of the defining strings.</p>
+
+<p>If this method is overridden by the subclass, method <code>__defining_string()</code> need not be, unless the overridden <code>__make_group_type_matcher()</code> calls <code>__defining_string()</code>.</p>
+
+<h2 id="match_setup">__match_setup</h2>
+
+<pre><code> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">__match_setup</span><span class="operator">(</span> <span class="variable">$tokenizer</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is private to the <code>PPIx-Regexp</code> package, and is documented for the author&#39;s benefit only. It may be changed or revoked without notice.</p>
+
+<p>This method performs whatever setup is needed once it is determined that the given group type has been detected. This method is called only if the class matched at the current position in the string being parsed. It must perform whatever extra setup is needed for the match. It returns nothing.</p>
+
+<p>This method need not be overridden. The default does nothing.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is by the author. Please file bug reports at <a href="http://rt.cpan.org">http://rt.cpan.org</a>, or in electronic mail to the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2017 by Thomas R. Wyant, III</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the full text of the licenses in the directory LICENSES.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+
+</body>
+
+</html>
+
+

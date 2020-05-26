@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#NOTE">NOTE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Net::hostent - by-name interface to Perl&#39;s built-in gethost*() functions</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Net::hostent</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module&#39;s default exports override the core gethostbyname() and gethostbyaddr() functions, replacing them with versions that return &quot;Net::hostent&quot; objects. This object has methods that return the similarly named structure field name from the C&#39;s hostent structure from <i>netdb.h</i>; namely name, aliases, addrtype, length, and addr_list. The aliases and addr_list methods return array reference, the rest scalars. The addr method is equivalent to the zeroth element in the addr_list array reference.</p>
+
+<p>You may also import all the structure fields directly into your namespace as regular variables using the :FIELDS import tag. (Note that this still overrides your core functions.) Access these fields as variables named with a preceding <code>h_</code>. Thus, <code>$host_obj-&gt;name()</code> corresponds to $h_name if you import the fields. Array references are available as regular array variables, so for example <code><span class="variable">@</span><span class="operator">{</span> <span class="variable">$host_obj</span><span class="operator">-&gt;</span><span class="variable">aliases</span><span class="operator">()</span> <span class="operator">}</span>
+</code> would be simply @h_aliases.</p>
+
+<p>The gethost() function is a simple front-end that forwards a numeric argument to gethostbyaddr() by way of Socket::inet_aton, and the rest to gethostbyname().</p>
+
+<p>To access this functionality without the core overrides, pass the <code>use</code> an empty import list, and then access function functions with their full qualified names. On the other hand, the built-ins are still available via the <code>CORE::</code> pseudo-package.</p>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Net::hostent</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">Socket</span><span class="operator">;</span>
+ 
+ <span class="variable">@ARGV</span> <span class="operator">=</span> <span class="operator">(</span><span class="string">'netscape.com'</span><span class="operator">)</span> <span class="keyword">unless</span> <span class="variable">@ARGV</span><span class="operator">;</span>
+ 
+ <span class="keyword">for</span> <span class="variable">$host</span> <span class="operator">(</span> <span class="variable">@ARGV</span> <span class="operator">)</span> <span class="operator">{</span>
+ 
+    <span class="keyword">unless</span> <span class="operator">(</span><span class="variable">$h</span> <span class="operator">=</span> <span class="variable">gethost</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">))</span> <span class="operator">{</span>
+        <span class="keyword">warn</span> <span class="string">"</span><span class="variable">$0</span><span class="string">: no such host: </span><span class="variable">$host</span><span class="string">\n"</span><span class="operator">;</span>
+        <span class="keyword">next</span><span class="operator">;</span>
+    <span class="operator">}</span>
+ 
+    <span class="keyword">printf</span> <span class="string">"\n%s is %s%s\n"</span><span class="operator">,</span> 
+            <span class="variable">$host</span><span class="operator">,</span> 
+            <span class="keyword">lc</span><span class="operator">(</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">)</span> <span class="keyword">eq</span> <span class="keyword">lc</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">)</span> <span class="operator">?</span> <span class="string">""</span> <span class="operator">:</span> <span class="string">"*really* "</span><span class="operator">,</span>
+            <span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+ 
+    <span class="keyword">print</span> <span class="string">"\taliases are "</span><span class="operator">,</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">", "</span><span class="operator">,</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">aliases</span><span class="operator">}</span><span class="operator">),</span> <span class="string">"\n"</span>
+                <span class="keyword">if</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">aliases</span><span class="operator">}</span><span class="operator">;</span>     
+ 
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">addr_list</span><span class="operator">}</span> <span class="operator">&gt;</span> <span class="number">1</span> <span class="operator">)</span> <span class="operator">{</span> 
+        <span class="keyword">my</span> <span class="variable">$i</span><span class="operator">;</span>
+        <span class="keyword">for</span> <span class="variable">$addr</span> <span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">addr_list</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">printf</span> <span class="string">"\taddr #%d is [%s]\n"</span><span class="operator">,</span> <span class="variable">$i</span><span class="operator">++,</span> <span class="variable">inet_ntoa</span><span class="operator">(</span><span class="variable">$addr</span><span class="operator">);</span>
+        <span class="operator">}</span> 
+    <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+        <span class="keyword">printf</span> <span class="string">"\taddress is [%s]\n"</span><span class="operator">,</span> <span class="variable">inet_ntoa</span><span class="operator">(</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">addr</span><span class="operator">);</span>
+    <span class="operator">}</span> 
+ 
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$h</span> <span class="operator">=</span> <span class="keyword">gethostbyaddr</span><span class="operator">(</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">addr</span><span class="operator">))</span> <span class="operator">{</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">lc</span><span class="operator">(</span><span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">)</span> <span class="keyword">ne</span> <span class="keyword">lc</span><span class="operator">(</span><span class="variable">$host</span><span class="operator">))</span> <span class="operator">{</span>
+            <span class="keyword">printf</span> <span class="string">"\tThat addr reverses to host %s!\n"</span><span class="operator">,</span> <span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+            <span class="variable">$host</span> <span class="operator">=</span> <span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+            <span class="keyword">redo</span><span class="operator">;</span>
+        <span class="operator">}</span> 
+    <span class="operator">}</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="NOTE">NOTE</h1>
+
+<p>While this class is currently implemented using the Class::Struct module to build a struct-like class, you shouldn&#39;t rely upon this.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Tom Christiansen</p>
+
+
+</body>
+
+</html>
+
+

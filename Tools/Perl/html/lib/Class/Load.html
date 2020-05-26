@@ -1,0 +1,221 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#load_class-Class::Name-options">load_class Class::Name, \%options</a></li>
+      <li><a href="#try_load_class-Class::Name-options---0-1-error-message">try_load_class Class::Name, \%options -&gt; (0|1, error message)</a></li>
+      <li><a href="#is_class_loaded-Class::Name-options---0-1">is_class_loaded Class::Name, \%options -&gt; 0|1</a></li>
+      <li><a href="#load_first_existing_class-Class::Name-options">load_first_existing_class Class::Name, \%options, ...</a></li>
+      <li><a href="#load_optional_class-Class::Name-options---0-1">load_optional_class Class::Name, \%options -&gt; 0|1</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::Load - A working (require &quot;Class::Name&quot;) and more</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.24</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Class::Load</span> <span class="string">':all'</span><span class="operator">;</span>
+    
+    <span class="variable">try_load_class</span><span class="operator">(</span><span class="string">'Class::Name'</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="variable">plan</span> <span class="string">skip_all</span> <span class="operator">=&gt;</span> <span class="string">"Class::Name required to run these tests"</span><span class="operator">;</span>
+    
+    <span class="variable">load_class</span><span class="operator">(</span><span class="string">'Class::Name'</span><span class="operator">);</span>
+    
+    <span class="variable">is_class_loaded</span><span class="operator">(</span><span class="string">'Class::Name'</span><span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$baseclass</span> <span class="operator">=</span> <span class="variable">load_optional_class</span><span class="operator">(</span><span class="string">'Class::Name::MightExist'</span><span class="operator">)</span>
+        <span class="operator">?</span> <span class="string">'Class::Name::MightExist'</span>
+        <span class="operator">:</span> <span class="string">'Class::Name::Default'</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>require EXPR</code> only accepts <code>Class/Name.pm</code> style module names, not <code>Class::Name</code>. How frustrating! For that, we provide <code>load_class &#39;Class::Name&#39;</code>.</p>
+
+<p>It&#39;s often useful to test whether a module can be loaded, instead of throwing an error when it&#39;s not available. For that, we provide <code>try_load_class &#39;Class::Name&#39;</code>.</p>
+
+<p>Finally, sometimes we need to know whether a particular class has been loaded. Asking <code>%INC</code> is an option, but that will miss inner packages and any class for which the filename does not correspond to the package name. For that, we provide <code>is_class_loaded &#39;Class::Name&#39;</code>.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="load_class-Class::Name-options">load_class Class::Name, \%options</h2>
+
+<p><code>load_class</code> will load <code>Class::Name</code> or throw an error, much like <code>require</code>.</p>
+
+<p>If <code>Class::Name</code> is already loaded (checked with <code>is_class_loaded</code>) then it will not try to load the class. This is useful when you have inner packages which <code>require</code> does not check.</p>
+
+<p>The <code>%options</code> hash currently accepts one key, <code>-version</code>. If you specify a version, then this subroutine will call <code><span class="variable">Class::Name</span><span class="operator">-&gt;</span><span class="variable">VERSION</span><span class="operator">(</span> <span class="variable">$options</span><span class="operator">{</span><span class="string">-version</span><span class="operator">}</span> <span class="operator">)</span>
+</code> internally, which will throw an error if the class&#39;s version is not equal to or greater than the version you requested.</p>
+
+<p>This method will return the name of the class on success.</p>
+
+<h2 id="try_load_class-Class::Name-options---0-1-error-message">try_load_class Class::Name, \%options -&gt; (0|1, error message)</h2>
+
+<p>Returns 1 if the class was loaded, 0 if it was not. If the class was not loaded, the error will be returned as a second return value in list context.</p>
+
+<p>Again, if <code>Class::Name</code> is already loaded (checked with <code>is_class_loaded</code>) then it will not try to load the class. This is useful when you have inner packages which <code>require</code> does not check.</p>
+
+<p>Like <code>load_class</code>, you can pass a <code>-version</code> in <code>%options</code>. If the version is not sufficient, then this subroutine will return false.</p>
+
+<h2 id="is_class_loaded-Class::Name-options---0-1">is_class_loaded Class::Name, \%options -&gt; 0|1</h2>
+
+<p>This uses a number of heuristics to determine if the class <code>Class::Name</code> is loaded. There heuristics were taken from <a href="../../lib/Class/MOP.html">Class::MOP</a>&#39;s old pure-perl implementation.</p>
+
+<p>Like <code>load_class</code>, you can pass a <code>-version</code> in <code>%options</code>. If the version is not sufficient, then this subroutine will return false.</p>
+
+<h2 id="load_first_existing_class-Class::Name-options">load_first_existing_class Class::Name, \%options, ...</h2>
+
+<p>This attempts to load the first loadable class in the list of classes given. Each class name can be followed by an options hash reference.</p>
+
+<p>If any one of the classes loads and passes the optional version check, that class name will be returned. If <i>none</i> of the classes can be loaded (or none pass their version check), then an error will be thrown.</p>
+
+<p>If, when attempting to load a class, it fails to load because of a syntax error, then an error will be thrown immediately.</p>
+
+<h2 id="load_optional_class-Class::Name-options---0-1">load_optional_class Class::Name, \%options -&gt; 0|1</h2>
+
+<p><code>load_optional_class</code> is a lot like <code>try_load_class</code>, but also a lot like <code>load_class</code>.</p>
+
+<p>If the class exists, and it works, then it will return 1. If you specify a version in <code>%options</code>, then the version check must succeed or it will return 0.</p>
+
+<p>If the class doesn&#39;t exist, and it appears to not exist on disk either, it will return 0.</p>
+
+<p>If the class exists on disk, but loading from disk results in an error (e.g.: a syntax error), then it will <code>croak</code> with that error.</p>
+
+<p>This is useful for using if you want a fallback module system, i.e.:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="variable">load_optional_class</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">)</span> <span class="operator">?</span> <span class="variable">$foo</span> <span class="operator">:</span> <span class="variable">$default</span><span class="operator">;</span>
+</code></pre>
+
+<p>That way, if $foo does exist, but can&#39;t be loaded due to error, you won&#39;t get the behaviour of it simply not existing.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>Because of some of the heuristics that this module uses to infer whether a module has been loaded, some false positives may occur in <code>is_class_loaded</code> checks (which are also performed internally in other interfaces) -- if a class has started to be loaded but then dies, it may appear that it has already been loaded, which can cause other things to make the wrong decision. <a href="../../lib/Module/Runtime.html">Module::Runtime</a> doesn&#39;t have this issue, but it also doesn&#39;t do some things that this module does -- for example gracefully handle packages that have been defined inline in the same file as another package.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="http:-blog.fox.geek.nz-2010-11-searching-design-spec-for-ultimate.html"><a href="http://blog.fox.geek.nz/2010/11/searching-design-spec-for-ultimate.html">http://blog.fox.geek.nz/2010/11/searching-design-spec-for-ultimate.html</a></dt>
+<dd>
+
+<p>This blog post is a good overview of the current state of the existing modules for loading other modules in various ways.</p>
+
+</dd>
+<dt id="http:-blog.fox.geek.nz-2010-11-handling-optional-requirements-with.html"><a href="http://blog.fox.geek.nz/2010/11/handling-optional-requirements-with.html">http://blog.fox.geek.nz/2010/11/handling-optional-requirements-with.html</a></dt>
+<dd>
+
+<p>This blog post describes how to handle optional modules with <a href="../../lib/Class/Load.html">Class::Load</a>.</p>
+
+</dd>
+<dt id="http:-d.hatena.ne.jp-tokuhirom-20110202-1296598578"><a href="http://d.hatena.ne.jp/tokuhirom/20110202/1296598578">http://d.hatena.ne.jp/tokuhirom/20110202/1296598578</a></dt>
+<dd>
+
+<p>This Japanese blog post describes why <a>DBIx::Skinny</a> now uses <a href="../../lib/Class/Load.html">Class::Load</a> over its competitors.</p>
+
+</dd>
+<dt id="Moose-Jifty-Prophet-etc"><a href="../../lib/Moose.html">Moose</a>, <a>Jifty</a>, <a>Prophet</a>, etc</dt>
+<dd>
+
+<p>This module was designed to be used anywhere you have <code><span class="keyword">if</span> <span class="operator">(</span><span class="keyword">eval</span> <span class="string">"require </span><span class="variable">$module</span><span class="string">"</span><span class="operator">;</span> <span class="number">1</span><span class="operator">)</span>
+</code>, which occurs in many large projects.</p>
+
+</dd>
+<dt id="Module::Runtime"><a href="../../lib/Module/Runtime.html">Module::Runtime</a></dt>
+<dd>
+
+<p>A leaner approach to loading modules</p>
+
+</dd>
+</dl>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Load">the RT bug tracker</a> (or <a href="mailto:bug-Class-Load@rt.cpan.org">bug-Class-Load@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/moose.html">http://lists.perl.org/list/moose.html</a>.</p>
+
+<p>There is also an irc channel available for users of this distribution, at <a href="irc://irc.perl.org/#moose"><code><span class="comment">#moose</span>
+</code> on <code>irc.perl.org</code></a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Shawn M Moore &lt;sartak at bestpractical.com&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Shawn Moore &lt;sartak@bestpractical.com&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Kent Fredric &lt;kentfredric@gmail.com&gt;</p>
+
+</li>
+<li><p>Paul Howarth &lt;paul@city-fan.org&gt;</p>
+
+</li>
+<li><p>Olivier Mengu&eacute; &lt;dolmen@cpan.org&gt;</p>
+
+</li>
+<li><p>Caleb Cushing &lt;xenoterracide@gmail.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2008 by Shawn M Moore.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,230 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#INTERFACE-SUPPORT">INTERFACE SUPPORT</a></li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Document - Caching wrapper around a PPI::Document.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">PPI::Document</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Perl::Critic::Document</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$doc</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Foo.pm'</span><span class="operator">);</span>
+    <span class="variable">$doc</span> <span class="operator">=</span> <span class="variable">Perl::Critic::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">-source</span> <span class="operator">=&gt;</span> <span class="variable">$doc</span><span class="operator">);</span>
+    <span class="comment">## Then use the instance just like a PPI::Document</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl::Critic does a lot of iterations over the PPI document tree via the <code>PPI::Document::find()</code> method. To save some time, this class pre-caches a lot of the common <code>find()</code> calls in a single traversal. Then, on subsequent requests we return the cached data.</p>
+
+<p>This is implemented as a facade, where method calls are handed to the stored <code>PPI::Document</code> instance.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>This facade does not implement the overloaded operators from <a href="../../../lib/PPI/Document.html">PPI::Document</a> (that is, the <code>use overload ...</code> work). Therefore, users of this facade must not rely on that syntactic sugar. So, for example, instead of <code><span class="keyword">my</span> <span class="variable">$source</span> <span class="operator">=</span> <span class="string">"</span><span class="variable">$doc</span><span class="string">"</span><span class="operator">;</span>
+</code> you should write <code><span class="keyword">my</span> <span class="variable">$source</span> <span class="operator">=</span> <span class="variable">$doc</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">();</span>
+</code></p>
+
+<p>Perhaps there is a CPAN module out there which implements a facade better than we do here?</p>
+
+<h1 id="INTERFACE-SUPPORT">INTERFACE SUPPORT</h1>
+
+<p>This is considered to be a public class. Any changes to its interface will go through a deprecation cycle.</p>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<dl>
+
+<dt id="new--source-source_code--filename-override-filename--program-extensions-program_extensions"><code>new(-source =&gt; $source_code, &#39;-filename-override&#39; =&gt; $filename, &#39;-program-extensions&#39; =&gt; [program_extensions])</code></dt>
+<dd>
+
+<p>Create a new instance referencing a PPI::Document instance. The <code>$source_code</code> can be the name of a file, a reference to a scalar containing actual source code, or a <a href="../../../lib/PPI/Document.html">PPI::Document</a> or <a href="../../../lib/PPI/Document/File.html">PPI::Document::File</a>.</p>
+
+<p>In the event that <code>$source_code</code> is a reference to a scalar containing actual source code or a <a href="../../../lib/PPI/Document.html">PPI::Document</a>, the resulting <a href="../../../lib/Perl/Critic/Document.html">Perl::Critic::Document</a> will not have a filename. This may cause <a href="../../../lib/Perl/Critic/Document.html">Perl::Critic::Document</a> to incorrectly classify the source code as a module or script. To avoid this problem, you can optionally set the <code>-filename-override</code> to force the <a href="../../../lib/Perl/Critic/Document.html">Perl::Critic::Document</a> to have a particular <code>$filename</code>. Do not use this option if <code>$source_code</code> is already the name of a file, or is a reference to a <a href="../../../lib/PPI/Document/File.html">PPI::Document::File</a>.</p>
+
+<p>The &#39;-program-extensions&#39; argument is optional, and is a reference to a list of strings and/or regular expressions. The strings will be made into regular expressions matching the end of a file name, and any document whose file name matches one of the regular expressions will be considered a program.</p>
+
+<p>If -program-extensions is not specified, or if it does not determine the document type, the document will be considered to be a program if the source has a shebang line or its file name (if any) matches <code>m/ [.] PL \z /smx</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="ppi_document"><code>ppi_document()</code></dt>
+<dd>
+
+<p>Accessor for the wrapped PPI::Document instance. Note that altering this instance in any way can cause unpredictable failures in Perl::Critic&#39;s subsequent analysis because some caches may fall out of date.</p>
+
+</dd>
+<dt id="find-wanted"><code>find($wanted)</code></dt>
+<dd>
+
+</dd>
+<dt id="find_first-wanted"><code>find_first($wanted)</code></dt>
+<dd>
+
+</dd>
+<dt id="find_any-wanted"><code>find_any($wanted)</code></dt>
+<dd>
+
+<p>Caching wrappers around the PPI methods. If <code>$wanted</code> is a simple PPI class name, then the cache is employed. Otherwise we forward the call to the corresponding method of the <code>PPI::Document</code> instance.</p>
+
+</dd>
+<dt id="namespaces"><code>namespaces()</code></dt>
+<dd>
+
+<p>Returns a list of the namespaces (package names) in the document.</p>
+
+</dd>
+<dt id="subdocuments_for_namespace-namespace"><code>subdocuments_for_namespace($namespace)</code></dt>
+<dd>
+
+<p>Returns a list of sub-documents containing the elements in the given namespace. For example, given that the current document is for the source</p>
+
+<pre><code>    <span class="variable">foo</span><span class="operator">();</span>
+    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    <span class="keyword">package</span> <span class="variable">Bar</span><span class="operator">;</span>
+    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+</code></pre>
+
+<p>this method will return two <a href="../../../lib/Perl/Critic/Document.html">Perl::Critic::Document</a>s for a parameter of <code>&quot;Foo&quot;</code>. For more, see <a href="../../../lib/PPIx/Utilities/Node.html#split_ppi_node_by_namespace">&quot;split_ppi_node_by_namespace&quot; in PPIx::Utilities::Node</a>.</p>
+
+</dd>
+<dt id="ppix_regexp_from_element-element"><code>ppix_regexp_from_element($element)</code></dt>
+<dd>
+
+<p>Caching wrapper around <code>PPIx::Regexp-&gt;new($element)</code>. If <code>$element</code> is a <code>PPI::Element</code> the cache is employed, otherwise it just returns the results of <code>PPIx::Regexp-&gt;new()</code>. In either case, it returns <code>undef</code> unless the argument is something that <a href="../../../lib/PPIx/Regexp.html">PPIx::Regexp</a> actually understands.</p>
+
+</dd>
+<dt id="element_is_in_lexical_scope_after_statement_containing-inner-outer"><code>element_is_in_lexical_scope_after_statement_containing( $inner, $outer )</code></dt>
+<dd>
+
+<p>Is the <code>$inner</code> element in lexical scope after the statement containing the <code>$outer</code> element?</p>
+
+<p>In the case where <code>$outer</code> is itself a scope-defining element, returns true if <code>$outer</code> contains <code>$inner</code>. In any other case, <code>$inner</code> must be after the last element of the statement containing <code>$outer</code>, and the innermost scope for <code>$outer</code> also contains <code>$inner</code>.</p>
+
+<p>This is not the same as asking whether <code>$inner</code> is visible from <code>$outer</code>.</p>
+
+</dd>
+<dt id="filename"><code>filename()</code></dt>
+<dd>
+
+<p>Returns the filename for the source code if applicable (PPI::Document::File) or <code>undef</code> otherwise (PPI::Document).</p>
+
+</dd>
+<dt id="isa-classname"><code>isa( $classname )</code></dt>
+<dd>
+
+<p>To be compatible with other modules that expect to get a PPI::Document, the Perl::Critic::Document class masquerades as the PPI::Document class.</p>
+
+</dd>
+<dt id="highest_explicit_perl_version"><code>highest_explicit_perl_version()</code></dt>
+<dd>
+
+<p>Returns a <a href="../../../lib/version.html">version</a> object for the highest Perl version requirement declared in the document via a <code>use</code> or <code>require</code> statement. Returns nothing if there is no version statement.</p>
+
+</dd>
+<dt id="uses_module-module_or_pragma_name"><code>uses_module($module_or_pragma_name)</code></dt>
+<dd>
+
+<p>Answers whether there is a <code>use</code>, <code>require</code>, or <code>no</code> of the given name in this document. Note that there is no differentiation of modules vs. pragmata here.</p>
+
+</dd>
+<dt id="process_annotations"><code>process_annotations()</code></dt>
+<dd>
+
+<p>Causes this Document to scan itself and mark which lines &amp; policies are disabled by the <code>&quot;## no critic&quot;</code> annotations.</p>
+
+</dd>
+<dt id="line_is_disabled_for_policy-line-policy_object"><code>line_is_disabled_for_policy($line, $policy_object)</code></dt>
+<dd>
+
+<p>Returns true if the given <code>$policy_object</code> or <code>$policy_name</code> has been disabled for at <code>$line</code> in this Document. Otherwise, returns false.</p>
+
+</dd>
+<dt id="add_annotation-annotation"><code>add_annotation( $annotation )</code></dt>
+<dd>
+
+<p>Adds an <code>$annotation</code> object to this Document.</p>
+
+</dd>
+<dt id="annotations"><code>annotations()</code></dt>
+<dd>
+
+<p>Returns a list containing all the <a href="../../../lib/Perl/Critic/Annotation.html">Perl::Critic::Annotation</a>s that were found in this Document.</p>
+
+</dd>
+<dt id="add_suppressed_violation-violation"><code>add_suppressed_violation($violation)</code></dt>
+<dd>
+
+<p>Informs this Document that a <code>$violation</code> was found but not reported because it fell on a line that had been suppressed by a <code>&quot;## no critic&quot;</code> annotation. Returns <code>$self</code>.</p>
+
+</dd>
+<dt id="suppressed_violations"><code>suppressed_violations()</code></dt>
+<dd>
+
+<p>Returns a list of references to all the <a href="../../../lib/Perl/Critic/Violation.html">Perl::Critic::Violation</a>s that were found in this Document but were suppressed.</p>
+
+</dd>
+<dt id="is_program"><code>is_program()</code></dt>
+<dd>
+
+<p>Returns whether this document is considered to be a program.</p>
+
+</dd>
+<dt id="is_module"><code>is_module()</code></dt>
+<dd>
+
+<p>Returns whether this document is considered to be a Perl module.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2006-2011 Chris Dolan.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

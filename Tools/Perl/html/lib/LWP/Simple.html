@@ -1,0 +1,193 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#get">get</a></li>
+      <li><a href="#head">head</a></li>
+      <li><a href="#getprint">getprint</a></li>
+      <li><a href="#getstore">getstore</a></li>
+      <li><a href="#mirror">mirror</a></li>
+    </ul>
+  </li>
+  <li><a href="#STATUS-CONSTANTS">STATUS CONSTANTS</a></li>
+  <li><a href="#CLASSIFICATION-FUNCTIONS">CLASSIFICATION FUNCTIONS</a>
+    <ul>
+      <li><a href="#is_success">is_success</a></li>
+      <li><a href="#is_error">is_error</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEAT">CAVEAT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>LWP::Simple - simple procedural interface to LWP</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="variable">perl</span> <span class="operator">-</span><span class="variable">MLWP::Simple</span> <span class="keyword">-e</span> <span class="string">'getprint "http://www.sn.no"'</span>
+ 
+ <span class="keyword">use</span> <span class="variable">LWP::Simple</span><span class="operator">;</span>
+ <span class="variable">$content</span> <span class="operator">=</span> <span class="variable">get</span><span class="operator">(</span><span class="string">"http://www.sn.no/"</span><span class="operator">);</span>
+ <span class="keyword">die</span> <span class="string">"Couldn't get it!"</span> <span class="keyword">unless</span> <span class="keyword">defined</span> <span class="variable">$content</span><span class="operator">;</span>
+ 
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">mirror</span><span class="operator">(</span><span class="string">"http://www.sn.no/"</span><span class="operator">,</span> <span class="string">"foo"</span><span class="operator">)</span> <span class="operator">==</span> <span class="variable">RC_NOT_MODIFIED</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+ 
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">is_success</span><span class="operator">(</span><span class="variable">getprint</span><span class="operator">(</span><span class="string">"http://www.sn.no/"</span><span class="operator">)))</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is meant for people who want a simplified view of the libwww-perl library. It should also be suitable for one-liners. If you need more control or access to the header fields in the requests sent and responses received, then you should use the full object-oriented interface provided by the <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> module.</p>
+
+<p>The module will also export the <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a> object as <code>$ua</code> if you ask for it explicitly.</p>
+
+<p>The user agent created by this module will identify itself as <code>LWP::Simple/#.##</code> and will initialize its proxy defaults from the environment (by calling <code>$ua-&gt;env_proxy</code>).</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<p>The following functions are provided (and exported) by this module:</p>
+
+<h2 id="get">get</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">get</span><span class="operator">(</span><span class="variable">$url</span><span class="operator">);</span>
+</code></pre>
+
+<p>The get() function will fetch the document identified by the given URL and return it. It returns <code>undef</code> if it fails. The <code>$url</code> argument can be either a string or a reference to a <a href="../../lib/URI.html">URI</a> object.</p>
+
+<p>You will not be able to examine the response code or response headers (like <code>Content-Type</code>) when you are accessing the web using this function. If you need that information you should use the full OO interface (see <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>).</p>
+
+<h2 id="head">head</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$res</span> <span class="operator">=</span> <span class="variable">head</span><span class="operator">(</span><span class="variable">$url</span><span class="operator">);</span>
+</code></pre>
+
+<p>Get document headers. Returns the following 5 values if successful: ($content_type, $document_length, $modified_time, $expires, $server)</p>
+
+<p>Returns an empty list if it fails. In scalar context returns TRUE if successful.</p>
+
+<h2 id="getprint">getprint</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="variable">getprint</span><span class="operator">(</span><span class="variable">$url</span><span class="operator">);</span>
+</code></pre>
+
+<p>Get and print a document identified by a URL. The document is printed to the selected default filehandle for output (normally STDOUT) as data is received from the network. If the request fails, then the status code and message are printed on STDERR. The return value is the HTTP response code.</p>
+
+<h2 id="getstore">getstore</h2>
+
+<pre><code>    my $code = getstore($url, $file)</code></pre>
+
+<p>Gets a document identified by a URL and stores it in the file. The return value is the HTTP response code.</p>
+
+<h2 id="mirror">mirror</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="variable">mirror</span><span class="operator">(</span><span class="variable">$url</span><span class="operator">,</span> <span class="variable">$file</span><span class="operator">);</span>
+</code></pre>
+
+<p>Get and store a document identified by a URL, using <i>If-modified-since</i>, and checking the <i>Content-Length</i>. Returns the HTTP response code.</p>
+
+<h1 id="STATUS-CONSTANTS">STATUS CONSTANTS</h1>
+
+<p>This module also exports the <a href="../../lib/HTTP/Status.html">HTTP::Status</a> constants and procedures. You can use them when you check the response code from <a href="../../lib/LWP/Simple.html#getprint">&quot;getprint&quot; in LWP::Simple</a>, <a href="../../lib/LWP/Simple.html#getstore">&quot;getstore&quot; in LWP::Simple</a> or <a href="../../lib/LWP/Simple.html#mirror">&quot;mirror&quot; in LWP::Simple</a>. The constants are:</p>
+
+<pre><code>   RC_CONTINUE
+   RC_SWITCHING_PROTOCOLS
+   RC_OK
+   RC_CREATED
+   RC_ACCEPTED
+   RC_NON_AUTHORITATIVE_INFORMATION
+   RC_NO_CONTENT
+   RC_RESET_CONTENT
+   RC_PARTIAL_CONTENT
+   RC_MULTIPLE_CHOICES
+   RC_MOVED_PERMANENTLY
+   RC_MOVED_TEMPORARILY
+   RC_SEE_OTHER
+   RC_NOT_MODIFIED
+   RC_USE_PROXY
+   RC_BAD_REQUEST
+   RC_UNAUTHORIZED
+   RC_PAYMENT_REQUIRED
+   RC_FORBIDDEN
+   RC_NOT_FOUND
+   RC_METHOD_NOT_ALLOWED
+   RC_NOT_ACCEPTABLE
+   RC_PROXY_AUTHENTICATION_REQUIRED
+   RC_REQUEST_TIMEOUT
+   RC_CONFLICT
+   RC_GONE
+   RC_LENGTH_REQUIRED
+   RC_PRECONDITION_FAILED
+   RC_REQUEST_ENTITY_TOO_LARGE
+   RC_REQUEST_URI_TOO_LARGE
+   RC_UNSUPPORTED_MEDIA_TYPE
+   RC_INTERNAL_SERVER_ERROR
+   RC_NOT_IMPLEMENTED
+   RC_BAD_GATEWAY
+   RC_SERVICE_UNAVAILABLE
+   RC_GATEWAY_TIMEOUT
+   RC_HTTP_VERSION_NOT_SUPPORTED</code></pre>
+
+<h1 id="CLASSIFICATION-FUNCTIONS">CLASSIFICATION FUNCTIONS</h1>
+
+<p>The <a href="../../lib/HTTP/Status.html">HTTP::Status</a> classification functions are:</p>
+
+<h2 id="is_success">is_success</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">is_success</span><span class="operator">(</span><span class="variable">$rc</span><span class="operator">);</span>
+</code></pre>
+
+<p>True if response code indicated a successful request.</p>
+
+<h2 id="is_error">is_error</h2>
+
+<pre><code>    my $bool = is_error($rc)</code></pre>
+
+<p>True if response code indicated that an error occurred.</p>
+
+<h1 id="CAVEAT">CAVEAT</h1>
+
+<p>Note that if you are using both LWP::Simple and the very popular <a href="../../lib/CGI.html">CGI</a> module, you may be importing a <code>head</code> function from each module, producing a warning like <code>Prototype mismatch: sub main::head ($) vs none</code>. Get around this problem by just not importing LWP::Simple&#39;s <code>head</code> function, like so:</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">LWP::Simple</span> <span class="string">qw(!head)</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">CGI</span> <span class="string">qw(:standard)</span><span class="operator">;</span>  <span class="comment"># then only CGI.pm defines a head()</span>
+</code></pre>
+
+<p>Then if you do need LWP::Simple&#39;s <code>head</code> function, you can just call it as <code>LWP::Simple::head($url)</code>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/LWP.html">LWP</a>, <a href="../../lib/libwww/lwpcook.html">lwpcook</a>, <a href="../../lib/LWP/UserAgent.html">LWP::UserAgent</a>, <a href="../../lib/HTTP/Status.html">HTTP::Status</a>, <a href="../../bin/lwp-request.html">lwp-request</a>, <a href="../../bin/lwp-mirror.html">lwp-mirror</a></p>
+
+
+</body>
+
+</html>
+
+

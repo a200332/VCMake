@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>LWP::MediaTypes - guess media type for a file or a URL</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">LWP::MediaTypes</span> <span class="string">qw(guess_media_type)</span><span class="operator">;</span>
+ <span class="variable">$type</span> <span class="operator">=</span> <span class="variable">guess_media_type</span><span class="operator">(</span><span class="string">"/tmp/foo.gif"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides functions for handling media (also known as MIME) types and encodings. The mapping from file extensions to media types is defined by the <i>media.types</i> file. If the <i>~/.media.types</i> file exists it is used instead. For backwards compatibility we will also look for <i>~/.mime.types</i>.</p>
+
+<p>The following functions are exported by default:</p>
+
+<dl>
+
+<dt id="guess_media_type-filename">guess_media_type( $filename )</dt>
+<dd>
+
+</dd>
+<dt id="guess_media_type-uri">guess_media_type( $uri )</dt>
+<dd>
+
+</dd>
+<dt id="guess_media_type-filename_or_uri-header_to_modify">guess_media_type( $filename_or_uri, $header_to_modify )</dt>
+<dd>
+
+<p>This function tries to guess media type and encoding for a file or a URI. It returns the content type, which is a string like <code>&quot;text/html&quot;</code>. In array context it also returns any content encodings applied (in the order used to encode the file). You can pass a URI object reference, instead of the file name.</p>
+
+<p>If the type can not be deduced from looking at the file name, then guess_media_type() will let the <code>-T</code> Perl operator take a look. If this works (and <code>-T</code> returns a TRUE value) then we return <i>text/plain</i> as the type, otherwise we return <i>application/octet-stream</i> as the type.</p>
+
+<p>The optional second argument should be a reference to a HTTP::Headers object or any object that implements the $obj-&gt;header method in a similar way. When it is present the values of the &#39;Content-Type&#39; and &#39;Content-Encoding&#39; will be set for this header.</p>
+
+</dd>
+<dt id="media_suffix-type">media_suffix( $type, ... )</dt>
+<dd>
+
+<p>This function will return all suffixes that can be used to denote the specified media type(s). Wildcard types can be used. In a scalar context it will return the first suffix found. Examples:</p>
+
+<pre><code>  <span class="variable">@suffixes</span> <span class="operator">=</span> <span class="variable">media_suffix</span><span class="operator">(</span><span class="string">'image/*'</span><span class="operator">,</span> <span class="string">'audio/basic'</span><span class="operator">);</span>
+  <span class="variable">$suffix</span> <span class="operator">=</span> <span class="variable">media_suffix</span><span class="operator">(</span><span class="string">'text/html'</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<p>The following functions are only exported by explicit request:</p>
+
+<dl>
+
+<dt id="add_type-type-exts">add_type( $type, @exts )</dt>
+<dd>
+
+<p>Associate a list of file extensions with the given media type. Example:</p>
+
+<pre><code>    <span class="variable">add_type</span><span class="operator">(</span><span class="string">"x-world/x-vrml"</span> <span class="operator">=&gt;</span> <span class="string">qw(wrl vrml)</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="add_encoding-type-ext">add_encoding( $type, @ext )</dt>
+<dd>
+
+<p>Associate a list of file extensions with an encoding type. Example:</p>
+
+<pre><code> <span class="variable">add_encoding</span><span class="operator">(</span><span class="string">"x-gzip"</span> <span class="operator">=&gt;</span> <span class="string">"gz"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="read_media_types-files">read_media_types( @files )</dt>
+<dd>
+
+<p>Parse media types files and add the type mappings found there. Example:</p>
+
+<pre><code>    <span class="variable">read_media_types</span><span class="operator">(</span><span class="string">"conf/mime.types"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 1995-1999 Gisle Aas.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

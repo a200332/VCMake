@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">&quot;EXPORTS&quot;</a>
+    <ul>
+      <li><a href="#is_-type-value">is_$type($value)</a></li>
+      <li><a href="#assert_-type-value">assert_$type($value)</a></li>
+      <li><a href="#to_-type-value">to_$type($value)</a></li>
+      <li><a href="#force_-type-value">force_$type($value)</a></li>
+    </ul>
+  </li>
+  <li><a href="#ADDITIONAL-API">ADDITIONAL API</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Subs - Make validation and coercion subs from Specio types</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Specio::Subs</span> <span class="string">qw( Specio::Library::Builtins Specio::Library::Perl My::Lib )</span><span class="operator">;</span>
+  
+  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">is_PackageName</span><span class="operator">(</span><span class="variable">$var</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+  
+  <span class="variable">assert_Str</span><span class="operator">(</span><span class="variable">$var</span><span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$person1</span> <span class="operator">=</span> <span class="variable">to_Person</span><span class="operator">(</span><span class="variable">$var</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$person2</span> <span class="operator">=</span> <span class="variable">force_Person</span><span class="operator">(</span><span class="variable">$var</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module generates a set of helpful validation and coercion subroutines for all of the types defined in one or more libraries.</p>
+
+<p>To use it, simply import <code>Specio::Subs</code> passing a list of one or more library names. This module will load those libraries as needed.</p>
+
+<p>If any of the types in any libraries have names that do not work as part of a Perl subroutine name, this module will throw an exception.</p>
+
+<p>If you have <a href="../../lib/Sub/Util.html">Sub::Util</a> or <a href="../../lib/Sub/Name.html">Sub::Name</a> installed, one of those will be used to name the generated subroutines.</p>
+
+<h1 id="EXPORTS">&quot;EXPORTS&quot;</h1>
+
+<p>The following subs are created in the importing package:</p>
+
+<h2 id="is_-type-value">is_$type($value)</h2>
+
+<p>This subroutine returns a boolean indicating whether or not the <code>$value</code> is valid for the type.</p>
+
+<h2 id="assert_-type-value">assert_$type($value)</h2>
+
+<p>This subroutine dies if the <code>$value</code> is not valid for the type.</p>
+
+<h2 id="to_-type-value">to_$type($value)</h2>
+
+<p>This subroutine attempts to coerce <code>$value</code> into the given type. If it cannot be coerced it returns the original <code>$value</code>.</p>
+
+<p>This is only created if the type has coercions.</p>
+
+<h2 id="force_-type-value">force_$type($value)</h2>
+
+<p>This subroutine attempts to coerce <code>$value</code> into the given type, and dies if it cannot do so.</p>
+
+<p>This is only created if the type has coercions.</p>
+
+<h1 id="ADDITIONAL-API">ADDITIONAL API</h1>
+
+<p>This module has a subroutine named <code>subs_installed_into</code>. It is not exported but it can be called by its fully qualified name. It accepts a single argument, a package name. It returns a list of subs that it generated and installed in the given package, if any.</p>
+
+<p>This exists to make it easy to write a type library that combines other library and generates helper subs for export all at once.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

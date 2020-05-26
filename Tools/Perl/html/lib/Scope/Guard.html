@@ -1,0 +1,188 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#dismiss">dismiss</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#guard">guard</a></li>
+      <li><a href="#scope_guard">scope_guard</a></li>
+    </ul>
+  </li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Scope::Guard - lexically-scoped resource management</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">guard</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+      <span class="comment"># or</span>
+    
+    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">scope_guard</span> <span class="operator">\&amp;</span><span class="variable">handler</span><span class="operator">;</span>
+    
+      <span class="comment"># or</span>
+    
+    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">Scope::Guard</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">});</span>
+    
+    <span class="variable">$guard</span><span class="operator">-&gt;</span><span class="variable">dismiss</span><span class="operator">();</span> <span class="comment"># disable the handler</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a convenient way to perform cleanup or other forms of resource management at the end of a scope. It is particularly useful when dealing with exceptions: the <code>Scope::Guard</code> constructor takes a reference to a subroutine that is guaranteed to be called even if the thread of execution is aborted prematurely. This effectively allows lexically-scoped &quot;promises&quot; to be made that are automatically honoured by perl&#39;s garbage collector.</p>
+
+<p>For more information, see: <a href="http://www.drdobbs.com/cpp/184403758">http://www.drdobbs.com/cpp/184403758</a></p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">Scope::Guard</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">});</span>
+    
+      <span class="comment"># or</span>
+    
+    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">Scope::Guard</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\&amp;</span><span class="variable">handler</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>new</code> method creates a new <code>Scope::Guard</code> object which calls the supplied handler when its <code>DESTROY</code> method is called, typically at the end of the scope.</p>
+
+<h2 id="dismiss">dismiss</h2>
+
+<pre><code>    <span class="variable">$guard</span><span class="operator">-&gt;</span><span class="variable">dismiss</span><span class="operator">();</span>
+    
+      <span class="comment"># or</span>
+    
+    <span class="variable">$guard</span><span class="operator">-&gt;</span><span class="variable">dismiss</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p><code>dismiss</code> detaches the handler from the <code>Scope::Guard</code> object. This revokes the &quot;promise&quot; to call the handler when the object is destroyed.</p>
+
+<p>The handler can be re-enabled by calling:</p>
+
+<pre><code>    <span class="variable">$guard</span><span class="operator">-&gt;</span><span class="variable">dismiss</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<h2 id="guard">guard</h2>
+
+<p><code>guard</code> takes a block and returns a new <code>Scope::Guard</code> object. It can be used as a shorthand for:</p>
+
+<pre><code>    Scope::Guard-&gt;new(...)</code></pre>
+
+<p>e.g.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">guard</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<p>Note: calling <code>guard</code> anonymously, i.e. in void context, will raise an exception. This is because anonymous guards are destroyed <b>immediately</b> (rather than at the end of the scope), which is unlikely to be the desired behaviour.</p>
+
+<h2 id="scope_guard">scope_guard</h2>
+
+<p><code>scope_guard</code> is the same as <code>guard</code>, but it takes a code ref rather than a block. e.g.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">scope_guard</span> <span class="operator">\&amp;</span><span class="variable">handler</span><span class="operator">;</span>
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">scope_guard</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<p>or:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$guard</span> <span class="operator">=</span> <span class="variable">scope_guard</span> <span class="variable">$handler</span><span class="operator">;</span>
+</code></pre>
+
+<p>As with <code>guard</code>, calling <code>scope_guard</code> in void context will raise an exception.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>0.21</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<ul>
+
+<li><p><a href="../../lib/B/Hooks/EndOfScope.html">B::Hooks::EndOfScope</a></p>
+
+</li>
+<li><p><a href="../../lib/PPI/Statement/End.html">End</a></p>
+
+</li>
+<li><p><a href="../../lib/Scope/Guard.html">Guard</a></p>
+
+</li>
+<li><p><a>Hook::Scope</a></p>
+
+</li>
+<li><p><a>Object::Destroyer</a></p>
+
+</li>
+<li><p><a>Perl::AtEndOfScope</a></p>
+
+</li>
+<li><p><a>ReleaseAction</a></p>
+
+</li>
+<li><p><a>Scope::local_OnExit</a></p>
+
+</li>
+<li><p><a>Scope::OnExit</a></p>
+
+</li>
+<li><p><a>Sub::ScopeFinalizer</a></p>
+
+</li>
+<li><p><a>Value::Canary</a></p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>chocolateboy &lt;chocolate@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2015, chocolateboy.</p>
+
+<p>This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,439 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#capture">capture</a></li>
+      <li><a href="#capture_stdout">capture_stdout</a></li>
+      <li><a href="#capture_stderr">capture_stderr</a></li>
+      <li><a href="#capture_merged">capture_merged</a></li>
+      <li><a href="#tee">tee</a></li>
+      <li><a href="#tee_stdout">tee_stdout</a></li>
+      <li><a href="#tee_stderr">tee_stderr</a></li>
+      <li><a href="#tee_merged">tee_merged</a></li>
+    </ul>
+  </li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a>
+    <ul>
+      <li><a href="#Portability">Portability</a></li>
+      <li><a href="#PerlIO-layers">PerlIO layers</a></li>
+      <li><a href="#Modifying-filehandles-before-capturing">Modifying filehandles before capturing</a>
+        <ul>
+          <li><a href="#Closed-filehandles">Closed filehandles</a></li>
+          <li><a href="#Localized-filehandles">Localized filehandles</a></li>
+          <li><a href="#Scalar-filehandles">Scalar filehandles</a></li>
+          <li><a href="#Tied-output-filehandles">Tied output filehandles</a></li>
+          <li><a href="#Tied-input-filehandle">Tied input filehandle</a></li>
+        </ul>
+      </li>
+      <li><a href="#Modifying-filehandles-during-a-capture">Modifying filehandles during a capture</a>
+        <ul>
+          <li><a href="#Forking-inside-a-capture">Forking inside a capture</a></li>
+          <li><a href="#Using-threads">Using threads</a></li>
+          <li><a href="#Dropping-privileges-during-a-capture">Dropping privileges during a capture</a></li>
+        </ul>
+      </li>
+      <li><a href="#No-support-for-Perl-5.8.0">No support for Perl 5.8.0</a></li>
+      <li><a href="#Limited-support-for-Perl-5.6">Limited support for Perl 5.6</a></li>
+    </ul>
+  </li>
+  <li><a href="#ENVIRONMENT">ENVIRONMENT</a>
+    <ul>
+      <li><a href="#PERL_CAPTURE_TINY_TIMEOUT">PERL_CAPTURE_TINY_TIMEOUT</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a>
+    <ul>
+      <li><a href="#Bugs-Feature-Requests">Bugs / Feature Requests</a></li>
+      <li><a href="#Source-Code">Source Code</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Capture::Tiny - Capture STDOUT and STDERR from Perl, XS or external programs</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.46</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Capture::Tiny</span> <span class="string">':all'</span><span class="operator">;</span>
+  
+  <span class="comment"># capture from external command</span>
+  
+  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">$exit</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">{</span>
+    <span class="keyword">system</span><span class="operator">(</span> <span class="variable">$cmd</span><span class="operator">,</span> <span class="variable">@args</span> <span class="operator">);</span>
+  <span class="operator">};</span>
+  
+  <span class="comment"># capture from arbitrary code (Perl or external)</span>
+  
+  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">{</span>
+    <span class="comment"># your code here</span>
+  <span class="operator">};</span>
+  
+  <span class="comment"># capture partial or merged output</span>
+  
+  <span class="variable">$stdout</span> <span class="operator">=</span> <span class="variable">capture_stdout</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+  <span class="variable">$stderr</span> <span class="operator">=</span> <span class="variable">capture_stderr</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+  <span class="variable">$merged</span> <span class="operator">=</span> <span class="variable">capture_merged</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+  
+  <span class="comment"># tee output</span>
+  
+  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">tee</span> <span class="operator">{</span>
+    <span class="comment"># your code here</span>
+  <span class="operator">};</span>
+  
+  <span class="variable">$stdout</span> <span class="operator">=</span> <span class="variable">tee_stdout</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+  <span class="variable">$stderr</span> <span class="operator">=</span> <span class="variable">tee_stderr</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+  <span class="variable">$merged</span> <span class="operator">=</span> <span class="variable">tee_merged</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Capture::Tiny provides a simple, portable way to capture almost anything sent to STDOUT or STDERR, regardless of whether it comes from Perl, from XS code or from an external program. Optionally, output can be teed so that it is captured while being passed through to the original filehandles. Yes, it even works on Windows (usually). Stop guessing which of a dozen capturing modules to use in any particular situation and just use this one.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>The following functions are available. None are exported by default.</p>
+
+<h2 id="capture">capture</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$stdout</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>capture</code> function takes a code reference and returns what is sent to STDOUT and STDERR as well as any return values from the code reference. In scalar context, it returns only STDOUT. If no output was received for a filehandle, it returns an empty string for that filehandle. Regardless of calling context, all output is captured -- nothing is passed to the existing filehandles.</p>
+
+<p>It is prototyped to take a subroutine reference as an argument. Thus, it can be called in block form:</p>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">{</span>
+    <span class="comment"># your code here ...</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Note that the coderef is evaluated in list context. If you wish to force scalar context on the return value, you must use the <code>scalar</code> keyword.</p>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">$count</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">@list</span> <span class="operator">=</span> <span class="string">qw/one two three/</span><span class="operator">;</span>
+    <span class="keyword">return</span> <span class="keyword">scalar</span> <span class="variable">@list</span><span class="operator">;</span> <span class="comment"># $count will be 3</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Also note that within the coderef, the <code>@_</code> variable will be empty. So don&#39;t use arguments from a surrounding subroutine without copying them to an array first:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> wont_work </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">{</span> <span class="variable">do_stuff</span><span class="operator">(</span> <span class="variable">@_</span> <span class="operator">)</span> <span class="operator">};</span>    <span class="comment"># WRONG</span>
+    <span class="operator">...</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> will_work </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">@args</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture</span> <span class="operator">{</span> <span class="variable">do_stuff</span><span class="operator">(</span> <span class="variable">@args</span> <span class="operator">)</span> <span class="operator">};</span> <span class="comment"># RIGHT</span>
+    <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Captures are normally done to an anonymous temporary filehandle. To capture via a named file (e.g. to externally monitor a long-running capture), provide custom filehandles as a trailing list of option pairs:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$out_fh</span> <span class="operator">=</span> <span class="variable">IO::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"out.txt"</span><span class="operator">,</span> <span class="string">"w+"</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$err_fh</span> <span class="operator">=</span> <span class="variable">IO::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"out.txt"</span><span class="operator">,</span> <span class="string">"w+"</span><span class="operator">);</span>
+  <span class="variable">capture</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span> <span class="string">stdout</span> <span class="operator">=&gt;</span> <span class="variable">$out_fh</span><span class="operator">,</span> <span class="string">stderr</span> <span class="operator">=&gt;</span> <span class="variable">$err_fh</span><span class="operator">;</span>
+</code></pre>
+
+<p>The filehandles must be read/write and seekable. Modifying the files or filehandles during a capture operation will give unpredictable results. Existing IO layers on them may be changed by the capture.</p>
+
+<p>When called in void context, <code>capture</code> saves memory and time by not reading back from the capture handles.</p>
+
+<h2 id="capture_stdout">capture_stdout</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture_stdout</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$stdout</span> <span class="operator">=</span> <span class="variable">capture_stdout</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>capture_stdout</code> function works just like <code>capture</code> except only STDOUT is captured. STDERR is not captured.</p>
+
+<h2 id="capture_stderr">capture_stderr</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture_stderr</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$stderr</span> <span class="operator">=</span> <span class="variable">capture_stderr</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>capture_stderr</code> function works just like <code>capture</code> except only STDERR is captured. STDOUT is not captured.</p>
+
+<h2 id="capture_merged">capture_merged</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$merged</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">capture_merged</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$merged</span> <span class="operator">=</span> <span class="variable">capture_merged</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>capture_merged</code> function works just like <code>capture</code> except STDOUT and STDERR are merged. (Technically, STDERR is redirected to the same capturing handle as STDOUT before executing the function.)</p>
+
+<p>Caution: STDOUT and STDERR output in the merged result are not guaranteed to be properly ordered due to buffering.</p>
+
+<h2 id="tee">tee</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">tee</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$stdout</span> <span class="operator">=</span> <span class="variable">tee</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>tee</code> function works just like <code>capture</code>, except that output is captured as well as passed on to the original STDOUT and STDERR.</p>
+
+<p>When called in void context, <code>tee</code> saves memory and time by not reading back from the capture handles, except when the original STDOUT OR STDERR were tied or opened to a scalar handle.</p>
+
+<h2 id="tee_stdout">tee_stdout</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stdout</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">tee_stdout</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$stdout</span> <span class="operator">=</span> <span class="variable">tee_stdout</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>tee_stdout</code> function works just like <code>tee</code> except only STDOUT is teed. STDERR is not teed (output goes to STDERR as usual).</p>
+
+<h2 id="tee_stderr">tee_stderr</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$stderr</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">tee_stderr</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$stderr</span> <span class="operator">=</span> <span class="variable">tee_stderr</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>tee_stderr</code> function works just like <code>tee</code> except only STDERR is teed. STDOUT is not teed (output goes to STDOUT as usual).</p>
+
+<h2 id="tee_merged">tee_merged</h2>
+
+<pre><code>  <span class="operator">(</span><span class="variable">$merged</span><span class="operator">,</span> <span class="variable">@result</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">tee_merged</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+  <span class="variable">$merged</span> <span class="operator">=</span> <span class="variable">tee_merged</span> <span class="operator">\&amp;</span><span class="variable">code</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>tee_merged</code> function works just like <code>capture_merged</code> except that output is captured as well as passed on to STDOUT.</p>
+
+<p>Caution: STDOUT and STDERR output in the merged result are not guaranteed to be properly ordered due to buffering.</p>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<h2 id="Portability">Portability</h2>
+
+<p>Portability is a goal, not a guarantee. <code>tee</code> requires fork, except on Windows where <code>system(1, @cmd)</code> is used instead. Not tested on any particularly esoteric platforms yet. See the <a href="http://matrix.cpantesters.org/?dist=Capture-Tiny">CPAN Testers Matrix</a> for test result by platform.</p>
+
+<h2 id="PerlIO-layers">PerlIO layers</h2>
+
+<p>Capture::Tiny does its best to preserve PerlIO layers such as &#39;:utf8&#39; or &#39;:crlf&#39; when capturing (only for Perl 5.8.1+) . Layers should be applied to STDOUT or STDERR <i>before</i> the call to <code>capture</code> or <code>tee</code>. This may not work for tied filehandles (see below).</p>
+
+<h2 id="Modifying-filehandles-before-capturing">Modifying filehandles before capturing</h2>
+
+<p>Generally speaking, you should do little or no manipulation of the standard IO filehandles prior to using Capture::Tiny. In particular, closing, reopening, localizing or tying standard filehandles prior to capture may cause a variety of unexpected, undesirable and/or unreliable behaviors, as described below. Capture::Tiny does its best to compensate for these situations, but the results may not be what you desire.</p>
+
+<h3 id="Closed-filehandles">Closed filehandles</h3>
+
+<p>Capture::Tiny will work even if STDIN, STDOUT or STDERR have been previously closed. However, since they will be reopened to capture or tee output, any code within the captured block that depends on finding them closed will, of course, not find them to be closed. If they started closed, Capture::Tiny will close them again when the capture block finishes.</p>
+
+<p>Note that this reopening will happen even for STDIN or a filehandle not being captured to ensure that the filehandle used for capture is not opened to file descriptor 0, as this causes problems on various platforms.</p>
+
+<p>Prior to Perl 5.12, closed STDIN combined with PERL_UNICODE=D leaks filehandles and also breaks tee() for undiagnosed reasons. So don&#39;t do that.</p>
+
+<h3 id="Localized-filehandles">Localized filehandles</h3>
+
+<p>If code localizes any of Perl&#39;s standard filehandles before capturing, the capture will affect the localized filehandles and not the original ones. External system calls are not affected by localizing a filehandle in Perl and will continue to send output to the original filehandles (which will thus not be captured).</p>
+
+<h3 id="Scalar-filehandles">Scalar filehandles</h3>
+
+<p>If STDOUT or STDERR are reopened to scalar filehandles prior to the call to <code>capture</code> or <code>tee</code>, then Capture::Tiny will override the output filehandle for the duration of the <code>capture</code> or <code>tee</code> call and then, for <code>tee</code>, send captured output to the output filehandle after the capture is complete. (Requires Perl 5.8)</p>
+
+<p>Capture::Tiny attempts to preserve the semantics of STDIN opened to a scalar reference, but note that external processes will not be able to read from such a handle. Capture::Tiny tries to ensure that external processes will read from the null device instead, but this is not guaranteed.</p>
+
+<h3 id="Tied-output-filehandles">Tied output filehandles</h3>
+
+<p>If STDOUT or STDERR are tied prior to the call to <code>capture</code> or <code>tee</code>, then Capture::Tiny will attempt to override the tie for the duration of the <code>capture</code> or <code>tee</code> call and then send captured output to the tied filehandle after the capture is complete. (Requires Perl 5.8)</p>
+
+<p>Capture::Tiny may not succeed resending UTF-8 encoded data to a tied STDOUT or STDERR filehandle. Characters may appear as bytes. If the tied filehandle is based on <a href="../../lib/Tie/StdHandle.html">Tie::StdHandle</a>, then Capture::Tiny will attempt to determine appropriate layers like <code>:utf8</code> from the underlying filehandle and do the right thing.</p>
+
+<h3 id="Tied-input-filehandle">Tied input filehandle</h3>
+
+<p>Capture::Tiny attempts to preserve the semantics of tied STDIN, but this requires Perl 5.8 and is not entirely predictable. External processes will not be able to read from such a handle.</p>
+
+<p>Unless having STDIN tied is crucial, it may be safest to localize STDIN when capturing:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$out</span><span class="operator">,</span> <span class="variable">$err</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">do</span> <span class="operator">{</span> <span class="keyword">local</span> <span class="variable">*STDIN</span><span class="operator">;</span> <span class="variable">capture</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span> <span class="operator">};</span>
+</code></pre>
+
+<h2 id="Modifying-filehandles-during-a-capture">Modifying filehandles during a capture</h2>
+
+<p>Attempting to modify STDIN, STDOUT or STDERR <i>during</i> <code>capture</code> or <code>tee</code> is almost certainly going to cause problems. Don&#39;t do that.</p>
+
+<h3 id="Forking-inside-a-capture">Forking inside a capture</h3>
+
+<p>Forks aren&#39;t portable. The behavior of filehandles during a fork is even less so. If Capture::Tiny detects that a fork has occurred within a capture, it will shortcut in the child process and return empty strings for captures. Other problems may occur in the child or parent, as well. Forking in a capture block is not recommended.</p>
+
+<h3 id="Using-threads">Using threads</h3>
+
+<p>Filehandles are global. Mixing up I/O and captures in different threads without coordination is going to cause problems. Besides, threads are officially discouraged.</p>
+
+<h3 id="Dropping-privileges-during-a-capture">Dropping privileges during a capture</h3>
+
+<p>If you drop privileges during a capture, temporary files created to facilitate the capture may not be cleaned up afterwards.</p>
+
+<h2 id="No-support-for-Perl-5.8.0">No support for Perl 5.8.0</h2>
+
+<p>It&#39;s just too buggy when it comes to layers and UTF-8. Perl 5.8.1 or later is recommended.</p>
+
+<h2 id="Limited-support-for-Perl-5.6">Limited support for Perl 5.6</h2>
+
+<p>Perl 5.6 predates PerlIO. UTF-8 data may not be captured correctly.</p>
+
+<h1 id="ENVIRONMENT">ENVIRONMENT</h1>
+
+<h2 id="PERL_CAPTURE_TINY_TIMEOUT">PERL_CAPTURE_TINY_TIMEOUT</h2>
+
+<p>Capture::Tiny uses subprocesses internally for <code>tee</code>. By default, Capture::Tiny will timeout with an error if such subprocesses are not ready to receive data within 30 seconds (or whatever is the value of <code>$Capture::Tiny::TIMEOUT</code>). An alternate timeout may be specified by setting the <code>PERL_CAPTURE_TINY_TIMEOUT</code> environment variable. Setting it to zero will disable timeouts. <b>NOTE</b>, this does not timeout the code reference being captured -- this only prevents Capture::Tiny itself from hanging your process waiting for its child processes to be ready to proceed.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>This module was inspired by <a>IO::CaptureOutput</a>, which provides similar functionality without the ability to tee output and with more complicated code and API. <a>IO::CaptureOutput</a> does not handle layers or most of the unusual cases described in the <a href="#Limitations">&quot;Limitations&quot;</a> section and I no longer recommend it.</p>
+
+<p>There are many other CPAN modules that provide some sort of output capture, albeit with various limitations that make them appropriate only in particular circumstances. I&#39;m probably missing some. The long list is provided to show why I felt Capture::Tiny was necessary.</p>
+
+<ul>
+
+<li><p><a>IO::Capture</a></p>
+
+</li>
+<li><p><a>IO::Capture::Extended</a></p>
+
+</li>
+<li><p><a>IO::CaptureOutput</a></p>
+
+</li>
+<li><p><a>IPC::Capture</a></p>
+
+</li>
+<li><p><a href="../../lib/IPC/Cmd.html">IPC::Cmd</a></p>
+
+</li>
+<li><p><a href="../../lib/IPC/Open2.html">IPC::Open2</a></p>
+
+</li>
+<li><p><a href="../../lib/IPC/Open3.html">IPC::Open3</a></p>
+
+</li>
+<li><p><a>IPC::Open3::Simple</a></p>
+
+</li>
+<li><p><a>IPC::Open3::Utils</a></p>
+
+</li>
+<li><p><a>IPC::Run</a></p>
+
+</li>
+<li><p><a>IPC::Run::SafeHandles</a></p>
+
+</li>
+<li><p><a>IPC::Run::Simple</a></p>
+
+</li>
+<li><p><a href="../../lib/IPC/Run3.html">IPC::Run3</a></p>
+
+</li>
+<li><p><a>IPC::System::Simple</a></p>
+
+</li>
+<li><p><a>Tee</a></p>
+
+</li>
+<li><p><a>IO::Tee</a></p>
+
+</li>
+<li><p><a>File::Tee</a></p>
+
+</li>
+<li><p><a>Filter::Handle</a></p>
+
+</li>
+<li><p><a>Tie::STDERR</a></p>
+
+</li>
+<li><p><a>Tie::STDOUT</a></p>
+
+</li>
+<li><p><a>Test::Output</a></p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<h2 id="Bugs-Feature-Requests">Bugs / Feature Requests</h2>
+
+<p>Please report any bugs or feature requests through the issue tracker at <a href="https://github.com/dagolden/Capture-Tiny/issues">https://github.com/dagolden/Capture-Tiny/issues</a>. You will be notified automatically of any progress on your issue.</p>
+
+<h2 id="Source-Code">Source Code</h2>
+
+<p>This is open source software. The code repository is available for public review and contribution under the terms of the license.</p>
+
+<p><a href="https://github.com/dagolden/Capture-Tiny">https://github.com/dagolden/Capture-Tiny</a></p>
+
+<pre><code>  git clone https://github.com/dagolden/Capture-Tiny.git</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>David Golden &lt;dagolden@cpan.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Dagfinn Ilmari Manns&aring;ker &lt;ilmari@ilmari.org&gt;</p>
+
+</li>
+<li><p>David E. Wheeler &lt;david@justatheory.com&gt;</p>
+
+</li>
+<li><p>fecundf &lt;not.com+github@gmail.com&gt;</p>
+
+</li>
+<li><p>Graham Knop &lt;haarg@haarg.org&gt;</p>
+
+</li>
+<li><p>Peter Rabbitson &lt;ribasushi@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2009 by David Golden.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Apache License, Version 2.0, January 2004</code></pre>
+
+
+</body>
+
+</html>
+
+

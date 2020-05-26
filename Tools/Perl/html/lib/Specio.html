@@ -1,0 +1,420 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#WHAT-IS-A-TYPE">WHAT IS A TYPE?</a></li>
+  <li><a href="#BUILTIN-TYPES">BUILTIN TYPES</a>
+    <ul>
+      <li><a href="#Overloading">Overloading</a></li>
+    </ul>
+  </li>
+  <li><a href="#PARAMETERIZABLE-TYPES">PARAMETERIZABLE TYPES</a>
+    <ul>
+      <li><a href="#Maybe">Maybe</a></li>
+    </ul>
+  </li>
+  <li><a href="#REGISTRIES-AND-IMPORTING">REGISTRIES AND IMPORTING</a></li>
+  <li><a href="#CREATING-A-TYPE-LIBRARY">CREATING A TYPE LIBRARY</a></li>
+  <li><a href="#DECLARING-TYPES">DECLARING TYPES</a></li>
+  <li><a href="#USING-SPECIO-WITH-Moose">USING SPECIO WITH Moose</a></li>
+  <li><a href="#USING-SPECIO-WITH-Moo">USING SPECIO WITH Moo</a></li>
+  <li><a href="#USING-SPECIO-WITH-OTHER-THINGS">USING SPECIO WITH OTHER THINGS</a></li>
+  <li><a href="#Moose-MooseX::Types-and-Specio">Moose, MooseX::Types, and Specio</a></li>
+  <li><a href="#WHY-THE-NAME">WHY THE NAME?</a></li>
+  <li><a href="#LONG-TERM-PLANS">LONG-TERM PLANS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio - Type constraints and coercions for Perl</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyApp::Type::Library</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span><span class="operator">;</span>
+    
+    <span class="variable">declare</span><span class="operator">(</span>
+        <span class="string">'PositiveInt'</span><span class="operator">,</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+        <span class="string">inline</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">parent</span><span class="operator">-&gt;</span><span class="variable">inline_check</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">)</span>
+                <span class="operator">.</span> <span class="string">' &amp;&amp; ( '</span>
+                <span class="operator">.</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span>
+                <span class="operator">.</span> <span class="string">' &gt; 0 )'</span><span class="operator">;</span>
+        <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># or ...</span>
+    
+    <span class="variable">declare</span><span class="operator">(</span>
+        <span class="string">'PositiveInt'</span><span class="operator">,</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+        <span class="string">where</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">&gt;</span> <span class="number">0</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">declare</span><span class="operator">(</span>
+        <span class="string">'ArrayRefOfPositiveInt'</span><span class="operator">,</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span>
+            <span class="string">'ArrayRef'</span><span class="operator">,</span>
+            <span class="string">of</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'PositiveInt'</span><span class="operator">),</span>
+        <span class="operator">),</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">coerce</span><span class="operator">(</span>
+        <span class="string">'ArrayRefOfPositiveInt'</span><span class="operator">,</span>
+        <span class="string">from</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'PositiveInt'</span><span class="operator">),</span>
+        <span class="string">using</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">]</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">any_can_type</span><span class="operator">(</span>
+        <span class="string">'Duck'</span><span class="operator">,</span>
+        <span class="string">methods</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'duck_walk'</span><span class="operator">,</span> <span class="string">'quack'</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">object_isa_type</span><span class="operator">(</span><span class="string">'MyApp::Person'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>Specio</code> distribution provides classes for representing type constraints and coercion, along with syntax sugar for declaring them.</p>
+
+<p>Note that this is not a proper type system for Perl. Nothing in this distribution will magically make the Perl interpreter start checking a value&#39;s type on assignment to a variable. In fact, there&#39;s no built-in way to apply a type to a variable at all.</p>
+
+<p>Instead, you can explicitly check a value against a type, and optionally coerce values to that type.</p>
+
+<p>My long-term goal is to replace Moose&#39;s built-in types and <a>MooseX::Types</a> with this module.</p>
+
+<h1 id="WHAT-IS-A-TYPE">WHAT IS A TYPE?</h1>
+
+<p>At it&#39;s core, a type is simply a constraint. A constraint is code that checks a value and returns true or false. Most constraints are represented by <a href="../lib/Specio/Constraint/Simple.html">Specio::Constraint::Simple</a> objects. However, there are other type constraint classes for specialized kinds of constraints.</p>
+
+<p>Types can be named or anonymous, and each type can have a parent type. A type&#39;s constraint is optional because sometimes you may want to create a named subtype of some existing type without adding additional constraints.</p>
+
+<p>Constraints can be expressed either in terms of a simple subroutine reference or in terms of an inline generator subroutine reference. The former is easier to write but the latter is preferred because it allow for better optimization.</p>
+
+<p>A type can also have an optional message generator subroutine reference. You can use this to provide a more intelligent error message when a value does not pass the constraint, though the default message should suffice for most cases.</p>
+
+<p>Finally, you can associate a set of coercions with a type. A coercion is a subroutine reference (or inline generator, like constraints), that takes a value of one type and turns it into a value that matches the type the coercion belongs to.</p>
+
+<h1 id="BUILTIN-TYPES">BUILTIN TYPES</h1>
+
+<p>This distribution ships with a set of builtin types representing the types provided by the Perl interpreter itself. They are arranged in a hierarchy as follows:</p>
+
+<pre><code>  Item
+      Bool
+      Maybe (of `a)
+      Undef
+      Defined
+          Value
+              Str
+                  Num
+                      Int
+                  ClassName
+          Ref
+              ScalarRef (of `a)
+              ArrayRef (of `a)
+              HashRef (of `a)
+              CodeRef
+              RegexpRef
+              GlobRef
+              FileHandle
+              Object</code></pre>
+
+<p>The <code>Item</code> type accepts anything and everything.</p>
+
+<p>The <code>Bool</code> type only accepts <code>undef</code>, <code>0</code>, or <code>1</code>.</p>
+
+<p>The <code>Undef</code> type only accepts <code>undef</code>.</p>
+
+<p>The <code>Defined</code> type accepts anything <i>except</i> <code>undef</code>.</p>
+
+<p>The <code>Num</code> and <code>Int</code> types are stricter about numbers than Perl is. Specifically, they do not allow any sort of space in the number, nor do they accept &quot;Nan&quot;, &quot;Inf&quot;, or &quot;Infinity&quot;.</p>
+
+<p>The <code>ClassName</code> type constraint checks that the name is valid <i>and</i> that the class is loaded.</p>
+
+<p>The <code>FileHandle</code> type accepts either a glob, a scalar filehandle, or anything that isa <a href="../lib/IO/Handle.html">IO::Handle</a>.</p>
+
+<p>All types accept overloaded objects that support the required operation. See below for details.</p>
+
+<h2 id="Overloading">Overloading</h2>
+
+<p>Perl&#39;s overloading is horribly broken and doesn&#39;t make much sense at all.</p>
+
+<p>However, unlike Moose, all type constraints allow overloaded objects where they make sense.</p>
+
+<p>For types where overloading makes sense, we explicitly check that the object provides the type overloading we expect. We <i>do not</i> simply try to use the object as the type in question and hope it works. This means that these checks effectively ignore the <code>fallback</code> setting for the overloaded object. In other words, an object that overloads stringification will not pass the <code>Bool</code> type check unless it <i>also</i> overloads boolification.</p>
+
+<p>Most types do not check that the overloaded method actually returns something that matches the constraint. This may change in the future.</p>
+
+<p>The <code>Bool</code> type accepts an object that implements <code>bool</code> overloading.</p>
+
+<p>The <code>Str</code> type accepts an object that implements string (<code><span class="string">q{""}</span>
+</code>) overloading.</p>
+
+<p>The <code>Num</code> type accepts an object that implements numeric (<code>&#39;0+&#39;}</code>) overloading. The <code>Int</code> type does as well, but it will check that the overloading returns an actual integer.</p>
+
+<p>The <code>ClassName</code> type will accept an object with string overloading that returns a class name.</p>
+
+<p>To make this all more confusing, the <code>Value</code> type will <i>never</i> accept an object, even though some of its subtypes will.</p>
+
+<p>The various reference types all accept objects which provide the appropriate overloading. The <code>FileHandle</code> type accepts an object which overloads globification as long as the returned glob is an open filehandle.</p>
+
+<h1 id="PARAMETERIZABLE-TYPES">PARAMETERIZABLE TYPES</h1>
+
+<p>Any type followed by a type parameter <code>of `a</code> in the hierarchy above can be parameterized. The parameter is itself a type, so you can say you want an &quot;ArrayRef of Int&quot;, or even an &quot;ArrayRef of HashRef of ScalarRef of ClassName&quot;.</p>
+
+<p>When they are parameterized, the <code>ScalarRef</code> and <code>ArrayRef</code> types check that the value(s) they refer to match the type parameter. For the <code>HashRef</code> type, the parameter applies to the values (keys are never checked).</p>
+
+<h2 id="Maybe">Maybe</h2>
+
+<p>The <code>Maybe</code> type is a special parameterized type. It allows for either <code>undef</code> or a value. All by itself, it is meaningless, since it is equivalent to &quot;Maybe of Item&quot;, which is equivalent to Item. When parameterized, it accepts either an <code>undef</code> or the type of its parameter.</p>
+
+<p>This is useful for optional attributes or parameters. However, you&#39;re probably better off making your code simply not pass the parameter at all This usually makes for a simpler API.</p>
+
+<h1 id="REGISTRIES-AND-IMPORTING">REGISTRIES AND IMPORTING</h1>
+
+<p>Types are local to each package where they are used. When you &quot;import&quot; types from some other library, you are actually making a copy of that type.</p>
+
+<p>This means that a type named &quot;Foo&quot; in one package may not be the same as &quot;Foo&quot; in another package. This has potential for confusion, but it also avoids the magic action at a distance pollution that comes with a global type naming system.</p>
+
+<p>The registry is managed internally by the Specio distribution&#39;s modules, and is not exposed to your code. To access a type, you always call <code>t(&#39;TypeName&#39;)</code>.</p>
+
+<p>This returns the named type or dies if no such type exists.</p>
+
+<p>Because types are always copied on import, it&#39;s safe to create coercions on any type. Your coercion from <code>Str</code> to <code>Int</code> will not be seen by any other package, unless that package explicitly imports your <code>Int</code> type.</p>
+
+<p>When you import types, you import every type defined in the package you import from. However, you <i>can</i> overwrite an imported type with your own type definition. You <i>cannot</i> define the same type twice internally.</p>
+
+<h1 id="CREATING-A-TYPE-LIBRARY">CREATING A TYPE LIBRARY</h1>
+
+<p>By default, all types created inside a package are invisible to other packages. If you want to create a type library, you need to inherit from <a href="../lib/Specio/Exporter.html">Specio::Exporter</a> package:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::Type::Library</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">'Specio::Exporter'</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span><span class="operator">;</span>
+  
+  <span class="variable">declare</span><span class="operator">(</span>
+      <span class="string">'Foo'</span><span class="operator">,</span>
+      <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+      <span class="string">where</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=~</span> <span class="regex">/foo/i</span> <span class="operator">},</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Now the MyApp::Type::Library package will export a single type named <code>Foo</code>. It <i>does not</i> re-export the types provided by <a href="../lib/Specio/Library/Builtins.html">Specio::Library::Builtins</a>.</p>
+
+<p>If you want to make your library re-export some other libraries types, you can ask for this explicitly:</p>
+
+<pre><code>  package MyApp::Type::Library;
+
+  use parent &#39;Specio::Exporter&#39;;
+
+  use Specio::Declare;
+  use Specio::Library::Builtins -reexport;
+
+  declare( &#39;Foo, ... );</code></pre>
+
+<p>Now MyApp::Types::Library exports any types it defines, as well as all the types defined in <a href="../lib/Specio/Library/Builtins.html">Specio::Library::Builtins</a>.</p>
+
+<h1 id="DECLARING-TYPES">DECLARING TYPES</h1>
+
+<p>Use the <a href="../lib/Specio/Declare.html">Specio::Declare</a> module to declare types. It exports a set of helpers for declaring types. See that module&#39;s documentation for more details on these helpers.</p>
+
+<h1 id="USING-SPECIO-WITH-Moose">USING SPECIO WITH <a href="../lib/Moose.html">Moose</a></h1>
+
+<p>This should just work. Use a Specio type anywhere you&#39;d specify a type.</p>
+
+<h1 id="USING-SPECIO-WITH-Moo">USING SPECIO WITH <a>Moo</a></h1>
+
+<p>Using Specio with Moo is easy. You can pass Specio constraint objects as <code>isa</code> parameters for attributes. For coercions, simply call <code>$type-&gt;coercion_sub</code>.</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moo</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$str_type</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">);</span>
+    <span class="variable">has</span> <span class="string">string</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+       <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+       <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="variable">$str_type</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$ucstr</span> <span class="operator">=</span> <span class="variable">declare</span><span class="operator">(</span>
+        <span class="string">'UCStr'</span><span class="operator">,</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+        <span class="string">where</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=~</span> <span class="regex">/^[A-Z]+$/</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">coerce</span><span class="operator">(</span>
+        <span class="variable">$ucstr</span><span class="operator">,</span>
+        <span class="string">from</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+        <span class="string">using</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">return</span> <span class="keyword">uc</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">has</span> <span class="string">ucstr</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">is</span>     <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+        <span class="string">isa</span>    <span class="operator">=&gt;</span> <span class="variable">$ucstr</span><span class="operator">,</span>
+        <span class="string">coerce</span> <span class="operator">=&gt;</span> <span class="variable">$ucstr</span><span class="operator">-&gt;</span><span class="variable">coercion_sub</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>The subs returned by Specio use <a href="../lib/Sub/Quote.html">Sub::Quote</a> internally and are suitable for inlining.</p>
+
+<h1 id="USING-SPECIO-WITH-OTHER-THINGS">USING SPECIO WITH OTHER THINGS</h1>
+
+<p>See <a href="../lib/Specio/Constraint/Simple.html">Specio::Constraint::Simple</a> for the API that all constraint objects share.</p>
+
+<h1 id="Moose-MooseX::Types-and-Specio"><a href="../lib/Moose.html">Moose</a>, <a>MooseX::Types</a>, and Specio</h1>
+
+<p>This module aims to supplant both <a href="../lib/Moose.html">Moose</a>&#39;s built-in type system (see <a href="../lib/Moose/Util/TypeConstraints.html">Moose::Util::TypeConstraints</a> aka MUTC) and <a>MooseX::Types</a>, which attempts to patch some of the holes in the Moose built-in type design.</p>
+
+<p>Here are some of the salient differences:</p>
+
+<ul>
+
+<li><p>Types names are strings, but they&#39;re not global</p>
+
+<p>Unlike Moose and MooseX::Types, type names are always local to the current package. There is no possibility of name collision between different modules, so you can safely use short type names.</p>
+
+<p>Unlike MooseX::Types, types are strings, so there is no possibility of colliding with existing class or subroutine names.</p>
+
+</li>
+<li><p>No type auto-creation</p>
+
+<p>Types are always retrieved using the <code>t()</code> subroutine. If you pass an unknown name to this subroutine it dies. This is different from Moose and MooseX::Types, which assume that unknown names are class names.</p>
+
+</li>
+<li><p>Anon types are explicit</p>
+
+<p>With <a href="../lib/Moose.html">Moose</a> and <a>MooseX::Types</a>, you use the same subroutine, <code>subtype()</code>, to declare both named and anonymous types. With Specio, you use <code>declare()</code> for named types and <code>anon()</code> for anonymous types.</p>
+
+</li>
+<li><p>Class and object types are separate</p>
+
+<p>Moose and MooseX::Types have <code>class_type</code> and <code>duck_type</code>. The former type requires an object, while the latter accepts a class name or object.</p>
+
+<p>With Specio, the distinction between accepting an object versus object or class is explicit. There are six declaration helpers, <code>object_can_type</code>, <code>object_does_type</code>, <code>object_isa_type</code>, <code>any_can_type</code>, <code>any_does_type</code>, and <code>any_isa_type</code>.</p>
+
+</li>
+<li><p>Overloading support is baked in</p>
+
+<p>Perl&#39;s overloading is quite broken but ignoring it makes Moose&#39;s type system frustrating to use in many cases.</p>
+
+</li>
+<li><p>Types can either have a constraint or inline generator, not both</p>
+
+<p>Moose and MooseX::Types types can be defined with a subroutine reference as the constraint, an inline generator subroutine, or both. This is purely for backwards compatibility, and it makes the internals more complicated than they need to be.</p>
+
+<p>With Specio, a constraint can have <i>either</i> a subroutine reference or an inline generator, not both.</p>
+
+</li>
+<li><p>Coercions can be inlined</p>
+
+<p>I simply never got around to implementing this in Moose.</p>
+
+</li>
+<li><p>No crazy coercion features</p>
+
+<p>Moose has some bizarre (and mostly) undocumented features relating to coercions and parameterizable types. This is a misfeature.</p>
+
+</li>
+</ul>
+
+<h1 id="WHY-THE-NAME">WHY THE NAME?</h1>
+
+<p>This distro was originally called &quot;Type&quot;, but that&#39;s an awfully generic top level namespace. Specio is Latin for for &quot;look at&quot; and &quot;spec&quot; is the root for the word &quot;species&quot;. It&#39;s short, relatively easy to type, and not used by any other distro.</p>
+
+<h1 id="LONG-TERM-PLANS">LONG-TERM PLANS</h1>
+
+<p>Eventually I&#39;d like to see this distro replace Moose&#39;s internal type system, which would also make MooseX::Types obsolete.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>cpansprout &lt;cpansprout@gmail.com&gt;</p>
+
+</li>
+<li><p>Graham Knop &lt;haarg@haarg.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

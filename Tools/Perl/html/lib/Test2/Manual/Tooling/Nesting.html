@@ -1,0 +1,163 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#NAIVE-WAY">NAIVE WAY</a>
+    <ul>
+      <li><a href="#WHATS-WRONG-WITH-IT">WHATS WRONG WITH IT?</a></li>
+      <li><a href="#HOW-TO-FIX-IT">HOW TO FIX IT</a>
+        <ul>
+          <li><a href="#THE-OLD-WAY-DO-NOT-DO-THIS-ANYMORE">THE OLD WAY (DO NOT DO THIS ANYMORE)</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Manual::Tooling::Nesting - Tutorial for using other tools within your own.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Sometimes you find yourself writing the same test pattern over and over, in such cases you may want to encapsulate the logic in a new test function that calls several tools together. This sounds easy enough, but can cause headaches if not done correctly.</p>
+
+<h1 id="NAIVE-WAY">NAIVE WAY</h1>
+
+<p>Lets say you find yourself writing the same test pattern over and over for multiple objects:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$obj1</span> <span class="operator">=</span> <span class="variable">$class1</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj1</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"got foo"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj1</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">,</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">"got bar"</span><span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$obj2</span> <span class="operator">=</span> <span class="variable">$class1</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj2</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"got foo"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj2</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">,</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">"got bar"</span><span class="operator">);</span>
+    
+    <span class="operator">...</span> <span class="number">10</span><span class="operator">x</span> <span class="variable">more</span> <span class="keyword">times</span> <span class="keyword">for</span> <span class="variable">classes</span> <span class="number">2</span><span class="operator">-</span><span class="number">12</span>
+</code></pre>
+
+<p>The naive way to do this is to write a <code>check_class()</code> function like this:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> check_class </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"got foo"</span><span class="operator">);</span>
+        <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">,</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">"got bar"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">check_class</span><span class="operator">(</span><span class="variable">$class1</span><span class="operator">);</span>
+    <span class="variable">check_class</span><span class="operator">(</span><span class="variable">$class2</span><span class="operator">);</span>
+    <span class="variable">check_class</span><span class="operator">(</span><span class="variable">$class3</span><span class="operator">);</span>
+    <span class="operator">...</span>
+</code></pre>
+
+<p>This will appear to work fine, and you might not notice any problems, <i>so long as the tests are passing.</i></p>
+
+<h2 id="WHATS-WRONG-WITH-IT">WHATS WRONG WITH IT?</h2>
+
+<p>The problems with the naive approach become obvious if things start to fail. The diagnostics that tell you what file and line the failure occurred on will be wrong. The failure will be reported to the line <i>inside</i> <code>check_class</code>, not to the line where <code>check_class()</code> was called. This is problem because it leaves you with no idea which class is failing.</p>
+
+<h2 id="HOW-TO-FIX-IT">HOW TO FIX IT</h2>
+
+<p>Luckily this is extremely easy to fix. You need to acquire a context object at the start of your function, and release it at the end... yes it is that simple.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context/</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> check_class </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    
+        <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"got foo"</span><span class="operator">);</span>
+        <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">,</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">"got bar"</span><span class="operator">);</span>
+    
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>See, that was easy. With these 2 additional lines we know have proper file+line reporting. The nested tools will find the context we acquired here, and know to use it&#39;s file and line numbers.</p>
+
+<h3 id="THE-OLD-WAY-DO-NOT-DO-THIS-ANYMORE">THE OLD WAY (DO NOT DO THIS ANYMORE)</h3>
+
+<p>With <a href="../../../../lib/Test/Builder.html">Test::Builder</a> there was a global variables called <code>$Test::Builder::Level</code> which helped solve this problem:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> check_class </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="keyword">local</span> <span class="variable">$Test::Builder::Level</span> <span class="operator">=</span> <span class="variable">$Test::Builder::Level</span> <span class="operator">+</span> <span class="number">1</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"got foo"</span><span class="operator">);</span>
+        <span class="variable">is</span><span class="operator">(</span><span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">bar</span><span class="operator">,</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">"got bar"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This variable worked well enough (and will still work) but was not very discoverable. Another problem with this variable is that it becomes cumbersome if you have a more deeply nested code structure called the nested tools, you might need to count stack frames, and hope they never change due to a third party module. The context solution has no such caveats.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Test2/Manual.html">Test2::Manual</a> - Primary index of the manual.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Manual can be found at <i>http://github.com/Test-More/Test2-Manual/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

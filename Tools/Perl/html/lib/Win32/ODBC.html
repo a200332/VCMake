@@ -1,0 +1,601 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Background">Background</a></li>
+      <li><a href="#Benefits">Benefits</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONSTANTS">CONSTANTS</a></li>
+  <li><a href="#SPECIAL-NOTATION">SPECIAL NOTATION</a></li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#INSTALLATION-NOTES">INSTALLATION NOTES</a></li>
+  <li><a href="#OTHER-DOCUMENTATION">OTHER DOCUMENTATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#DISCLAIMER">DISCLAIMER</a></li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::ODBC - ODBC Extension for Win32</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>To use this module, include the following statement at the top of your script:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::ODBC</span><span class="operator">;</span>
+</code></pre>
+
+<p>Next, create a data connection to your DSN:</p>
+
+<pre><code>    <span class="variable">$Data</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Win32::ODBC</span><span class="operator">(</span><span class="string">"MyDSN"</span><span class="operator">);</span>
+</code></pre>
+
+<p><b>NOTE</b>: <i>MyDSN</i> can be either the <i>DSN</i> as defined in the ODBC Administrator, <i>or</i> it can be an honest-to-God <i>DSN Connect String</i>.</p>
+
+<pre><code>    <span class="variable">Example</span><span class="operator">:</span> <span class="string">"DSN=My Database;UID=Brown Cow;PWD=Moo;"</span>
+</code></pre>
+
+<p>You should check to see if <code>$Data</code> is indeed defined, otherwise there has been an error.</p>
+
+<p>You can now send SQL queries and retrieve info to your heart&#39;s content! See the description of the methods provided by this module below and also the file <i>TEST.PL</i> as referred to in <a href="#INSTALLATION-NOTES">&quot;INSTALLATION NOTES&quot;</a> to see how it all works.</p>
+
+<p>Finally, <b>MAKE SURE</b> that you close your connection when you are finished:</p>
+
+<pre><code>    <span class="variable">$Data</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="Background">Background</h2>
+
+<p>This is a hack of Dan DeMaggio&#39;s &lt;dmag@umich.edu&gt; <i>NTXS.C</i> ODBC implementation. I have recoded and restructured most of it including most of the <i>ODBC.PM</i> package, but its very core is still based on Dan&#39;s code (thanks Dan!).</p>
+
+<p>The history of this extension is found in the file <i>HISTORY.TXT</i> that comes with the original archive (see <a href="#INSTALLATION-NOTES">&quot;INSTALLATION NOTES&quot;</a> below).</p>
+
+<h2 id="Benefits">Benefits</h2>
+
+<p>And what are the benefits of this module?</p>
+
+<ul>
+
+<li><p>The number of ODBC connections is limited by memory and ODBC itself (have as many as you want!).</p>
+
+</li>
+<li><p>The working limit for the size of a field is 10,240 bytes, but you can increase that limit (if needed) to a max of 2,147,483,647 bytes. (You can always recompile to increase the max limit.)</p>
+
+</li>
+<li><p>You can open a connection by either specifying a DSN or a connection string!</p>
+
+</li>
+<li><p>You can open and close the connections in any order!</p>
+
+</li>
+<li><p>Other things that I can not think of right now... :)</p>
+
+</li>
+</ul>
+
+<h1 id="CONSTANTS">CONSTANTS</h1>
+
+<p>This package defines a number of constants. You may refer to each of these constants using the notation <code>ODBC::xxxxx</code>, where <code>xxxxx</code> is the constant.</p>
+
+<p>Example:</p>
+
+<pre><code>   <span class="keyword">print</span> <span class="variable">ODBC::SQL_SQL_COLUMN_NAME</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="SPECIAL-NOTATION">SPECIAL NOTATION</h1>
+
+<p>For the method documentation that follows, an <b>*</b> following the method parameters indicates that that method is new or has been modified for this version.</p>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<dl>
+
+<dt id="new-ODBC_OBJECT-DSN-OPTION1-VALUE1-OPTION2-VALUE2">new ( ODBC_OBJECT | DSN [, (OPTION1, VALUE1), (OPTION2, VALUE2) ...] ) *</dt>
+<dd>
+
+<p>Creates a new ODBC connection based on <code>DSN</code>, or, if you specify an already existing ODBC object, then a new ODBC object will be created but using the ODBC Connection specified by <code>ODBC_OBJECT</code>. (The new object will be a new <i>hstmt</i> using the <i>hdbc</i> connection in <code>ODBC_OBJECT</code>.)</p>
+
+<p><code>DSN</code> is <i>Data Source Name</i> or a proper <code>ODBCDriverConnect</code> string.</p>
+
+<p>You can specify SQL Connect Options that are implemented before the actual connection to the DSN takes place. These option/values are the same as specified in <code>GetConnectOption</code>/<code>SetConnectOption</code> (see below) and are defined in the ODBC API specs.</p>
+
+<p>Returns a handle to the database on success, or <i>undef</i> on failure.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="Catalog-QUALIFIER-OWNER-NAME-TYPE">Catalog ( QUALIFIER, OWNER, NAME, TYPE )</dt>
+<dd>
+
+<p>Tells ODBC to create a data set that contains table information about the DSN. Use <code>Fetch</code> and <code>Data</code> or <code>DataHash</code> to retrieve the data. The returned format is:</p>
+
+<pre><code>    [Qualifier] [Owner] [Name] [Type]</code></pre>
+
+<p>Returns <i>true</i> on error.</p>
+
+</dd>
+<dt id="ColAttributes-ATTRIBUTE-FIELD_NAMES">ColAttributes ( ATTRIBUTE [, FIELD_NAMES ] )</dt>
+<dd>
+
+<p>Returns the attribute <code>ATTRIBUTE</code> on each of the fields in the list <code>FIELD_NAMES</code> in the current record set. If <code>FIELD_NAMES</code> is empty, then all fields are assumed. The attributes are returned as an associative array.</p>
+
+</dd>
+<dt id="ConfigDSN-OPTION-DRIVER-ATTRIBUTE1-ATTRIBUTE2-ATTRIBUTE3">ConfigDSN ( OPTION, DRIVER, ATTRIBUTE1 [, ATTRIBUTE2, ATTRIBUTE3, ... ] )</dt>
+<dd>
+
+<p>Configures a DSN. <code>OPTION</code> takes on one of the following values:</p>
+
+<pre><code>    ODBC_ADD_DSN.......Adds a new DSN.
+    ODBC_MODIFY_DSN....Modifies an existing DSN.
+    ODBC_REMOVE_DSN....Removes an existing DSN.
+
+    ODBC_ADD_SYS_DSN.......Adds a new System DSN.
+    ODBC_MODIFY_SYS_DSN....Modifies an existing System DSN.
+    ODBC_REMOVE_SYS_DSN....Removes an existing System DSN.</code></pre>
+
+<p>You must specify the driver <code>DRIVER</code> (which can be retrieved by using <code>DataSources</code> or <code>Drivers</code>).</p>
+
+<p><code>ATTRIBUTE1</code> <b>should</b> be <i>&quot;DSN=xxx&quot;</i> where <i>xxx</i> is the name of the DSN. Other attributes can be any DSN attribute such as:</p>
+
+<pre><code>    &quot;UID=Cow&quot;
+    &quot;PWD=Moo&quot;
+    &quot;Description=My little bitty Data Source Name&quot;</code></pre>
+
+<p>Returns <i>true</i> on success, <i>false</i> on failure.</p>
+
+<p><b>NOTE 1</b>: If you use <code>ODBC_ADD_DSN</code>, then you must include at least <i>&quot;DSN=xxx&quot;</i> and the location of the database.</p>
+
+<p>Example: For MS Access databases, you must specify the <i>DatabaseQualifier</i>:</p>
+
+<pre><code>    &quot;DBQ=c:\\...\\MyDatabase.mdb&quot;</code></pre>
+
+<p><b>NOTE 2</b>: If you use <code>ODBC_MODIFY_DSN</code>, then you need only specify the <i>&quot;DNS=xxx&quot;</i> attribute. Any other attribute you include will be changed to what you specify.</p>
+
+<p><b>NOTE 3</b>: If you use <code>ODBC_REMOVE_DSN</code>, then you need only specify the <i>&quot;DSN=xxx&quot;</i> attribute.</p>
+
+</dd>
+<dt id="Connection">Connection ()</dt>
+<dd>
+
+<p>Returns the connection number associated with the ODBC connection.</p>
+
+</dd>
+<dt id="Close">Close ()</dt>
+<dd>
+
+<p>Closes the ODBC connection. No return value.</p>
+
+</dd>
+<dt id="Data-FIELD_NAME">Data ( [ FIELD_NAME ] )</dt>
+<dd>
+
+<p>Returns the contents of column name <code>FIELD_NAME</code> or the current row (if nothing is specified).</p>
+
+</dd>
+<dt id="DataHash-FIELD1-FIELD2">DataHash ( [ FIELD1, FIELD2, ... ] )</dt>
+<dd>
+
+<p>Returns the contents for <code>FIELD1, FIELD2, ...</code> or the entire row (if nothing is specified) as an associative array consisting of:</p>
+
+<pre><code>    <span class="operator">{</span><span class="variable">Field</span> <span class="variable">Name</span><span class="operator">}</span> <span class="operator">=&gt;</span> <span class="variable">Field</span> <span class="variable">Data</span>
+</code></pre>
+
+</dd>
+<dt id="DataSources">DataSources ()</dt>
+<dd>
+
+<p>Returns an associative array of Data Sources and ODBC remarks about them. They are returned in the form of:</p>
+
+<pre><code>    <span class="variable">$ArrayName</span><span class="operator">{</span><span class="string">'DSN'</span><span class="operator">}</span><span class="operator">=</span><span class="variable">Driver</span>
+</code></pre>
+
+<p>where <i>DSN</i> is the Data Source Name and ODBC Driver used.</p>
+
+</dd>
+<dt id="Debug-1-0">Debug ( [ 1 | 0 ] )</dt>
+<dd>
+
+<p>Sets the debug option to on or off. If nothing is specified, then nothing is changed.</p>
+
+<p>Returns the debugging value (<i>1</i> or <i>0</i>).</p>
+
+</dd>
+<dt id="Drivers">Drivers ()</dt>
+<dd>
+
+<p>Returns an associative array of ODBC Drivers and their attributes. They are returned in the form of:</p>
+
+<pre><code>    <span class="variable">$ArrayName</span><span class="operator">{</span><span class="string">'DRIVER'</span><span class="operator">}</span><span class="operator">=</span><span class="variable">Attrib1</span><span class="operator">;</span><span class="variable">Attrib2</span><span class="operator">;</span><span class="variable">Attrib3</span><span class="operator">;...</span>
+</code></pre>
+
+<p>where <i>DRIVER</i> is the ODBC Driver Name and <i>AttribX</i> are the driver-defined attributes.</p>
+
+</dd>
+<dt id="DropCursor-CLOSE_TYPE">DropCursor ( [ CLOSE_TYPE ] )</dt>
+<dd>
+
+<p>Drops the cursor associated with the ODBC object. This forces the cursor to be deallocated. This overrides <code>SetStmtCloseType</code>, but the ODBC object does not lose the <code>StmtCloseType</code> setting. <code>CLOSE_TYPE</code> can be any valid <code>SmtpCloseType</code> and will perform a close on the stmt using the specified close type.</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> on failure.</p>
+
+</dd>
+<dt id="DumpData">DumpData ()</dt>
+<dd>
+
+<p>Dumps to the screen the fieldnames and all records of the current data set. Used primarily for debugging. No return value.</p>
+
+</dd>
+<dt id="Error">Error ()</dt>
+<dd>
+
+<p>Returns the last encountered error. The returned value is context dependent:</p>
+
+<p>If called in a <i>scalar</i> context, then a <i>3-element array</i> is returned:</p>
+
+<pre><code>    ( ERROR_NUMBER, ERROR_TEXT, CONNECTION_NUMBER )</code></pre>
+
+<p>If called in a <i>string</i> context, then a <i>string</i> is returned:</p>
+
+<pre><code>    &quot;[ERROR_NUMBER] [CONNECTION_NUMBER] [ERROR_TEXT]&quot;</code></pre>
+
+<p>If debugging is on then two more variables are returned:</p>
+
+<pre><code>    ( ..., FUNCTION, LEVEL )</code></pre>
+
+<p>where <code>FUNCTION</code> is the name of the function in which the error occurred, and <code>LEVEL</code> represents extra information about the error (usually the location of the error).</p>
+
+</dd>
+<dt id="FetchRow-ROW-TYPE">FetchRow ( [ ROW [, TYPE ] ] )</dt>
+<dd>
+
+<p>Retrieves the next record from the keyset. When <code>ROW</code> and/or <code>TYPE</code> are specified, the call is made using <code>SQLExtendedFetch</code> instead of <code>SQLFetch</code>.</p>
+
+<p><b>NOTE 1</b>: If you are unaware of <code>SQLExtendedFetch</code> and its implications, stay with just regular <code>FetchRow</code> with no parameters.</p>
+
+<p><b>NOTE 2</b>: The ODBC API explicitly warns against mixing calls to <code>SQLFetch</code> and <code>SQLExtendedFetch</code>; use one or the other but not both.</p>
+
+<p>If <i>ROW</i> is specified, it moves the keyset <b>RELATIVE</b> <code>ROW</code> number of rows.</p>
+
+<p>If <i>ROW</i> is specified and <code>TYPE</code> is <b>not</b>, then the type used is <b>RELATIVE</b>.</p>
+
+<p>Returns <i>true</i> when another record is available to read, and <i>false</i> when there are no more records.</p>
+
+</dd>
+<dt id="FieldNames">FieldNames ()</dt>
+<dd>
+
+<p>Returns an array of fieldnames found in the current data set. There is no guarantee on order.</p>
+
+</dd>
+<dt id="GetConnections">GetConnections ()</dt>
+<dd>
+
+<p>Returns an array of connection numbers showing what connections are currently open.</p>
+
+</dd>
+<dt id="GetConnectOption-OPTION">GetConnectOption ( OPTION )</dt>
+<dd>
+
+<p>Returns the value of the specified connect option <code>OPTION</code>. Refer to ODBC documentation for more information on the options and values.</p>
+
+<p>Returns a string or scalar depending upon the option specified.</p>
+
+</dd>
+<dt id="GetCursorName">GetCursorName ()</dt>
+<dd>
+
+<p>Returns the name of the current cursor as a string or <i>undef</i>.</p>
+
+</dd>
+<dt id="GetData">GetData ()</dt>
+<dd>
+
+<p>Retrieves the current row from the dataset. This is not generally used by users; it is used internally.</p>
+
+<p>Returns an array of field data where the first element is either <i>false</i> (if successful) and <i>true</i> (if <b>not</b> successful).</p>
+
+</dd>
+<dt id="getDSN-DSN">getDSN ( [ DSN ] )</dt>
+<dd>
+
+<p>Returns an associative array indicating the configuration for the specified DSN.</p>
+
+<p>If no DSN is specified then the current connection is used.</p>
+
+<p>The returned associative array consists of:</p>
+
+<pre><code>    <span class="keyword">keys</span><span class="operator">=</span><span class="variable">DSN</span> <span class="variable">keyword</span><span class="operator">;</span> <span class="keyword">values</span><span class="operator">=</span><span class="variable">Keyword</span> <span class="variable">value</span><span class="operator">.</span> <span class="variable">$Data</span><span class="operator">{</span><span class="variable">$Keyword</span><span class="operator">}</span><span class="operator">=</span><span class="variable">Value</span>
+</code></pre>
+
+</dd>
+<dt id="GetFunctions-FUNCTION1-FUNCTION2">GetFunctions ( [ FUNCTION1, FUNCTION2, ... ] )</dt>
+<dd>
+
+<p>Returns an associative array indicating the ability of the ODBC Driver to support the specified functions. If no functions are specified, then a 100 element associative array is returned containing all possible functions and their values.</p>
+
+<p><code>FUNCTION</code> must be in the form of an ODBC API constant like <code>SQL_API_SQLTRANSACT</code>.</p>
+
+<p>The returned array will contain the results like:</p>
+
+<pre><code>    <span class="variable">$Results</span><span class="operator">{</span><span class="string">SQL_API_SQLTRANSACT</span><span class="operator">}</span><span class="operator">=</span><span class="variable">Value</span>
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>    <span class="variable">$Results</span> <span class="operator">=</span> <span class="variable">$O</span><span class="operator">-&gt;</span><span class="variable">GetFunctions</span><span class="operator">(</span>
+                                <span class="variable">$O</span><span class="operator">-&gt;</span><span class="variable">SQL_API_SQLTRANSACT</span><span class="operator">,</span>
+                                <span class="variable">SQL_API_SQLSETCONNECTOPTION</span>
+                               <span class="operator">);</span>
+    <span class="variable">$ConnectOption</span> <span class="operator">=</span> <span class="variable">$Results</span><span class="operator">{</span><span class="string">SQL_API_SQLSETCONNECTOPTION</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="variable">$Transact</span> <span class="operator">=</span> <span class="variable">$Results</span><span class="operator">{</span><span class="string">SQL_API_SQLTRANSACT</span><span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="GetInfo-OPTION">GetInfo ( OPTION )</dt>
+<dd>
+
+<p>Returns a string indicating the value of the particular option specified.</p>
+
+</dd>
+<dt id="GetMaxBufSize">GetMaxBufSize ()</dt>
+<dd>
+
+<p>Returns the current allocated limit for <i>MaxBufSize</i>. For more info, see <code>SetMaxBufSize</code>.</p>
+
+</dd>
+<dt id="GetSQLState">GetSQLState () *</dt>
+<dd>
+
+<p>Returns a string indicating the SQL state as reported by ODBC. The SQL state is a code that the ODBC Manager or ODBC Driver returns after the execution of a SQL function. This is helpful for debugging purposes.</p>
+
+</dd>
+<dt id="GetStmtCloseType-CONNECTION">GetStmtCloseType ( [ CONNECTION ] )</dt>
+<dd>
+
+<p>Returns a string indicating the type of closure that will be used every time the <i>hstmt</i> is freed. See <code>SetStmtCloseType</code> for details.</p>
+
+<p>By default, the connection of the current object will be used. If <code>CONNECTION</code> is a valid connection number, then it will be used.</p>
+
+</dd>
+<dt id="GetStmtOption-OPTION">GetStmtOption ( OPTION )</dt>
+<dd>
+
+<p>Returns the value of the specified statement option <code>OPTION</code>. Refer to ODBC documentation for more information on the options and values.</p>
+
+<p>Returns a string or scalar depending upon the option specified.</p>
+
+</dd>
+<dt id="MoreResults">MoreResults ()</dt>
+<dd>
+
+<p>This will report whether there is data yet to be retrieved from the query. This can happen if the query was a multiple select.</p>
+
+<p>Example:</p>
+
+<pre><code>    &quot;SELECT * FROM [foo] SELECT * FROM [bar]&quot;</code></pre>
+
+<p><b>NOTE</b>: Not all drivers support this.</p>
+
+<p>Returns <i>1</i> if there is more data, <i>undef</i> otherwise.</p>
+
+</dd>
+<dt id="RowCount-CONNECTION">RowCount ( CONNECTION )</dt>
+<dd>
+
+<p>For <i>UPDATE</i>, <i>INSERT</i> and <i>DELETE</i> statements, the returned value is the number of rows affected by the request or <i>-1</i> if the number of affected rows is not available.</p>
+
+<p><b>NOTE 1</b>: This function is not supported by all ODBC drivers! Some drivers do support this but not for all statements (e.g., it is supported for <i>UPDATE</i>, <i>INSERT</i> and <i>DELETE</i> commands but not for the <i>SELECT</i> command).</p>
+
+<p><b>NOTE 2</b>: Many data sources cannot return the number of rows in a result set before fetching them; for maximum interoperability, applications should not rely on this behavior.</p>
+
+<p>Returns the number of affected rows, or <i>-1</i> if not supported by the driver in the current context.</p>
+
+</dd>
+<dt id="Run-SQL">Run ( SQL )</dt>
+<dd>
+
+<p>Executes the SQL command <b>SQL</b> and dumps to the screen info about it. Used primarily for debugging.</p>
+
+<p>No return value.</p>
+
+</dd>
+<dt id="SetConnectOption-OPTION">SetConnectOption ( OPTION ) *</dt>
+<dd>
+
+<p>Sets the value of the specified connect option <b>OPTION</b>. Refer to ODBC documentation for more information on the options and values.</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> otherwise.</p>
+
+</dd>
+<dt id="SetCursorName-NAME">SetCursorName ( NAME ) *</dt>
+<dd>
+
+<p>Sets the name of the current cursor.</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> otherwise.</p>
+
+</dd>
+<dt id="SetPos-ROW-OPTION-LOCK">SetPos ( ROW [, OPTION, LOCK ] ) *</dt>
+<dd>
+
+<p>Moves the cursor to the row <code>ROW</code> within the current keyset (<b>not</b> the current data/result set).</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> otherwise.</p>
+
+</dd>
+<dt id="SetMaxBufSize-SIZE">SetMaxBufSize ( SIZE )</dt>
+<dd>
+
+<p>This sets the <i>MaxBufSize</i> for a particular connection. This will most likely never be needed but...</p>
+
+<p>The amount of memory that is allocated to retrieve the field data of a record is dynamic and changes when it need to be larger. I found that a memo field in an MS Access database ended up requesting 4 Gig of space. This was a bit much so there is an imposed limit (2,147,483,647 bytes) that can be allocated for data retrieval.</p>
+
+<p>Since it is possible that someone has a database with field data greater than 10,240, you can use this function to increase the limit up to a ceiling of 2,147,483,647 (recompile if you need more).</p>
+
+<p>Returns the max number of bytes.</p>
+
+</dd>
+<dt id="SetStmtCloseType-TYPE-CONNECTION">SetStmtCloseType ( TYPE [, CONNECTION ] )</dt>
+<dd>
+
+<p>Sets a particular <i>hstmt</i> close type for the connection. This is the same as <code>ODBCFreeStmt(hstmt, TYPE)</code>. By default, the connection of the current object will be used. If <code>CONNECTION</code> is a valid connection number, then it will be used.</p>
+
+<p><code>TYPE</code> may be one of:</p>
+
+<pre><code>    SQL_CLOSE
+    SQL_DROP
+    SQL_UNBIND
+    SQL_RESET_PARAMS</code></pre>
+
+<p>Returns a string indicating the newly set type.</p>
+
+</dd>
+<dt id="SetStmtOption-OPTION">SetStmtOption ( OPTION ) *</dt>
+<dd>
+
+<p>Sets the value of the specified statement option <code>OPTION</code>. Refer to ODBC documentation for more information on the options and values.</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> otherwise.</p>
+
+</dd>
+<dt id="ShutDown">ShutDown ()</dt>
+<dd>
+
+<p>Closes the ODBC connection and dumps to the screen info about it. Used primarily for debugging.</p>
+
+<p>No return value.</p>
+
+</dd>
+<dt id="Sql-SQL_STRING">Sql ( SQL_STRING )</dt>
+<dd>
+
+<p>Executes the SQL command <code>SQL_STRING</code> on the current connection.</p>
+
+<p>Returns <i>?</i> on success, or an error number on failure.</p>
+
+</dd>
+<dt id="TableList-QUALIFIER-OWNER-NAME-TYPE">TableList ( QUALIFIER, OWNER, NAME, TYPE )</dt>
+<dd>
+
+<p>Returns the catalog of tables that are available in the DSN. For an unknown parameter, just specify the empty string <i>&quot;&quot;</i>.</p>
+
+<p>Returns an array of table names.</p>
+
+</dd>
+<dt id="Transact-TYPE">Transact ( TYPE ) *</dt>
+<dd>
+
+<p>Forces the ODBC connection to perform a <i>rollback</i> or <i>commit</i> transaction.</p>
+
+<p><code>TYPE</code> may be one of:</p>
+
+<pre><code>    SQL_COMMIT
+    SQL_ROLLBACK</code></pre>
+
+<p><b>NOTE</b>: This only works with ODBC drivers that support transactions. Your driver supports it if <i>true</i> is returned from:</p>
+
+<pre><code>    $O-&gt;GetFunctions($O-&gt;SQL_API_SQLTRANSACT)[1]</code></pre>
+
+<p>(See <code>GetFunctions</code> for more details.)</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> otherwise.</p>
+
+</dd>
+<dt id="Version-PACKAGES">Version ( PACKAGES )</dt>
+<dd>
+
+<p>Returns an array of version numbers for the requested packages (<i>ODBC.pm</i> or <i>ODBC.PLL</i>). If the list <code>PACKAGES</code> is empty, then all version numbers are returned.</p>
+
+</dd>
+</dl>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>What known problems does this thing have?</p>
+
+<ul>
+
+<li><p>If the account under which the process runs does not have write permission on the default directory (for the process, not the ODBC DSN), you will probably get a runtime error during a <code>SQLConnection</code>. I don&#39;t think that this is a problem with the code, but more like a problem with ODBC. This happens because some ODBC drivers need to write a temporary file. I noticed this using the MS Jet Engine (Access Driver).</p>
+
+</li>
+<li><p>This module has been neither optimized for speed nor optimized for memory consumption.</p>
+
+</li>
+</ul>
+
+<h1 id="INSTALLATION-NOTES">INSTALLATION NOTES</h1>
+
+<p>If you wish to use this module with a build of Perl other than ActivePerl, you may wish to fetch the original source distribution for this module at:</p>
+
+<pre><code>  ftp://ftp.roth.net:/pub/ntperl/ODBC/970208/Bin/Win32_ODBC_Build_CORE.zip</code></pre>
+
+<p>or one of the other archives at that same location. See the included README for hints on installing this module manually, what to do if you get a <i>parse exception</i>, and a pointer to a test script for this module.</p>
+
+<h1 id="OTHER-DOCUMENTATION">OTHER DOCUMENTATION</h1>
+
+<p>Find a FAQ for Win32::ODBC at:</p>
+
+<pre><code>  http://www.roth.net/odbc/odbcfaq.htm</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Roth &lt;rothd@roth.net&gt;</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>Based on original code by Dan DeMaggio &lt;dmag@umich.edu&gt;</p>
+
+<h1 id="DISCLAIMER">DISCLAIMER</h1>
+
+<p>I do not guarantee <b>ANYTHING</b> with this package. If you use it you are doing so <b>AT YOUR OWN RISK</b>! I may or may not support this depending on my time schedule.</p>
+
+<h1 id="HISTORY">HISTORY</h1>
+
+<p>Last Modified 1999.09.25.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 1996-1998 Dave Roth. All rights reserved.</p>
+
+<p>Courtesy of Roth Consulting: http://www.roth.net/consult/</p>
+
+<p>Use under GNU General Public License. Details can be found at: http://www.gnu.org/copyleft/gpl.html</p>
+
+
+</body>
+
+</html>
+
+

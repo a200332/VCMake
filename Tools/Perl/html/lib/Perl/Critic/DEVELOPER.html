@@ -1,0 +1,896 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#BACKGROUND">BACKGROUND</a></li>
+  <li><a href="#EXAMPLE-POLICY">EXAMPLE POLICY</a></li>
+  <li><a href="#MAKING-YOUR-POLICY-CONFIGURABLE">MAKING YOUR POLICY CONFIGURABLE</a>
+    <ul>
+      <li><a href="#Do-It-All-Yourself">Do It All Yourself</a></li>
+      <li><a href="#Note-On-Constructors">Note On Constructors</a></li>
+      <li><a href="#Providing-Basic-Configuration-Information-Via-supported_parameters">Providing Basic Configuration Information Via supported_parameters()</a></li>
+      <li><a href="#Using-supported_parameters-to-Get-It-Done-For-You">Using supported_parameters() to Get It Done For You</a>
+        <ul>
+          <li><a href="#string">&quot;string&quot;</a>
+            <ul>
+              <li><a href="#supported_parameters-example">supported_parameters() example</a></li>
+              <li><a href="#Access-example">Access example</a></li>
+            </ul>
+          </li>
+          <li><a href="#boolean">&quot;boolean&quot;</a>
+            <ul>
+              <li><a href="#supported_parameters-example1">supported_parameters() example</a></li>
+              <li><a href="#Access-example1">Access example</a></li>
+            </ul>
+          </li>
+          <li><a href="#integer">&quot;integer&quot;</a>
+            <ul>
+              <li><a href="#supported_parameters-example2">supported_parameters() example</a></li>
+              <li><a href="#Access-example2">Access example</a></li>
+            </ul>
+          </li>
+          <li><a href="#string-list">&quot;string list&quot;</a>
+            <ul>
+              <li><a href="#supported_parameters-example3">supported_parameters() example</a></li>
+              <li><a href="#Access-example3">Access example</a></li>
+            </ul>
+          </li>
+          <li><a href="#enumeration">&quot;enumeration&quot;</a>
+            <ul>
+              <li><a href="#supported_parameters-example4">supported_parameters() example</a></li>
+              <li><a href="#Access-example4">Access example</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#Using-a-Custom-Parser">Using a Custom Parser</a></li>
+      <li><a href="#Using-Both-supported_parameters-and-initialize_if_enabled">Using Both supported_parameters() and initialize_if_enabled()</a></li>
+      <li><a href="#Summary-of-permitted-hash-keys-in-supported_parameters">Summary of permitted hash keys in supported_parameters().</a>
+        <ul>
+          <li><a href="#All-types">All types</a></li>
+          <li><a href="#Enumerations">Enumerations</a></li>
+          <li><a href="#Integers">Integers</a></li>
+          <li><a href="#String-lists">String lists</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#ADDITIONAL-FEATURES">ADDITIONAL FEATURES</a>
+    <ul>
+      <li><a href="#default_maximum_violations_per_document">default_maximum_violations_per_document()</a></li>
+      <li><a href="#is_safe">is_safe()</a></li>
+    </ul>
+  </li>
+  <li><a href="#DISTRIBUTING-YOUR-POLICIES">DISTRIBUTING YOUR POLICIES</a>
+    <ul>
+      <li><a href="#Create-a-Distribution">Create a Distribution</a></li>
+      <li><a href="#Themes">Themes</a></li>
+      <li><a href="#Documentation">Documentation</a>
+        <ul>
+          <li><a href="#AFFILIATION">AFFILIATION</a></li>
+          <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#TESTING-YOUR-POLICY">TESTING YOUR POLICY</a></li>
+  <li><a href="#HINT">HINT</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::DEVELOPER - How to make new Perl::Critic::Policy modules.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>For developers who want to create custom coding standards, the following tells how to create a Policy module for <a href="../../../lib/Perl/Critic.html">Perl::Critic</a>. Although the Perl::Critic distribution already includes a number of Policies based on Damian Conway&#39;s book <i>Perl Best Practices</i> (which will be referred to via &quot;<i>PBP</i>&quot; from here on), Perl::Critic is not limited to his guidelines and can be used to enforce any practice, preference, or style that you want to follow. You can even write Policies to enforce contradictory guidelines. All you need to do is write a corresponding <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> subclass, which may require as little as 10 lines of code.</p>
+
+<h1 id="BACKGROUND">BACKGROUND</h1>
+
+<p>The heart of Perl::Critic is <a href="../../../lib/PPI.html">PPI</a>, a parser and lexer for Perl. PPI transforms Perl source code into a Document Object Model (DOM). Each token in the document is represented by a PPI class, such as <a href="../../../lib/PPI/Token/Operator.html">PPI::Token::Operator</a> or <a href="../../../lib/PPI/Token/Word.html">PPI::Token::Word</a>, and then organized into structure classes, like <a href="../../../lib/PPI/Statement/Expression.html">PPI::Statement::Expression</a> and <a>PPI::Structure::Subroutine</a>. The root node of the hierarchy is the <a href="../../../lib/PPI/Document.html">PPI::Document</a>.</p>
+
+<p>The <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> engine traverses each node in the <a href="../../../lib/PPI/Document.html">PPI::Document</a> tree and invokes each of the <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> subclasses at the appropriate node. The Policy can inspect the node, look at the surrounding nodes, and do whatever else it wants. If the Policy decides that a coding standard has been violated, it returns one or more <a href="../../../lib/Perl/Critic/Violation.html">Perl::Critic::Violation</a> objects. If there are no violations, then the Policy returns nothing.</p>
+
+<p>Policies are usually written based on existing policies, so let&#39;s look at one to see how it works. The <i>RequireBlockGrep.pm</i> Policy is relatively simple and demonstrates most of the important issues. The goal of this Policy is to enforce that every call to <code>grep</code> uses a block for the first argument and not an expression. The reasons for this Policy are discussed in detail in <i>PBP</i>.</p>
+
+<h1 id="EXAMPLE-POLICY">EXAMPLE POLICY</h1>
+
+<p>First, the Policy module needs to have a name. Perl::Critic uses <a href="../../../lib/Module/Pluggable.html">Module::Pluggable</a> to automatically discover all modules in the <code>Perl::Critic::Policy</code> namespace. Also, we&#39;ve adopted the convention of grouping Policies into directories according to the chapters of <i>PBP</i>. Since the goal of this Policy is to enforce the use of block arguments to <code>grep</code> and it comes from the &quot;Builtin Functions&quot; chapter of <i>PBP</i>, we call it <code>&quot;Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep&quot;</code>.</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep</span><span class="operator">;</span>
+</code></pre>
+
+<p>Next, we set some pragmas and load the modules that we&#39;ll need. All Policy modules inherit from the <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> class, which provides no-op implementations of the basic methods. Our job is to override these methods to make them do something useful.</p>
+
+<p>Technically, <code>use strict</code> and <code>use warnings</code> are optional, but we don&#39;t want Perl::Critic to be a hypocrite, now do we?</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Readonly</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Perl::Critic::Utils</span> <span class="string">qw{ :severities :classification :ppi }</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Perl::Critic::Policy'</span><span class="operator">;</span>
+    
+    <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="string">'1.05'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Next, we&#39;ll declare a description and explanation for this Policy. The description is always just a string that basically says &quot;this is what&#39;s wrong.&quot; The explanation can be either a string with further details, or a reference to an array of integers that correspond to page numbers in <i>PBP</i>. We make them read-only because they never change. (See <a href="../../../lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitConstantPragma.html">Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma</a> for why we don&#39;t <code>use constant</code>.)</p>
+
+<pre><code>    <span class="variable">Readonly::Scalar</span> <span class="keyword">my</span> <span class="variable">$DESC</span> <span class="operator">=&gt;</span> <span class="string">q{Expression form of "grep"}</span><span class="operator">;</span>
+    <span class="variable">Readonly::Scalar</span> <span class="keyword">my</span> <span class="variable">$EXPL</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">169</span> <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>Most policies don&#39;t need to override the <code>initialize_if_enabled()</code> method provided by <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a>. However, if your Policy is configurable via <i>.perlcriticrc</i>, you should implement a <code>supported_parameters()</code> method and need to implement <code>initialize_if_enabled()</code> to examine the <code>$config</code> values. Since this Policy isn&#39;t configurable, we&#39;ll declare that by providing an implementation of <code>supported_parameters()</code> that returns an empty list.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span> <span class="keyword">return</span> <span class="operator">()</span>                  <span class="operator">}</span>
+</code></pre>
+
+<p>Next, we define the <code>default_severity()</code> method, which must return an integer indicating the severity of violating this Policy. Severity values range from 1 to 5, where 5 is the &quot;most severe.&quot; In general, level 5 is reserved for things that are frequently misused and/or cause bugs. Level 1 is for things that are highly subjective or purely cosmetic. The <a href="../../../lib/Perl/Critic/Utils.html">Perl::Critic::Utils</a> package exports several severity constants that you can use here via the <code>:severities</code> tag.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> default_severity     </span><span class="operator">{</span> <span class="keyword">return</span> <span class="variable">$SEVERITY_HIGH</span>      <span class="operator">}</span>
+</code></pre>
+
+<p>Likewise, the <code>default_themes()</code> method returns a list of theme names. Themes are intended to be named groups of Policies. All Policies that ship with Perl::Critic have a <code>&quot;core&quot;</code> theme. Since use of <code>grep</code> without blocks often leads to bugs, we include a <code>&quot;bugs&quot;</code> theme. And since this Policy comes directly from <i>PBP</i>, this Policy should be a member of the <code>&quot;pbp&quot;</code> theme.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> default_themes       </span><span class="operator">{</span> <span class="keyword">return</span> <span class="string">qw( core bugs pbp )</span> <span class="operator">}</span>
+</code></pre>
+
+<p>As a Policy author, you can assign any themes you want to the Policy. If you&#39;re publishing a suite of custom Policies, we suggest that you create a unique theme that covers all the Policies in the distribution. That way, users can easily enable or disable all of your policies at once. For example, Policies in the <a>Perl::Critic::More</a> distribution all have a <code>&quot;more&quot;</code> theme.</p>
+
+<p>Next, we indicate what elements of the code this Policy will analyze, like statements or variables or conditionals or POD. These elements are specified as PPI classes such as <a href="../../../lib/PPI/Statement.html">PPI::Statement</a>, <a href="../../../lib/PPI/Token/Symbol.html">PPI::Token::Symbol</a>, <a>PPI::Structure::Conditional</a> or <a href="../../../lib/PPI/Token/Pod.html">PPI::Token::Pod</a> respectively. The <code>applies_to()</code> method returns a list of PPI package names. (You can get that list of available package names via <code>perldoc PPI</code>.) As Perl::Critic traverses the document, it will call the <code>violates()</code> method from this module whenever it encounters one of the PPI types that are given here. In this case, we just want to test calls to <code>grep</code>. Since the token &quot;grep&quot; is a <a href="../../../lib/PPI/Token/Word.html">PPI::Token::Word</a>, we return that package name from the <code>applies_to()</code> method.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> applies_to           </span><span class="operator">{</span> <span class="keyword">return</span> <span class="string">'PPI::Token::Word'</span>  <span class="operator">}</span>
+</code></pre>
+
+<p>If your Policy needs to analyze several different types of elements, the <code>applies_to</code> method may return the name of several PPI packages. If your Policy needs to examine the file as a whole, then the <code>applies_to</code> method should return <a href="../../../lib/PPI/Document.html">PPI::Document</a>. Since there is only one PPI::Document element, your Policy would only be invoked once per file.</p>
+
+<p>Now comes the interesting part. The <code>violates()</code> method does all the work. It is always called with 2 arguments: a reference to the current PPI element that Perl::Critic is traversing, and a reference to the entire PPI document. [And since this is an object method, there will be an additional argument that is a reference to this object (<code>$self</code>), but you already knew that!] Since this Policy does not need access to the document as a whole, we ignore the last parameter by assigning to <code>undef</code>.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> violates </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$elem</span><span class="operator">,</span> <span class="keyword">undef</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>violates()</code> method then often performs some tests to make sure we have the right &quot;type&quot; of element. In our example, we know that the element will be a <a href="../../../lib/PPI/Token/Word.html">PPI::Token::Word</a> because that&#39;s what we declared back in the <code>applies_to()</code> method. However, we didn&#39;t specify exactly which &quot;word&quot; we were looking for. Evaluating a PPI element in a string context returns the literal form of the code. (You can also use the <code>content()</code> method.) So we make sure that this <code>PPI::Token::Word</code> is, in fact, &quot;grep&quot;. If it&#39;s not, then we don&#39;t need to bother examining it.</p>
+
+<pre><code>        <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">$elem</span> <span class="keyword">ne</span> <span class="string">'grep'</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>PPI::Token::Word</code> class is also used for barewords and methods called on object references. It is possible for someone to declare a bareword hash key as <code>%hash = ( grep =&gt; &#39;foo&#39;)</code>. We don&#39;t want to test those types of elements because they don&#39;t represent function calls to <code>grep</code>. So we use one of handy utility functions from <a href="../../../lib/Perl/Critic/Utils.html">Perl::Critic::Utils</a> to make sure that this &quot;grep&quot; is actually in the right context. (The <code>is_function_call()</code> subroutine is brought in via the <code>:classification</code> tag.)</p>
+
+<pre><code>        <span class="keyword">return</span> <span class="keyword">if</span> <span class="operator">!</span> <span class="variable">is_function_call</span><span class="operator">(</span><span class="variable">$elem</span><span class="operator">);</span>
+</code></pre>
+
+<p>Now that we know this element is a call to the <code>grep</code> function, we can look at the nearby elements to see what kind of arguments are being passed to it. In the following paragraphs, we discuss how to do this manually in order to explore <a href="../../../lib/PPI.html">PPI</a>; after that, we&#39;ll show how this Policy actually uses facilities provided by <a href="../../../lib/Perl/Critic/Utils.html">Perl::Critic::Utils</a> to get this done.</p>
+
+<p>Every PPI element is linked to its siblings, parent, and children (if it has any). Since those siblings could just be whitespace, we use the <code>snext_sibling()</code> to get the next code-sibling (the &quot;s&quot; in <code>snext_sibling</code> stands for &quot;significant&quot;).</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$sib</span> <span class="operator">=</span> <span class="variable">$elem</span><span class="operator">-&gt;</span><span class="variable">snext_sibling</span><span class="operator">()</span> <span class="keyword">or</span> <span class="keyword">return</span><span class="operator">;</span>
+</code></pre>
+
+<p>In Perl, the parenthesis around argument lists are usually optional, and PPI packs the elements into a <a href="../../../lib/PPI/Structure/List.html">PPI::Structure::List</a> object when parentheses are used. So if the sibling is a <code>PPI::Structure::List</code>, we pull out the first (significant) child of that list. This child will be the first argument to <code>grep</code>. If parentheses were not used, then the sibling itself is the first argument.</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$arg</span> <span class="operator">=</span> <span class="variable">$sib</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'PPI::Structure::List'</span><span class="operator">)</span> <span class="operator">?</span> <span class="variable">$sib</span><span class="operator">-&gt;</span><span class="variable">schild</span><span class="operator">(</span><span class="number">0</span><span class="operator">)</span> <span class="operator">:</span> <span class="variable">$sib</span><span class="operator">;</span>
+</code></pre>
+
+<p>In actuality, this sort of function argument lookup is common, so there is a <a href="../../../lib/Perl/Critic/Utils.html#first_arg">&quot;first_arg&quot; in Perl::Critic::Utils</a> subroutine available via the <code>:ppi</code> tag. So we use that instead.</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">$arg</span> <span class="operator">=</span> <span class="variable">first_arg</span><span class="operator">(</span><span class="variable">$elem</span><span class="operator">);</span>
+</code></pre>
+
+<p>Finally, we now have a reference to the first argument to <code>grep</code>. If that argument is a block (i.e. something in curly braces), then it will be a <a href="../../../lib/PPI/Structure/Block.html">PPI::Structure::Block</a>, in which case our Policy is satisfied and we just return nothing.</p>
+
+<pre><code>        <span class="keyword">return</span> <span class="keyword">if</span> <span class="operator">!</span><span class="variable">$arg</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">$arg</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'PPI::Structure::Block'</span><span class="operator">);</span>
+</code></pre>
+
+<p>But if it is not a <a href="../../../lib/PPI/Structure/Block.html">PPI::Structure::Block</a>, then we know that this call to <code>grep</code> must be using the expression form, and that violates our Policy. So we create and return a new <a href="../../../lib/Perl/Critic/Violation.html">Perl::Critic::Violation</a> object via the <a href="../../../lib/Perl/Critic/Policy.html#violation">&quot;violation&quot; in Perl::Critic::Policy</a> method, passing in the description, explanation, and a reference to the PPI element that caused the violation. And that&#39;s all there is to it!</p>
+
+<pre><code>        <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">violation</span><span class="operator">(</span> <span class="variable">$DESC</span><span class="operator">,</span> <span class="variable">$EXPL</span><span class="operator">,</span> <span class="variable">$elem</span> <span class="operator">);</span>
+            <span class="operator">}</span>
+        
+            <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>One last thing -- people are going to need to understand what is wrong with the code when your Policy finds a problem. It isn&#39;t reasonable to include all the details in your violation description or explanation. So please include a DESCRIPTION section in the POD for your Policy. It should succinctly describe the behavior and motivation for your Policy and include a few examples of both good and bad code. Here&#39;s an example:</p>
+
+<pre><code>    <span class="comment">=pod
+    
+    =head1 NAME
+    
+    Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep
+    
+    
+    =head1 DESCRIPTION
+    
+    The expression forms of C&lt;grep&gt; and C&lt;map&gt; are awkward and hard to read.
+    Use the block forms instead.
+    
+        @matches = grep  /pattern/,    @list;        #not ok
+        @matches = grep { /pattern/ }  @list;        #ok
+    
+        @mapped = map  transform($_),    @list;      #not ok
+        @mapped = map { transform($_) }  @list;      #ok
+    
+    =cut</span>
+</code></pre>
+
+<p>When your policy has a section like this, users can invoke <a href="../../../bin/perlcritic.html">perlcritic</a> with a <code>--verbose</code> parameter of <code>10</code> or <code>11</code> or with a &quot;%d&quot; escape to see it along with the rest of the output for violations of your policy.</p>
+
+<h1 id="MAKING-YOUR-POLICY-CONFIGURABLE">MAKING YOUR POLICY CONFIGURABLE</h1>
+
+<p><a href="../../../lib/Perl/Critic.html">Perl::Critic</a> takes care of gathering configuration information for your Policy, from whatever source the user specifies. (See <a href="../../../lib/Perl/Critic.html#CONFIGURATION">&quot;CONFIGURATION&quot; in Perl::Critic</a> for the details of how a user specifies the values you&#39;re going to receive.) What your Policy ends up receiving for the value of a parameter is a string with leading and trailing whitespace removed. By default, you will need to handle conversion of that string to a useful form yourself. However, if you provide some metadata about your parameters, the parameter handling will be taken care of for you. (Additionally, tools that deal with Policies themselves can use this information to enhance their functionality. See the <a href="../../../bin/perlcritic.html">perlcritic</a> <code>--profile-proto</code> option for an example.)</p>
+
+<p>You can look at <a href="../../../lib/Perl/Critic/Policy/ControlStructures/ProhibitCascadingIfElse.html">Perl::Critic::Policy::ControlStructures::ProhibitCascadingIfElse</a> for a simple example of a configurable Policy and <a href="../../../lib/Perl/Critic/Policy/Documentation/RequirePodSections.html">Perl::Critic::Policy::Documentation::RequirePodSections</a> for a more complex one.</p>
+
+<h2 id="Do-It-All-Yourself">Do It All Yourself</h2>
+
+<p>The <code>initialize_if_enabled()</code> method for a Policy receives one argument: an instance of <a href="../../../lib/Perl/Critic/PolicyConfig.html">Perl::Critic::PolicyConfig</a>. This method is only called if the user&#39;s configuration has enabled the policy. It returns a boolean stating whether the Policy should continue to be enabled. Generally, the only reason to return <code>$FALSE</code> is when some external requirement is missing. For example, <a href="../../../lib/Perl/Critic/Policy/CodeLayout/RequireTidyCode.html">Perl::Critic::Policy::CodeLayout::RequireTidyCode</a> used to disable itself if <a>Perl::Tidy</a> was not installed (that is until we made it no longer optional for the Perl-Critic distribution).</p>
+
+<p>A basic, do-nothing implementation of <code>initialize_if_enabled()</code> would be:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Perl::Critic::Utils</span> <span class="string">qw&lt; :booleans &gt;</span><span class="operator">;</span>
+    
+    <span class="operator">...</span>
+    
+    <span class="keyword">sub</span><span class="variable"> initialize_if_enabled </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$config</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="variable">$TRUE</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>As stated above, what you get in <code>$config</code> are trimmed strings. For example, if the user&#39;s <i>.perlcritic</i> contains</p>
+
+<pre><code>    [Your::Policy]
+    foo          = bar baz
+    factor   =     5.52
+    selections =   2 78 92</code></pre>
+
+<p>then <code>$config</code> will contain the equivalent of</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$config</span> <span class="operator">=</span> <span class="operator">{</span>
+        <span class="string">foo</span>        <span class="operator">=&gt;</span> <span class="string">'bar baz'</span><span class="operator">,</span>
+        <span class="string">factor</span>     <span class="operator">=&gt;</span> <span class="string">'5.52'</span><span class="operator">,</span>
+        <span class="string">selections</span> <span class="operator">=&gt;</span> <span class="string">'2 78 92'</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>To make this available to the <code>violates()</code> method, the values are usually put into <code>$self</code> under the name of the configuration item prefixed with an underscore. E.g.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> initialize_if_enabled </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$config</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_foo</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$config</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_factor</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$config</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">{</span><span class="string">factor</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_selections</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$config</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">{</span><span class="string">selections</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="variable">$TRUE</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Often, you&#39;ll want to convert the configuration values into something more useful. In this example, <code>selections</code> is supposed to be a list of integers. <a href="../../../lib/Perl/Critic/Utils.html">Perl::Critic::Utils</a> contains a number of functions that can help you with this. Assuming that <code>violates()</code> wants to have <code>selections</code> as an array, you&#39;ll want to have something like this:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Perl::Critic::Utils</span> <span class="string">qw{ :booleans :characters :data_conversion }</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> initialize_if_enabled </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$config</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_foo</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$config</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_factor</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$config</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">{</span><span class="string">factor</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$selections</span> <span class="operator">=</span> <span class="variable">$config</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">{</span><span class="string">selections</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="variable">$selections</span> <span class="operator">=</span> <span class="keyword">defined</span> <span class="variable">$selections</span> <span class="operator">?</span> <span class="variable">$selections</span> <span class="operator">:</span> <span class="variable">$EMPTY_STRING</span><span class="operator">;</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_selections</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">words_from_string</span><span class="operator">(</span><span class="variable">$selections</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="variable">$TRUE</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Since <code>selections</code> contains numbers, it may be desirable to change the assignment to look like</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_selections</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">[</span> <span class="keyword">map</span> <span class="operator">{</span> <span class="variable">$_</span> <span class="operator">+</span> <span class="number">0</span> <span class="operator">}</span> <span class="variable">words_from_string</span><span class="operator">(</span><span class="variable">$selections</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>If <code>violates()</code> needs to quickly determine whether a particular value is in <code>selections</code>, you would want to use a hash instead of an array, like this:</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_selections</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span> <span class="variable">hashify</span><span class="operator">(</span> <span class="variable">words_from_string</span><span class="operator">(</span><span class="variable">$selections</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>For an example of a Policy that has some simple, but non-standard configuration handling, see <a href="../../../lib/Perl/Critic/Policy/CodeLayout/RequireTidyCode.html">Perl::Critic::Policy::CodeLayout::RequireTidyCode</a>.</p>
+
+<h2 id="Note-On-Constructors">Note On Constructors</h2>
+
+<p>It used to be the case that Policies handled configuration by implementing a constructor. However, there was no requirement to call the base constructor; as long as the Policy ended up being a blessed hash reference, everything was fine. Unfortunately, this meant that Policies would be loaded and their prerequisites would be <code>use</code>d, even if the Policy wasn&#39;t enabled, slowing things down. Also, this severely restricted the core of <a href="../../../lib/Perl/Critic.html">Perl::Critic</a>&#39;s ability to enhance things. Use of constructors is deprecated and is incompatible with <code>supported_parameters()</code> metadata below. Kindly use <code>initialize_if_enabled()</code>, instead, to do any sort of set up that you need.</p>
+
+<h2 id="Providing-Basic-Configuration-Information-Via-supported_parameters">Providing Basic Configuration Information Via <code>supported_parameters()</code></h2>
+
+<p>As minimum for a well behaved Policy, you should implement <code>supported_parameters()</code> in order to tell the rest of <code>Perl::Critic</code> what configuration values the Policy looks for, even if it is only to say that the Policy is not configurable. In the simple form, this function returns a list of the names of the parameters the Policy supports. So, for an non-configurable Policy, as in the <code>RequireBlockGrep</code> example above, this looked like</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span> <span class="keyword">return</span> <span class="operator">()</span>                  <span class="operator">}</span>
+</code></pre>
+
+<p>For the example being used in the <code>initialize_if_enabled()</code> section above, this would be</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span> <span class="keyword">return</span> <span class="string">qw&lt; foo factor selections &gt;</span><span class="operator">;</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Given this information, <code>Perl::Critic</code> can tell the user when they have specified a parameter for a Policy which isn&#39;t valid, e.g. when they&#39;ve misspelled the name of the parameter, and can emit the parameter as part of a <i>.perlcriticrc</i> prototype.</p>
+
+<p>You can provide even more information about your Policy&#39;s configuration by giving each parameter a description and a string representation of the default value for the parameter. You do this by having the values in the list returned by <code>supported_parameters()</code> be hash references instead of strings, with keys of <code>name</code>, <code>description</code>, and <code>default_string</code>. For example,</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>           <span class="operator">=&gt;</span> <span class="string">'allowed_values'</span><span class="operator">,</span>
+                <span class="string">description</span>    <span class="operator">=&gt;</span>
+                    <span class="string">'Individual and ranges of values to allow, and/or "all_integers".'</span><span class="operator">,</span>
+                <span class="string">default_string</span> <span class="operator">=&gt;</span> <span class="string">'0 1 2'</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>           <span class="operator">=&gt;</span> <span class="string">'allowed_types'</span><span class="operator">,</span>
+                <span class="string">description</span>    <span class="operator">=&gt;</span> <span class="string">'Kind of literals to allow.'</span><span class="operator">,</span>
+                <span class="string">default_string</span> <span class="operator">=&gt;</span> <span class="string">'Float'</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Note that use of constructors is <a href="#Note-On-Constructors">incompatible</a> with specifying parameters in this way.</p>
+
+<h2 id="Using-supported_parameters-to-Get-It-Done-For-You">Using <code>supported_parameters()</code> to Get It Done For You</h2>
+
+<p>The <code>supported_parameters()</code> discussion above showed how you could help others with your Policy, but didn&#39;t do anything to make your life as a Policy author easier; you still need to implement <code>initialize_if_enabled()</code> to access any configuration that the user has specified. To have the configuration automatically handled for you, you need to declare how your parameters act by specifying a value for their <code>behavior</code>. For example, the following declares that a parameter allows the user to choose from five specific values and that the user can select any combination of them:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>               <span class="operator">=&gt;</span> <span class="string">'allowed_types'</span><span class="operator">,</span>
+                <span class="string">description</span>        <span class="operator">=&gt;</span> <span class="string">'Kind of literals to allow.'</span><span class="operator">,</span>
+                <span class="string">default_string</span>     <span class="operator">=&gt;</span> <span class="string">'Float'</span><span class="operator">,</span>
+                <span class="string">behavior</span>           <span class="operator">=&gt;</span> <span class="string">'enumeration'</span><span class="operator">,</span>
+                <span class="string">enumeration_values</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw{ Binary Exp Float Hex Octal }</span> <span class="operator">]</span><span class="operator">,</span>
+                <span class="string">enumeration_allow_multiple_values</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>When you specify a behavior, parsing and validation of the user-specified and default values is done for you and your <code>violates()</code> method can retrieve the value under the key of the parameter name prefixed with an underscore, e.g., for the above declaration, the parsed and validated value can be accessed via <code><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_allowed_types</span><span class="operator">}</span>
+</code>.</p>
+
+<p>The behaviors provide additional functionality to <code>Perl::Critic</code>; for more on this, see <a href="../../../lib/Perl/Critic/PolicyParameter.html">Perl::Critic::PolicyParameter</a> and <a href="../../../lib/Perl/Critic/PolicyParameter/Behavior.html">Perl::Critic::PolicyParameter::Behavior</a>.</p>
+
+<p>The following discusses each of the supported behaviors and the options they support. For the full details of a behavior, see the documentation for the implementing class.</p>
+
+<h3 id="string">&quot;string&quot;</h3>
+
+<p>Implemented in <a href="../../../lib/Perl/Critic/PolicyParameter/Behavior/String.html">Perl::Critic::PolicyParameter::Behavior::String</a>.</p>
+
+<p>The most basic of behaviors, the value of the parameter will be stored in the Policy as a string.</p>
+
+<p>This behavior is not configurable.</p>
+
+<h4 id="supported_parameters-example"><code>supported_parameters()</code> example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>           <span class="operator">=&gt;</span> <span class="string">'a_string'</span><span class="operator">,</span>
+                <span class="string">description</span>    <span class="operator">=&gt;</span> <span class="string">'An example string.'</span><span class="operator">,</span>
+                <span class="string">default_string</span> <span class="operator">=&gt;</span> <span class="string">'blah blah blah'</span><span class="operator">,</span>
+                <span class="string">behavior</span>       <span class="operator">=&gt;</span> <span class="string">'string'</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h4 id="Access-example">Access example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> violates </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$element</span><span class="operator">,</span> <span class="variable">$document</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+        <span class="keyword">my</span> <span class="variable">$string</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_a_string</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h3 id="boolean">&quot;boolean&quot;</h3>
+
+<p>Implemented in <a href="../../../lib/Perl/Critic/PolicyParameter/Behavior/Boolean.html">Perl::Critic::PolicyParameter::Behavior::Boolean</a>.</p>
+
+<p>The value of the parameter will be either <a href="../../../lib/Perl/Critic/Utils.html#TRUE">$TRUE</a> or <a href="../../../lib/Perl/Critic/Utils.html#FALSE">$FALSE</a>.</p>
+
+<p>This behavior is not configurable.</p>
+
+<h4 id="supported_parameters-example1"><code>supported_parameters()</code> example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>           <span class="operator">=&gt;</span> <span class="string">'a_boolean'</span><span class="operator">,</span>
+                <span class="string">description</span>    <span class="operator">=&gt;</span> <span class="string">'An example boolean.'</span><span class="operator">,</span>
+                <span class="string">default_string</span> <span class="operator">=&gt;</span> <span class="string">'1'</span><span class="operator">,</span>
+                <span class="string">behavior</span>       <span class="operator">=&gt;</span> <span class="string">'boolean'</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h4 id="Access-example1">Access example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> violates </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$element</span><span class="operator">,</span> <span class="variable">$document</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+        <span class="keyword">my</span> <span class="variable">$is_whatever</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_a_boolean</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$is_whatever</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h3 id="integer">&quot;integer&quot;</h3>
+
+<p>Implemented in <a href="../../../lib/Perl/Critic/PolicyParameter/Behavior/Integer.html">Perl::Critic::PolicyParameter::Behavior::Integer</a>.</p>
+
+<p>The value is validated against <code>m/ \A [-+]? [1-9] [\d_]* \z /xms</code> (with an special check for &quot;0&quot;). Notice that this means that underscores are allowed in input values as with Perl numeric literals.</p>
+
+<p>This takes two options, <code>integer_minimum</code> and <code>integer_maximum</code>, which specify endpoints of an inclusive range to restrict the value to. Either, neither, or both may be specified.</p>
+
+<h4 id="supported_parameters-example2"><code>supported_parameters()</code> example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>            <span class="operator">=&gt;</span> <span class="string">'an_integer'</span><span class="operator">,</span>
+                <span class="string">description</span>     <span class="operator">=&gt;</span> <span class="string">'An example integer.'</span><span class="operator">,</span>
+                <span class="string">default_string</span>  <span class="operator">=&gt;</span> <span class="string">'5'</span><span class="operator">,</span>
+                <span class="string">behavior</span>        <span class="operator">=&gt;</span> <span class="string">'integer'</span><span class="operator">,</span>
+                <span class="string">integer_minimum</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+                <span class="string">integer_maximum</span> <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h4 id="Access-example2">Access example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> violates </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$element</span><span class="operator">,</span> <span class="variable">$document</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+        <span class="keyword">my</span> <span class="variable">$integer</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_an_integer</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$integer</span> <span class="operator">&gt;</span> <span class="variable">$TURNING_POINT</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h3 id="string-list">&quot;string list&quot;</h3>
+
+<p>Implemented in <a href="../../../lib/Perl/Critic/PolicyParameter/Behavior/StringList.html">Perl::Critic::PolicyParameter::Behavior::StringList</a>.</p>
+
+<p>The values will be derived by splitting the input string on blanks. (See <a href="../../../lib/Perl/Critic/Utils.html#words_from_string">&quot;words_from_string&quot; in Perl::Critic::Utils</a>.) The parameter will be stored as a reference to a hash, with the values being the keys.</p>
+
+<p>This takes one optional option, <code>list_always_present_values</code>, of a reference to an array of strings that will always be included in the parameter value, e.g. if the value of this option is <code><span class="operator">[</span> <span class="string">qw{ a b c }</span> <span class="operator">]</span>
+</code> and the user specifies a value of <code>&#39;c d e&#39;</code>, then the value of the parameter will contain <code>&#39;a&#39;</code>, <code>&#39;b&#39;</code>, <code>&#39;c&#39;</code>, <code>&#39;d&#39;</code>, and <code>&#39;e&#39;</code>.</p>
+
+<h4 id="supported_parameters-example3"><code>supported_parameters()</code> example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>                  <span class="operator">=&gt;</span> <span class="string">'a_string_list'</span><span class="operator">,</span>
+                <span class="string">description</span>           <span class="operator">=&gt;</span> <span class="string">'An example list.'</span><span class="operator">,</span>
+                <span class="string">default_string</span>        <span class="operator">=&gt;</span> <span class="string">'red pink blue'</span><span class="operator">,</span>
+                <span class="string">behavior</span>              <span class="operator">=&gt;</span> <span class="string">'string list'</span><span class="operator">,</span>
+                <span class="string">list_always_present_values</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw{ green purple}</span> <span class="operator">]</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h4 id="Access-example3">Access example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> violates </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$element</span><span class="operator">,</span> <span class="variable">$document</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+        <span class="keyword">my</span> <span class="variable">$list</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_a_string_list</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">@list</span> <span class="operator">=</span> <span class="keyword">keys</span> <span class="variable">%</span><span class="operator">{</span><span class="variable">$list</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="operator">...</span>
+        <span class="keyword">return</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">$list</span><span class="operator">-&gt;</span><span class="operator">{</span> <span class="variable">$element</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">()</span> <span class="operator">}</span><span class="operator">;</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h3 id="enumeration">&quot;enumeration&quot;</h3>
+
+<p>Implemented in <a href="../../../lib/Perl/Critic/PolicyParameter/Behavior/Enumeration.html">Perl::Critic::PolicyParameter::Behavior::Enumeration</a>.</p>
+
+<p>The values will be derived by splitting the input string on blanks. (See <a href="../../../lib/Perl/Critic/Utils.html#words_from_string">&quot;words_from_string&quot; in Perl::Critic::Utils</a>.) Depending upon the value of the <code>enumeration_allow_multiple_values</code> option, the parameter will be stored as a string or a reference to a hash, with the values being the keys.</p>
+
+<p>This behavior takes one required option and one optional one. A value for <code>enumeration_values</code> of a reference to an array of valid strings is required. A true value can be specified for <code>enumeration_allow_multiple_values</code> to allow the user to pick more than one value, but this defaults to false.</p>
+
+<h4 id="supported_parameters-example4"><code>supported_parameters()</code> example</h4>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Perl::Critic::Utils</span> <span class="string">qw{ :characters }</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>               <span class="operator">=&gt;</span> <span class="string">'a_single_valued_enumeration'</span><span class="operator">,</span>
+                <span class="string">description</span>        <span class="operator">=&gt;</span>
+                    <span class="string">'An example enumeration that can only have a single value.'</span><span class="operator">,</span>
+                <span class="string">default_string</span>     <span class="operator">=&gt;</span> <span class="variable">$EMPTY</span><span class="operator">,</span>
+                <span class="string">behavior</span>           <span class="operator">=&gt;</span> <span class="string">'enumeration'</span><span class="operator">,</span>
+                <span class="string">enumeration_values</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw{ block statement pod operator }</span> <span class="operator">]</span><span class="operator">,</span>
+                <span class="string">enumeration_allow_multiple_values</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>               <span class="operator">=&gt;</span> <span class="string">'a_multi_valued_enumeration'</span><span class="operator">,</span>
+                <span class="string">description</span>        <span class="operator">=&gt;</span>
+                    <span class="string">'An example enumeration that can have multiple values.'</span><span class="operator">,</span>
+                <span class="string">default_string</span>     <span class="operator">=&gt;</span> <span class="string">'fe'</span><span class="operator">,</span>
+                <span class="string">behavior</span>           <span class="operator">=&gt;</span> <span class="string">'enumeration'</span><span class="operator">,</span>
+                <span class="string">enumeration_values</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw{ fe fi fo fum }</span> <span class="operator">]</span><span class="operator">,</span>
+                <span class="string">enumeration_allow_multiple_values</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h4 id="Access-example4">Access example</h4>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> violates </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$element</span><span class="operator">,</span> <span class="variable">$document</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+        <span class="keyword">my</span> <span class="variable">$single_value</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_a_single_valued_enumeration</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="operator">...</span>
+        <span class="keyword">my</span> <span class="variable">$multi_value</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_a_multi_valued_enumeration</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$multi_value</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">fum</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Using-a-Custom-Parser">Using a Custom Parser</h2>
+
+<p>If none of the behaviors does exactly what you want it to, you can provide your own parser for a parameter. The reason for doing this as opposed to using an implementation of <code>initialize_if_enabled()</code> is that it allows you to use a behavior to provide its extra functionality and it provides a means for a <code>Perl::Critic</code> configuration program, e.g. an IDE that integrates <code>Perl::Critic</code>, to validate your parameter as the user modifies its value.</p>
+
+<p>The way you declare that you have a custom parser is to include a reference to it in the parameter specification with the <code>parser</code> key. For example:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> supported_parameters </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="operator">(</span>
+            <span class="operator">{</span>
+                <span class="string">name</span>           <span class="operator">=&gt;</span> <span class="string">'file_name'</span><span class="operator">,</span>
+                <span class="string">description</span>    <span class="operator">=&gt;</span> <span class="string">'A file for to read a list of values from.'</span><span class="operator">,</span>
+                <span class="string">default_string</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span>
+                <span class="string">behavior</span>       <span class="operator">=&gt;</span> <span class="string">'string'</span><span class="operator">,</span>
+                <span class="string">parser</span>         <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">_parse_file_name</span><span class="operator">,</span>
+            <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>A parser is a method on a subclass of <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> that takes two parameters: the <a href="../../../lib/Perl/Critic/PolicyParameter.html">Perl::Critic::PolicyParameter</a> that is being specified and the value string provided by the user. The method is responsible for dealing with any default value and for saving the parsed value for later use by the <code>violates()</code> method.</p>
+
+<p>An example parser (without enough error handling) for the above example declaration:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Path::Tiny</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Perl::Critic::Exception::Configuration::Option::Policy::ParameterValue</span>
+        <span class="string">qw{ throw_policy_value }</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> _parse_file_name </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$parameter</span><span class="operator">,</span> <span class="variable">$config_string</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">@thingies</span><span class="operator">;</span>
+    
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$config_string</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">not</span> <span class="keyword">-r</span> <span class="variable">$config_string</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="variable">throw_policy_value</span>
+                    <span class="string">policy</span>         <span class="operator">=&gt;</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">get_short_name</span><span class="operator">(),</span>
+                    <span class="string">option_name</span>    <span class="operator">=&gt;</span> <span class="variable">$parameter</span><span class="operator">-&gt;</span><span class="variable">get_name</span><span class="operator">(),</span>
+                    <span class="string">option_value</span>   <span class="operator">=&gt;</span> <span class="variable">$config_string</span><span class="operator">,</span>
+                    <span class="string">message_suffix</span> <span class="operator">=&gt;</span> <span class="string">'is not readable.'</span><span class="operator">;</span>
+            <span class="operator">}</span>
+    
+            <span class="variable">@thingies</span> <span class="operator">=</span> <span class="variable">path</span><span class="operator">(</span><span class="variable">$config_string</span><span class="operator">)-&gt;</span><span class="variable">slurp</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_thingies</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">@thingies</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Note that, if the value for the parameter is not valid, an instance of <a href="../../../lib/Perl/Critic/Exception/Configuration/Option/Policy/ParameterValue.html">Perl::Critic::Exception::Configuration::Option::Policy::ParameterValue</a> is thrown. This allows <code>Perl::Critic</code> to include that problem along with any other problems found with the user&#39;s configuration in a single error message.</p>
+
+<h2 id="Using-Both-supported_parameters-and-initialize_if_enabled">Using Both <code>supported_parameters()</code> and <code>initialize_if_enabled()</code></h2>
+
+<p>There are cases where a Policy needs additional initialization beyond configuration or where the way it acts depends upon the combination of multiple parameters. In such situations, you will need to create an implementation of <code>initialize_if_enabled()</code>. If you want to take advantage of the supplied parameter handling from within implementation of <code>initialize_if_enabled()</code>, note that the information from <code>supported_parameters()</code> will already have been used, with user-supplied parameter values validated and placed into the Policy by the time <code>initialize_if_enabled()</code> has been called. It is likely that you will not need to refer the contents of the <code>$config</code> parameter; just pull the information you need out of <code>$self</code>. In fact, any value for the parameter values will be gone.</p>
+
+<h2 id="Summary-of-permitted-hash-keys-in-supported_parameters">Summary of permitted hash keys in <code>supported_parameters()</code>.</h2>
+
+<h3 id="All-types">All types</h3>
+
+<dl>
+
+<dt id="name-mandatory">- &quot;name&quot; (mandatory)</dt>
+<dd>
+
+</dd>
+<dt id="description-optional">- &quot;description&quot; (optional)</dt>
+<dd>
+
+</dd>
+<dt id="behavior-optional">- &quot;behavior&quot; (optional)</dt>
+<dd>
+
+<p>Currently, one of:</p>
+
+<dl>
+
+<dt id="boolean1">&quot;boolean&quot;</dt>
+<dd>
+
+</dd>
+<dt id="enumeration1">&quot;enumeration&quot;</dt>
+<dd>
+
+</dd>
+<dt id="integer1">&quot;integer&quot;</dt>
+<dd>
+
+</dd>
+<dt id="string1">&quot;string&quot;</dt>
+<dd>
+
+</dd>
+<dt id="string-list1">&quot;string list&quot;</dt>
+<dd>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="default_string-optional">- &quot;default_string&quot; (optional)</dt>
+<dd>
+
+<p>A string representation of the default value of the parameter.</p>
+
+</dd>
+<dt id="parser-optional">- &quot;parser&quot; (optional)</dt>
+<dd>
+
+<p>A code ref to a custom parser for the parameter.</p>
+
+</dd>
+</dl>
+
+<h3 id="Enumerations">Enumerations</h3>
+
+<dl>
+
+<dt id="enumeration_values-mandatory">- &quot;enumeration_values&quot; (mandatory)</dt>
+<dd>
+
+<p>A mandatory reference to an array of strings.</p>
+
+</dd>
+<dt id="enumeration_allow_multiple_values-optional">- &quot;enumeration_allow_multiple_values&quot; (optional)</dt>
+<dd>
+
+<p>Boolean indicating whether or not the user is restricted to a single value.</p>
+
+</dd>
+</dl>
+
+<h3 id="Integers">Integers</h3>
+
+<dl>
+
+<dt id="integer_minimum-optional">- &quot;integer_minimum&quot; (optional)</dt>
+<dd>
+
+<p>Minimum allowed value, inclusive.</p>
+
+</dd>
+<dt id="integer_maximum-optional">- &quot;integer_maximum&quot; (optional)</dt>
+<dd>
+
+<p>Maximum allowed value, inclusive.</p>
+
+</dd>
+</dl>
+
+<h3 id="String-lists">String lists</h3>
+
+<dl>
+
+<dt id="list_always_present_values-optional">- &quot;list_always_present_values&quot; (optional)</dt>
+<dd>
+
+<p>A reference to an array of values that should always be included in the value of the parameter.</p>
+
+</dd>
+</dl>
+
+<h1 id="ADDITIONAL-FEATURES">ADDITIONAL FEATURES</h1>
+
+<h2 id="default_maximum_violations_per_document"><code>default_maximum_violations_per_document()</code></h2>
+
+<p>Certain problems that a Policy detects can be endemic to a particular file; if there&#39;s one violation, there&#39;s likely to be many. A good example of this is <a href="../../../lib/Perl/Critic/Policy/TestingAndDebugging/RequireUseStrict.html">Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict</a>; if there&#39;s one line before <a href="#use-strict">&quot;use strict&quot;</a>, there&#39;s a good chance that the entire file is missing <a href="#use-strict">&quot;use strict&quot;</a>. In such cases, it&#39;s not much help to the user to report every single violation. If you&#39;ve got such a policy, you should override <a href="../../../lib/Perl/Critic/Policy.html#default_maximum_violations_per_document">default_maximum_violations_per_document()</a> method to provide a limit. The user can override this value with a value for &quot;maximum_violations_per_document&quot; in their <i>.perlcriticrc</i>.</p>
+
+<p>See the source code for <a href="../../../lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitMagicNumbers.html">Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers</a> and <a href="../../../lib/Perl/Critic/Policy/TestingAndDebugging/RequireUseWarnings.html">Perl::Critic::Policy::TestingAndDebugging::RequireUseWarnings</a> for examples.</p>
+
+<h2 id="is_safe"><code>is_safe()</code></h2>
+
+<p>Most <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> Policies are purely <i>static</i>. In other words, they never compile or execute any of the source code that they analyze. However it is possible to write <i>dynamic</i> Policies that do compile or execute code, which may result in unsafe operations (see <a>Perl::Critic::Dynamic</a> for an example). So the <code>is_safe()</code> method is used to indicate whether a Policy can be trusted to not cause mischief. By default, <code>is_safe()</code> returns true. But if you are writing a Policy that will compile or execute any of the source code that it analyzes, then you should override the <code>is_safe()</code> method to return false.</p>
+
+<h1 id="DISTRIBUTING-YOUR-POLICIES">DISTRIBUTING YOUR POLICIES</h1>
+
+<h2 id="Create-a-Distribution">Create a Distribution</h2>
+
+<p>You need to come up with a name for your set of policies. Sets of add-on policies are generally named <code>Perl::Critic::<i>something</i></code>, e.g. <a>Perl::Critic::More</a>.</p>
+
+<p>The module representing the distribution will not actually have any functionality; it&#39;s just documentation and a name for users to use when installing via <a href="../../../lib/CPAN.html">CPAN</a>/<a>CPANPLUS</a>. The important part is that this will include a list of the included policies, with descriptions of each.</p>
+
+<p>A typical implementation will look like:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Perl::Critic::Example</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="string">'1.000000'</span><span class="operator">;</span>
+    
+    <span class="number">1</span><span class="operator">;</span> <span class="comment"># Magic true value required at end of module</span>
+    
+    <span class="comment">__END__
+    
+    =head1 NAME
+    
+    Perl::Critic::Example - Policies for Perl::Critic that act as an example.
+    
+    =head1 AFFILIATION
+    
+    This module has no functionality, but instead contains documentation
+    for this distribution and acts as a means of pulling other modules
+    into a bundle.  All of the Policy modules contained herein will have
+    an "AFFILIATION" section announcing their participation in this
+    grouping.
+    
+    
+    =head1 SYNOPSIS
+    
+    Some L&lt;Perl::Critic|Perl::Critic&gt; policies that will help you keep your
+    code nice and compliant.
+    
+    
+    =head1 DESCRIPTION
+    
+    The included policies are:
+    
+    =over
+    
+    =item L&lt;Perl::Critic::Policy::Documentation::Example|Perl::Critic::Policy::Documentation::Example&gt;
+    
+    Complains about some example documentation issues.  [Default severity: 3]
+    
+    
+    =item L&lt;Perl::Critic::Policy::Variables::Example|Perl::Critic::Policy::Variables::Example&gt;
+    
+    All modules must have at least one variable.  [Default severity: 3]
+    
+    
+    =back
+    
+    
+    =head1 CONFIGURATION AND ENVIRONMENT
+    
+    All policies included are in the "example" theme.  See the
+    L&lt;Perl::Critic|Perl::Critic&gt; documentation for how to make use of this.
+    </span>
+</code></pre>
+
+<h2 id="Themes">Themes</h2>
+
+<p>Users can choose which policies to enable using themes. You should implement <code>default_themes()</code> so that users can take advantage of this. In particular, you should use a theme named after your distribution in all your policies; this should match the value listed in the <code>CONFIGURATION AND ENVIRONMENT</code> POD section as shown above.</p>
+
+<pre><code>    <span class="variable">default_themes</span> <span class="operator">{</span> <span class="keyword">return</span> <span class="string">qw&lt; example math &gt;</span> <span class="operator">}</span>
+</code></pre>
+
+<p>If you&#39;re looking for ideas of what themes to use, have a look at the output of <code>perlcritic --list-themes</code>.</p>
+
+<h2 id="Documentation">Documentation</h2>
+
+<h3 id="AFFILIATION">AFFILIATION</h3>
+
+<p>Since all policies have to go somewhere under the <code>Perl::Critic::Policy::</code> namespace, it isn&#39;t always clear what distribution a policy came from when browsing through their documentation. For this reason, you should include an <code>AFFILIATION</code> section in the POD for all of your policies that state where the policy comes from. For example:</p>
+
+<pre><code>    =head1 AFFILIATION
+
+    This policy is part of L&lt;Perl::Critic::Example|Perl::Critic::Example&gt;.</code></pre>
+
+<h3 id="CONFIGURATION">CONFIGURATION</h3>
+
+<p>In order to make it clear what can be done with a policy, you should always include a <code>CONFIGURATION</code> section in your POD, even if it&#39;s only to say:</p>
+
+<pre><code>    =head1 CONFIGURATION
+
+    This Policy is not configurable except for the standard options.</code></pre>
+
+<h1 id="TESTING-YOUR-POLICY">TESTING YOUR POLICY</h1>
+
+<p>The <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> distribution also contains a framework for testing your Policy. See <a href="../../../lib/Perl/Critic/TestUtils.html">Perl::Critic::TestUtils</a> for the details.</p>
+
+<h1 id="HINT">HINT</h1>
+
+<p>When you&#39;re trying to figure out what <a href="../../../lib/PPI.html">PPI</a> is going to hand you for a chunk of code, there is a <i>tools/ppidump</i> program in the <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> distribution that will help you. For example, when developing the above RequireBlockGrep example, you might want to try</p>
+
+<pre><code>    <span class="variable">tools</span><span class="operator">/</span><span class="variable">ppidump</span> <span class="string">'@matches = grep /pattern/, @list;'</span>
+</code></pre>
+
+<p>and</p>
+
+<pre><code>    <span class="variable">tools</span><span class="operator">/</span><span class="variable">ppidump</span> <span class="string">'@matches = grep { /pattern/ } @list;'</span>
+</code></pre>
+
+<p>to see the differences between the two cases.</p>
+
+<p>Alternatively, see the <code>ppi_dumper</code> documentation at <a href="http://search.cpan.org/dist/App-PPI-Dumper/script/ppi_dumper">http://search.cpan.org/dist/App-PPI-Dumper/script/ppi_dumper</a> and the <code>PPI::Tester</code> documentation at <a href="http://search.cpan.org/dist/PPI-Tester/lib/PPI/Tester.pm">http://search.cpan.org/dist/PPI-Tester/lib/PPI/Tester.pm</a>.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This is part of <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> version 1.116.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Chas. Owens has a blog post about developing in-house policies at <a href="http://svok.blogspot.com/2009/09/adding-house-policies-to-perlcritic.html">http://svok.blogspot.com/2009/09/adding-house-policies-to-perlcritic.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

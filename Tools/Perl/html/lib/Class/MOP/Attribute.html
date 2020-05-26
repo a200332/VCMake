@@ -1,0 +1,644 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Creation">Creation</a></li>
+      <li><a href="#Informational">Informational</a></li>
+      <li><a href="#Informational-predicates">Informational predicates</a></li>
+      <li><a href="#Value-management">Value management</a></li>
+      <li><a href="#Class-association">Class association</a></li>
+      <li><a href="#Attribute-Accessor-generation">Attribute Accessor generation</a></li>
+      <li><a href="#Introspection">Introspection</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::MOP::Attribute - Attribute Meta Object</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">accessor</span>  <span class="operator">=&gt;</span> <span class="string">'foo'</span><span class="operator">,</span>           <span class="comment"># dual purpose get/set accessor</span>
+          <span class="string">predicate</span> <span class="operator">=&gt;</span> <span class="string">'has_foo'</span><span class="operator">,</span>       <span class="comment"># predicate check for defined-ness</span>
+          <span class="string">init_arg</span>  <span class="operator">=&gt;</span> <span class="string">'-foo'</span><span class="operator">,</span>          <span class="comment"># class-&gt;new will look for a -foo key</span>
+          <span class="string">default</span>   <span class="operator">=&gt;</span> <span class="string">'BAR IS BAZ!'</span>    <span class="comment"># if no -foo key is provided, use this</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">reader</span>    <span class="operator">=&gt;</span> <span class="string">'bar'</span><span class="operator">,</span>           <span class="comment"># getter</span>
+          <span class="string">writer</span>    <span class="operator">=&gt;</span> <span class="string">'set_bar'</span><span class="operator">,</span>       <span class="comment"># setter</span>
+          <span class="string">predicate</span> <span class="operator">=&gt;</span> <span class="string">'has_bar'</span><span class="operator">,</span>       <span class="comment"># predicate check for defined-ness</span>
+          <span class="string">init_arg</span>  <span class="operator">=&gt;</span> <span class="string">':bar'</span><span class="operator">,</span>          <span class="comment"># class-&gt;new will look for a :bar key</span>
+                                        <span class="comment"># no default value means it is undef</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The Attribute Protocol is almost entirely an invention of <code>Class::MOP</code>. Perl 5 does not have a consistent notion of attributes. There are so many ways in which this is done, and very few (if any) are easily discoverable by this module.</p>
+
+<p>With that said, this module attempts to inject some order into this chaos, by introducing a consistent API which can be used to create object attributes.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Creation">Creation</h2>
+
+<dl>
+
+<dt id="Class::MOP::Attribute-new-name-options"><b>Class::MOP::Attribute-&gt;new($name, ?%options)</b></dt>
+<dd>
+
+<p>An attribute must (at the very least), have a <code>$name</code>. All other <code>%options</code> are added as key-value pairs.</p>
+
+<ul>
+
+<li><p>init_arg</p>
+
+<p>This is a string value representing the expected key in an initialization hash. For instance, if we have an <code>init_arg</code> value of <code>-foo</code>, then the following code will Just Work.</p>
+
+<pre><code>  <span class="variable">MyClass</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">new_object</span><span class="operator">(</span> <span class="string">-foo</span> <span class="operator">=&gt;</span> <span class="string">'Hello There'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If an init_arg is not assigned, it will automatically use the attribute&#39;s name. If <code>init_arg</code> is explicitly set to <code>undef</code>, the attribute cannot be specified during initialization.</p>
+
+</li>
+<li><p>builder</p>
+
+<p>This provides the name of a method that will be called to initialize the attribute. This method will be called on the object after it is constructed. It is expected to return a valid value for the attribute.</p>
+
+</li>
+<li><p>default</p>
+
+<p>This can be used to provide an explicit default for initializing the attribute. If the default you provide is a subroutine reference, then this reference will be called <i>as a method</i> on the object.</p>
+
+<p>If the value is a simple scalar (string or number), then it can be just passed as is. However, if you wish to initialize it with a HASH or ARRAY ref, then you need to wrap that inside a subroutine reference:</p>
+
+<pre><code>  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[]</span> <span class="operator">},</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+  
+  <span class="comment"># or ...</span>
+  
+  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">{}</span> <span class="operator">},</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>If you wish to initialize an attribute with a subroutine reference itself, then you need to wrap that in a subroutine as well:</p>
+
+<pre><code>  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+              <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">print</span> <span class="string">"Hello World"</span> <span class="operator">}</span>
+          <span class="operator">},</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>And lastly, if the value of your attribute is dependent upon some other aspect of the instance structure, then you can take advantage of the fact that when the <code>default</code> value is called as a method:</p>
+
+<pre><code>  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'object_identity'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">Scalar::Util::refaddr</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">)</span> <span class="operator">},</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Note that there is no guarantee that attributes are initialized in any particular order, so you cannot rely on the value of some other attribute when generating the default.</p>
+
+</li>
+<li><p>initializer</p>
+
+<p>This option can be either a method name or a subroutine reference. This method will be called when setting the attribute&#39;s value in the constructor. Unlike <code>default</code> and <code>builder</code>, the initializer is only called when a value is provided to the constructor. The initializer allows you to munge this value during object construction.</p>
+
+<p>The initializer is called as a method with three arguments. The first is the value that was passed to the constructor. The second is a subroutine reference that can be called to actually set the attribute&#39;s value, and the last is the associated <code>Class::MOP::Attribute</code> object.</p>
+
+<p>This contrived example shows an initializer that sets the attribute to twice the given value.</p>
+
+<pre><code>  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'doubled'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">initializer</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+              <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">,</span> <span class="variable">$set</span><span class="operator">,</span> <span class="variable">$attr</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+              <span class="variable">$set</span><span class="operator">-&gt;(</span> <span class="variable">$value</span> <span class="operator">*</span> <span class="number">2</span> <span class="operator">);</span>
+          <span class="operator">},</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Since an initializer can be a method name, you can easily make attribute initialization use the writer:</p>
+
+<pre><code>  <span class="variable">Class::MOP::Attribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">'some_attr'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+          <span class="string">writer</span>      <span class="operator">=&gt;</span> <span class="string">'some_attr'</span><span class="operator">,</span>
+          <span class="string">initializer</span> <span class="operator">=&gt;</span> <span class="string">'some_attr'</span><span class="operator">,</span>
+      <span class="operator">)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Your writer (actually, a wrapper around the writer, using <a href="../../../lib/Moose/Manual/MethodModifiers.html">method modifications</a>) will need to examine <code>@_</code> and determine under which context it is being called:</p>
+
+<pre><code>  <span class="variable">around</span> <span class="string">'some_attr'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$orig</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="comment"># $value is not defined if being called as a reader</span>
+      <span class="comment"># $setter and $attr are only defined if being called as an initializer</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$value</span><span class="operator">,</span> <span class="variable">$setter</span><span class="operator">,</span> <span class="variable">$attr</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="comment"># the reader behaves normally</span>
+      <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="comment"># mutate $value as desired</span>
+      <span class="comment"># $value = &lt;something($value);</span>
+  
+      <span class="comment"># if called as an initializer, set the value and we're done</span>
+      <span class="keyword">return</span> <span class="variable">$setter</span><span class="operator">-&gt;(</span><span class="variable">$row</span><span class="operator">)</span> <span class="keyword">if</span> <span class="variable">$setter</span><span class="operator">;</span>
+  
+      <span class="comment"># otherwise, call the real writer with the new value</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$orig</span><span class="operator">(</span><span class="variable">$row</span><span class="operator">);</span>
+  <span class="operator">};</span>
+</code></pre>
+
+</li>
+</ul>
+
+<p>The <code>accessor</code>, <code>reader</code>, <code>writer</code>, <code>predicate</code> and <code>clearer</code> options all accept the same parameters. You can provide the name of the method, in which case an appropriate default method will be generated for you. Or instead you can also provide hash reference containing exactly one key (the method name) and one value. The value should be a subroutine reference, which will be installed as the method itself.</p>
+
+<ul>
+
+<li><p>accessor</p>
+
+<p>An <code>accessor</code> is a standard Perl-style read/write accessor. It will return the value of the attribute, and if a value is passed as an argument, it will assign that value to the attribute.</p>
+
+<p>Note that <code>undef</code> is a legitimate value, so this will work:</p>
+
+<pre><code>  <span class="variable">$object</span><span class="operator">-&gt;</span><span class="variable">set_something</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>reader</p>
+
+<p>This is a basic read-only accessor. It returns the value of the attribute.</p>
+
+</li>
+<li><p>writer</p>
+
+<p>This is a basic write accessor, it accepts a single argument, and assigns that value to the attribute.</p>
+
+<p>Note that <code>undef</code> is a legitimate value, so this will work:</p>
+
+<pre><code>  <span class="variable">$object</span><span class="operator">-&gt;</span><span class="variable">set_something</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>predicate</p>
+
+<p>The predicate method returns a boolean indicating whether or not the attribute has been explicitly set.</p>
+
+<p>Note that the predicate returns true even if the attribute was set to a false value (<code>0</code> or <code>undef</code>).</p>
+
+</li>
+<li><p>clearer</p>
+
+<p>This method will uninitialize the attribute. After an attribute is cleared, its <code>predicate</code> will return false.</p>
+
+</li>
+<li><p>definition_context</p>
+
+<p>Mostly, this exists as a hook for the benefit of Moose.</p>
+
+<p>This option should be a hash reference containing several keys which will be used when inlining the attribute&#39;s accessors. The keys should include <code>line</code>, the line number where the attribute was created, and either <code>file</code> or <code>description</code>.</p>
+
+<p>This information will ultimately be used when eval&#39;ing inlined accessor code so that error messages report a useful line and file name.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="attr-clone-options"><b>$attr-&gt;clone(%options)</b></dt>
+<dd>
+
+<p>This clones the attribute. Any options you provide will override the settings of the original attribute. You can change the name of the new attribute by passing a <code>name</code> key in <code>%options</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Informational">Informational</h2>
+
+<p>These are all basic read-only accessors for the values passed into the constructor.</p>
+
+<dl>
+
+<dt id="attr-name"><b>$attr-&gt;name</b></dt>
+<dd>
+
+<p>Returns the attribute&#39;s name.</p>
+
+</dd>
+<dt id="attr-accessor"><b>$attr-&gt;accessor</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-reader"><b>$attr-&gt;reader</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-writer"><b>$attr-&gt;writer</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-predicate"><b>$attr-&gt;predicate</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-clearer"><b>$attr-&gt;clearer</b></dt>
+<dd>
+
+<p>The <code>accessor</code>, <code>reader</code>, <code>writer</code>, <code>predicate</code>, and <code>clearer</code> methods all return exactly what was passed to the constructor, so it can be either a string containing a method name, or a hash reference.</p>
+
+</dd>
+<dt id="attr-initializer"><b>$attr-&gt;initializer</b></dt>
+<dd>
+
+<p>Returns the initializer as passed to the constructor, so this may be either a method name or a subroutine reference.</p>
+
+</dd>
+<dt id="attr-init_arg"><b>$attr-&gt;init_arg</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-is_default_a_coderef"><b>$attr-&gt;is_default_a_coderef</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-builder"><b>$attr-&gt;builder</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-default-instance"><b>$attr-&gt;default($instance)</b></dt>
+<dd>
+
+<p>The <code>$instance</code> argument is optional. If you don&#39;t pass it, the return value for this method is exactly what was passed to the constructor, either a simple scalar or a subroutine reference.</p>
+
+<p>If you <i>do</i> pass an <code>$instance</code> and the default is a subroutine reference, then the reference is called as a method on the <code>$instance</code> and the generated value is returned.</p>
+
+</dd>
+<dt id="attr-slots"><b>$attr-&gt;slots</b></dt>
+<dd>
+
+<p>Return a list of slots required by the attribute. This is usually just one, the name of the attribute.</p>
+
+<p>A slot is the name of the hash key used to store the attribute in an object instance.</p>
+
+</dd>
+<dt id="attr-get_read_method"><b>$attr-&gt;get_read_method</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-get_write_method"><b>$attr-&gt;get_write_method</b></dt>
+<dd>
+
+<p>Returns the name of a method suitable for reading or writing the value of the attribute in the associated class.</p>
+
+<p>If an attribute is read- or write-only, then these methods can return <code>undef</code> as appropriate.</p>
+
+</dd>
+<dt id="attr-has_read_method"><b>$attr-&gt;has_read_method</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_write_method"><b>$attr-&gt;has_write_method</b></dt>
+<dd>
+
+<p>This returns a boolean indicating whether the attribute has a <i>named</i> read or write method.</p>
+
+</dd>
+<dt id="attr-get_read_method_ref"><b>$attr-&gt;get_read_method_ref</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-get_write_method_ref"><b>$attr-&gt;get_write_method_ref</b></dt>
+<dd>
+
+<p>Returns the subroutine reference of a method suitable for reading or writing the attribute&#39;s value in the associated class. These methods always return a subroutine reference, regardless of whether or not the attribute is read- or write-only.</p>
+
+</dd>
+<dt id="attr-insertion_order"><b>$attr-&gt;insertion_order</b></dt>
+<dd>
+
+<p>If this attribute has been inserted into a class, this returns a zero based index regarding the order of insertion.</p>
+
+</dd>
+</dl>
+
+<h2 id="Informational-predicates">Informational predicates</h2>
+
+<p>These are all basic predicate methods for the values passed into <code>new</code>.</p>
+
+<dl>
+
+<dt id="attr-has_accessor"><b>$attr-&gt;has_accessor</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_reader"><b>$attr-&gt;has_reader</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_writer"><b>$attr-&gt;has_writer</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_predicate"><b>$attr-&gt;has_predicate</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_clearer"><b>$attr-&gt;has_clearer</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_initializer"><b>$attr-&gt;has_initializer</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_init_arg"><b>$attr-&gt;has_init_arg</b></dt>
+<dd>
+
+<p>This will be <i>false</i> if the <code>init_arg</code> was set to <code>undef</code>.</p>
+
+</dd>
+<dt id="attr-has_default"><b>$attr-&gt;has_default</b></dt>
+<dd>
+
+<p>This will be <i>false</i> if the <code>default</code> was set to <code>undef</code>, since <code>undef</code> is the default <code>default</code> anyway.</p>
+
+</dd>
+<dt id="attr-has_builder"><b>$attr-&gt;has_builder</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-has_insertion_order"><b>$attr-&gt;has_insertion_order</b></dt>
+<dd>
+
+<p>This will be <i>false</i> if this attribute has not be inserted into a class</p>
+
+</dd>
+</dl>
+
+<h2 id="Value-management">Value management</h2>
+
+<p>These methods are basically &quot;back doors&quot; to the instance, and can be used to bypass the regular accessors, but still stay within the MOP.</p>
+
+<p>These methods are not for general use, and should only be used if you really know what you are doing.</p>
+
+<dl>
+
+<dt id="attr-initialize_instance_slot-meta_instance-instance-params"><b>$attr-&gt;initialize_instance_slot($meta_instance, $instance, $params)</b></dt>
+<dd>
+
+<p>This method is used internally to initialize the attribute&#39;s slot in the object <code>$instance</code>.</p>
+
+<p>The <code>$params</code> is a hash reference of the values passed to the object constructor.</p>
+
+<p>It&#39;s unlikely that you&#39;ll need to call this method yourself.</p>
+
+</dd>
+<dt id="attr-set_value-instance-value"><b>$attr-&gt;set_value($instance, $value)</b></dt>
+<dd>
+
+<p>Sets the value without going through the accessor. Note that this works even with read-only attributes.</p>
+
+</dd>
+<dt id="attr-set_raw_value-instance-value"><b>$attr-&gt;set_raw_value($instance, $value)</b></dt>
+<dd>
+
+<p>Sets the value with no side effects such as a trigger.</p>
+
+<p>This doesn&#39;t actually apply to Class::MOP attributes, only to subclasses.</p>
+
+</dd>
+<dt id="attr-set_initial_value-instance-value"><b>$attr-&gt;set_initial_value($instance, $value)</b></dt>
+<dd>
+
+<p>Sets the value without going through the accessor. This method is only called when the instance is first being initialized.</p>
+
+</dd>
+<dt id="attr-get_value-instance"><b>$attr-&gt;get_value($instance)</b></dt>
+<dd>
+
+<p>Returns the value without going through the accessor. Note that this works even with write-only accessors.</p>
+
+</dd>
+<dt id="attr-get_raw_value-instance"><b>$attr-&gt;get_raw_value($instance)</b></dt>
+<dd>
+
+<p>Returns the value without any side effects such as lazy attributes.</p>
+
+<p>Doesn&#39;t actually apply to Class::MOP attributes, only to subclasses.</p>
+
+</dd>
+<dt id="attr-has_value-instance"><b>$attr-&gt;has_value($instance)</b></dt>
+<dd>
+
+<p>Return a boolean indicating whether the attribute has been set in <code>$instance</code>. This how the default <code>predicate</code> method works.</p>
+
+</dd>
+<dt id="attr-clear_value-instance"><b>$attr-&gt;clear_value($instance)</b></dt>
+<dd>
+
+<p>This will clear the attribute&#39;s value in <code>$instance</code>. This is what the default <code>clearer</code> calls.</p>
+
+<p>Note that this works even if the attribute does not have any associated read, write or clear methods.</p>
+
+</dd>
+</dl>
+
+<h2 id="Class-association">Class association</h2>
+
+<p>These methods allow you to manage the attributes association with the class that contains it. These methods should not be used lightly, nor are they very magical, they are mostly used internally and by metaclass instances.</p>
+
+<dl>
+
+<dt id="attr-associated_class"><b>$attr-&gt;associated_class</b></dt>
+<dd>
+
+<p>This returns the <a href="../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> with which this attribute is associated, if any.</p>
+
+</dd>
+<dt id="attr-attach_to_class-metaclass"><b>$attr-&gt;attach_to_class($metaclass)</b></dt>
+<dd>
+
+<p>This method stores a weakened reference to the <code>$metaclass</code> object internally.</p>
+
+<p>This method does not remove the attribute from its old class, nor does it create any accessors in the new class.</p>
+
+<p>It is probably best to use the <a href="../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> <code>add_attribute</code> method instead.</p>
+
+</dd>
+<dt id="attr-detach_from_class"><b>$attr-&gt;detach_from_class</b></dt>
+<dd>
+
+<p>This method removes the associate metaclass object from the attribute it has one.</p>
+
+<p>This method does not remove the attribute itself from the class, or remove its accessors.</p>
+
+<p>It is probably best to use the <a href="../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> <code>remove_attribute</code> method instead.</p>
+
+</dd>
+</dl>
+
+<h2 id="Attribute-Accessor-generation">Attribute Accessor generation</h2>
+
+<dl>
+
+<dt id="attr-accessor_metaclass"><b>$attr-&gt;accessor_metaclass</b></dt>
+<dd>
+
+<p>Accessor methods are generated using an accessor metaclass. By default, this is <a href="../../../lib/Class/MOP/Method/Accessor.html">Class::MOP::Method::Accessor</a>. This method returns the name of the accessor metaclass that this attribute uses.</p>
+
+</dd>
+<dt id="attr-associate_method-method"><b>$attr-&gt;associate_method($method)</b></dt>
+<dd>
+
+<p>This associates a <a href="../../../lib/Class/MOP/Method.html">Class::MOP::Method</a> object with the attribute. Typically, this is called internally when an attribute generates its accessors.</p>
+
+</dd>
+<dt id="attr-associated_methods"><b>$attr-&gt;associated_methods</b></dt>
+<dd>
+
+<p>This returns the list of methods which have been associated with the attribute.</p>
+
+</dd>
+<dt id="attr-install_accessors"><b>$attr-&gt;install_accessors</b></dt>
+<dd>
+
+<p>This method generates and installs code the attributes various accessors. It is typically called from the <a href="../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> <code>add_attribute</code> method.</p>
+
+</dd>
+<dt id="attr-remove_accessors"><b>$attr-&gt;remove_accessors</b></dt>
+<dd>
+
+<p>This method removes all of the accessors associated with the attribute.</p>
+
+<p>This does not currently remove methods from the list returned by <code>associated_methods</code>.</p>
+
+</dd>
+<dt id="attr-inline_get"><b>$attr-&gt;inline_get</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-inline_set"><b>$attr-&gt;inline_set</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-inline_has"><b>$attr-&gt;inline_has</b></dt>
+<dd>
+
+</dd>
+<dt id="attr-inline_clear"><b>$attr-&gt;inline_clear</b></dt>
+<dd>
+
+<p>These methods return a code snippet suitable for inlining the relevant operation. They expect strings containing variable names to be used in the inlining, like <code>&#39;$self&#39;</code> or <code>&#39;$_[1]&#39;</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Introspection">Introspection</h2>
+
+<dl>
+
+<dt id="Class::MOP::Attribute-meta"><b>Class::MOP::Attribute-&gt;meta</b></dt>
+<dd>
+
+<p>This will return a <a href="../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> instance for this class.</p>
+
+<p>It should also be noted that <a href="../../../lib/Class/MOP.html">Class::MOP</a> will actually bootstrap this module by installing a number of attribute meta-objects into its metaclass.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

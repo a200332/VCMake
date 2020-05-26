@@ -1,0 +1,200 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Implementations">Implementations</a>
+        <ul>
+          <li><a href="#Linux-BSD-and-other-UNIXes">Linux, *BSD and other UNIXes</a></li>
+          <li><a href="#Modern-Windows-including-NT-XP-Vista-7-8-10-etc">Modern Windows (including NT, XP, Vista, 7, 8, 10 etc)</a></li>
+          <li><a href="#Cygwin">Cygwin</a></li>
+          <li><a href="#Windows-95-98-ME-MS-DOS-OS-2">Windows 95, 98, ME, MS-DOS, OS/2</a></li>
+          <li><a href="#VMS">VMS</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#which">which</a></li>
+      <li><a href="#where">where</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>File::Which - Perl implementation of the which utility as an API</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.22</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">File::Which</span><span class="operator">;</span>                  <span class="comment"># exports which()</span>
+ <span class="keyword">use</span> <span class="variable">File::Which</span> <span class="string">qw(which where)</span><span class="operator">;</span>  <span class="comment"># exports which() and where()</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$exe_path</span> <span class="operator">=</span> <span class="variable">which</span> <span class="string">'perldoc'</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">where</span> <span class="string">'perl'</span><span class="operator">;</span>
+ <span class="comment"># Or</span>
+ <span class="keyword">my</span> <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">which</span> <span class="string">'perl'</span><span class="operator">;</span> <span class="comment"># an array forces search for all of them</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><a href="../../lib/File/Which.html">File::Which</a> finds the full or relative paths to executable programs on the system. This is normally the function of <code>which</code> utility. <code>which</code> is typically implemented as either a program or a built in shell command. On some platforms, such as Microsoft Windows it is not provided as part of the core operating system. This module provides a consistent API to this functionality regardless of the underlying platform.</p>
+
+<p>The focus of this module is correctness and portability. As a consequence platforms where the current directory is implicitly part of the search path such as Microsoft Windows will find executables in the current directory, whereas on platforms such as UNIX where this is not the case executables in the current directory will only be found if the current directory is explicitly added to the path.</p>
+
+<p>If you need a portable <code>which</code> on the command line in an environment that does not provide it, install <a>App::pwhich</a> which provides a command line interface to this API.</p>
+
+<h2 id="Implementations">Implementations</h2>
+
+<p><a href="../../lib/File/Which.html">File::Which</a> searches the directories of the user&#39;s <code>PATH</code> (the current implementation uses <a>File::Spec#path</a> to determine the correct <code>PATH</code>), looking for executable files having the name specified as a parameter to <a href="#which">&quot;which&quot;</a>. Under Win32 systems, which do not have a notion of directly executable files, but uses special extensions such as <code>.exe</code> and <code>.bat</code> to identify them, <code>File::Which</code> takes extra steps to assure that you will find the correct file (so for example, you might be searching for <code>perl</code>, it&#39;ll try <i>perl.exe</i>, <i>perl.bat</i>, etc.)</p>
+
+<h3 id="Linux-BSD-and-other-UNIXes">Linux, *BSD and other UNIXes</h3>
+
+<p>There should not be any surprises here. The current directory will not be searched unless it is explicitly added to the path.</p>
+
+<h3 id="Modern-Windows-including-NT-XP-Vista-7-8-10-etc">Modern Windows (including NT, XP, Vista, 7, 8, 10 etc)</h3>
+
+<p>Windows NT has a special environment variable called <code>PATHEXT</code>, which is used by the shell to look for executable files. Usually, it will contain a list in the form <code><span class="operator">.</span><span class="variable">EXE</span><span class="operator">;.</span><span class="variable">BAT</span><span class="operator">;.</span><span class="variable">COM</span><span class="operator">;.</span><span class="variable">JS</span><span class="operator">;.</span><span class="variable">VBS</span>
+</code> etc. If <code>File::Which</code> finds such an environment variable, it parses the list and uses it as the different extensions.</p>
+
+<h3 id="Cygwin">Cygwin</h3>
+
+<p>Cygwin provides a Unix-like environment for Microsoft Windows users. In most ways it works like other Unix and Unix-like environments, but in a few key aspects it works like Windows. As with other Unix environments, the current directory is not included in the search unless it is explicitly included in the search path. Like on Windows, files with <code>.EXE</code> or &lt;.BAT&gt; extensions will be discovered even if they are not part of the query. <code>.COM</code> or extensions specified using the <code>PATHEXT</code> environment variable will NOT be discovered without the fully qualified name, however.</p>
+
+<h3 id="Windows-95-98-ME-MS-DOS-OS-2">Windows 95, 98, ME, MS-DOS, OS/2</h3>
+
+<p>This set of operating systems don&#39;t have the <code>PATHEXT</code> variable, and usually you will find executable files there with the extensions <code>.exe</code>, <code>.bat</code> and (less likely) <code>.com</code>. <code>File::Which</code> uses this hardcoded list if it&#39;s running under Win32 but does not find a <code>PATHEXT</code> variable.</p>
+
+<p>As of 2015 none of these platforms are tested frequently (or perhaps ever), but the current maintainer is determined not to intentionally remove support for older operating systems.</p>
+
+<h3 id="VMS">VMS</h3>
+
+<p>Same case as Windows 9x: uses <code>.exe</code> and <code>.com</code> (in that order).</p>
+
+<p>As of 2015 the current maintainer does not test on VMS, and is in fact not certain it has ever been tested on VMS. If this platform is important to you and you can help me verify and or support it on that platform please contact me.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="which">which</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$path</span> <span class="operator">=</span> <span class="variable">which</span> <span class="variable">$short_exe_name</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">which</span> <span class="variable">$short_exe_name</span><span class="operator">;</span>
+</code></pre>
+
+<p>Exported by default.</p>
+
+<p><code>$short_exe_name</code> is the name used in the shell to call the program (for example, <code>perl</code>).</p>
+
+<p>If it finds an executable with the name you specified, <code>which()</code> will return the absolute path leading to this executable (for example, <i>/usr/bin/perl</i> or <i>C:\Perl\Bin\perl.exe</i>).</p>
+
+<p>If it does <i>not</i> find the executable, it returns <code>undef</code>.</p>
+
+<p>If <code>which()</code> is called in list context, it will return <i>all</i> the matches.</p>
+
+<h2 id="where">where</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">@paths</span> <span class="operator">=</span> <span class="variable">where</span> <span class="variable">$short_exe_name</span><span class="operator">;</span>
+</code></pre>
+
+<p>Not exported by default.</p>
+
+<p>Same as <a href="#which">&quot;which&quot;</a> in array context. Same as the <code>where</code> utility, will return an array containing all the path names matching <code>$short_exe_name</code>.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>This module has no non-core requirements for Perl 5.6.2 and better.</p>
+
+<p>This module is fully supported back to Perl 5.8.1. It may work on 5.8.0. It should work on Perl 5.6.x and I may even test on 5.6.2. I will accept patches to maintain compatibility for such older Perls, but you may need to fix it on 5.6.x / 5.8.0 and send me a patch.</p>
+
+<p>Not tested on VMS although there is platform specific code for those. Anyone who haves a second would be very kind to send me a report of how it went.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs should be reported via the GitHub issue tracker</p>
+
+<p><a href="https://github.com/plicease/File-Which/issues">https://github.com/plicease/File-Which/issues</a></p>
+
+<p>For other issues, contact the maintainer.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="pwhich-App::pwhich"><a>pwhich</a>, <a>App::pwhich</a></dt>
+<dd>
+
+<p>Command line interface to this module.</p>
+
+</dd>
+<dt id="IPC::Cmd"><a href="../../lib/IPC/Cmd.html">IPC::Cmd</a></dt>
+<dd>
+
+<p>Comes with a <code>can_run</code> function with slightly different semantics that the traditional UNIX where. It will find executables in the current directory, even though the current directory is not searched for by default on Unix.</p>
+
+</dd>
+<dt id="Devel::CheckBin"><a>Devel::CheckBin</a></dt>
+<dd>
+
+<p>This module purports to &quot;check that a command is available&quot;, but does not provide any documentation on how you might use it.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Per Einar Ellefsen &lt;pereinar@cpan.org&gt;</p>
+
+</li>
+<li><p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+</li>
+<li><p>Graham Ollis &lt;plicease@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2002 by Per Einar Ellefsen &lt;pereinar@cpan.org&gt;.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

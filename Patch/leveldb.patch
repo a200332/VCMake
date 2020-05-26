@@ -1,0 +1,80 @@
+ CMakeLists.txt    |  2 +-
+ port/port_win.h   |  2 +-
+ util/env_boost.cc | 10 +++++-----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 40a97d6..d35bd35 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -35,7 +35,7 @@ if(NOT QDB_VERSION)
+ 
+     set(Boost_USE_STATIC_LIBS ON)
+     set(Boost_USE_MULTITHREAD ON)
+-    set(Boost_USE_STATIC_RUNTIME OFF)
++    set(Boost_USE_STATIC_RUNTIME ON)
+ 
+     set(Boost_ADDITIONAL_VERSIONS)
+ 
+diff --git a/port/port_win.h b/port/port_win.h
+index db41683..d1e459a 100644
+--- a/port/port_win.h
++++ b/port/port_win.h
+@@ -31,7 +31,7 @@
+ #ifndef STORAGE_LEVELDB_PORT_PORT_WIN_H_
+ #define STORAGE_LEVELDB_PORT_PORT_WIN_H_
+ 
+-#define snprintf _snprintf
++//#define snprintf _snprintf
+ #define close _close
+ #define fread_unlocked _fread_nolock
+ 
+diff --git a/util/env_boost.cc b/util/env_boost.cc
+index a08c8aa..609dbc6 100644
+--- a/util/env_boost.cc
++++ b/util/env_boost.cc
+@@ -339,7 +339,7 @@ class PosixEnv : public Env {
+ 
+     boost::system::error_code ec;
+     boost::filesystem::directory_iterator current(dir, ec);
+-    if (ec != 0) {
++    if (ec) {
+       return Status::IOError(dir, ec.message());
+     }
+ 
+@@ -359,7 +359,7 @@ class PosixEnv : public Env {
+ 
+     Status result;
+ 
+-    if (ec != 0) {
++    if (ec) {
+       result = Status::IOError(fname, ec.message());
+     }
+ 
+@@ -400,7 +400,7 @@ class PosixEnv : public Env {
+     Status result;
+ 
+     *size = static_cast<uint64_t>(boost::filesystem::file_size(fname, ec));
+-    if (ec != 0) {
++    if (ec) {
+       *size = 0;
+        result = Status::IOError(fname, ec.message());
+     }
+@@ -415,7 +415,7 @@ class PosixEnv : public Env {
+ 
+     Status result;
+ 
+-    if (ec != 0) {
++    if (ec) {
+       result = Status::IOError(src, ec.message());
+     }
+ 
+@@ -471,7 +471,7 @@ class PosixEnv : public Env {
+     boost::system::error_code ec;
+     boost::filesystem::path temp_dir = 
+         boost::filesystem::temp_directory_path(ec);
+-    if (ec != 0) {
++    if (ec) {
+       temp_dir = "tmp";
+     }
+ 

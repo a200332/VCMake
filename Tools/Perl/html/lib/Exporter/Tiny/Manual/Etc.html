@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Utility-Functions">Utility Functions</a></li>
+      <li><a href="#History">History</a></li>
+      <li><a href="#Obligatory-Exporter-Comparison">Obligatory Exporter Comparison</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Exporter::Tiny::Manual::Etc - odds and ends</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="Utility-Functions">Utility Functions</h2>
+
+<p>Exporter::Tiny is itself an exporter!</p>
+
+<p>These functions are really for internal use, but can be exported if you need them:</p>
+
+<dl>
+
+<dt id="mkopt-array"><code>mkopt(\@array)</code></dt>
+<dd>
+
+<p>Similar to <code>mkopt</code> from <a href="../../../../lib/Data/OptList.html">Data::OptList</a>. It doesn&#39;t support all the fancy options that Data::OptList does (<code>moniker</code>, <code>require_unique</code>, <code>must_be</code> and <code>name_test</code>) but runs about 50% faster.</p>
+
+</dd>
+<dt id="mkopt_hash-array"><code>mkopt_hash(\@array)</code></dt>
+<dd>
+
+<p>Similar to <code>mkopt_hash</code> from <a href="../../../../lib/Data/OptList.html">Data::OptList</a>. See also <code>mkopt</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="History">History</h2>
+
+<p><a>Type::Library</a> had a bunch of custom exporting code which poked coderefs into its caller&#39;s stash. It needed this to be something more powerful than most exporters so that it could switch between exporting Moose, Mouse and Moo-compatible objects on request. <a href="../../../../lib/Sub/Exporter.html">Sub::Exporter</a> would have been capable, but had too many dependencies for the Type::Tiny project.</p>
+
+<p>Meanwhile <a>Type::Utils</a>, <a>Types::TypeTiny</a> and <a>Test::TypeTiny</a> each used the venerable <a href="../../../../lib/Exporter.html">Exporter.pm</a>. However, this meant they were unable to use the features like <a href="../../../../lib/Sub/Exporter.html">Sub::Exporter</a>-style function renaming which I&#39;d built into Type::Library:</p>
+
+<pre><code>   <span class="comment">## import "Str" but rename it to "String".</span>
+   <span class="keyword">use</span> <span class="variable">Types::Standard</span> <span class="string">"Str"</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">"String"</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>And so I decided to factor out code that could be shared by all Type-Tiny&#39;s exporters into a single place: Exporter::TypeTiny.</p>
+
+<p>As of version 0.026, Exporter::TypeTiny was also made available as <a href="../../../../lib/Exporter/Tiny.html">Exporter::Tiny</a>, distributed independently on CPAN. CHOCOLATEBOY had convinced me that it was mature enough to live a life of its own.</p>
+
+<p>As of version 0.030, Type-Tiny depends on Exporter::Tiny and Exporter::TypeTiny is being phased out.</p>
+
+<h2 id="Obligatory-Exporter-Comparison">Obligatory Exporter Comparison</h2>
+
+<p>Exporting is unlikely to be your application&#39;s performance bottleneck, but nonetheless here are some comparisons.</p>
+
+<p><b>Comparative sizes according to <a>Devel::SizeMe</a>:</b></p>
+
+<pre><code>   Exporter                     217.1Kb
+   Sub::Exporter::Progressive   263.2Kb
+   Exporter::Tiny               267.7Kb
+   Exporter + Exporter::Heavy   281.5Kb
+   Exporter::Renaming           406.2Kb
+   Sub::Exporter                701.0Kb</code></pre>
+
+<p><b>Performance exporting a single sub:</b></p>
+
+<pre><code>              Rate     SubExp    ExpTiny SubExpProg      ExpPM
+SubExp      2489/s         --       -56%       -85%       -88%
+ExpTiny     5635/s       126%         --       -67%       -72%
+SubExpProg 16905/s       579%       200%         --       -16%
+ExpPM      20097/s       707%       257%        19%         --</code></pre>
+
+<p>(Exporter::Renaming globally changes the behaviour of Exporter.pm, so could not be included in the same benchmarks.)</p>
+
+<p><b>(Non-Core) Dependencies:</b></p>
+
+<pre><code>   Exporter                    -1
+   Exporter::Renaming           0
+   Exporter::Tiny               0
+   Sub::Exporter::Progressive   0
+   Sub::Exporter                3</code></pre>
+
+<p><b>Features:</b></p>
+
+<pre><code>                                      ExpPM   ExpTiny SubExp  SubExpProg
+ Can export code symbols............. Yes     Yes     Yes     Yes      
+ Can export non-code symbols......... Yes                              
+ Groups/tags......................... Yes     Yes     Yes     Yes      
+ Export by regexp.................... Yes     Yes                      
+ Bang prefix......................... Yes     Yes                      
+ Allows renaming of subs.............         Yes     Yes     Maybe    
+ Install code into scalar refs.......         Yes     Yes     Maybe    
+ Can be passed an &quot;into&quot; parameter...         Yes     Yes     Maybe    
+ Can be passed an &quot;installer&quot; sub....         Yes     Yes     Maybe    
+ Config avoids package variables.....                 Yes              
+ Supports generators.................         Yes     Yes              
+ Sane API for generators.............         Yes     Yes              
+ Unimport............................         Yes                      </code></pre>
+
+<p>(Certain Sub::Exporter::Progressive features are only available if Sub::Exporter is installed.)</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../lib/Exporter/Shiny.html">Exporter::Shiny</a>, <a href="../../../../lib/Exporter/Tiny.html">Exporter::Tiny</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Toby Inkster &lt;tobyink@cpan.org&gt;.</p>
+
+<h1 id="COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</h1>
+
+<p>This software is copyright (c) 2013-2014, 2017 by Toby Inkster.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTIES">DISCLAIMER OF WARRANTIES</h1>
+
+<p>THIS PACKAGE IS PROVIDED &quot;AS IS&quot; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.</p>
+
+
+</body>
+
+</html>
+
+

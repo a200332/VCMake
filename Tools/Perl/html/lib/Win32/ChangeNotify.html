@@ -1,0 +1,189 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Methods">Methods</a></li>
+      <li><a href="#Deprecated-Functions-and-Methods">Deprecated Functions and Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#INCOMPATIBILITIES">INCOMPATIBILITIES</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+  <li><a href="#DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::ChangeNotify - Monitor events related to files and directories</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes version 1.09 of Win32::ChangeNotify, released November 15, 2014 as part of Win32-IPC version 1.11.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        <span class="keyword">require</span> <span class="variable">Win32::ChangeNotify</span><span class="operator">;</span>
+        
+        <span class="variable">$notify</span> <span class="operator">=</span> <span class="variable">Win32::ChangeNotify</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$Path</span><span class="operator">,</span><span class="variable">$WatchSubTree</span><span class="operator">,</span><span class="variable">$Events</span><span class="operator">);</span>
+        <span class="variable">$notify</span><span class="operator">-&gt;</span><span class="variable">wait</span> <span class="keyword">or</span> <span class="keyword">warn</span> <span class="string">"Something failed: $!\n"</span><span class="operator">;</span>
+        <span class="comment"># There has been a change.</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module allows the user to use a Win32 change notification event object from Perl. This allows the Perl program to monitor events relating to files and directory trees.</p>
+
+<p>Unfortunately, the Win32 API which implements this feature does not provide any indication of <i>what</i> triggered the notification (as far as I know). If you&#39;re monitoring a directory for file changes, and you need to know <i>which</i> file changed, you&#39;ll have to find some other way of determining that. Depending on exactly what you&#39;re trying to do, you may be able to check file timestamps to find recently changed files. Or, you may need to cache the directory contents somewhere and compare the current contents to your cached copy when you receive a change notification.</p>
+
+<p>The <code>wait</code> method and <code>wait_all</code> &amp; <code>wait_any</code> functions are inherited from the <a href="../../lib/Win32/IPC.html">Win32::IPC</a> module.</p>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="notify-Win32::ChangeNotify-new-path-subtree-filter">$notify = Win32::ChangeNotify-&gt;new($path, $subtree, $filter)</dt>
+<dd>
+
+<p>Constructor for a new ChangeNotification object. <code>$path</code> is the directory to monitor. If <code>$subtree</code> is true, then all directories under <code>$path</code> will be monitored. <code>$filter</code> indicates what events should trigger a notification. It should be a string containing any of the following flags (separated by whitespace and/or <code>|</code>).</p>
+
+<pre><code>   ATTRIBUTES   Any attribute change
+   DIR_NAME     Any directory name change
+   FILE_NAME    Any file name change (creating/deleting/renaming)
+   LAST_WRITE   Any change to a file&#39;s last write time
+   SECURITY     Any security descriptor change
+   SIZE         Any change in a file&#39;s size</code></pre>
+
+<p>(<code>$filter</code> can also be an integer composed from the <code>FILE_NOTIFY_CHANGE_*</code> constants.)</p>
+
+<p>Under Cygwin, <code>$path</code> must be a Windows pathname, not a Cygwin Unix-like pathname.</p>
+
+</dd>
+<dt id="notify-close">$notify-&gt;close</dt>
+<dd>
+
+<p>Shut down monitoring. You could just <code>undef $notify</code> instead (but <code>close</code> works even if there are other copies of the object). This happens automatically when your program exits.</p>
+
+</dd>
+<dt id="notify-reset">$notify-&gt;reset</dt>
+<dd>
+
+<p>Resets the ChangeNotification object after a change has been detected. The object will become signalled again after the next change. (It is OK to call this immediately after <code>new</code>, but it is not required.) Returns true if successful, or zero if it fails (additional error information can be found in <code>$^E</code>).</p>
+
+</dd>
+<dt id="notify-wait">$notify-&gt;wait</dt>
+<dd>
+
+<p>See <a href="../../lib/Win32/IPC.html">Win32::IPC</a>. Remember to call <code>reset</code> afterwards if you want to continue monitoring.</p>
+
+</dd>
+</dl>
+
+<h2 id="Deprecated-Functions-and-Methods">Deprecated Functions and Methods</h2>
+
+<p>Win32::ChangeNotify still supports the ActiveWare syntax, but its use is deprecated.</p>
+
+<dl>
+
+<dt id="FindFirst-Obj-PathName-WatchSubTree-Filter">FindFirst($Obj,$PathName,$WatchSubTree,$Filter)</dt>
+<dd>
+
+<p>Use</p>
+
+<pre><code>  $Obj = Win32::ChangeNotify-&gt;new($PathName,$WatchSubTree,$Filter)</code></pre>
+
+<p>instead.</p>
+
+</dd>
+<dt id="obj-FindNext">$obj-&gt;FindNext()</dt>
+<dd>
+
+<p>Use <code>$obj-&gt;reset</code> instead.</p>
+
+</dd>
+<dt id="obj-Close">$obj-&gt;Close()</dt>
+<dd>
+
+<p>Use <code>$obj-&gt;close</code> instead.</p>
+
+</dd>
+</dl>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<p>None.</p>
+
+<h1 id="CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</h1>
+
+<p>Win32::ChangeNotify requires no configuration files or environment variables.</p>
+
+<p>It runs under 32-bit or 64-bit Microsoft Windows, either natively or under Cygwin.</p>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p><a href="../../lib/Win32/IPC.html">Win32::IPC</a></p>
+
+<h1 id="INCOMPATIBILITIES">INCOMPATIBILITIES</h1>
+
+<p>Prior to version 1.06, the Win32 IPC modules treated <code>undef</code> values differently. In version 1.06 and later, passing <code>undef</code> as the value of an optional parameter is the same as omitting that parameter. In previous versions, <code>undef</code> was interpreted as either the empty string or 0 (along with a warning about &quot;Use of uninitialized value...&quot;).</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>Signal handlers will not be called during the <code>wait</code> method. See <a href="../../lib/Win32/IPC.html#BUGS-AND-LIMITATIONS">&quot;BUGS AND LIMITATIONS&quot; in Win32::IPC</a> for details.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Christopher J. Madsen <span style="white-space: nowrap;"><code>&lt;perl AT cjmweb.net&gt;</code></span></p>
+
+<p>Please report any bugs or feature requests to <span style="white-space: nowrap;"><code>&lt;bug-Win32-IPC AT rt.cpan.org&gt;</code></span> or through the web interface at <a href="http://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-IPC">http://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-IPC</a>.</p>
+
+<p>You can follow or contribute to Win32-IPC&#39;s development at <a href="https://github.com/madsen/win32-ipc">https://github.com/madsen/win32-ipc</a>.</p>
+
+<p>Loosely based on the original module by ActiveWare Internet Corp., <a href="http://www.ActiveState.com">http://www.ActiveState.com</a></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright 1998-2014 Christopher J. Madsen</p>
+
+<p>Created: 3 Feb 1998 from the ActiveWare version (c) 1995 Microsoft Corporation. All rights reserved. Developed by ActiveWare Internet Corp., http://www.ActiveState.com</p>
+
+<pre><code>  Other modifications (c) 1997 by Gurusamy Sarathy &lt;gsar AT cpan.org&gt;</code></pre>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+
+
+</body>
+
+</html>
+
+

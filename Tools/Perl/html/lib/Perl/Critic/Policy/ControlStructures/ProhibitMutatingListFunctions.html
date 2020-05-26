@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions - Don&#39;t modify <code>$_</code> in list functions.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>map</code>, <code>grep</code> and other list operators are intended to transform arrays into other arrays by applying code to the array elements one by one. For speed, the elements are referenced via a <code>$_</code> alias rather than copying them. As a consequence, if the code block of the <code>map</code> or <code>grep</code> modify <code>$_</code> in any way, then it is actually modifying the source array. This IS technically allowed, but those side effects can be quite surprising, especially when the array being passed is <code>@_</code> or perhaps <code>values(%ENV)</code>! Instead authors should restrict in-place array modification to <code><span class="keyword">for</span><span class="operator">(</span><span class="variable">@array</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> constructs instead, or use <code>List::MoreUtils::apply()</code>.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>By default, this policy applies to the following list functions:</p>
+
+<pre><code>    map grep
+    List::Util qw(first)
+    List::MoreUtils qw(any all none notall true false firstidx
+                       first_index lastidx last_index insert_after
+                       insert_after_string)</code></pre>
+
+<p>This list can be overridden the <i>.perlcriticrc</i> file like this:</p>
+
+<pre><code>    [ControlStructures::ProhibitMutatingListFunctions]
+    list_funcs = map grep List::Util::first</code></pre>
+
+<p>Or, one can just append to the list like so:</p>
+
+<pre><code>    [ControlStructures::ProhibitMutatingListFunctions]
+    add_list_funcs = Foo::Bar::listmunge</code></pre>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>This policy deliberately does not apply to <code><span class="keyword">for</span> <span class="operator">(</span><span class="variable">@array</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> or <code>List::MoreUtils::apply()</code>.</p>
+
+<p>Currently, the policy only detects explicit external module usage like this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@out</span> <span class="operator">=</span> <span class="variable">List::MoreUtils::any</span> <span class="operator">{</span><span class="regex">s/^foo//</span><span class="operator">}</span> <span class="variable">@in</span><span class="operator">;</span>
+</code></pre>
+
+<p>and not like this:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">List::MoreUtils</span> <span class="string">qw(any)</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">@out</span> <span class="operator">=</span> <span class="variable">any</span> <span class="operator">{</span><span class="regex">s/^foo//</span><span class="operator">}</span> <span class="variable">@in</span><span class="operator">;</span>
+</code></pre>
+
+<p>This policy looks only for modifications of <code>$_</code>. Other naughtiness could include modifying <code>$a</code> and <code>$b</code> in <code>sort</code> and the like. That&#39;s beyond the scope of this policy.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>There is discussion of this policy at <a href="http://perlmonks.org/index.pl?node_id=743445">http://perlmonks.org/index.pl?node_id=743445</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<p>Michael Wolf &lt;MichaelRWolf@att.net&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2006-2011 Chris Dolan.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

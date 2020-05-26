@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#lex_file-filename">lex_file $filename</a></li>
+      <li><a href="#lex_source-string">lex_source $string</a></li>
+      <li><a href="#lex_tokenizer-Tokenizer">lex_tokenizer $Tokenizer</a></li>
+      <li><a href="#errstr">errstr</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI::Lexer - The PPI Lexer</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">PPI</span><span class="operator">;</span>
+  
+  <span class="comment"># Create a new Lexer</span>
+  <span class="keyword">my</span> <span class="variable">$Lexer</span> <span class="operator">=</span> <span class="variable">PPI::Lexer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  
+  <span class="comment"># Build a PPI::Document object from a Token stream</span>
+  <span class="keyword">my</span> <span class="variable">$Tokenizer</span> <span class="operator">=</span> <span class="variable">PPI::Tokenizer</span><span class="operator">-&gt;</span><span class="variable">load</span><span class="operator">(</span><span class="string">'My/Module.pm'</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">$Lexer</span><span class="operator">-&gt;</span><span class="variable">lex_tokenizer</span><span class="operator">(</span><span class="variable">$Tokenizer</span><span class="operator">);</span>
+  
+  <span class="comment"># Build a PPI::Document object for some raw source</span>
+  <span class="keyword">my</span> <span class="variable">$source</span> <span class="operator">=</span> <span class="string">"print 'Hello World!'; kill(Humans-&gt;all);"</span><span class="operator">;</span>
+  <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">$Lexer</span><span class="operator">-&gt;</span><span class="variable">lex_source</span><span class="operator">(</span><span class="variable">$source</span><span class="operator">);</span>
+  
+  <span class="comment"># Build a PPI::Document object for a particular file name</span>
+  <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">$Lexer</span><span class="operator">-&gt;</span><span class="variable">lex_file</span><span class="operator">(</span><span class="string">'My/Module.pm'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The is the <a href="../../lib/PPI.html">PPI</a> Lexer. In the larger scheme of things, its job is to take token streams, in a variety of forms, and &quot;lex&quot; them into nested structures.</p>
+
+<p>Pretty much everything in this module happens behind the scenes at this point. In fact, at the moment you don&#39;t really need to instantiate the lexer at all, the three main methods will auto-instantiate themselves a <code>PPI::Lexer</code> object as needed.</p>
+
+<p>All methods do a one-shot &quot;lex this and give me a <a href="../../lib/PPI/Document.html">PPI::Document</a> object&quot;.</p>
+
+<p>In fact, if you are reading this, what you <b>probably</b> want to do is to just &quot;load a document&quot;, in which case you can do this in a much more direct and concise manner with one of the following.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">PPI</span><span class="operator">;</span>
+  
+  <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">load</span><span class="operator">(</span> <span class="variable">$filename</span> <span class="operator">);</span>
+  <span class="variable">$Document</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$string</span> <span class="operator">);</span>
+</code></pre>
+
+<p>See <a href="../../lib/PPI/Document.html">PPI::Document</a> for more details.</p>
+
+<p>For more unusual tasks, by all means forge onwards.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<p>The <code>new</code> constructor creates a new <code>PPI::Lexer</code> object. The object itself is merely used to hold various buffers and state data during the lexing process, and holds no significant data between -&gt;lex_xxxxx calls.</p>
+
+<p>Returns a new <code>PPI::Lexer</code> object</p>
+
+<h2 id="lex_file-filename">lex_file $filename</h2>
+
+<p>The <code>lex_file</code> method takes a filename as argument. It then loads the file, creates a <a href="../../lib/PPI/Tokenizer.html">PPI::Tokenizer</a> for the content and lexes the token stream produced by the tokenizer. Basically, a sort of all-in-one method for getting a <a href="../../lib/PPI/Document.html">PPI::Document</a> object from a file name.</p>
+
+<p>Returns a <a href="../../lib/PPI/Document.html">PPI::Document</a> object, or <code>undef</code> on error.</p>
+
+<h2 id="lex_source-string">lex_source $string</h2>
+
+<p>The <code>lex_source</code> method takes a normal scalar string as argument. It creates a <a href="../../lib/PPI/Tokenizer.html">PPI::Tokenizer</a> object for the string, and then lexes the resulting token stream.</p>
+
+<p>Returns a <a href="../../lib/PPI/Document.html">PPI::Document</a> object, or <code>undef</code> on error.</p>
+
+<h2 id="lex_tokenizer-Tokenizer">lex_tokenizer $Tokenizer</h2>
+
+<p>The <code>lex_tokenizer</code> takes as argument a <a href="../../lib/PPI/Tokenizer.html">PPI::Tokenizer</a> object. It lexes the token stream from the tokenizer into a <a href="../../lib/PPI/Document.html">PPI::Document</a> object.</p>
+
+<p>Returns a <a href="../../lib/PPI/Document.html">PPI::Document</a> object, or <code>undef</code> on error.</p>
+
+<h2 id="errstr">errstr</h2>
+
+<p>For any error that occurs, you can use the <code>errstr</code>, as either a static or object method, to access the error message.</p>
+
+<p>If no error occurs for any particular action, <code>errstr</code> will return false.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>- Add optional support for some of the more common source filters</p>
+
+<p>- Some additional checks for blessing things into various Statement and Structure subclasses.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See the <a href="../../lib/PPI.html#SUPPORT">support section</a> in the main module.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

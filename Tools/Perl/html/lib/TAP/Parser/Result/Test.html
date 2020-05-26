@@ -1,0 +1,189 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#OVERRIDDEN-METHODS">OVERRIDDEN METHODS</a>
+    <ul>
+      <li><a href="#Instance-Methods">Instance Methods</a>
+        <ul>
+          <li><a href="#ok">ok</a></li>
+          <li><a href="#number">number</a></li>
+          <li><a href="#description">description</a></li>
+          <li><a href="#directive">directive</a></li>
+          <li><a href="#explanation">explanation</a></li>
+          <li><a href="#is_ok">is_ok</a></li>
+          <li><a href="#is_actual_ok">is_actual_ok</a></li>
+          <li><a href="#actual_passed">actual_passed</a></li>
+          <li><a href="#todo_passed">todo_passed</a></li>
+          <li><a href="#todo_failed">todo_failed</a></li>
+          <li><a href="#has_skip">has_skip</a></li>
+          <li><a href="#has_todo">has_todo</a></li>
+          <li><a href="#as_string">as_string</a></li>
+          <li><a href="#is_unplanned">is_unplanned</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>TAP::Parser::Result::Test - Test result token.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 3.39</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a subclass of <a href="../../../../lib/TAP/Parser/Result.html">TAP::Parser::Result</a>. A token of this class will be returned if a test line is encountered.</p>
+
+<pre><code> 1..1
+ ok 1 - woo hooo!</code></pre>
+
+<h1 id="OVERRIDDEN-METHODS">OVERRIDDEN METHODS</h1>
+
+<p>This class is the workhorse of the <a href="../../../../lib/TAP/Parser.html">TAP::Parser</a> system. Most TAP lines will be test lines and if <code>$result-&gt;is_test</code>, then you have a bunch of methods at your disposal.</p>
+
+<h2 id="Instance-Methods">Instance Methods</h2>
+
+<h3 id="ok"><code>ok</code></h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$ok</span> <span class="operator">=</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">ok</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns the literal text of the <code>ok</code> or <code>not ok</code> status.</p>
+
+<h3 id="number"><code>number</code></h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$test_number</span> <span class="operator">=</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">number</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns the number of the test, even if the original TAP output did not supply that number.</p>
+
+<h3 id="description"><code>description</code></h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$description</span> <span class="operator">=</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">description</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns the description of the test, if any. This is the portion after the test number but before the directive.</p>
+
+<h3 id="directive"><code>directive</code></h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$directive</span> <span class="operator">=</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">directive</span><span class="operator">;</span>
+</code></pre>
+
+<p>Returns either <code>TODO</code> or <code>SKIP</code> if either directive was present for a test line.</p>
+
+<h3 id="explanation"><code>explanation</code></h3>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$explanation</span> <span class="operator">=</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">explanation</span><span class="operator">;</span>
+</code></pre>
+
+<p>If a test had either a <code>TODO</code> or <code>SKIP</code> directive, this method will return the accompanying explanation, if present.</p>
+
+<pre><code>  not ok 17 - &#39;Pigs can fly&#39; # TODO not enough acid</code></pre>
+
+<p>For the above line, the explanation is <i>not enough acid</i>.</p>
+
+<h3 id="is_ok"><code>is_ok</code></h3>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">is_ok</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Returns a boolean value indicating whether or not the test passed. Remember that for TODO tests, the test always passes.</p>
+
+<p>If the test is unplanned, this method will always return false. See <code>is_unplanned</code>.</p>
+
+<h3 id="is_actual_ok"><code>is_actual_ok</code></h3>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">is_actual_ok</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Returns a boolean value indicating whether or not the test passed, regardless of its TODO status.</p>
+
+<h3 id="actual_passed"><code>actual_passed</code></h3>
+
+<p>Deprecated. Please use <code>is_actual_ok</code> instead.</p>
+
+<h3 id="todo_passed"><code>todo_passed</code></h3>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$test</span><span class="operator">-&gt;</span><span class="variable">todo_passed</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="comment"># test unexpectedly succeeded</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>If this is a TODO test and an &#39;ok&#39; line, this method returns true. Otherwise, it will always return false (regardless of passing status on non-todo tests).</p>
+
+<p>This is used to track which tests unexpectedly succeeded.</p>
+
+<h3 id="todo_failed"><code>todo_failed</code></h3>
+
+<pre><code>  <span class="comment"># deprecated in favor of 'todo_passed'.  This method was horribly misnamed.</span>
+</code></pre>
+
+<p>This was a badly misnamed method. It indicates which TODO tests unexpectedly succeeded. Will now issue a warning and call <code>todo_passed</code>.</p>
+
+<h3 id="has_skip"><code>has_skip</code></h3>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">has_skip</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Returns a boolean value indicating whether or not this test has a SKIP directive.</p>
+
+<h3 id="has_todo"><code>has_todo</code></h3>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">has_todo</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Returns a boolean value indicating whether or not this test has a TODO directive.</p>
+
+<h3 id="as_string"><code>as_string</code></h3>
+
+<pre><code>  <span class="keyword">print</span> <span class="variable">$result</span><span class="operator">-&gt;</span><span class="variable">as_string</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method prints the test as a string. It will probably be similar, but not necessarily identical, to the original test line. Directives are capitalized, some whitespace may be trimmed and a test number will be added if it was not present in the original line. If you need the original text of the test line, use the <code>raw</code> method.</p>
+
+<h3 id="is_unplanned"><code>is_unplanned</code></h3>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$test</span><span class="operator">-&gt;</span><span class="variable">is_unplanned</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+  <span class="variable">$test</span><span class="operator">-&gt;</span><span class="variable">is_unplanned</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>If a test number is greater than the number of planned tests, this method will return true. Unplanned tests will <i>always</i> return false for <code>is_ok</code>, regardless of whether or not the test <code>has_todo</code>.</p>
+
+<p>Note that if tests have a trailing plan, it is not possible to set this property for unplanned tests as we do not know it&#39;s unplanned until the plan is reached:</p>
+
+<pre><code>  <span class="keyword">print</span> <span class="operator">&lt;&lt;</span><span class="default">'END'</span><span class="operator">;</span><span class="string">
+  ok 1
+  ok 2
+  1..1
+  </span><span class="default">END</span>
+</code></pre>
+
+
+</body>
+
+</html>
+
+

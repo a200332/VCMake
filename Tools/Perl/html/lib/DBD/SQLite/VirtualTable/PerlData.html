@@ -1,0 +1,228 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#PARAMETERS">PARAMETERS</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#Common-part-of-all-examples-:-declaring-the-module">Common part of all examples : declaring the module</a></li>
+      <li><a href="#Arrayref-example-:-statistics-from-files">Arrayref example : statistics from files</a></li>
+      <li><a href="#Hashref-example-:-unicode-characters">Hashref example : unicode characters</a></li>
+      <li><a href="#Colref-example:-SELECT-WHERE-...-IN">Colref example: SELECT WHERE ... IN ...</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::SQLite::VirtualTable::PerlData -- virtual table hooked to Perl data</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Within Perl :</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">sqlite_create_module</span><span class="operator">(</span><span class="string">perl</span> <span class="operator">=&gt;</span> <span class="string">"DBD::SQLite::VirtualTable::PerlData"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Then, within SQL :</p>
+
+<pre><code>  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">atbl</span> <span class="variable">USING</span> <span class="variable">perl</span><span class="operator">(</span><span class="variable">foo</span><span class="operator">,</span> <span class="variable">bar</span><span class="operator">,</span> <span class="variable">etc</span><span class="operator">,</span>
+                                       <span class="variable">arrayrefs</span><span class="operator">=</span><span class="string">"some::global::var::aref"</span><span class="operator">)</span>
+  
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">htbl</span> <span class="variable">USING</span> <span class="variable">perl</span><span class="operator">(</span><span class="variable">foo</span><span class="operator">,</span> <span class="variable">bar</span><span class="operator">,</span> <span class="variable">etc</span><span class="operator">,</span>
+                                       <span class="variable">hashrefs</span><span class="operator">=</span><span class="string">"some::global::var::href"</span><span class="operator">)</span>
+  
+  <span class="variable">CREATE</span> <span class="variable">VIRTUAL</span> <span class="variable">TABLE</span> <span class="variable">ctbl</span> <span class="variable">USING</span> <span class="variable">perl</span><span class="operator">(</span><span class="variable">single_col</span>
+                                       <span class="variable">colref</span><span class="operator">=</span><span class="string">"some::global::var::ref"</span><span class="operator">)</span>
+  
+  
+  <span class="variable">SELECT</span> <span class="variable">foo</span><span class="operator">,</span> <span class="variable">bar</span> <span class="variable">FROM</span> <span class="variable">atbl</span> <span class="variable">WHERE</span> <span class="operator">...;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>A <code>PerlData</code> virtual table is a database view on some datastructure within a Perl program. The data can be read or modified both from SQL and from Perl. This is useful for simple import/export operations, for debugging purposes, for joining data from different sources, etc.</p>
+
+<h1 id="PARAMETERS">PARAMETERS</h1>
+
+<p>Parameters for creating a <code>PerlData</code> virtual table are specified within the <code>CREATE VIRTUAL TABLE</code> statement, mixed with regular column declarations, but with an &#39;=&#39; sign.</p>
+
+<p>The only authorized (and mandatory) parameter is the one that specifies the Perl datastructure to which the virtual table is bound. It must be given as the fully qualified name of a global variable; the parameter can be one of three different kinds :</p>
+
+<dl>
+
+<dt id="arrayrefs"><code>arrayrefs</code></dt>
+<dd>
+
+<p>arrayref that contains an arrayref for each row. Each such row will have a size equivalent to the number of columns declared for the virtual table.</p>
+
+</dd>
+<dt id="hashrefs"><code>hashrefs</code></dt>
+<dd>
+
+<p>arrayref that contains a hashref for each row. Keys in each hashref should correspond to the columns declared for the virtual table.</p>
+
+</dd>
+<dt id="colref"><code>colref</code></dt>
+<dd>
+
+<p>arrayref that contains a single scalar for each row; obviously, this is a single-column virtual table.</p>
+
+</dd>
+</dl>
+
+<h1 id="USAGE">USAGE</h1>
+
+<h2 id="Common-part-of-all-examples-:-declaring-the-module">Common part of all examples : declaring the module</h2>
+
+<p>In all examples below, the common part is that the Perl program should connect to the database and then declare the <code>PerlData</code> virtual table module, like this</p>
+
+<pre><code>  <span class="comment"># connect to the database</span>
+  <span class="keyword">my</span> <span class="variable">$dbh</span> <span class="operator">=</span> <span class="variable">DBI</span><span class="operator">-&gt;</span><span class="variable">connect</span><span class="operator">(</span><span class="string">"dbi:SQLite:dbname=</span><span class="variable">$dbfile</span><span class="string">"</span><span class="operator">,</span> <span class="string">''</span><span class="operator">,</span> <span class="string">''</span><span class="operator">,</span>
+                          <span class="operator">{</span><span class="string">RaiseError</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">AutoCommit</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">);</span>
+                          <span class="comment"># or any other options suitable to your needs</span>
+  
+  <span class="comment"># register the module</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">sqlite_create_module</span><span class="operator">(</span><span class="string">perl</span> <span class="operator">=&gt;</span> <span class="string">"DBD::SQLite::VirtualTable::PerlData"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Then create a global arrayref variable, using <code>our</code> instead of <code>my</code>, so that the variable is stored in the symbol table of the enclosing module.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo::Bar</span><span class="operator">;</span> <span class="comment"># could as well be just "main"</span>
+  <span class="keyword">our</span> <span class="variable">$rows</span> <span class="operator">=</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>Finally, create the virtual table and bind it to the global variable (here we assume that <code>@$rows</code> contains arrayrefs) :</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(</span><span class="string">'CREATE VIRTUAL TABLE temp.vtab'</span>
+          <span class="operator">.</span><span class="string">'  USING perl(col1 INT, col2 TEXT, etc,
+                         arrayrefs="Foo::Bar::rows'</span><span class="operator">);</span>
+</code></pre>
+
+<p>In most cases, the virtual table will be for temporary use, which is the reason why this example prepends <code>temp.</code> in front of the table name : this tells SQLite to cleanup that table when the database handle will be disconnected, without the need to emit an explicit DROP statement.</p>
+
+<p>Column names (and optionally their types) are specified in the virtual table declaration, just like for any regular table.</p>
+
+<h2 id="Arrayref-example-:-statistics-from-files">Arrayref example : statistics from files</h2>
+
+<p>Let&#39;s suppose we want to perform some searches over a collection of files, where search constraints may be based on some of the fields returned by <a href="../../../../lib/File/stat.html">stat</a>, such as the size of the file or its last modify time. Here is a way to do it with a virtual table :</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@files</span> <span class="operator">=</span> <span class="operator">...</span> <span class="operator">;</span> <span class="comment"># list of files to inspect</span>
+  
+  <span class="comment"># apply the L&lt;stat&gt; function to each file</span>
+  <span class="keyword">our</span> <span class="variable">$file_stats</span> <span class="operator">=</span> <span class="operator">[</span> <span class="keyword">map</span> <span class="operator">{(</span><span class="variable">$_</span><span class="operator">,</span> <span class="keyword">stat</span> <span class="variable">$_</span><span class="operator">)}</span> <span class="variable">@files</span><span class="operator">]</span><span class="operator">;</span>
+  
+  <span class="comment"># create a temporary virtual table</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">);</span><span class="string">
+     CREATE VIRTUAL TABLE temp.file_stats'
+        USING perl(path, dev, ino, mode, nlink, uid, gid, rdev, size,
+                         atime, mtime, ctime, blksize, blocks,
+                   arrayrefs="main::file_stats");
+  </span>
+  <span class="comment"># search files</span>
+  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">);</span><span class="string">
+    SELECT * FROM file_stats 
+      WHERE mtime BETWEEN ? AND ?
+        AND uid IN (...)
+  </span>
+</code></pre>
+
+<h2 id="Hashref-example-:-unicode-characters">Hashref example : unicode characters</h2>
+
+<p>Given any unicode character, the <a href="../../../../lib/Unicode/UCD.html#charinfo">&quot;charinfo&quot; in Unicode::UCD</a> function returns a hashref with various bits of information about that character. So this can be exploited in a virtual table :</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Unicode::UCD</span> <span class="string">'charinfo'</span><span class="operator">;</span>
+  <span class="keyword">our</span> <span class="variable">$chars</span> <span class="operator">=</span> <span class="operator">[</span><span class="keyword">map</span> <span class="operator">{</span><span class="variable">charinfo</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)}</span> <span class="number">0x300</span><span class="operator">..</span><span class="number">0x400</span><span class="operator">]</span><span class="operator">;</span> <span class="comment"># arbitrary subrange</span>
+  
+  <span class="comment"># create a temporary virtual table</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">);</span><span class="string">
+    CREATE VIRTUAL TABLE charinfo USING perl(
+      code, name, block, script, category,
+      hashrefs="main::chars"
+     )
+  </span>
+  <span class="comment"># search characters</span>
+  <span class="keyword">my</span> <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(&lt;&lt;</span><span class="default">""</span><span class="operator">);</span><span class="string">
+    SELECT * FROM charinfo 
+     WHERE script='Greek' 
+       AND name LIKE '%SIGMA%'
+  </span>
+</code></pre>
+
+<h2 id="Colref-example:-SELECT-WHERE-...-IN">Colref example: SELECT WHERE ... IN ...</h2>
+
+<p><i>Note: The idea for the following example is borrowed from the <code>test_intarray.h</code> file in SQLite&#39;s source (<a href="http://www.sqlite.org/src">http://www.sqlite.org/src</a>).</i></p>
+
+<p>A <code>colref</code> virtual table is designed to facilitate using an array of values as the right-hand side of an IN operator. The usual syntax for IN is to prepare a statement like this:</p>
+
+<pre><code>    <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">table</span> <span class="variable">WHERE</span> <span class="operator">x</span> <span class="variable">IN</span> <span class="operator">(</span><span class="regex">?,?</span><span class="operator">,</span><span class="regex">?,...,?</span><span class="operator">);</span>
+</code></pre>
+
+<p>and then bind individual values to each of the ? slots; but this has the disadvantage that the number of values must be known in advance. Instead, we can store values in a Perl array, bind that array to a virtual table, and then write a statement like this</p>
+
+<pre><code>    <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">table</span> <span class="variable">WHERE</span> <span class="operator">x</span> <span class="variable">IN</span> <span class="variable">perl_array</span><span class="operator">;</span>
+</code></pre>
+
+<p>Here is how such a program would look like :</p>
+
+<pre><code>  <span class="comment"># connect to the database</span>
+  <span class="keyword">my</span> <span class="variable">$dbh</span> <span class="operator">=</span> <span class="variable">DBI</span><span class="operator">-&gt;</span><span class="variable">connect</span><span class="operator">(</span><span class="string">"dbi:SQLite:dbname=</span><span class="variable">$dbfile</span><span class="string">"</span><span class="operator">,</span> <span class="string">''</span><span class="operator">,</span> <span class="string">''</span><span class="operator">,</span>
+                          <span class="operator">{</span><span class="string">RaiseError</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">AutoCommit</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">);</span>
+  
+  <span class="comment"># Declare a global arrayref containing the values. Here we assume</span>
+  <span class="comment"># they are taken from @ARGV, but any other datasource would do.</span>
+  <span class="comment"># Note the use of "our" instead of "my".</span>
+  <span class="keyword">our</span> <span class="variable">$values</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">@ARGV</span><span class="operator">;</span> 
+  
+  <span class="comment"># register the module and declare the virtual table</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">sqlite_create_module</span><span class="operator">(</span><span class="string">perl</span> <span class="operator">=&gt;</span> <span class="string">"DBD::SQLite::VirtualTable::PerlData"</span><span class="operator">);</span>
+  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">do</span><span class="operator">(</span><span class="string">'CREATE VIRTUAL TABLE temp.intarray'</span>
+          <span class="operator">.</span><span class="string">'  USING perl(i INT, colref="main::values'</span><span class="operator">);</span>
+  
+  <span class="comment"># now we can SELECT from another table, using the intarray as a constraint</span>
+  <span class="keyword">my</span> <span class="variable">$sql</span>    <span class="operator">=</span> <span class="string">"SELECT * FROM some_table WHERE some_col IN intarray"</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$result</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">selectall_arrayref</span><span class="operator">(</span><span class="variable">$sql</span><span class="operator">);</span>
+</code></pre>
+
+<p>Beware that the virtual table is read-write, so the statement below would push 99 into @ARGV !</p>
+
+<pre><code>  <span class="variable">INSERT</span> <span class="variable">INTO</span> <span class="variable">intarray</span> <span class="variable">VALUES</span> <span class="operator">(</span><span class="number">99</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Laurent Dami &lt;dami@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright Laurent Dami, 2014.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

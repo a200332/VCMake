@@ -1,0 +1,154 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#API">API</a>
+    <ul>
+      <li><a href="#Module::Implementation::build_loader_sub">Module::Implementation::build_loader_sub(...)</a></li>
+      <li><a href="#Module::Implementation::implementation_for-package">Module::Implementation::implementation_for($package)</a></li>
+    </ul>
+  </li>
+  <li><a href="#HOW-THE-IMPLEMENTATION-LOADER-WORKS">HOW THE IMPLEMENTATION LOADER WORKS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Module::Implementation - Loads one of several alternate underlying implementations for a module</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.09</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo::Bar</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Module::Implementation</span><span class="operator">;</span>
+  
+  <span class="keyword">BEGIN</span> <span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$loader</span> <span class="operator">=</span> <span class="variable">Module::Implementation::build_loader_sub</span><span class="operator">(</span>
+          <span class="string">implementations</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'XS'</span><span class="operator">,</span>  <span class="string">'PurePerl'</span> <span class="operator">]</span><span class="operator">,</span>
+          <span class="string">symbols</span>         <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'run'</span><span class="operator">,</span> <span class="string">'check'</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">);</span>
+  
+      <span class="variable">$loader</span><span class="operator">-&gt;();</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">Consumer</span><span class="operator">;</span>
+  
+  <span class="comment"># loads the first viable implementation</span>
+  <span class="keyword">use</span> <span class="variable">Foo::Bar</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module abstracts out the process of choosing one of several underlying implementations for a module. This can be used to provide XS and pure Perl implementations of a module, or it could be used to load an implementation for a given OS or any other case of needing to provide multiple implementations.</p>
+
+<p>This module is only useful when you know all the implementations ahead of time. If you want to load arbitrary implementations then you probably want something like a plugin system, not this module.</p>
+
+<h1 id="API">API</h1>
+
+<p>This module provides two subroutines, neither of which are exported.</p>
+
+<h2 id="Module::Implementation::build_loader_sub">Module::Implementation::build_loader_sub(...)</h2>
+
+<p>This subroutine takes the following arguments.</p>
+
+<ul>
+
+<li><p>implementations</p>
+
+<p>This should be an array reference of implementation names. Each name should correspond to a module in the caller&#39;s namespace.</p>
+
+<p>In other words, using the example in the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a>, this module will look for the <code>Foo::Bar::XS</code> and <code>Foo::Bar::PurePerl</code> modules.</p>
+
+<p>This argument is required.</p>
+
+</li>
+<li><p>symbols</p>
+
+<p>A list of symbols to copy from the implementation package to the calling package.</p>
+
+<p>These can be prefixed with a variable type: <code>$</code>, <code>@</code>, <code>%</code>, <code>&amp;</code>, or <code>*)</code>. If no prefix is given, the symbol is assumed to be a subroutine.</p>
+
+<p>This argument is optional.</p>
+
+</li>
+</ul>
+
+<p>This subroutine <i>returns</i> the implementation loader as a sub reference.</p>
+
+<p>It is up to you to call this loader sub in your code.</p>
+
+<p>I recommend that you <i>do not</i> call this loader in an <code>import()</code> sub. If a caller explicitly requests no imports, your <code>import()</code> sub will not be run at all, which can cause weird breakage.</p>
+
+<h2 id="Module::Implementation::implementation_for-package">Module::Implementation::implementation_for($package)</h2>
+
+<p>Given a package name, this subroutine returns the implementation that was loaded for the package. This is not a full package name, just the suffix that identifies the implementation. For the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a> example, this subroutine would be called as <code>Module::Implementation::implementation_for(&#39;Foo::Bar&#39;)</code>, and it would return &quot;XS&quot; or &quot;PurePerl&quot;.</p>
+
+<h1 id="HOW-THE-IMPLEMENTATION-LOADER-WORKS">HOW THE IMPLEMENTATION LOADER WORKS</h1>
+
+<p>The implementation loader works like this ...</p>
+
+<p>First, it checks for an <code>%ENV</code> var specifying the implementation to load. The env var is based on the package name which loads the implementations. The <code>::</code> package separator is replaced with <code>_</code>, and made entirely upper-case. Finally, we append &quot;_IMPLEMENTATION&quot; to this name.</p>
+
+<p>So in our <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a> example, the corresponding <code>%ENV</code> key would be <code>FOO_BAR_IMPLEMENTATION</code>.</p>
+
+<p>If this is set, then the loader will <b>only</b> try to load this one implementation.</p>
+
+<p>If the env var requests an implementation which doesn&#39;t match one of the implementations specified when the loader was created, an error is thrown.</p>
+
+<p>If this one implementation fails to load then loader throws an error. This is useful for testing. You can request a specific implementation in a test file by writing something like this:</p>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">$ENV</span><span class="operator">{</span><span class="string">FOO_BAR_IMPLEMENTATION</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">'XS'</span> <span class="operator">}</span>
+  <span class="keyword">use</span> <span class="variable">Foo::Bar</span><span class="operator">;</span>
+</code></pre>
+
+<p>If the environment variable is <i>not</i> set, then the loader simply tries the implementations originally passed to <code>Module::Implementation</code>. The implementations are tried in the order in which they were originally passed.</p>
+
+<p>The loader will use the first implementation that loads without an error. It will copy any requested symbols from this implementation.</p>
+
+<p>If none of the implementations can be loaded, then the loader throws an exception.</p>
+
+<p>The loader returns the name of the package it loaded.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2014 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

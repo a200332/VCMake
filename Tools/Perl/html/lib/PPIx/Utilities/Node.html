@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INTERFACE">INTERFACE</a>
+    <ul>
+      <li><a href="#split_ppi_node_by_namespace-node">split_ppi_node_by_namespace($node)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Utilities::Node - Extensions to <a href="../../../lib/PPI/Node.html">PPI::Node</a>.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes PPIx::Utilities::Node version 1.1.0.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">PPIx::Utilities::Node</span> <span class="string">qw&lt; split_ppi_node_by_namespace &gt;</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$dom</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"..."</span><span class="operator">);</span>
+    
+    <span class="keyword">while</span> <span class="operator">(</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$namespace</span><span class="operator">,</span> <span class="variable">$sub_doms</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">each</span> <span class="variable">split_ppi_node_by_namespace</span><span class="operator">(</span><span class="variable">$dom</span><span class="operator">)</span>
+    <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$sub_dom</span> <span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$sub_doms</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a collection of functions for dealing with <a href="../../../lib/PPI/Node.html">PPI::Node</a>s.</p>
+
+<h1 id="INTERFACE">INTERFACE</h1>
+
+<p>Nothing is exported by default.</p>
+
+<h2 id="split_ppi_node_by_namespace-node">split_ppi_node_by_namespace($node)</h2>
+
+<p>Returns the sub-trees for each namespace in the node as a reference to a hash of references to arrays of <a href="../../../lib/PPI/Node.html">PPI::Node</a>s. Say we&#39;ve got the following code:</p>
+
+<pre><code>    <span class="comment">#!perl</span>
+    
+    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">blah</span><span class="operator">();</span>
+    
+    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">blah_blah</span><span class="operator">();</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">say</span> <span class="string">'Whee!'</span><span class="operator">;</span>
+    
+        <span class="keyword">package</span> <span class="variable">Bar</span><span class="operator">;</span>
+    
+        <span class="variable">something</span><span class="operator">();</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">thingy</span><span class="operator">();</span>
+    
+    <span class="keyword">package</span> <span class="variable">Baz</span><span class="operator">;</span>
+    
+    <span class="variable">da_da_da</span><span class="operator">();</span>
+    
+    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    
+    <span class="keyword">foreach</span> <span class="operator">(</span> <span class="variable">blrfl</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Calling this function on a <a href="../../../lib/PPI/Document.html">PPI::Document</a> for the above returns a value that looks like this, using multi-line string literals for the actual code parts instead of PPI trees to make this easier to read:</p>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="string">main</span>    <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">q&lt;
+                #!perl
+    
+                my $x = blah();
+            &gt;</span><span class="operator">,</span>
+        <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">Foo</span>     <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">q&lt;
+                package Foo;
+    
+                my $y = blah_blah();
+    
+                {
+                    say 'Whee!';
+    
+                }
+    
+                thingy();
+            &gt;</span><span class="operator">,</span>
+            <span class="string">q&lt;
+                package Foo;
+    
+                foreach ( blrfl() ) {
+                    ...
+                }
+            &gt;</span><span class="operator">,</span>
+        <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">Bar</span>     <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">q&lt;
+                package Bar;
+    
+                something();
+            &gt;</span><span class="operator">,</span>
+        <span class="operator">]</span><span class="operator">,</span>
+        <span class="string">Baz</span>     <span class="operator">=&gt;</span> <span class="operator">[</span>
+            <span class="string">q&lt;
+                package Baz;
+    
+                da_da_da();
+            &gt;</span><span class="operator">,</span>
+        <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Note that the return value contains copies of the original nodes, and not the original nodes themselves due to the need to handle namespaces that are not file-scoped. (Notice how the first element for &quot;Foo&quot; above differs from the original code.)</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-ppix-utilities@rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Elliot Shank <code>&lt;perl@galumph.com&gt;</code></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c)2009-2010, Elliot Shank <code>&lt;perl@galumph.com&gt;</code>.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,246 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#BECOMING-A-CORE-DEVELOPER">BECOMING A CORE DEVELOPER</a>
+    <ul>
+      <li><a href="#Modules-required-for-authortest">Modules required for authortest</a></li>
+    </ul>
+  </li>
+  <li><a href="#ADDING-A-GLOBAL-CONFIGURATION-ITEM">ADDING A GLOBAL CONFIGURATION ITEM</a>
+    <ul>
+      <li><a href="#Naming-Conventions">Naming Conventions</a></li>
+      <li><a href="#Implementation">Implementation</a>
+        <ul>
+          <li><a href="#lib-Perl-Critic-Utils-Constants.pm">lib/Perl/Critic/Utils/Constants.pm</a></li>
+          <li><a href="#lib-Perl-Critic-Command.pm">lib/Perl/Critic/Command.pm</a></li>
+          <li><a href="#lib-Perl-Critic-OptionsProcessor.pm">lib/Perl/Critic/OptionsProcessor.pm</a></li>
+          <li><a href="#lib-Perl-Critic-Config.pm">lib/Perl/Critic/Config.pm</a></li>
+          <li><a href="#lib-Perl-Critic-ProfilePrototype.pm">lib/Perl/Critic/ProfilePrototype.pm</a></li>
+          <li><a href="#bin-perlcriticrc">bin/perlcriticrc</a></li>
+          <li><a href="#examples-perlcriticrc">examples/perlcriticrc</a></li>
+        </ul>
+      </li>
+      <li><a href="#Testing">Testing</a></li>
+    </ul>
+  </li>
+  <li><a href="#DEPRECATING-AND-REMOVING-A-PUBLIC-SUBROUTINE-OR-METHOD">DEPRECATING AND REMOVING A PUBLIC SUBROUTINE OR METHOD</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::CORE_DEVELOPER - Hints for working on the Perl::Critic core.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This document is a grab-bag of notes for those who are working on the underpinnings of Perl::Critic. They are intended to be informative, but unfortunately can not really be considered authoritative. It is in the nature of the task being described that the user of this document will end up working out the details for him- or herself based on the actual work being performed. <b>Caveat lector.</b></p>
+
+<h1 id="BECOMING-A-CORE-DEVELOPER">BECOMING A CORE DEVELOPER</h1>
+
+<p>Here are my thoughts on how to get started. Note that the steps are not numbered because I&#39;m not sure there is a clear order to them. The items with two stars in front of them are from the mailing list; the ones with one star are my opinion. Although sometimes I have felt it helpful to comment on the two-star items, just to make things thoroughly unclear.</p>
+
+<p>* If you&#39;re unsure of yourself, install Perl::Critic, then download the source and rummage around in it.</p>
+
+<p>** Subscribe to the developers&#39; mailing list. There are instructions in <a href="../../../lib/Perl/Critic.html#EXTENDING-THE-CRITIC">&quot;EXTENDING THE CRITIC&quot; in Perl::Critic</a>. The <i>commits</i> mailing list is another good one.</p>
+
+<p>** If you are working on a GitHub issue, you should update the ticket to say that you are, to keep other people from duplicating your effort.</p>
+
+<p>* I personally would update GitHub at the point I was reasonably confident I could hack it, just to prevent myself from having to update GitHub again in a week or so saying &quot;oops, bit off more than I could chew.&quot; But that&#39;s me talking.</p>
+
+<p>* Development requires using Module::Build rather than ExtUtils::MakeMaker. In other words,</p>
+
+<pre><code>    $ perl Build.PL
+    $ ./Build
+    $ ./Build test</code></pre>
+
+<p>* You need to run the suite of author tests by running</p>
+
+<pre><code>    $ ./Build authortest</code></pre>
+
+<p>(but not &#39;make authortest&#39;, which is one of the reasons you should start with <i>Build.PL</i> rather than <i>Makefile.PL</i>) These should run cleanly before you declare your work done. My advice, though, is not to worry about them until your code is functionally correct.</p>
+
+<h2 id="Modules-required-for-authortest">Modules required for authortest</h2>
+
+<p>The authortest requires a <b>bunch</b> of modules above and beyond those required to run <code>Perl::Critic</code>. The list probably depends on which <code>Perl::Critic</code> you are testing, so the following should not be considered definitive. You need the following in addition to <b>all</b> optional modules for Perl::Critic itself.</p>
+
+<pre><code>    Devel::EnforceEncapsulation
+    Perl::Critic::More
+    Test::Kwalitee
+    Test::Memory::Cycle
+    Test::Perl::Critic
+    Test::Pod
+    Test::Pod::Coverage
+    Test::Without::Module</code></pre>
+
+<p>You can find out what the optional modules are by looking at <code>recommended_module_versions()</code> in <i>inc/Perl/Critic/BuildUtilities.pm</i>.</p>
+
+<p>In the absence of <code>Test::Memory::Cycle</code>, the relevant tests are simply skipped. In the absence of the other modules, the tests die horribly. Of course, either way they do not get run, so the difference is mainly one of aesthetics.</p>
+
+<p>Under Perl 5.12 and above, <a>Devel::Cycle</a> 1.11 needs to be patched to handle a <code>Regexp</code> as a first-class Perl object. See <a href="https://rt.cpan.org/Public/Bug/Display.html?id=56681">https://rt.cpan.org/Public/Bug/Display.html?id=56681</a> for the details.</p>
+
+<h1 id="ADDING-A-GLOBAL-CONFIGURATION-ITEM">ADDING A GLOBAL CONFIGURATION ITEM</h1>
+
+<p>Perlcritic handles global configuration items and command line options in very similar ways. These notes will cover adding both a global configuration item and a corresponding, same-named command option. These notes can not, of course, cover implementing the functionality of the new item, just the mechanics of getting the item into Perl::Critic.</p>
+
+<h2 id="Naming-Conventions">Naming Conventions</h2>
+
+<p>All names are lower-case, except for the names of constants (if any), which are upper-case. When a name contains multiple words, dashes will be used to separate the words in the configuration item name and the command line option, and underscores will be used in the accessor and attribute value names, and constant names if any.</p>
+
+<p>For example, if &quot;new item&quot; is being added, the configuration item is &quot;new-item&quot;, the command option is &quot;--new-item&quot;, the accessors are <code>new_item()</code>, and the value of the attribute will be stored in <code><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_new_item</span><span class="operator">}</span>
+</code>. If there are constants involved, their names will start with <code>NEW_ITEM_</code>. These names will be used in the following discussion.</p>
+
+<h2 id="Implementation">Implementation</h2>
+
+<p>There are several files that must be modified to get your new configuration item and/or command line option.</p>
+
+<h3 id="lib-Perl-Critic-Utils-Constants.pm"><i>lib/Perl/Critic/Utils/Constants.pm</i></h3>
+
+<p>If there are manifest constants connected with your implementation they go here. You may well at least have a</p>
+
+<pre><code>    $NEW_ITEM_DEFAULT</code></pre>
+
+<p>to define. All the constants for your new item must be exported, and should be exported not only individually but all together with export tag</p>
+
+<pre><code>    new_item</code></pre>
+
+<h3 id="lib-Perl-Critic-Command.pm"><i>lib/Perl/Critic/Command.pm</i></h3>
+
+<p>If your new item is a command option, its <a href="../../../lib/Getopt/Long.html">Getopt::Long</a> specification must be defined in <code>_get_option_specification()</code>. If your new configuration item does not have a corresponding command option, you do not need to make any changes to this file.</p>
+
+<h3 id="lib-Perl-Critic-OptionsProcessor.pm"><i>lib/Perl/Critic/OptionsProcessor.pm</i></h3>
+
+<p>If your new item is a global configuration item, you need to add the code to handle it here. Specifically:</p>
+
+<p>You must add code to the <code>_init()</code> method to store the value of your item as an attribute value, defaulting it if necessary. Using our naming convention, a single-valued item would be stored like this:</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_new_item</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">dor</span><span class="operator">(</span><span class="keyword">delete</span> <span class="variable">$args</span><span class="operator">{</span><span class="string">'new-item'</span><span class="operator">}</span><span class="operator">,</span>
+        <span class="variable">$NEW_ITEM_DEFAULT</span><span class="operator">);</span>
+</code></pre>
+
+<p>If the item has synonyms (e.g. both &#39;color&#39; and &#39;colour&#39; meaning the same thing), the <code>dor()</code> call must check for all of them. If the item took a list of values, they would be parsed apart and stored as an array reference.</p>
+
+<p>You must also add and document an accessor for your new item. This would look something like this:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> new_item </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_new_item</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>In the case of multi-valued items, the accessor must return the array reference, so the above specimen code works in that case also.</p>
+
+<p>Note that no validation is done here -- this class is simply a bridge between the physical <i>.perlcriticrc</i> file and <a href="../../../lib/Perl/Critic/Config.html">Perl::Critic::Config</a>, which is where the action is.</p>
+
+<p>If your new item is a command option without a corresponding global configuration item, you do not need to modify this file.</p>
+
+<h3 id="lib-Perl-Critic-Config.pm"><i>lib/Perl/Critic/Config.pm</i></h3>
+
+<p>You must write a <code>_validate_and_store_new_item()</code> method to validate and store the value of the new item. The signature of this method depends on the details of your new item, but it must include at least the value of the item, <b>even if</b> there is no corresponding global configuration item. If it is possible to get validation failures, it will also need an errors object to add the validation exception to. Because the details vary, the best way to proceed is probably to find a method similar to the one you want to write, and implement from there. The <code>_validate_and_store_top()</code> method is a reasonable starting point for an item having a single value. The validated value needs to be stored in <code><span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_new_item</span><span class="operator">}</span>
+</code>.</p>
+
+<p>You must call <code>_validate_and_store_new_item()</code> in the <code>_init()</code> method.</p>
+
+<p>You must write and document an accessor method for the value of the new item. The typical accessor method for a single-valued item is</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> new_item </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_new_item</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>but the accessor for a multi-valued item must return a list:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> new_item </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_new_item</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Last, you must document the item itself.</p>
+
+<h3 id="lib-Perl-Critic-ProfilePrototype.pm"><i>lib/Perl/Critic/ProfilePrototype.pm</i></h3>
+
+<p>If your new item has a corresponding global configuration item, you must update the <code>to_string()</code> method to include the item in the string. Your implementation of the item must be such that the generated string is the same as the input string for the item, except for whitespace.</p>
+
+<p>If your new item has no corresponding global configuration item, you do not need to change this file.</p>
+
+<h3 id="bin-perlcriticrc"><i>bin/perlcriticrc</i></h3>
+
+<p>If your new item has a corresponding command option, you must document it here. If it does not, you do not need to change this file.</p>
+
+<h3 id="examples-perlcriticrc"><i>examples/perlcriticrc</i></h3>
+
+<p>If your new item has a corresponding global configuration item, you must add it here. If it does not, you do not need to change this file.</p>
+
+<h2 id="Testing">Testing</h2>
+
+<p>The following test files must be considered for modification:</p>
+
+<pre><code>    t/00_modules.t
+    t/01_config.t
+    t/01_config_bad_perlcritic.t
+    t/04_options_processor.t
+    t/07_command.t
+    t/10_user_profile.t
+    t/16_roundtrip_defaults.t</code></pre>
+
+<p>Depending on your new item, you may not need to change all of these, but you should at least review them. Depending on what your new item actually does, other test files may need to be modified as well.</p>
+
+<h1 id="DEPRECATING-AND-REMOVING-A-PUBLIC-SUBROUTINE-OR-METHOD">DEPRECATING AND REMOVING A PUBLIC SUBROUTINE OR METHOD</h1>
+
+<p>This is something to be done cautiously. The code in question may only exist to serve Perl::Critic, but if it is documented as public it may well be in use &quot;in the wild&quot;, either in add-ons to Perl::Critic or by users of Perl::Critic.</p>
+
+<p>Before deprecating public code, the potential deprecator must discuss the issues on the Perl::Critic developers&#39; mailing list. There are instructions on how to subscribe to this list in <a href="../../../lib/Perl/Critic.html#EXTENDING-THE-CRITIC">&quot;EXTENDING THE CRITIC&quot; in Perl::Critic</a>.</p>
+
+<p>Once agreement is reached, the technical details of the deprecation are fairly simple.</p>
+
+<p>You must insert something like the following in the code to be deprecated:</p>
+
+<pre><code>    <span class="variable">warnings::warnif</span><span class="operator">(</span>
+        <span class="string">'deprecated'</span><span class="operator">,</span>
+        <span class="string">'Perl::Critic::Utils::foo() deprecated, use blah::foo() instead.'</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>You should have the deprecated subroutine delegate its functionality to the new subroutine, if that is practical (it may not be).</p>
+
+<p>You must update the documentation to say that the old code is deprecated, and what the replacement is.</p>
+
+<p>After the old code has been deprecated for a couple production releases, it can be removed.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2009-2011 Thomas R. Wyant, III</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,333 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#test_constraint-type-tests-describer">test_constraint( $type, $tests, [ $describer ] )</a></li>
+      <li><a href="#describe-value">describe($value)</a></li>
+      <li><a href="#builtins_tests-GLOB-GLOB_OVERLOAD-GLOB_OVERLOAD_FH">builtins_tests( $GLOB, $GLOB_OVERLOAD, $GLOB_OVERLOAD_FH )</a></li>
+      <li><a href="#Variables">Variables</a></li>
+      <li><a href="#Globs-and-the-_T::GlobOverload-package">Globs and the _T::GlobOverload package</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test::Specio - Test helpers for Specio</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Test::Specio</span> <span class="string">qw( test_constraint :vars )</span><span class="operator">;</span>
+  
+  <span class="variable">test_constraint</span><span class="operator">(</span>
+      <span class="variable">t</span><span class="operator">(</span><span class="string">'Foo'</span><span class="operator">),</span> <span class="operator">{</span>
+          <span class="string">accept</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">'bar'</span> <span class="operator">]</span><span class="operator">,</span>
+          <span class="string">reject</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">42</span><span class="operator">,</span>    <span class="operator">{}</span><span class="operator">,</span> <span class="variable">$EMPTY_STRING</span><span class="operator">,</span> <span class="variable">$HASH_REF</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package provides some helper functions and variables for testing Specio types.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>This module provides the following exports:</p>
+
+<h2 id="test_constraint-type-tests-describer">test_constraint( $type, $tests, [ $describer ] )</h2>
+
+<p>This subroutine accepts two arguments. The first should be a Specio type object. The second is hashref which can contain the keys <code>accept</code> and <code>reject</code>. Each key should contain an arrayref of values which the type accepts or rejects.</p>
+
+<p>The third argument is optional. This is a sub reference which will be called to generate a description of the value being tested. This defaults to calling this package&#39;s <code>describe</code> sub, but you can provide your own.</p>
+
+<h2 id="describe-value">describe($value)</h2>
+
+<p>Given a value, this subroutine returns a string describing that value in a useful way for test output. It know about the various classes used for the variables exported by this package and will do something intelligent when such a variable.</p>
+
+<h2 id="builtins_tests-GLOB-GLOB_OVERLOAD-GLOB_OVERLOAD_FH">builtins_tests( $GLOB, $GLOB_OVERLOAD, $GLOB_OVERLOAD_FH )</h2>
+
+<p>This subroutine returns a hashref containing test variables for all builtin types. The hashref has a form like this:</p>
+
+<pre><code>  <span class="operator">{</span>
+      <span class="string">Bool</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">accept</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+              <span class="variable">$ZERO</span><span class="operator">,</span>
+              <span class="variable">$ONE</span><span class="operator">,</span>
+              <span class="variable">$BOOL_OVERLOAD_TRUE</span><span class="operator">,</span>
+              <span class="variable">$BOOL_OVERLOAD_FALSE</span><span class="operator">,</span>
+              <span class="operator">...,</span>
+          <span class="operator">]</span><span class="operator">,</span>
+          <span class="string">reject</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+              <span class="variable">$INT</span><span class="operator">,</span>
+              <span class="variable">$NEG_INT</span><span class="operator">,</span>
+              <span class="variable">$NUM</span><span class="operator">,</span>
+              <span class="variable">$NEG_NUM</span><span class="operator">,</span>
+              <span class="operator">...,</span>
+              <span class="variable">$OBJECT</span><span class="operator">,</span>
+          <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+      <span class="string">Maybe</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>You need to pass in a glob, an object which overloads globification, and an object which overloads globification to return an open filehandle. See below for more details on how to create these things.</p>
+
+<h2 id="Variables">Variables</h2>
+
+<p>This module also exports many variables containing values which are useful for testing constraints. Note that references are always empty unless stated otherwise. You can import these variables individually or import all of them with the <code>:vars</code> import tag.</p>
+
+<ul>
+
+<li><p><code>$ZERO</code></p>
+
+</li>
+<li><p><code>$ONE</code></p>
+
+</li>
+<li><p><code>$INT</code></p>
+
+<p>An arbitrary positive integer.</p>
+
+</li>
+<li><p><code>$NEG_INT</code></p>
+
+<p>An arbitrary negative integer.</p>
+
+</li>
+<li><p><code>$NUM</code></p>
+
+<p>An arbitrary positive non-integer number.</p>
+
+</li>
+<li><p><code>$NEG_NUM</code></p>
+
+<p>An arbitrary negative non-integer number.</p>
+
+</li>
+<li><p><code>$EMPTY_STRING</code></p>
+
+</li>
+<li><p><code>$STRING</code></p>
+
+<p>An arbitrary non-empty string.</p>
+
+</li>
+<li><p><code>$NUM_IN_STRING</code></p>
+
+<p>An arbitrary string which contains a number.</p>
+
+</li>
+<li><p><code>$INT_WITH_NL1</code></p>
+
+<p>An string containing an integer followed by a newline.</p>
+
+</li>
+<li><p><code>$INT_WITH_NL2</code></p>
+
+<p>An string containing a newline followed by an integer.</p>
+
+</li>
+<li><p><code>$SCALAR_REF</code></p>
+
+</li>
+<li><p><code>$SCALAR_REF_REF</code></p>
+
+<p>A reference containing a reference to a scalar.</p>
+
+</li>
+<li><p><code>$ARRAY_REF</code></p>
+
+</li>
+<li><p><code>$HASH_REF</code></p>
+
+</li>
+<li><p><code>$CODE_REF</code></p>
+
+</li>
+<li><p><code>$GLOB_REF</code></p>
+
+</li>
+<li><p><code>$FH</code></p>
+
+<p>An opened filehandle.</p>
+
+</li>
+<li><p><code>$FH_OBJECT</code></p>
+
+<p>An opened <a href="../../lib/IO/File.html">IO::File</a> object.</p>
+
+</li>
+<li><p><code>$REGEX</code></p>
+
+<p>A regex created with <code>qr//</code>.</p>
+
+</li>
+<li><p><code>$REGEX_OBJ</code></p>
+
+<p>A regex created with <code>qr//</code> that was then blessed into class.</p>
+
+</li>
+<li><p><code>$FAKE_REGEX</code></p>
+
+<p>A non-regex blessed into the <code>Regexp</code> class which Perl uses internally for <code>qr//</code> objects.</p>
+
+</li>
+<li><p><code>$OBJECT</code></p>
+
+<p>An arbitrary object.</p>
+
+</li>
+<li><p><code>$UNDEF</code></p>
+
+</li>
+<li><p><code>$CLASS_NAME</code></p>
+
+<p>A string containing a loaded package name.</p>
+
+</li>
+<li><p><code>$BOOL_OVERLOAD_TRUE</code></p>
+
+<p>An object which overloads boolification to return true.</p>
+
+</li>
+<li><p><code>$BOOL_OVERLOAD_FALSE</code></p>
+
+<p>An object which overloads boolification to return false.</p>
+
+</li>
+<li><p><code>$STR_OVERLOAD_EMPTY</code></p>
+
+<p>An object which overloads stringification to return an empty string.</p>
+
+</li>
+<li><p><code>$STR_OVERLOAD_FULL</code></p>
+
+<p>An object which overloads stringification to return a non-empty string.</p>
+
+</li>
+<li><p><code>$STR_OVERLOAD_CLASS_NAME</code></p>
+
+<p>An object which overloads stringification to return a loaded package name.</p>
+
+</li>
+<li><p><code>$NUM_OVERLOAD_ZERO</code></p>
+
+</li>
+<li><p><code>$NUM_OVERLOAD_ONE</code></p>
+
+</li>
+<li><p><code>$NUM_OVERLOAD_NEG</code></p>
+
+</li>
+<li><p><code>$NUM_OVERLOAD_DECIMAL</code></p>
+
+</li>
+<li><p><code>$NUM_OVERLOAD_NEG_DECIMAL</code></p>
+
+</li>
+<li><p><code>$CODE_OVERLOAD</code></p>
+
+</li>
+<li><p><code>$SCALAR_OVERLOAD</code></p>
+
+<p>An object which overloads scalar dereferencing to return a non-empty string.</p>
+
+</li>
+<li><p><code>$ARRAY_OVERLOAD</code></p>
+
+<p>An object which overloads array dereferencing to return a non-empty array.</p>
+
+</li>
+<li><p><code>$HASH_OVERLOAD</code></p>
+
+<p>An object which overloads hash dereferencing to return a non-empty hash.</p>
+
+</li>
+</ul>
+
+<h2 id="Globs-and-the-_T::GlobOverload-package">Globs and the _T::GlobOverload package</h2>
+
+<p>To create a glob you can pass around for tests, use this code:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$GLOB</span> <span class="operator">=</span> <span class="keyword">do</span> <span class="operator">{</span>
+      <span class="keyword">no</span> <span class="variable">warnings</span> <span class="string">'once'</span><span class="operator">;</span>
+      <span class="variable">*SOME_GLOB</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>The <code>_T::GlobOverload</code> package is defined when you load <code>Test::Specio</code> so you can create your own glob overloading objects. Such objects cannot be exported because the glob they return does not transfer across packages properly.</p>
+
+<p>You can create such a variable like this:</p>
+
+<pre><code>  <span class="keyword">local</span> <span class="variable">*FOO</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$GLOB_OVERLOAD</span> <span class="operator">=</span> <span class="variable">_T::GlobOverload</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">*FOO</span> <span class="operator">);</span>
+</code></pre>
+
+<p>If you want to create a glob overloading object that returns a filehandle, do this:</p>
+
+<pre><code>  <span class="keyword">local</span> <span class="variable">*BAR</span><span class="operator">;</span>
+  <span class="keyword">open</span> <span class="variable">BAR</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="variable">$0</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Could not open </span><span class="variable">$0</span><span class="string"> for the test"</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$GLOB_OVERLOAD_FH</span> <span class="operator">=</span> <span class="variable">_T::GlobOverload</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">*BAR</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,181 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#INTRODUCTION">INTRODUCTION</a></li>
+  <li><a href="#GETTING-STARTED">GETTING STARTED</a></li>
+  <li><a href="#USING-THE-METACLASS-OBJECT">USING THE METACLASS OBJECT</a></li>
+  <li><a href="#ALTERING-CLASSES-WITH-THE-MOP">ALTERING CLASSES WITH THE MOP</a></li>
+  <li><a href="#GOING-FURTHER">GOING FURTHER</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::MOP - The Moose (and Class::MOP) meta API</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="INTRODUCTION">INTRODUCTION</h1>
+
+<p>Moose provides a powerful introspection API built on top of <code>Class::MOP</code>. &quot;MOP&quot; stands for Meta-Object Protocol. In plainer English, a MOP is an API for performing introspection on classes, attributes, methods, and so on.</p>
+
+<p>In fact, it is <code>Class::MOP</code> that provides many of Moose&#39;s core features, including attributes, before/after/around method modifiers, and immutability. In most cases, Moose takes an existing <code>Class::MOP</code> class and subclasses it to add additional features. Moose also adds some entirely new features of its own, such as roles, the augment modifier, and types.</p>
+
+<p>If you&#39;re interested in the MOP, it&#39;s important to know about <code>Class::MOP</code> so you know what docs to read. Often, the introspection method that you&#39;re looking for is defined in a <code>Class::MOP</code> class, rather than Moose itself.</p>
+
+<p>The MOP provides more than just <i>read-only</i> introspection. It also lets you add attributes and methods, apply roles, and much more. In fact, all of the declarative Moose sugar is simply a thin layer on top of the MOP API.</p>
+
+<p>If you want to write Moose extensions, you&#39;ll need to learn some of the MOP API. The introspection methods are also handy if you want to generate docs or inheritance graphs, or do some other runtime reflection.</p>
+
+<p>This document is not a complete reference for the meta API. We&#39;re just going to cover some of the highlights, and give you a sense of how it all works. To really understand it, you&#39;ll have to read a lot of other docs, and possibly even dig into the Moose guts a bit.</p>
+
+<h1 id="GETTING-STARTED">GETTING STARTED</h1>
+
+<p>The usual entry point to the meta API is through a class&#39;s metaclass object, which is a <a href="../../../lib/Moose/Meta/Class.html">Moose::Meta::Class</a>. This is available by calling the <code>meta</code> method on a class or object:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">User</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$meta</span> <span class="operator">=</span> <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>meta</code> method is added to a class when it uses Moose.</p>
+
+<p>You can also use <code>Class::MOP::Class-&gt;initialize($name)</code> to get a metaclass object for any class. This is safer than calling <code>$class-&gt;meta</code> when you&#39;re not sure that the class has a meta method.</p>
+
+<p>The <code>Class::MOP::Class-&gt;initialize</code> constructor will return an existing metaclass if one has already been created (via Moose or some other means). If it hasn&#39;t, it will return a new <code>Class::MOP::Class</code> object. This will work for classes that use Moose, meta API classes, and classes which don&#39;t use Moose at all.</p>
+
+<h1 id="USING-THE-METACLASS-OBJECT">USING THE METACLASS OBJECT</h1>
+
+<p>The metaclass object can tell you about a class&#39;s attributes, methods, roles, parents, and more. For example, to look at all of the class&#39;s attributes:</p>
+
+<pre><code>  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$attr</span> <span class="operator">(</span> <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">get_all_attributes</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="variable">$attr</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>get_all_attributes</code> method is documented in <code>Class::MOP::Class</code>. For Moose-using classes, it returns a list of <a href="../../../lib/Moose/Meta/Attribute.html">Moose::Meta::Attribute</a> objects for attributes defined in the class and its parents.</p>
+
+<p>You can also get a list of methods:</p>
+
+<pre><code>  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$method</span> <span class="operator">(</span> <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">get_all_methods</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="variable">$method</span><span class="operator">-&gt;</span><span class="variable">fully_qualified_name</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Now we&#39;re looping over a list of <a href="../../../lib/Moose/Meta/Method.html">Moose::Meta::Method</a> objects. Note that some of these objects may actually be a subclass of <a href="../../../lib/Moose/Meta/Method.html">Moose::Meta::Method</a>, as Moose uses different classes to represent wrapped methods, delegation methods, constructors, etc.</p>
+
+<p>We can look at a class&#39;s parent classes and subclasses:</p>
+
+<pre><code>  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">(</span> <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">linearized_isa</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"</span><span class="variable">$class</span><span class="string">\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$subclass</span> <span class="operator">(</span> <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">subclasses</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"</span><span class="variable">$subclass</span><span class="string">\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Note that both these methods return class <i>names</i>, not metaclass objects.</p>
+
+<h1 id="ALTERING-CLASSES-WITH-THE-MOP">ALTERING CLASSES WITH THE MOP</h1>
+
+<p>The metaclass object can change the class directly, by adding attributes, methods, etc.</p>
+
+<p>As an example, we can add a method to a class:</p>
+
+<pre><code>  <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">add_method</span><span class="operator">(</span> <span class="string">'say'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">print</span> <span class="variable">@_</span><span class="operator">,</span> <span class="string">"\n"</span> <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Or an attribute:</p>
+
+<pre><code>  <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">add_attribute</span><span class="operator">(</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span>  <span class="operator">=&gt;</span> <span class="string">'Int'</span> <span class="operator">)</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Obviously, this is much more cumbersome than using Perl syntax or Moose sugar for defining methods and attributes, but this API allows for very powerful extensions.</p>
+
+<p>You might remember that we&#39;ve talked about making classes immutable elsewhere in the manual. This is a good practice. However, once a class is immutable, calling any of these update methods will throw an exception.</p>
+
+<p>You can make a class mutable again simply by calling <code>$meta-&gt;make_mutable</code>. Once you&#39;re done changing it, you can restore immutability by calling <code>$meta-&gt;make_immutable</code>.</p>
+
+<p>However, the most common use for this part of the meta API is as part of Moose extensions. These extensions should assume that they are being run before you make a class immutable.</p>
+
+<h1 id="GOING-FURTHER">GOING FURTHER</h1>
+
+<p>If you&#39;re interested in extending Moose, we recommend reading all of the &quot;Meta&quot; and &quot;Extending&quot; recipes in the <a href="../../../lib/Moose/Cookbook.html">Moose::Cookbook</a>. Those recipes show various practical applications of the MOP.</p>
+
+<p>If you&#39;d like to write your own extensions, one of the best ways to learn more about this is to look at other similar extensions to see how they work. You&#39;ll probably also need to read various API docs, including the docs for the various <code>Moose::Meta::*</code> and <code>Class::MOP::*</code> classes.</p>
+
+<p>Finally, we welcome questions on the Moose mailing list and IRC. Information on the mailing list, IRC, and more references can be found in the <a href="../../../lib/Moose.html#GETTING-HELP">Moose.pm docs</a>.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

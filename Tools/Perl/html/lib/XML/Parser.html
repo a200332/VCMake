@@ -1,0 +1,418 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#HANDLERS">HANDLERS</a>
+    <ul>
+      <li><a href="#Init-Expat">Init (Expat)</a></li>
+      <li><a href="#Final-Expat">Final (Expat)</a></li>
+      <li><a href="#Start-Expat-Element-Attr-Val">Start (Expat, Element [, Attr, Val [,...]])</a></li>
+      <li><a href="#End-Expat-Element">End (Expat, Element)</a></li>
+      <li><a href="#Char-Expat-String">Char (Expat, String)</a></li>
+      <li><a href="#Proc-Expat-Target-Data">Proc (Expat, Target, Data)</a></li>
+      <li><a href="#Comment-Expat-Data">Comment (Expat, Data)</a></li>
+      <li><a href="#CdataStart-Expat">CdataStart (Expat)</a></li>
+      <li><a href="#CdataEnd-Expat">CdataEnd (Expat)</a></li>
+      <li><a href="#Default-Expat-String">Default (Expat, String)</a></li>
+      <li><a href="#Unparsed-Expat-Entity-Base-Sysid-Pubid-Notation">Unparsed (Expat, Entity, Base, Sysid, Pubid, Notation)</a></li>
+      <li><a href="#Notation-Expat-Notation-Base-Sysid-Pubid">Notation (Expat, Notation, Base, Sysid, Pubid)</a></li>
+      <li><a href="#ExternEnt-Expat-Base-Sysid-Pubid">ExternEnt (Expat, Base, Sysid, Pubid)</a></li>
+      <li><a href="#ExternEntFin-Expat">ExternEntFin (Expat)</a></li>
+      <li><a href="#Entity-Expat-Name-Val-Sysid-Pubid-Ndata-IsParam">Entity (Expat, Name, Val, Sysid, Pubid, Ndata, IsParam)</a></li>
+      <li><a href="#Element-Expat-Name-Model">Element (Expat, Name, Model)</a></li>
+      <li><a href="#Attlist-Expat-Elname-Attname-Type-Default-Fixed">Attlist (Expat, Elname, Attname, Type, Default, Fixed)</a></li>
+      <li><a href="#Doctype-Expat-Name-Sysid-Pubid-Internal">Doctype (Expat, Name, Sysid, Pubid, Internal)</a></li>
+      <li><a href="#DoctypeFin-Parser">* DoctypeFin (Parser)</a></li>
+      <li><a href="#XMLDecl-Expat-Version-Encoding-Standalone">XMLDecl (Expat, Version, Encoding, Standalone)</a></li>
+    </ul>
+  </li>
+  <li><a href="#STYLES">STYLES</a>
+    <ul>
+      <li><a href="#Debug">Debug</a></li>
+      <li><a href="#Subs">Subs</a></li>
+      <li><a href="#Tree">Tree</a></li>
+      <li><a href="#Objects">Objects</a></li>
+      <li><a href="#Stream">Stream</a></li>
+    </ul>
+  </li>
+  <li><a href="#ENCODINGS">ENCODINGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>XML::Parser - A perl module for parsing XML documents</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">XML::Parser</span><span class="operator">;</span>
+  
+  <span class="variable">$p1</span> <span class="operator">=</span> <span class="variable">XML::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">Style</span> <span class="operator">=&gt;</span> <span class="string">'Debug'</span><span class="operator">);</span>
+  <span class="variable">$p1</span><span class="operator">-&gt;</span><span class="variable">parsefile</span><span class="operator">(</span><span class="string">'REC-xml-19980210.xml'</span><span class="operator">);</span>
+  <span class="variable">$p1</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="string">'&lt;foo id="me"&gt;Hello World&lt;/foo&gt;'</span><span class="operator">);</span>
+  
+  <span class="comment"># Alternative</span>
+  <span class="variable">$p2</span> <span class="operator">=</span> <span class="variable">XML::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">Handlers</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="string">Start</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">handle_start</span><span class="operator">,</span>
+                                     <span class="string">End</span>   <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">handle_end</span><span class="operator">,</span>
+                                     <span class="string">Char</span>  <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">handle_char</span><span class="operator">}</span><span class="operator">);</span>
+  <span class="variable">$p2</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="variable">$socket</span><span class="operator">);</span>
+  
+  <span class="comment"># Another alternative</span>
+  <span class="variable">$p3</span> <span class="operator">=</span> <span class="variable">XML::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">ErrorContext</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">);</span>
+  
+  <span class="variable">$p3</span><span class="operator">-&gt;</span><span class="variable">setHandlers</span><span class="operator">(</span><span class="string">Char</span>    <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">text</span><span class="operator">,</span>
+                   <span class="string">Default</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">other</span><span class="operator">);</span>
+  
+  <span class="keyword">open</span><span class="operator">(</span><span class="variable">FOO</span><span class="operator">,</span> <span class="string">'xmlgenerator |'</span><span class="operator">);</span>
+  <span class="variable">$p3</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="variable">*FOO</span><span class="operator">,</span> <span class="string">ProtocolEncoding</span> <span class="operator">=&gt;</span> <span class="string">'ISO-8859-1'</span><span class="operator">);</span>
+  <span class="keyword">close</span><span class="operator">(</span><span class="variable">FOO</span><span class="operator">);</span>
+  
+  <span class="variable">$p3</span><span class="operator">-&gt;</span><span class="variable">parsefile</span><span class="operator">(</span><span class="string">'junk.xml'</span><span class="operator">,</span> <span class="string">ErrorContext</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides ways to parse XML documents. It is built on top of <a href="../../lib/XML/Parser/Expat.html">XML::Parser::Expat</a>, which is a lower level interface to James Clark&#39;s expat library. Each call to one of the parsing methods creates a new instance of XML::Parser::Expat which is then used to parse the document. Expat options may be provided when the XML::Parser object is created. These options are then passed on to the Expat object on each parse call. They can also be given as extra arguments to the parse methods, in which case they override options given at XML::Parser creation time.</p>
+
+<p>The behavior of the parser is controlled either by <code><a href="#STYLES">&quot;STYLES&quot;</a></code> and/or <code><a href="#HANDLERS">&quot;HANDLERS&quot;</a></code> options, or by <a href="#setHandlers">&quot;setHandlers&quot;</a> method. These all provide mechanisms for XML::Parser to set the handlers needed by XML::Parser::Expat. If neither <code>Style</code> nor <code>Handlers</code> are specified, then parsing just checks the document for being well-formed.</p>
+
+<p>When underlying handlers get called, they receive as their first parameter the <i>Expat</i> object, not the Parser object.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<p>This is a class method, the constructor for XML::Parser. Options are passed as keyword value pairs. Recognized options are:</p>
+
+<ul>
+
+<li><p>Style</p>
+
+<p>This option provides an easy way to create a given style of parser. The built in styles are: <a href="#Debug">&quot;Debug&quot;</a>, <a href="#Subs">&quot;Subs&quot;</a>, <a href="#Tree">&quot;Tree&quot;</a>, <a href="#Objects">&quot;Objects&quot;</a>, and <a href="#Stream">&quot;Stream&quot;</a>. These are all defined in separate packages under <code>XML::Parser::Style::*</code>, and you can find further documentation for each style both below, and in those packages.</p>
+
+<p>Custom styles can be provided by giving a full package name containing at least one &#39;::&#39;. This package should then have subs defined for each handler it wishes to have installed. See <a href="#STYLES">&quot;STYLES&quot;</a> below for a discussion of each built in style.</p>
+
+</li>
+<li><p>Handlers</p>
+
+<p>When provided, this option should be an anonymous hash containing as keys the type of handler and as values a sub reference to handle that type of event. All the handlers get passed as their 1st parameter the instance of expat that is parsing the document. Further details on handlers can be found in <a href="#HANDLERS">&quot;HANDLERS&quot;</a>. Any handler set here overrides the corresponding handler set with the Style option.</p>
+
+</li>
+<li><p>Pkg</p>
+
+<p>Some styles will refer to subs defined in this package. If not provided, it defaults to the package which called the constructor.</p>
+
+</li>
+<li><p>ErrorContext</p>
+
+<p>This is an Expat option. When this option is defined, errors are reported in context. The value should be the number of lines to show on either side of the line in which the error occurred.</p>
+
+</li>
+<li><p>ProtocolEncoding</p>
+
+<p>This is an Expat option. This sets the protocol encoding name. It defaults to none. The built-in encodings are: <code>UTF-8</code>, <code>ISO-8859-1</code>, <code>UTF-16</code>, and <code>US-ASCII</code>. Other encodings may be used if they have encoding maps in one of the directories in the @Encoding_Path list. Check <a href="#ENCODINGS">&quot;ENCODINGS&quot;</a> for more information on encoding maps. Setting the protocol encoding overrides any encoding in the XML declaration.</p>
+
+</li>
+<li><p>Namespaces</p>
+
+<p>This is an Expat option. If this is set to a true value, then namespace processing is done during the parse. See <a href="../../lib/XML/Parser/Expat.html#Namespaces">&quot;Namespaces&quot; in XML::Parser::Expat</a> for further discussion of namespace processing.</p>
+
+</li>
+<li><p>NoExpand</p>
+
+<p>This is an Expat option. Normally, the parser will try to expand references to entities defined in the internal subset. If this option is set to a true value, and a default handler is also set, then the default handler will be called when an entity reference is seen in text. This has no effect if a default handler has not been registered, and it has no effect on the expansion of entity references inside attribute values.</p>
+
+</li>
+<li><p>Stream_Delimiter</p>
+
+<p>This is an Expat option. It takes a string value. When this string is found alone on a line while parsing from a stream, then the parse is ended as if it saw an end of file. The intended use is with a stream of xml documents in a MIME multipart format. The string should not contain a trailing newline.</p>
+
+</li>
+<li><p>ParseParamEnt</p>
+
+<p>This is an Expat option. Unless standalone is set to &quot;yes&quot; in the XML declaration, setting this to a true value allows the external DTD to be read, and parameter entities to be parsed and expanded.</p>
+
+</li>
+<li><p>NoLWP</p>
+
+<p>This option has no effect if the ExternEnt or ExternEntFin handlers are directly set. Otherwise, if true, it forces the use of a file based external entity handler.</p>
+
+</li>
+<li><p>Non-Expat-Options</p>
+
+<p>If provided, this should be an anonymous hash whose keys are options that shouldn&#39;t be passed to Expat. This should only be of concern to those subclassing XML::Parser.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="setHandlers-TYPE-HANDLER-TYPE-HANDLER">setHandlers(TYPE, HANDLER [, TYPE, HANDLER [...]])</dt>
+<dd>
+
+<p>This method registers handlers for various parser events. It overrides any previous handlers registered through the Style or Handler options or through earlier calls to setHandlers. By providing a false or undefined value as the handler, the existing handler can be unset.</p>
+
+<p>This method returns a list of type, handler pairs corresponding to the input. The handlers returned are the ones that were in effect prior to the call.</p>
+
+<p>See a description of the handler types in <a href="#HANDLERS">&quot;HANDLERS&quot;</a>.</p>
+
+</dd>
+<dt id="parse-SOURCE-OPT-OPT_VALUE">parse(SOURCE [, OPT =&gt; OPT_VALUE [...]])</dt>
+<dd>
+
+<p>The SOURCE parameter should either be a string containing the whole XML document, or it should be an open IO::Handle. Constructor options to XML::Parser::Expat given as keyword-value pairs may follow the SOURCE parameter. These override, for this call, any options or attributes passed through from the XML::Parser instance.</p>
+
+<p>A die call is thrown if a parse error occurs. Otherwise it will return 1 or whatever is returned from the <b>Final</b> handler, if one is installed. In other words, what parse may return depends on the style.</p>
+
+</dd>
+<dt id="parsestring">parsestring</dt>
+<dd>
+
+<p>This is just an alias for parse for backwards compatibility.</p>
+
+</dd>
+<dt id="parsefile-FILE-OPT-OPT_VALUE">parsefile(FILE [, OPT =&gt; OPT_VALUE [...]])</dt>
+<dd>
+
+<p>Open FILE for reading, then call parse with the open handle. The file is closed no matter how parse returns. Returns what parse returns.</p>
+
+</dd>
+<dt id="parse_start-OPT-OPT_VALUE">parse_start([ OPT =&gt; OPT_VALUE [...]])</dt>
+<dd>
+
+<p>Create and return a new instance of XML::Parser::ExpatNB. Constructor options may be provided. If an init handler has been provided, it is called before returning the ExpatNB object. Documents are parsed by making incremental calls to the parse_more method of this object, which takes a string. A single call to the parse_done method of this object, which takes no arguments, indicates that the document is finished.</p>
+
+<p>If there is a final handler installed, it is executed by the parse_done method before returning and the parse_done method returns whatever is returned by the final handler.</p>
+
+</dd>
+</dl>
+
+<h1 id="HANDLERS">HANDLERS</h1>
+
+<p>Expat is an event based parser. As the parser recognizes parts of the document (say the start or end tag for an XML element), then any handlers registered for that type of an event are called with suitable parameters. All handlers receive an instance of XML::Parser::Expat as their first argument. See <a href="../../lib/XML/Parser/Expat.html#METHODS">&quot;METHODS&quot; in XML::Parser::Expat</a> for a discussion of the methods that can be called on this object.</p>
+
+<h2 id="Init-Expat">Init (Expat)</h2>
+
+<p>This is called just before the parsing of the document starts.</p>
+
+<h2 id="Final-Expat">Final (Expat)</h2>
+
+<p>This is called just after parsing has finished, but only if no errors occurred during the parse. Parse returns what this returns.</p>
+
+<h2 id="Start-Expat-Element-Attr-Val">Start (Expat, Element [, Attr, Val [,...]])</h2>
+
+<p>This event is generated when an XML start tag is recognized. Element is the name of the XML element type that is opened with the start tag. The Attr &amp; Val pairs are generated for each attribute in the start tag.</p>
+
+<h2 id="End-Expat-Element">End (Expat, Element)</h2>
+
+<p>This event is generated when an XML end tag is recognized. Note that an XML empty tag (&lt;foo/&gt;) generates both a start and an end event.</p>
+
+<h2 id="Char-Expat-String">Char (Expat, String)</h2>
+
+<p>This event is generated when non-markup is recognized. The non-markup sequence of characters is in String. A single non-markup sequence of characters may generate multiple calls to this handler. Whatever the encoding of the string in the original document, this is given to the handler in UTF-8.</p>
+
+<h2 id="Proc-Expat-Target-Data">Proc (Expat, Target, Data)</h2>
+
+<p>This event is generated when a processing instruction is recognized.</p>
+
+<h2 id="Comment-Expat-Data">Comment (Expat, Data)</h2>
+
+<p>This event is generated when a comment is recognized.</p>
+
+<h2 id="CdataStart-Expat">CdataStart (Expat)</h2>
+
+<p>This is called at the start of a CDATA section.</p>
+
+<h2 id="CdataEnd-Expat">CdataEnd (Expat)</h2>
+
+<p>This is called at the end of a CDATA section.</p>
+
+<h2 id="Default-Expat-String">Default (Expat, String)</h2>
+
+<p>This is called for any characters that don&#39;t have a registered handler. This includes both characters that are part of markup for which no events are generated (markup declarations) and characters that could generate events, but for which no handler has been registered.</p>
+
+<p>Whatever the encoding in the original document, the string is returned to the handler in UTF-8.</p>
+
+<h2 id="Unparsed-Expat-Entity-Base-Sysid-Pubid-Notation">Unparsed (Expat, Entity, Base, Sysid, Pubid, Notation)</h2>
+
+<p>This is called for a declaration of an unparsed entity. Entity is the name of the entity. Base is the base to be used for resolving a relative URI. Sysid is the system id. Pubid is the public id. Notation is the notation name. Base and Pubid may be undefined.</p>
+
+<h2 id="Notation-Expat-Notation-Base-Sysid-Pubid">Notation (Expat, Notation, Base, Sysid, Pubid)</h2>
+
+<p>This is called for a declaration of notation. Notation is the notation name. Base is the base to be used for resolving a relative URI. Sysid is the system id. Pubid is the public id. Base, Sysid, and Pubid may all be undefined.</p>
+
+<h2 id="ExternEnt-Expat-Base-Sysid-Pubid">ExternEnt (Expat, Base, Sysid, Pubid)</h2>
+
+<p>This is called when an external entity is referenced. Base is the base to be used for resolving a relative URI. Sysid is the system id. Pubid is the public id. Base, and Pubid may be undefined.</p>
+
+<p>This handler should either return a string, which represents the contents of the external entity, or return an open filehandle that can be read to obtain the contents of the external entity, or return undef, which indicates the external entity couldn&#39;t be found and will generate a parse error.</p>
+
+<p>If an open filehandle is returned, it must be returned as either a glob (*FOO) or as a reference to a glob (e.g. an instance of IO::Handle).</p>
+
+<p>A default handler is installed for this event. The default handler is XML::Parser::lwp_ext_ent_handler unless the NoLWP option was provided with a true value, otherwise XML::Parser::file_ext_ent_handler is the default handler for external entities. Even without the NoLWP option, if the URI or LWP modules are missing, the file based handler ends up being used after giving a warning on the first external entity reference.</p>
+
+<p>The LWP external entity handler will use proxies defined in the environment (http_proxy, ftp_proxy, etc.).</p>
+
+<p>Please note that the LWP external entity handler reads the entire entity into a string and returns it, where as the file handler opens a filehandle.</p>
+
+<p>Also note that the file external entity handler will likely choke on absolute URIs or file names that don&#39;t fit the conventions of the local operating system.</p>
+
+<p>The expat base method can be used to set a basename for relative pathnames. If no basename is given, or if the basename is itself a relative name, then it is relative to the current working directory.</p>
+
+<h2 id="ExternEntFin-Expat">ExternEntFin (Expat)</h2>
+
+<p>This is called after parsing an external entity. It&#39;s not called unless an ExternEnt handler is also set. There is a default handler installed that pairs with the default ExternEnt handler.</p>
+
+<p>If you&#39;re going to install your own ExternEnt handler, then you should set (or unset) this handler too.</p>
+
+<h2 id="Entity-Expat-Name-Val-Sysid-Pubid-Ndata-IsParam">Entity (Expat, Name, Val, Sysid, Pubid, Ndata, IsParam)</h2>
+
+<p>This is called when an entity is declared. For internal entities, the Val parameter will contain the value and the remaining three parameters will be undefined. For external entities, the Val parameter will be undefined, the Sysid parameter will have the system id, the Pubid parameter will have the public id if it was provided (it will be undefined otherwise), the Ndata parameter will contain the notation for unparsed entities. If this is a parameter entity declaration, then the IsParam parameter is true.</p>
+
+<p>Note that this handler and the Unparsed handler above overlap. If both are set, then this handler will not be called for unparsed entities.</p>
+
+<h2 id="Element-Expat-Name-Model">Element (Expat, Name, Model)</h2>
+
+<p>The element handler is called when an element declaration is found. Name is the element name, and Model is the content model as an XML::Parser::Content object. See <a href="../../lib/XML/Parser/Expat.html#XML::Parser::ContentModel-Methods">&quot;XML::Parser::ContentModel Methods&quot; in XML::Parser::Expat</a> for methods available for this class.</p>
+
+<h2 id="Attlist-Expat-Elname-Attname-Type-Default-Fixed">Attlist (Expat, Elname, Attname, Type, Default, Fixed)</h2>
+
+<p>This handler is called for each attribute in an ATTLIST declaration. So an ATTLIST declaration that has multiple attributes will generate multiple calls to this handler. The Elname parameter is the name of the element with which the attribute is being associated. The Attname parameter is the name of the attribute. Type is the attribute type, given as a string. Default is the default value, which will either be &quot;#REQUIRED&quot;, &quot;#IMPLIED&quot; or a quoted string (i.e. the returned string will begin and end with a quote character). If Fixed is true, then this is a fixed attribute.</p>
+
+<h2 id="Doctype-Expat-Name-Sysid-Pubid-Internal">Doctype (Expat, Name, Sysid, Pubid, Internal)</h2>
+
+<p>This handler is called for DOCTYPE declarations. Name is the document type name. Sysid is the system id of the document type, if it was provided, otherwise it&#39;s undefined. Pubid is the public id of the document type, which will be undefined if no public id was given. Internal is the internal subset, given as a string. If there was no internal subset, it will be undefined. Internal will contain all whitespace, comments, processing instructions, and declarations seen in the internal subset. The declarations will be there whether or not they have been processed by another handler (except for unparsed entities processed by the Unparsed handler). However, comments and processing instructions will not appear if they&#39;ve been processed by their respective handlers.</p>
+
+<h2 id="DoctypeFin-Parser">* DoctypeFin (Parser)</h2>
+
+<p>This handler is called after parsing of the DOCTYPE declaration has finished, including any internal or external DTD declarations.</p>
+
+<h2 id="XMLDecl-Expat-Version-Encoding-Standalone">XMLDecl (Expat, Version, Encoding, Standalone)</h2>
+
+<p>This handler is called for xml declarations. Version is a string containing the version. Encoding is either undefined or contains an encoding string. Standalone will be either true, false, or undefined if the standalone attribute is yes, no, or not made respectively.</p>
+
+<h1 id="STYLES">STYLES</h1>
+
+<h2 id="Debug">Debug</h2>
+
+<p>This just prints out the document in outline form. Nothing special is returned by parse.</p>
+
+<h2 id="Subs">Subs</h2>
+
+<p>Each time an element starts, a sub by that name in the package specified by the Pkg option is called with the same parameters that the Start handler gets called with.</p>
+
+<p>Each time an element ends, a sub with that name appended with an underscore (&quot;_&quot;), is called with the same parameters that the End handler gets called with.</p>
+
+<p>Nothing special is returned by parse.</p>
+
+<h2 id="Tree">Tree</h2>
+
+<p>Parse will return a parse tree for the document. Each node in the tree takes the form of a tag, content pair. Text nodes are represented with a pseudo-tag of &quot;0&quot; and the string that is their content. For elements, the content is an array reference. The first item in the array is a (possibly empty) hash reference containing attributes. The remainder of the array is a sequence of tag-content pairs representing the content of the element.</p>
+
+<p>So for example the result of parsing:</p>
+
+<pre><code>  &lt;foo&gt;&lt;head id=&quot;a&quot;&gt;Hello &lt;em&gt;there&lt;/em&gt;&lt;/head&gt;&lt;bar&gt;Howdy&lt;ref/&gt;&lt;/bar&gt;do&lt;/foo&gt;</code></pre>
+
+<p>would be:</p>
+
+<pre><code>             <span class="variable">Tag</span>   <span class="variable">Content</span>
+               <span class="operator">==================================================================</span>
+               <span class="operator">[</span><span class="variable">foo</span><span class="operator">,</span> <span class="operator">[{}</span><span class="operator">,</span> <span class="variable">head</span><span class="operator">,</span> <span class="operator">[{</span><span class="string">id</span> <span class="operator">=&gt;</span> <span class="string">"a"</span><span class="operator">}</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="string">"Hello "</span><span class="operator">,</span>  <span class="variable">em</span><span class="operator">,</span> <span class="operator">[{}</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="string">"there"</span><span class="operator">]]</span><span class="operator">,</span>
+              <span class="variable">bar</span><span class="operator">,</span> <span class="operator">[</span>         <span class="operator">{}</span><span class="operator">,</span> <span class="number">0</span><span class="operator">,</span> <span class="string">"Howdy"</span><span class="operator">,</span>  <span class="keyword">ref</span><span class="operator">,</span> <span class="operator">[{}]]</span><span class="operator">,</span>
+                <span class="number">0</span><span class="operator">,</span> <span class="string">"do"</span>
+                     <span class="operator">]</span>
+               <span class="operator">]</span>
+</code></pre>
+
+<p>The root document &quot;foo&quot;, has 3 children: a &quot;head&quot; element, a &quot;bar&quot; element and the text &quot;do&quot;. After the empty attribute hash, these are represented in it&#39;s contents by 3 tag-content pairs.</p>
+
+<h2 id="Objects">Objects</h2>
+
+<p>This is similar to the Tree style, except that a hash object is created for each element. The corresponding object will be in the class whose name is created by appending &quot;::&quot; and the element name to the package set with the Pkg option. Non-markup text will be in the ::Characters class. The contents of the corresponding object will be in an anonymous array that is the value of the Kids property for that object.</p>
+
+<h2 id="Stream">Stream</h2>
+
+<p>This style also uses the Pkg package. If none of the subs that this style looks for is there, then the effect of parsing with this style is to print a canonical copy of the document without comments or declarations. All the subs receive as their 1st parameter the Expat instance for the document they&#39;re parsing.</p>
+
+<p>It looks for the following routines:</p>
+
+<ul>
+
+<li><p>StartDocument</p>
+
+<p>Called at the start of the parse .</p>
+
+</li>
+<li><p>StartTag</p>
+
+<p>Called for every start tag with a second parameter of the element type. The $_ variable will contain a copy of the tag and the %_ variable will contain attribute values supplied for that element.</p>
+
+</li>
+<li><p>EndTag</p>
+
+<p>Called for every end tag with a second parameter of the element type. The $_ variable will contain a copy of the end tag.</p>
+
+</li>
+<li><p>Text</p>
+
+<p>Called just before start or end tags with accumulated non-markup text in the $_ variable.</p>
+
+</li>
+<li><p>PI</p>
+
+<p>Called for processing instructions. The $_ variable will contain a copy of the PI and the target and data are sent as 2nd and 3rd parameters respectively.</p>
+
+</li>
+<li><p>EndDocument</p>
+
+<p>Called at conclusion of the parse.</p>
+
+</li>
+</ul>
+
+<h1 id="ENCODINGS">ENCODINGS</h1>
+
+<p>XML documents may be encoded in character sets other than Unicode as long as they may be mapped into the Unicode character set. Expat has further restrictions on encodings. Read the xmlparse.h header file in the expat distribution to see details on these restrictions.</p>
+
+<p>Expat has built-in encodings for: <code>UTF-8</code>, <code>ISO-8859-1</code>, <code>UTF-16</code>, and <code>US-ASCII</code>. Encodings are set either through the XML declaration encoding attribute or through the ProtocolEncoding option to XML::Parser or XML::Parser::Expat.</p>
+
+<p>For encodings other than the built-ins, expat calls the function load_encoding in the Expat package with the encoding name. This function looks for a file in the path list @XML::Parser::Expat::Encoding_Path, that matches the lower-cased name with a &#39;.enc&#39; extension. The first one it finds, it loads.</p>
+
+<p>If you wish to build your own encoding maps, check out the XML::Encoding module from CPAN.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Larry Wall &lt;<i>larry@wall.org</i>&gt; wrote version 1.0.</p>
+
+<p>Clark Cooper &lt;<i>coopercc@netheaven.com</i>&gt; picked up support, changed the API for this version (2.x), provided documentation, and added some standard package features.</p>
+
+<p>Matt Sergeant &lt;<i>matt@sergeant.org</i>&gt; is now maintaining XML::Parser</p>
+
+
+</body>
+
+</html>
+
+

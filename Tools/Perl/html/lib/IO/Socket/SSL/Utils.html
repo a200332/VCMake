@@ -1,0 +1,353 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>IO::Socket::SSL::Utils -- loading, storing, creating certificates and keys</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">IO::Socket::SSL::Utils</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$cert</span> <span class="operator">=</span> <span class="variable">PEM_file2cert</span><span class="operator">(</span><span class="string">'cert.pem'</span><span class="operator">);</span>  <span class="comment"># load certificate from file</span>
+    <span class="keyword">my</span> <span class="variable">$string</span> <span class="operator">=</span> <span class="variable">PEM_cert2string</span><span class="operator">(</span><span class="variable">$cert</span><span class="operator">);</span>   <span class="comment"># convert certificate to PEM string</span>
+    <span class="variable">CERT_free</span><span class="operator">(</span><span class="variable">$cert</span><span class="operator">);</span>                      <span class="comment"># free memory within OpenSSL</span>
+    
+    <span class="keyword">my</span> <span class="variable">$key</span> <span class="operator">=</span> <span class="variable">KEY_create_rsa</span><span class="operator">(</span><span class="number">2048</span><span class="operator">);</span>        <span class="comment"># create new 2048-bit RSA key</span>
+    <span class="variable">PEM_string2file</span><span class="operator">(</span><span class="variable">$key</span><span class="operator">,</span><span class="string">"key.pem"</span><span class="operator">);</span>       <span class="comment"># and write it to file</span>
+    <span class="variable">KEY_free</span><span class="operator">(</span><span class="variable">$key</span><span class="operator">);</span>                        <span class="comment"># free memory within OpenSSL</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides various utility functions to work with certificates and private keys, shielding some of the complexity of the underlying Net::SSLeay and OpenSSL.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<ul>
+
+<li><p>Functions converting between string or file and certificates and keys. They croak if the operation cannot be completed.</p>
+
+<dl>
+
+<dt id="PEM_file2cert-file---cert">PEM_file2cert(file) -&gt; cert</dt>
+<dd>
+
+</dd>
+<dt id="PEM_cert2file-cert-file">PEM_cert2file(cert,file)</dt>
+<dd>
+
+</dd>
+<dt id="PEM_string2cert-string---cert">PEM_string2cert(string) -&gt; cert</dt>
+<dd>
+
+</dd>
+<dt id="PEM_cert2string-cert---string">PEM_cert2string(cert) -&gt; string</dt>
+<dd>
+
+</dd>
+<dt id="PEM_file2key-file---key">PEM_file2key(file) -&gt; key</dt>
+<dd>
+
+</dd>
+<dt id="PEM_key2file-key-file">PEM_key2file(key,file)</dt>
+<dd>
+
+</dd>
+<dt id="PEM_string2key-string---key">PEM_string2key(string) -&gt; key</dt>
+<dd>
+
+</dd>
+<dt id="PEM_key2string-key---string">PEM_key2string(key) -&gt; string</dt>
+<dd>
+
+</dd>
+</dl>
+
+</li>
+<li><p>Functions for cleaning up. Each loaded or created cert and key must be freed to not leak memory.</p>
+
+<dl>
+
+<dt id="CERT_free-cert">CERT_free(cert)</dt>
+<dd>
+
+</dd>
+<dt id="KEY_free-key">KEY_free(key)</dt>
+<dd>
+
+</dd>
+</dl>
+
+</li>
+<li><p>KEY_create_rsa(bits) -&gt; key</p>
+
+<p>Creates an RSA key pair, bits defaults to 2048.</p>
+
+</li>
+<li><p>KEY_create_ec(curve) -&gt; key</p>
+
+<p>Creates an EC key, curve defaults to <code>prime256v1</code>.</p>
+
+</li>
+<li><p>CERT_asHash(cert,[digest_algo]) -&gt; hash</p>
+
+<p>Extracts the information from the certificate into a hash and uses the given digest_algo (default: SHA-256) to determine digest of pubkey and cert. The resulting hash contains:</p>
+
+<dl>
+
+<dt id="subject">subject</dt>
+<dd>
+
+<p>Hash with the parts of the subject, e.g. commonName, countryName, organizationName, stateOrProvinceName, localityName.</p>
+
+</dd>
+<dt id="subjectAltNames">subjectAltNames</dt>
+<dd>
+
+<p>Array with list of alternative names. Each entry in the list is of <code>[type,value]</code>, where <code>type</code> can be OTHERNAME, EMAIL, DNS, X400, DIRNAME, EDIPARTY, URI, IP or RID.</p>
+
+</dd>
+<dt id="issuer">issuer</dt>
+<dd>
+
+<p>Hash with the parts of the issuer, e.g. commonName, countryName, organizationName, stateOrProvinceName, localityName.</p>
+
+</dd>
+<dt id="not_before-not_after">not_before, not_after</dt>
+<dd>
+
+<p>The time frame, where the certificate is valid, as time_t, e.g. can be converted with localtime or similar functions.</p>
+
+</dd>
+<dt id="serial">serial</dt>
+<dd>
+
+<p>The serial number</p>
+
+</dd>
+<dt id="crl_uri">crl_uri</dt>
+<dd>
+
+<p>List of URIs for CRL distribution.</p>
+
+</dd>
+<dt id="ocsp_uri">ocsp_uri</dt>
+<dd>
+
+<p>List of URIs for revocation checking using OCSP.</p>
+
+</dd>
+<dt id="keyusage">keyusage</dt>
+<dd>
+
+<p>List of keyUsage information in the certificate.</p>
+
+</dd>
+<dt id="extkeyusage">extkeyusage</dt>
+<dd>
+
+<p>List of extended key usage information from the certificate. Each entry in this list consists of a hash with oid, nid, ln and sn.</p>
+
+</dd>
+<dt id="pubkey_digest_xxx">pubkey_digest_xxx</dt>
+<dd>
+
+<p>Binary digest of the pubkey using the given digest algorithm, e.g. pubkey_digest_sha256 if (the default) SHA-256 was used.</p>
+
+</dd>
+<dt id="x509_digest_xxx">x509_digest_xxx</dt>
+<dd>
+
+<p>Binary digest of the X.509 certificate using the given digest algorithm, e.g. x509_digest_sha256 if (the default) SHA-256 was used.</p>
+
+</dd>
+<dt id="fingerprint_xxx">fingerprint_xxx</dt>
+<dd>
+
+<p>Fingerprint of the certificate using the given digest algorithm, e.g. fingerprint_sha256 if (the default) SHA-256 was used. Contrary to digest_* this is an ASCII string with a list if hexadecimal numbers, e.g. &quot;73:59:75:5C:6D...&quot;.</p>
+
+</dd>
+<dt id="signature_alg">signature_alg</dt>
+<dd>
+
+<p>Algorithm used to sign certificate, e.g. <code>sha256WithRSAEncryption</code>.</p>
+
+</dd>
+<dt id="ext">ext</dt>
+<dd>
+
+<p>List of extensions. Each entry in the list is a hash with oid, nid, sn, critical flag (boolean) and data (string representation given by X509V3_EXT_print).</p>
+
+</dd>
+<dt id="version">version</dt>
+<dd>
+
+<p>Certificate version, usually 2 (x509v3)</p>
+
+</dd>
+</dl>
+
+</li>
+<li><p>CERT_create(hash) -&gt; (cert,key)</p>
+
+<p>Creates a certificate based on the given hash. If the issuer is not specified the certificate will be self-signed. The following keys can be given:</p>
+
+<dl>
+
+<dt id="subject1">subject</dt>
+<dd>
+
+<p>Hash with the parts of the subject, e.g. commonName, countryName, ... as described in <code>CERT_asHash</code>. Default points to IO::Socket::SSL.</p>
+
+</dd>
+<dt id="not_before">not_before</dt>
+<dd>
+
+<p>A time_t value when the certificate starts to be valid. Defaults to current time.</p>
+
+</dd>
+<dt id="not_after">not_after</dt>
+<dd>
+
+<p>A time_t value when the certificate ends to be valid. Defaults to current time plus one 365 days.</p>
+
+</dd>
+<dt id="serial1">serial</dt>
+<dd>
+
+<p>The serial number. If not given a random number will be used.</p>
+
+</dd>
+<dt id="version1">version</dt>
+<dd>
+
+<p>The version of the certificate, default 2 (x509v3).</p>
+
+</dd>
+<dt id="CA-true-false">CA true|false</dt>
+<dd>
+
+<p>If true declare certificate as CA, defaults to false.</p>
+
+</dd>
+<dt id="purpose-string-array-hash">purpose string|array|hash</dt>
+<dd>
+
+<p>Set the purpose of the certificate. The different purposes can be given as a string separated by non-word character, as array or hash. With string or array each purpose can be prefixed with &#39;+&#39; (enable) or &#39;-&#39; (disable) and same can be done with the value when given as a hash. By default enabling the purpose is assumed.</p>
+
+<p>If the CA option is given and true the defaults &quot;ca,sslca,emailca,objca&quot; are assumed, but can be overridden with explicit purpose. If the CA option is given and false the defaults &quot;server,client&quot; are assumed. If no CA option and no purpose is given it defaults to &quot;server,client&quot;.</p>
+
+<p>Purpose affects basicConstraints, keyUsage, extKeyUsage and netscapeCertType. The following purposes are defined (case is not important):</p>
+
+<pre><code>    client
+    server
+    email
+    objsign
+
+    CA
+    sslCA
+    emailCA
+    objCA
+
+    emailProtection
+    codeSigning
+    timeStamping
+
+    digitalSignature
+    nonRepudiation
+    keyEncipherment
+    dataEncipherment
+    keyAgreement
+    keyCertSign
+    cRLSign
+    encipherOnly
+    decipherOnly</code></pre>
+
+<p>Examples:</p>
+
+<pre><code>     # root-CA for SSL certificates
+     purpose =&gt; &#39;sslCA&#39;   # or CA =&gt; 1
+
+     # server certificate and CA (typically self-signed)
+     purpose =&gt; &#39;sslCA,server&#39;
+
+     # client certificate
+     purpose =&gt; &#39;client&#39;,</code></pre>
+
+</dd>
+<dt id="ext-sn-..-data">ext [{ sn =&gt; .., data =&gt; ... }, ... ]</dt>
+<dd>
+
+<p>List of extensions. The type of the extension can be specified as name with <code>sn</code> or as NID with <code>nid</code> and the data with <code>data</code>. These data must be in the same syntax as expected within openssl.cnf, e.g. something like <code><span class="variable">OCSP</span><span class="operator">;</span><span class="variable">URI</span><span class="operator">=</span><span class="variable">http</span><span class="operator">:</span><span class="regex">//</span><span class="operator">...</span>
+</code>. Additionally the critical flag can be set with <code>critical =</code> 1&gt;.</p>
+
+</dd>
+<dt id="key-key">key key</dt>
+<dd>
+
+<p>use given key as key for certificate, otherwise a new one will be generated and returned</p>
+
+</dd>
+<dt id="issuer_cert-cert">issuer_cert cert</dt>
+<dd>
+
+<p>set issuer for new certificate</p>
+
+</dd>
+<dt id="issuer_key-key">issuer_key key</dt>
+<dd>
+
+<p>sign new certificate with given key</p>
+
+</dd>
+<dt id="issuer-cert-key">issuer [ cert, key ]</dt>
+<dd>
+
+<p>Instead of giving issuer_key and issuer_cert as separate arguments they can be given both together.</p>
+
+</dd>
+<dt id="digest-algorithm">digest algorithm</dt>
+<dd>
+
+<p>specify the algorithm used to sign the certificate, default SHA-256.</p>
+
+</dd>
+</dl>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Steffen Ullrich</p>
+
+
+</body>
+
+</html>
+
+

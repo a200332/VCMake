@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#Todo">Todo</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::ODBC::TO_DO - Things to do in DBD::ODBC</p>
+
+<p>As of $LastChangedDate: 2010-10-08 17:00:31 +0100 (Fri, 08 Oct 2010)$</p>
+
+<p>$Revision: 10667 $</p>
+
+<h1 id="Todo">Todo</h1>
+
+<pre><code>  Better/more tests on multiple statement handles which ensure the
+    correct number of rows
+
+  Better/more tests on all queries which ensure the correct number of
+    rows and data
+
+  Better tests on SQLExecDirect/do
+
+  Keep checking Oracle&#39;s ODBC drivers for Windows to fix the Date
+    binding problem
+
+  There is a Columns private ODBC method which is not documented.
+
+  Add support for sending lobs in chunks instead of all in one
+    go. Although DBD::ODBC uses SQLParamData and SQLPutData internally
+    they are not exposed so anyone binding a lob has to have all of it
+    available before it can be bound.
+
+  Why does level 15 tracing of any DBD::ODBC script show alot of these:
+    !!DBD::ODBC unsupported attribute passed (PrintError)
+    !!DBD::ODBC unsupported attribute passed (Username)
+    !!DBD::ODBC unsupported attribute passed (dbi_connect_closure)
+    !!DBD::ODBC unsupported attribute passed (LongReadLen)
+
+  Add a perlcritic test - see DBD::Pg
+
+  Anywhere we are storing a value in an SV that we didn&#39;t create
+    (and thus might have magic) should probably set magic.
+
+  Add a test for ChopBlanks and unicode data
+
+  Add some private SQLGetInfo values for whether SQL_ROWSET_SIZE hack
+  works etc. How can you tell a driver supports MARS_CONNECTION.
+
+  Might be able to detect MARS capable with SS_COPT_MARS_ENABLED
+
+  Bump requirement to Test::Simple 0.96 so we can use subtest which
+  is really cool and reorganise tests to use it. 0.96, because it seems
+  to be the first really stable version of subtest.
+
+  Add more Oracle-specific tests - like calling functions/procedures
+  and in/out params.
+
+  Download rpm package from here -&gt;
+  http://download.opensuse.org/repositories/devel:/languages:/perl/openSUSE_11.4/src/
+  and see what changes they are making (especially Makefile.PL) to see if we
+  might need to include them.
+
+  DRIVER and DSN in ODBC connection attributes should be case insensitive
+  and they are not - they are strcmped against DRIVER/DSN - check!
+
+  Some people still have problems with iODBC being picked up before
+  unixODBC. Various ideas from irc:</code></pre>
+
+<p>&lt;Caelum&gt; mje: what does undefined symbol: SQLGetFunctions mean? &lt;Caelum&gt; mje: do I have iodbc conflicting again? &lt;@Caelum&gt; yeah I think that&#39;s it &lt;mje&gt; perl Makefile.PL -x * gfx is now known as gfx_away &lt;Caelum&gt; mje: kinda sucks I have to do that every time, every auto-upgrade borks it &lt;mje&gt; can&#39;t you just uninstall iODBC &lt;mje&gt; is this OSX? &lt;@Caelum&gt; it&#39;s Debian, I think I have iODBC because amarok needs it &lt;mje&gt; oh, so use -x &lt;ribasushi&gt; mje: what if you just compile a quick program in the Makefile itself, and determine whether you need -x or not? &lt;@ribasushi&gt; I&#39;ve seen other things to that - e.g. Time::HiRes &lt;mje&gt; could do, I guess I could revisit this - problem was Jens (I think) sent me a patch to prefer iODBC over unixODBC and told me it was required for something - can&#39;t remember right now &lt;mje&gt; otherwise, I&#39;d just change the default to unixODBC then iODBC &lt;@Caelum&gt; maybe an env var in addition to -x? then I could just put it in my .zshrc like PERL_DBD_ODBC_PREFER_UNIXODBC &lt;mje&gt; yeah, could do that too &lt;ribasushi&gt; mje: the point is you can&#39;t really &quot;prefer&quot; one or the other - you need to check for a specific -dev existence, instead of assuming it&#39;s there if the package itself is there &lt;mje&gt; but iODBC and unixODBC dev packages both provide sql.h etc &lt;mje&gt; you should see the code I already have to try and fathom this out - it is massive &lt;ribasushi&gt; mje: by check I meant - compile something small and quick to run &lt;mje&gt; some unixODBC&#39;s don&#39;t include odbc_config, some do, some do but are too old and don&#39;t have switch fred &lt;mje&gt; to compile correctly I need to find odbc_config or iodbc_config so catch 22 &lt;@ribasushi&gt; but here&#39;s the kicker - you compile &quot;something&quot; - if it works - you found things correctly &lt;@ribasushi&gt; if the compile/execution fails - you &quot;found&quot; wrong &lt;mje&gt; I don&#39;t think it is that simple - I need to know it is iODBC or not and a whole load of other things &lt;mje&gt; there is a lot of history in the tests for supporting older systems &lt;@ribasushi&gt; https://metacpan.org/source/ZEFRAM/Time-HiRes-1.9724/Makefile.PL#L334 &lt;ribasushi&gt; mje: ^^ I was referring to stuff like this &lt;@ribasushi&gt; without changing the heuristics at all, simply looping the whole thing with different params depending on the config outcome &lt;@ribasushi&gt; it&#39;s ugly, but can end up rather effective &lt;mje&gt; I&#39;ll look at it again - added to TO_DO - where does try_compile_and_link come from? &lt;ribasushi&gt; mje: it&#39;s all part of this makefile, it&#39;s a good read rather clean &lt;mje&gt; ignore - sorry Jens suggested Config::AutoConf</p>
+
+<pre><code>  Cancel is not documented</code></pre>
+
+<p>ODBC 3.8: http://msdn.microsoft.com/en-us/library/ee388581%28v=vs.85%29.aspx</p>
+
+
+</body>
+
+</html>
+
+

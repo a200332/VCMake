@@ -1,0 +1,464 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#QUICK-START-GUIDE">QUICK START GUIDE</a>
+    <ul>
+      <li><a href="#Functions">Functions</a></li>
+    </ul>
+  </li>
+  <li><a href="#TEST-TYPES">TEST TYPES</a></li>
+  <li><a href="#ONFAIL">ONFAIL</a></li>
+  <li><a href="#BUGS-and-CAVEATS">BUGS and CAVEATS</a></li>
+  <li><a href="#ENVIRONMENT">ENVIRONMENT</a></li>
+  <li><a href="#NOTE">NOTE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test - provides a simple framework for writing test scripts</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Test</span><span class="operator">;</span>
+  
+  <span class="comment"># use a BEGIN block so we print our plan before MyModule is loaded</span>
+  <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">plan</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">14</span><span class="operator">,</span> <span class="string">todo</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">3</span><span class="operator">,</span><span class="number">4</span><span class="operator">]</span> <span class="operator">}</span>
+  
+  <span class="comment"># load your module...</span>
+  <span class="keyword">use</span> <span class="variable">MyModule</span><span class="operator">;</span>
+  
+  <span class="comment"># Helpful notes.  All note-lines must start with a "#".</span>
+  <span class="keyword">print</span> <span class="string">"# I'm testing MyModule version </span><span class="variable">$MyModule</span><span class="string">::VERSION\n"</span><span class="operator">;</span>
+  
+  <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span> <span class="comment"># failure</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span> <span class="comment"># success</span>
+  
+  <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span> <span class="comment"># ok, expected failure (see todo list, above)</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span> <span class="comment"># surprise success!</span>
+  
+  <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">1</span><span class="operator">);</span>             <span class="comment"># failure: '0' ne '1'</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="string">'broke'</span><span class="operator">,</span><span class="string">'fixed'</span><span class="operator">);</span> <span class="comment"># failure: 'broke' ne 'fixed'</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="string">'fixed'</span><span class="operator">,</span><span class="string">'fixed'</span><span class="operator">);</span> <span class="comment"># success: 'fixed' eq 'fixed'</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="string">'fixed'</span><span class="operator">,</span><span class="string">qr/x/</span><span class="operator">);</span>   <span class="comment"># success: 'fixed' =~ qr/x/</span>
+  
+  <span class="variable">ok</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="number">1</span><span class="operator">+</span><span class="number">1</span> <span class="operator">},</span> <span class="number">2</span><span class="operator">);</span>  <span class="comment"># success: '2' eq '2'</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="number">1</span><span class="operator">+</span><span class="number">1</span> <span class="operator">},</span> <span class="number">3</span><span class="operator">);</span>  <span class="comment"># failure: '2' ne '3'</span>
+  
+  <span class="keyword">my</span> <span class="variable">@list</span> <span class="operator">=</span> <span class="operator">(</span><span class="number">0</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>
+  <span class="variable">ok</span> <span class="variable">@list</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="string">"\@list="</span><span class="operator">.</span><span class="keyword">join</span><span class="operator">(</span><span class="string">','</span><span class="operator">,</span><span class="variable">@list</span><span class="operator">);</span>      <span class="comment">#extra notes</span>
+  <span class="variable">ok</span> <span class="string">'segmentation fault'</span><span class="operator">,</span> <span class="string">'/(?i)success/'</span><span class="operator">;</span>    <span class="comment">#regex match</span>
+  
+  <span class="variable">skip</span><span class="operator">(</span>
+    <span class="variable">$^O</span> <span class="operator">=~</span> <span class="regex">m/MSWin/</span> <span class="operator">?</span> <span class="string">"Skip if MSWin"</span> <span class="operator">:</span> <span class="number">0</span><span class="operator">,</span>  <span class="comment"># whether to skip</span>
+    <span class="variable">$foo</span><span class="operator">,</span> <span class="variable">$bar</span>  <span class="comment"># arguments just like for ok(...)</span>
+  <span class="operator">);</span>
+  <span class="variable">skip</span><span class="operator">(</span>
+    <span class="variable">$^O</span> <span class="operator">=~</span> <span class="regex">m/MSWin/</span> <span class="operator">?</span> <span class="number">0</span> <span class="operator">:</span> <span class="string">"Skip unless MSWin"</span><span class="operator">,</span>  <span class="comment"># whether to skip</span>
+    <span class="variable">$foo</span><span class="operator">,</span> <span class="variable">$bar</span>  <span class="comment"># arguments just like for ok(...)</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module simplifies the task of writing test files for Perl modules, such that their output is in the format that <a href="../lib/Test/Harness.html">Test::Harness</a> expects to see.</p>
+
+<h1 id="QUICK-START-GUIDE">QUICK START GUIDE</h1>
+
+<p>To write a test for your new (and probably not even done) module, create a new file called <i>t/test.t</i> (in a new <i>t</i> directory). If you have multiple test files, to test the &quot;foo&quot;, &quot;bar&quot;, and &quot;baz&quot; feature sets, then feel free to call your files <i>t/foo.t</i>, <i>t/bar.t</i>, and <i>t/baz.t</i></p>
+
+<h2 id="Functions">Functions</h2>
+
+<p>This module defines three public functions, <code>plan(...)</code>, <code>ok(...)</code>, and <code>skip(...)</code>. By default, all three are exported by the <code><span class="keyword">use</span> <span class="variable">Test</span><span class="operator">;</span>
+</code> statement.</p>
+
+<dl>
+
+<dt id="plan"><code>plan(...)</code></dt>
+<dd>
+
+<pre><code>     <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">plan</span> <span class="variable">%theplan</span><span class="operator">;</span> <span class="operator">}</span>
+</code></pre>
+
+<p>This should be the first thing you call in your test script. It declares your testing plan, how many there will be, if any of them should be allowed to fail, and so on.</p>
+
+<p>Typical usage is just:</p>
+
+<pre><code>     <span class="keyword">use</span> <span class="variable">Test</span><span class="operator">;</span>
+     <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">plan</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">23</span> <span class="operator">}</span>
+</code></pre>
+
+<p>These are the things that you can put in the parameters to plan:</p>
+
+<dl>
+
+<dt id="tests-number"><code>tests =&gt; <i>number</i></code></dt>
+<dd>
+
+<p>The number of tests in your script. This means all ok() and skip() calls.</p>
+
+</dd>
+<dt id="todo-1-5-14"><code>todo =&gt; [<i>1,5,14</i>]</code></dt>
+<dd>
+
+<p>A reference to a list of tests which are allowed to fail. See <a href="#TODO-TESTS">&quot;TODO TESTS&quot;</a>.</p>
+
+</dd>
+<dt id="onfail-sub"><code><span class="string">onfail</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></dt>
+<dd>
+
+</dd>
+<dt id="onfail-some_sub"><code>onfail =&gt; \&amp;some_sub</code></dt>
+<dd>
+
+<p>A subroutine reference to be run at the end of the test script, if any of the tests fail. See <a href="#ONFAIL">&quot;ONFAIL&quot;</a>.</p>
+
+</dd>
+</dl>
+
+<p>You must call <code>plan(...)</code> once and only once. You should call it in a <code><span class="keyword">BEGIN</span> <span class="operator">{...}</span>
+</code> block, like so:</p>
+
+<pre><code>     <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">plan</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="number">23</span> <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="ok"><code>ok(...)</code></dt>
+<dd>
+
+<pre><code>  <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span> <span class="operator">+</span> <span class="number">1</span> <span class="operator">==</span> <span class="number">2</span><span class="operator">);</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="variable">$have</span><span class="operator">,</span> <span class="variable">$expect</span><span class="operator">);</span>
+  <span class="variable">ok</span><span class="operator">(</span><span class="variable">$have</span><span class="operator">,</span> <span class="variable">$expect</span><span class="operator">,</span> <span class="variable">$diagnostics</span><span class="operator">);</span>
+</code></pre>
+
+<p>This function is the reason for <code>Test</code>&#39;s existence. It&#39;s the basic function that handles printing &quot;<code>ok</code>&quot; or &quot;<code>not ok</code>&quot;, along with the current test number. (That&#39;s what <code>Test::Harness</code> wants to see.)</p>
+
+<p>In its most basic usage, <code>ok(...)</code> simply takes a single scalar expression. If its value is true, the test passes; if false, the test fails. Examples:</p>
+
+<pre><code>    <span class="comment"># Examples of ok(scalar)</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span> <span class="number">1</span> <span class="operator">+</span> <span class="number">1</span> <span class="operator">==</span> <span class="number">2</span> <span class="operator">);</span>           <span class="comment"># ok if 1 + 1 == 2</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">$foo</span> <span class="operator">=~</span> <span class="regex">/bar/</span> <span class="operator">);</span>        <span class="comment"># ok if $foo contains 'bar'</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">baz</span><span class="operator">(</span><span class="variable">$x</span> <span class="operator">+</span> <span class="variable">$y</span><span class="operator">)</span> <span class="keyword">eq</span> <span class="string">'Armondo'</span> <span class="operator">);</span>    <span class="comment"># ok if baz($x + $y) returns</span>
+                                        <span class="comment"># 'Armondo'</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">@a</span> <span class="operator">==</span> <span class="variable">@b</span> <span class="operator">);</span>             <span class="comment"># ok if @a and @b are the same</span>
+                                <span class="comment"># length</span>
+</code></pre>
+
+<p>The expression is evaluated in scalar context. So the following will work:</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">@stuff</span> <span class="operator">);</span>                       <span class="comment"># ok if @stuff has any</span>
+                                        <span class="comment"># elements</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="operator">!</span><span class="keyword">grep</span> <span class="operator">!</span><span class="keyword">defined</span> <span class="variable">$_</span><span class="operator">,</span> <span class="variable">@stuff</span> <span class="operator">);</span>    <span class="comment"># ok if everything in @stuff</span>
+                                        <span class="comment"># is defined.</span>
+</code></pre>
+
+<p>A special case is if the expression is a subroutine reference (in either <code><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{...}</span>
+</code> syntax or <code>\&amp;foo</code> syntax). In that case, it is executed and its value (true or false) determines if the test passes or fails. For example,</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>   <span class="comment"># See whether sleep works at least passably</span>
+      <span class="keyword">my</span> <span class="variable">$start_time</span> <span class="operator">=</span> <span class="keyword">time</span><span class="operator">;</span>
+      <span class="keyword">sleep</span> <span class="number">5</span><span class="operator">;</span>
+      <span class="keyword">time</span><span class="operator">()</span> <span class="operator">-</span> <span class="variable">$start_time</span>  <span class="operator">&gt;=</span> <span class="number">4</span>
+    <span class="operator">});</span>
+</code></pre>
+
+<p>In its two-argument form, <code>ok(<i>arg1</i>, <i>arg2</i>)</code> compares the two scalar values to see if they match. They match if both are undefined, or if <i>arg2</i> is a regex that matches <i>arg1</i>, or if they compare equal with <code>eq</code>.</p>
+
+<pre><code>    <span class="comment"># Example of ok(scalar, scalar)</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span> <span class="string">"this"</span><span class="operator">,</span> <span class="string">"that"</span> <span class="operator">);</span>               <span class="comment"># not ok, 'this' ne 'that'</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="string">""</span><span class="operator">,</span> <span class="keyword">undef</span> <span class="operator">);</span>                    <span class="comment"># not ok, "" is defined</span>
+</code></pre>
+
+<p>The second argument is considered a regex if it is either a regex object or a string that looks like a regex. Regex objects are constructed with the qr// operator in recent versions of perl. A string is considered to look like a regex if its first and last characters are &quot;/&quot;, or if the first character is &quot;m&quot; and its second and last characters are both the same non-alphanumeric non-whitespace character. These regexp</p>
+
+<p>Regex examples:</p>
+
+<pre><code>    ok( &#39;JaffO&#39;, &#39;/Jaff/&#39; );    # ok, &#39;JaffO&#39; =~ /Jaff/
+    ok( &#39;JaffO&#39;, &#39;m|Jaff|&#39; );   # ok, &#39;JaffO&#39; =~ m|Jaff|
+    ok( &#39;JaffO&#39;, qr/Jaff/ );    # ok, &#39;JaffO&#39; =~ qr/Jaff/;
+    ok( &#39;JaffO&#39;, &#39;/(?i)jaff/ ); # ok, &#39;JaffO&#39; =~ /jaff/i;</code></pre>
+
+<p>If either (or both!) is a subroutine reference, it is run and used as the value for comparing. For example:</p>
+
+<pre><code>    <span class="variable">ok</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">open</span><span class="operator">(</span><span class="variable">OUT</span><span class="operator">,</span> <span class="string">'&gt;'</span><span class="operator">,</span> <span class="string">'x.dat'</span><span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span> <span class="variable">$!</span><span class="operator">;</span>
+        <span class="keyword">print</span> <span class="variable">OUT</span> <span class="string">"\x{e000}"</span><span class="operator">;</span>
+        <span class="keyword">close</span> <span class="variable">OUT</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$bytecount</span> <span class="operator">=</span> <span class="keyword">-s</span> <span class="string">'x.dat'</span><span class="operator">;</span>
+        <span class="keyword">unlink</span> <span class="string">'x.dat'</span> <span class="keyword">or</span> <span class="keyword">warn</span> <span class="string">"Can't unlink : $!"</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">$bytecount</span><span class="operator">;</span>
+      <span class="operator">},</span>
+      <span class="number">4</span>
+    <span class="operator">;</span>
+</code></pre>
+
+<p>The above test passes two values to <code>ok(arg1, arg2)</code> -- the first a coderef, and the second is the number 4. Before <code>ok</code> compares them, it calls the coderef, and uses its return value as the real value of this parameter. Assuming that <code>$bytecount</code> returns 4, <code>ok</code> ends up testing <code>4 eq 4</code>. Since that&#39;s true, this test passes.</p>
+
+<p>Finally, you can append an optional third argument, in <code>ok(<i>arg1</i>,<i>arg2</i>, <i>note</i>)</code>, where <i>note</i> is a string value that will be printed if the test fails. This should be some useful information about the test, pertaining to why it failed, and/or a description of the test. For example:</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span> <span class="keyword">grep</span><span class="operator">(</span><span class="variable">$_</span> <span class="keyword">eq</span> <span class="string">'something unique'</span><span class="operator">,</span> <span class="variable">@stuff</span><span class="operator">),</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="string">"Something that should be unique isn't!\n"</span><span class="operator">.</span>
+        <span class="string">'@stuff = '</span><span class="operator">.</span><span class="keyword">join</span> <span class="string">', '</span><span class="operator">,</span> <span class="variable">@stuff</span>
+      <span class="operator">);</span>
+</code></pre>
+
+<p>Unfortunately, a note cannot be used with the single argument style of <code>ok()</code>. That is, if you try <code>ok(<i>arg1</i>, <i>note</i>)</code>, then <code>Test</code> will interpret this as <code>ok(<i>arg1</i>, <i>arg2</i>)</code>, and probably end up testing <code><i>arg1</i> eq <i>arg2</i></code> -- and that&#39;s not what you want!</p>
+
+<p>All of the above special cases can occasionally cause some problems. See <a href="#BUGS-and-CAVEATS">&quot;BUGS and CAVEATS&quot;</a>.</p>
+
+</dd>
+<dt id="skip-skip_if_true-args"><code>skip(<i>skip_if_true</i>, <i>args...</i>)</code></dt>
+<dd>
+
+<p>This is used for tests that under some conditions can be skipped. It&#39;s basically equivalent to:</p>
+
+<pre><code>  <span class="keyword">if</span><span class="operator">(</span> <span class="variable">$skip_if_true</span> <span class="operator">)</span> <span class="operator">{</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+  <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">args</span><span class="operator">...</span> <span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>...except that the <code>ok(1)</code> emits not just &quot;<code>ok <i>testnum</i></code>&quot; but actually &quot;<code>ok <i>testnum</i> <span class="comment"># </span>
+<i>skip_if_true_value</i></code>&quot;.</p>
+
+<p>The arguments after the <i>skip_if_true</i> are what is fed to <code>ok(...)</code> if this test isn&#39;t skipped.</p>
+
+<p>Example usage:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$if_MSWin</span> <span class="operator">=</span>
+    <span class="variable">$^O</span> <span class="operator">=~</span> <span class="regex">m/MSWin/</span> <span class="operator">?</span> <span class="string">'Skip if under MSWin'</span> <span class="operator">:</span> <span class="string">''</span><span class="operator">;</span>
+  
+  <span class="comment"># A test to be skipped if under MSWin (i.e., run except under</span>
+  <span class="comment"># MSWin)</span>
+  <span class="variable">skip</span><span class="operator">(</span><span class="variable">$if_MSWin</span><span class="operator">,</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">),</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">)</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Or, going the other way:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$unless_MSWin</span> <span class="operator">=</span>
+    <span class="variable">$^O</span> <span class="operator">=~</span> <span class="regex">m/MSWin/</span> <span class="operator">?</span> <span class="string">''</span> <span class="operator">:</span> <span class="string">'Skip unless under MSWin'</span><span class="operator">;</span>
+  
+  <span class="comment"># A test to be skipped unless under MSWin (i.e., run only under</span>
+  <span class="comment"># MSWin)</span>
+  <span class="variable">skip</span><span class="operator">(</span><span class="variable">$unless_MSWin</span><span class="operator">,</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">),</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">)</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The tricky thing to remember is that the first parameter is true if you want to <i>skip</i> the test, not <i>run</i> it; and it also doubles as a note about why it&#39;s being skipped. So in the first codeblock above, read the code as &quot;skip if MSWin -- (otherwise) test whether <code>thing($foo)</code> is <code>thing($bar)</code>&quot; or for the second case, &quot;skip unless MSWin...&quot;.</p>
+
+<p>Also, when your <i>skip_if_reason</i> string is true, it really should (for backwards compatibility with older Test.pm versions) start with the string &quot;Skip&quot;, as shown in the above examples.</p>
+
+<p>Note that in the above cases, <code>thing($foo)</code> and <code>thing($bar)</code> <i>are</i> evaluated -- but as long as the <code>skip_if_true</code> is true, then we <code>skip(...)</code> just tosses out their value (i.e., not bothering to treat them like values to <code>ok(...)</code>. But if you need to <i>not</i> eval the arguments when skipping the test, use this format:</p>
+
+<pre><code>  <span class="variable">skip</span><span class="operator">(</span> <span class="variable">$unless_MSWin</span><span class="operator">,</span>
+    <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="comment"># This code returns true if the test passes.</span>
+      <span class="comment"># (But it doesn't even get called if the test is skipped.)</span>
+      <span class="variable">thing</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">)</span> <span class="keyword">eq</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">)</span>
+    <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>or even this, which is basically equivalent:</p>
+
+<pre><code>  <span class="variable">skip</span><span class="operator">(</span> <span class="variable">$unless_MSWin</span><span class="operator">,</span>
+    <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">)</span> <span class="operator">},</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">)</span> <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>That is, both are like this:</p>
+
+<pre><code>  <span class="keyword">if</span><span class="operator">(</span> <span class="variable">$unless_MSWin</span> <span class="operator">)</span> <span class="operator">{</span>
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>  <span class="comment"># but it actually appends "# $unless_MSWin"</span>
+            <span class="comment">#  so that Test::Harness can tell it's a skip</span>
+  <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+    <span class="comment"># Not skipping, so actually call and evaluate...</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">)</span> <span class="operator">},</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">)</span> <span class="operator">}</span> <span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="TEST-TYPES">TEST TYPES</h1>
+
+<ul>
+
+<li><p>NORMAL TESTS</p>
+
+<p>These tests are expected to succeed. Usually, most or all of your tests are in this category. If a normal test doesn&#39;t succeed, then that means that something is <i>wrong</i>.</p>
+
+</li>
+<li><p>SKIPPED TESTS</p>
+
+<p>The <code>skip(...)</code> function is for tests that might or might not be possible to run, depending on the availability of platform-specific features. The first argument should evaluate to true (think &quot;yes, please skip&quot;) if the required feature is <i>not</i> available. After the first argument, <code>skip(...)</code> works exactly the same way as <code>ok(...)</code> does.</p>
+
+</li>
+<li><p>TODO TESTS</p>
+
+<p>TODO tests are designed for maintaining an <b>executable TODO list</b>. These tests are <i>expected to fail.</i> If a TODO test does succeed, then the feature in question shouldn&#39;t be on the TODO list, now should it?</p>
+
+<p>Packages should NOT be released with succeeding TODO tests. As soon as a TODO test starts working, it should be promoted to a normal test, and the newly working feature should be documented in the release notes or in the change log.</p>
+
+</li>
+</ul>
+
+<h1 id="ONFAIL">ONFAIL</h1>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">plan</span> <span class="string">test</span> <span class="operator">=&gt;</span> <span class="number">4</span><span class="operator">,</span> <span class="string">onfail</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">warn</span> <span class="string">"CALL 911!"</span> <span class="operator">}</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Although test failures should be enough, extra diagnostics can be triggered at the end of a test run. <code>onfail</code> is passed an array ref of hash refs that describe each test failure. Each hash will contain at least the following fields: <code>package</code>, <code>repetition</code>, and <code>result</code>. (You shouldn&#39;t rely on any other fields being present.) If the test had an expected value or a diagnostic (or &quot;note&quot;) string, these will also be included.</p>
+
+<p>The <i>optional</i> <code>onfail</code> hook might be used simply to print out the version of your package and/or how to report problems. It might also be used to generate extremely sophisticated diagnostics for a particularly bizarre test failure. However it&#39;s not a panacea. Core dumps or other unrecoverable errors prevent the <code>onfail</code> hook from running. (It is run inside an <code>END</code> block.) Besides, <code>onfail</code> is probably over-kill in most cases. (Your test code should be simpler than the code it is testing, yes?)</p>
+
+<h1 id="BUGS-and-CAVEATS">BUGS and CAVEATS</h1>
+
+<ul>
+
+<li><p><code>ok(...)</code>&#39;s special handing of strings which look like they might be regexes can also cause unexpected behavior. An innocent:</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">$fileglob</span><span class="operator">,</span> <span class="string">'/path/to/some/*stuff/'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>will fail, since Test.pm considers the second argument to be a regex! The best bet is to use the one-argument form:</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">$fileglob</span> <span class="keyword">eq</span> <span class="string">'/path/to/some/*stuff/'</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p><code>ok(...)</code>&#39;s use of string <code>eq</code> can sometimes cause odd problems when comparing numbers, especially if you&#39;re casting a string to a number:</p>
+
+<pre><code>    <span class="variable">$foo</span> <span class="operator">=</span> <span class="string">"1.0"</span><span class="operator">;</span>
+    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">$foo</span><span class="operator">,</span> <span class="number">1</span> <span class="operator">);</span>      <span class="comment"># not ok, "1.0" ne 1</span>
+</code></pre>
+
+<p>Your best bet is to use the single argument form:</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span> <span class="variable">$foo</span> <span class="operator">==</span> <span class="number">1</span> <span class="operator">);</span>    <span class="comment"># ok "1.0" == 1</span>
+</code></pre>
+
+</li>
+<li><p>As you may have inferred from the above documentation and examples, <code>ok</code>&#39;s prototype is <code><span class="operator">(</span><span class="variable">$;$$</span><span class="operator">)</span>
+</code> (and, incidentally, <code>skip</code>&#39;s is <code><span class="operator">(</span><span class="variable">$;$$$)</span>
+</code>). This means, for example, that you can do <code>ok @foo, @bar</code> to compare the <i>size</i> of the two arrays. But don&#39;t be fooled into thinking that <code>ok @foo, @bar</code> means a comparison of the contents of two arrays -- you&#39;re comparing <i>just</i> the number of elements of each. It&#39;s so easy to make that mistake in reading <code>ok @foo, @bar</code> that you might want to be very explicit about it, and instead write <code>ok scalar(@foo), scalar(@bar)</code>.</p>
+
+</li>
+<li><p>This almost definitely doesn&#39;t do what you expect:</p>
+
+<pre><code>     <span class="variable">ok</span> <span class="variable">$thingy</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'some_method'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Why? Because <code>can</code> returns a coderef to mean &quot;yes it can (and the method is this...)&quot;, and then <code>ok</code> sees a coderef and thinks you&#39;re passing a function that you want it to call and consider the truth of the result of! I.e., just like:</p>
+
+<pre><code>     <span class="variable">ok</span> <span class="variable">$thingy</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'some_method'</span><span class="operator">)-&gt;();</span>
+</code></pre>
+
+<p>What you probably want instead is this:</p>
+
+<pre><code>     <span class="variable">ok</span> <span class="variable">$thingy</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'some_method'</span><span class="operator">)</span> <span class="operator">&amp;&amp;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>If the <code>can</code> returns false, then that is passed to <code>ok</code>. If it returns true, then the larger expression <span style="white-space: nowrap;"><code>$thingy-&gt;can(&#39;some_method&#39;) &amp;&amp; 1</code></span> returns 1, which <code>ok</code> sees as a simple signal of success, as you would expect.</p>
+
+</li>
+<li><p>The syntax for <code>skip</code> is about the only way it can be, but it&#39;s still quite confusing. Just start with the above examples and you&#39;ll be okay.</p>
+
+<p>Moreover, users may expect this:</p>
+
+<pre><code>  <span class="variable">skip</span> <span class="variable">$unless_mswin</span><span class="operator">,</span> <span class="variable">foo</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">),</span> <span class="variable">baz</span><span class="operator">(</span><span class="variable">$quux</span><span class="operator">);</span>
+</code></pre>
+
+<p>to not evaluate <code>foo($bar)</code> and <code>baz($quux)</code> when the test is being skipped. But in reality, they <i>are</i> evaluated, but <code>skip</code> just won&#39;t bother comparing them if <code>$unless_mswin</code> is true.</p>
+
+<p>You could do this:</p>
+
+<pre><code>  <span class="variable">skip</span> <span class="variable">$unless_mswin</span><span class="operator">,</span> <span class="keyword">sub</span><span class="operator">{</span><span class="variable">foo</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">)},</span> <span class="keyword">sub</span><span class="operator">{</span><span class="variable">baz</span><span class="operator">(</span><span class="variable">$quux</span><span class="operator">)};</span>
+</code></pre>
+
+<p>But that&#39;s not terribly pretty. You may find it simpler or clearer in the long run to just do things like this:</p>
+
+<pre><code>  <span class="keyword">if</span><span class="operator">(</span> <span class="variable">$^O</span> <span class="operator">=~</span> <span class="regex">m/MSWin/</span> <span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"# Yay, we're under $^O\n"</span><span class="operator">;</span>
+    <span class="variable">ok</span> <span class="variable">foo</span><span class="operator">(</span><span class="variable">$bar</span><span class="operator">),</span> <span class="variable">baz</span><span class="operator">(</span><span class="variable">$quux</span><span class="operator">);</span>
+    <span class="variable">ok</span> <span class="variable">thing</span><span class="operator">(</span><span class="variable">$whatever</span><span class="operator">),</span> <span class="variable">baz</span><span class="operator">(</span><span class="variable">$stuff</span><span class="operator">);</span>
+    <span class="variable">ok</span> <span class="variable">blorp</span><span class="operator">(</span><span class="variable">$quux</span><span class="operator">,</span> <span class="variable">$whatever</span><span class="operator">);</span>
+    <span class="variable">ok</span> <span class="variable">foo</span><span class="operator">(</span><span class="variable">$barzbarz</span><span class="operator">),</span> <span class="variable">thang</span><span class="operator">(</span><span class="variable">$quux</span><span class="operator">);</span>
+  <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"# Feh, we're under $^O.  Watch me skip some tests...\n"</span><span class="operator">;</span>
+    <span class="keyword">for</span><span class="operator">(</span><span class="number">1</span> <span class="operator">..</span> <span class="number">4</span><span class="operator">)</span> <span class="operator">{</span> <span class="variable">skip</span> <span class="string">"Skip unless under MSWin"</span> <span class="operator">}</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>But be quite sure that <code>ok</code> is called exactly as many times in the first block as <code>skip</code> is called in the second block.</p>
+
+</li>
+</ul>
+
+<h1 id="ENVIRONMENT">ENVIRONMENT</h1>
+
+<p>If <code>PERL_TEST_DIFF</code> environment variable is set, it will be used as a command for comparing unexpected multiline results. If you have GNU diff installed, you might want to set <code>PERL_TEST_DIFF</code> to <code>diff -u</code>. If you don&#39;t have a suitable program, you might install the <code>Text::Diff</code> module and then set <code>PERL_TEST_DIFF</code> to be <code>perl -MText::Diff -e &#39;print diff(@ARGV)&#39;</code>. If <code>PERL_TEST_DIFF</code> isn&#39;t set but the <code>Algorithm::Diff</code> module is available, then it will be used to show the differences in multiline results.</p>
+
+<h1 id="NOTE">NOTE</h1>
+
+<p>A past developer of this module once said that it was no longer being actively developed. However, rumors of its demise were greatly exaggerated. Feedback and suggestions are quite welcome.</p>
+
+<p>Be aware that the main value of this module is its simplicity. Note that there are already more ambitious modules out there, such as <a href="../lib/Test/More.html">Test::More</a> and <a>Test::Unit</a>.</p>
+
+<p>Some earlier versions of this module had docs with some confusing typos in the description of <code>skip(...)</code>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../lib/Test/Harness.html">Test::Harness</a></p>
+
+<p><a href="../lib/Test/Simple.html">Test::Simple</a>, <a href="../lib/Test/More.html">Test::More</a>, <a>Devel::Cover</a></p>
+
+<p><a href="../lib/Test/Builder.html">Test::Builder</a> for building your own testing library.</p>
+
+<p><a>Test::Unit</a> is an interesting XUnit-style testing library.</p>
+
+<p><a>Test::Inline</a> lets you embed tests in code.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Copyright (c) 1998-2000 Joshua Nathaniel Pritikin.</p>
+
+<p>Copyright (c) 2001-2002 Michael G. Schwern.</p>
+
+<p>Copyright (c) 2002-2004 Sean M. Burke.</p>
+
+<p>Current maintainer: Jesse Vincent. &lt;jesse@bestpractical.com&gt;</p>
+
+<p>This package is free software and is provided &quot;as is&quot; without express or implied warranty. It may be used, redistributed and/or modified under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

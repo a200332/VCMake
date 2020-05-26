@@ -1,0 +1,264 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#installed">installed</a></li>
+      <li><a href="#loaded">loaded</a></li>
+      <li><a href="#filename">filename</a></li>
+      <li><a href="#resolved_filename">resolved_filename</a></li>
+      <li><a href="#loaded_filename">loaded_filename</a></li>
+      <li><a href="#functions">functions</a></li>
+      <li><a href="#function_refs">function_refs</a></li>
+      <li><a href="#function_exists">function_exists</a></li>
+      <li><a href="#methods">methods</a></li>
+      <li><a href="#subclasses">subclasses</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::Inspector - Get information about a class and its structure</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.32</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Class::Inspector</span><span class="operator">;</span>
+  
+  <span class="comment"># Is a class installed and/or loaded</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">installed</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">loaded</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+  
+  <span class="comment"># Filename related information</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">filename</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">resolved_filename</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+  
+  <span class="comment"># Get subroutine related information</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">functions</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">function_refs</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">function_exists</span><span class="operator">(</span> <span class="string">'Foo::Class'</span><span class="operator">,</span> <span class="string">'bar'</span> <span class="operator">);</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">methods</span><span class="operator">(</span> <span class="string">'Foo::Class'</span><span class="operator">,</span> <span class="string">'full'</span><span class="operator">,</span> <span class="string">'public'</span> <span class="operator">);</span>
+  
+  <span class="comment"># Find all loaded subclasses or something</span>
+  <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">subclasses</span><span class="operator">(</span> <span class="string">'Foo::Class'</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Class::Inspector allows you to get information about a loaded class. Most or all of this information can be found in other ways, but they aren&#39;t always very friendly, and usually involve a relatively high level of Perl wizardry, or strange and unusual looking code. Class::Inspector attempts to provide an easier, more friendly interface to this information.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="installed">installed</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">installed</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>installed</code> static method tries to determine if a class is installed on the machine, or at least available to Perl. It does this by wrapping around <code>resolved_filename</code>.</p>
+
+<p>Returns true if installed/available, false if the class is not installed, or <code>undef</code> if the class name is invalid.</p>
+
+<h2 id="loaded">loaded</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">loaded</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>loaded</code> static method tries to determine if a class is loaded by looking for symbol table entries.</p>
+
+<p>This method it uses to determine this will work even if the class does not have its own file, but is contained inside a single file with multiple classes in it. Even in the case of some sort of run-time loading class being used, these typically leave some trace in the symbol table, so an <a>Autoload</a> or <a>Class::Autouse</a>-based class should correctly appear loaded.</p>
+
+<p>Returns true if the class is loaded, false if not, or <code>undef</code> if the class name is invalid.</p>
+
+<h2 id="filename">filename</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$filename</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">filename</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>For a given class, returns the base filename for the class. This will NOT be a fully resolved filename, just the part of the filename BELOW the <code>@INC</code> entry.</p>
+
+<pre><code>  <span class="keyword">print</span> <span class="variable">Class</span><span class="operator">-&gt;</span><span class="variable">filename</span><span class="operator">(</span> <span class="string">'Foo::Bar'</span> <span class="operator">);</span>
+  <span class="operator">&gt;</span> <span class="variable">Foo</span><span class="operator">/</span><span class="variable">Bar</span><span class="operator">.</span><span class="variable">pm</span>
+</code></pre>
+
+<p>This filename will be returned with the right separator for the local platform, and should work on all platforms.</p>
+
+<p>Returns the filename on success or <code>undef</code> if the class name is invalid.</p>
+
+<h2 id="resolved_filename">resolved_filename</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$filename</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">resolved_filename</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">$filename</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">resolved_filename</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">@try_first</span><span class="operator">);</span>
+</code></pre>
+
+<p>For a given class, the <code>resolved_filename</code> static method returns the fully resolved filename for a class. That is, the file that the class would be loaded from.</p>
+
+<p>This is not necessarily the file that the class WAS loaded from, as the value returned is determined each time it runs, and the <code>@INC</code> include path may change.</p>
+
+<p>To get the actual file for a loaded class, see the <code>loaded_filename</code> method.</p>
+
+<p>Returns the filename for the class, or <code>undef</code> if the class name is invalid.</p>
+
+<h2 id="loaded_filename">loaded_filename</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$filename</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">loaded_filename</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>For a given loaded class, the <code>loaded_filename</code> static method determines (via the <code>%INC</code> hash) the name of the file that it was originally loaded from.</p>
+
+<p>Returns a resolved file path, or false if the class did not have it&#39;s own file.</p>
+
+<h2 id="functions">functions</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$arrayref</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">functions</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>For a loaded class, the <code>functions</code> static method returns a list of the names of all the functions in the classes immediate namespace.</p>
+
+<p>Note that this is not the METHODS of the class, just the functions.</p>
+
+<p>Returns a reference to an array of the function names on success, or <code>undef</code> if the class name is invalid or the class is not loaded.</p>
+
+<h2 id="function_refs">function_refs</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$arrayref</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">function_refs</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>For a loaded class, the <code>function_refs</code> static method returns references to all the functions in the classes immediate namespace.</p>
+
+<p>Note that this is not the METHODS of the class, just the functions.</p>
+
+<p>Returns a reference to an array of <code>CODE</code> refs of the functions on success, or <code>undef</code> if the class is not loaded.</p>
+
+<h2 id="function_exists">function_exists</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">function_exists</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$functon</span><span class="operator">);</span>
+</code></pre>
+
+<p>Given a class and function name the <code>function_exists</code> static method will check to see if the function exists in the class.</p>
+
+<p>Note that this is as a function, not as a method. To see if a method exists for a class, use the <code>can</code> method for any class or object.</p>
+
+<p>Returns true if the function exists, false if not, or <code>undef</code> if the class or function name are invalid, or the class is not loaded.</p>
+
+<h2 id="methods">methods</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$arrayref</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">methods</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">@options</span><span class="operator">);</span>
+</code></pre>
+
+<p>For a given class name, the <code>methods</code> static method will returns ALL the methods available to that class. This includes all methods available from every class up the class&#39; <code>@ISA</code> tree.</p>
+
+<p>Returns a reference to an array of the names of all the available methods on success, or <code>undef</code> if the class name is invalid or the class is not loaded.</p>
+
+<p>A number of options are available to the <code>methods</code> method that will alter the results returned. These should be listed after the class name, in any order.</p>
+
+<pre><code>  <span class="comment"># Only get public methods</span>
+  <span class="keyword">my</span> <span class="variable">$method</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">methods</span><span class="operator">(</span> <span class="string">'My::Class'</span><span class="operator">,</span> <span class="string">'public'</span> <span class="operator">);</span>
+</code></pre>
+
+<dl>
+
+<dt id="public">public</dt>
+<dd>
+
+<p>The <code>public</code> option will return only &#39;public&#39; methods, as defined by the Perl convention of prepending an underscore to any &#39;private&#39; methods. The <code>public</code> option will effectively remove any methods that start with an underscore.</p>
+
+</dd>
+<dt id="private">private</dt>
+<dd>
+
+<p>The <code>private</code> options will return only &#39;private&#39; methods, as defined by the Perl convention of prepending an underscore to an private methods. The <code>private</code> option will effectively remove an method that do not start with an underscore.</p>
+
+<p><b>Note: The <code>public</code> and <code>private</code> options are mutually exclusive</b></p>
+
+</dd>
+<dt id="full">full</dt>
+<dd>
+
+<p><code>methods</code> normally returns just the method name. Supplying the <code>full</code> option will cause the methods to be returned as the full names. That is, instead of returning <code>[ &#39;method1&#39;, &#39;method2&#39;, &#39;method3&#39; ]</code>, you would instead get <code>[ &#39;Class::method1&#39;, &#39;AnotherClass::method2&#39;, &#39;Class::method3&#39; ]</code>.</p>
+
+</dd>
+<dt id="expanded">expanded</dt>
+<dd>
+
+<p>The <code>expanded</code> option will cause a lot more information about method to be returned. Instead of just the method name, you will instead get an array reference containing the method name as a single combined name, a la <code>full</code>, the separate class and method, and a CODE ref to the actual function ( if available ). Please note that the function reference is not guaranteed to be available. <code>Class::Inspector</code> is intended at some later time, to work with modules that have some kind of common run-time loader in place ( e.g <code>Autoloader</code> or <code>Class::Autouse</code> for example.</p>
+
+<p>The response from <code>methods( &#39;Class&#39;, &#39;expanded&#39; )</code> would look something like the following.</p>
+
+<pre><code>  [
+    [ &#39;Class::method1&#39;,   &#39;Class&#39;,   &#39;method1&#39;, \&amp;Class::method1   ],
+    [ &#39;Another::method2&#39;, &#39;Another&#39;, &#39;method2&#39;, \&amp;Another::method2 ],
+    [ &#39;Foo::bar&#39;,         &#39;Foo&#39;,     &#39;bar&#39;,     \&amp;Foo::bar         ],
+  ]</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="subclasses">subclasses</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$arrayref</span> <span class="operator">=</span> <span class="variable">Class::Inspector</span><span class="operator">-&gt;</span><span class="variable">subclasses</span><span class="operator">(</span><span class="variable">$class</span><span class="operator">);</span>
+</code></pre>
+
+<p>The <code>subclasses</code> static method will search then entire namespace (and thus <b>all</b> currently loaded classes) to find all classes that are subclasses of the class provided as a the parameter.</p>
+
+<p>The actual test will be done by calling <code>isa</code> on the class as a static method. (i.e. <code>My::Class-&gt;isa($class)</code>.</p>
+
+<p>Returns a reference to a list of the loaded classes that match the class provided, or false is none match, or <code>undef</code> if the class name provided is invalid.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="http://ali.as/">http://ali.as/</a>, <a>Class::Handle</a>, <a href="../../lib/Class/Inspector/Functions.html">Class::Inspector::Functions</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Original author: Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<p>Current maintainer: Graham Ollis &lt;plicease@cpan.org&gt;</p>
+
+<p>Contributors:</p>
+
+<p>Tom Wyant</p>
+
+<p>Steffen M&uuml;ller</p>
+
+<p>Kivanc Yazan (KYZN)</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2016 by Adam Kennedy.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

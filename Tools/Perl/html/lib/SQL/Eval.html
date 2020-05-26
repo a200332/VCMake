@@ -1,0 +1,478 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Method-interface-of-SQL::Eval">Method interface of SQL::Eval</a></li>
+      <li><a href="#Method-interface-of-SQL::Eval::Table">Method interface of SQL::Eval::Table</a></li>
+    </ul>
+  </li>
+  <li><a href="#INTERNALS">INTERNALS</a></li>
+  <li><a href="#MULTITHREADING">MULTITHREADING</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>SQL::Eval - Base for deriving evaluation objects for SQL::Statement</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">require</span> <span class="variable">SQL::Statement</span><span class="operator">;</span>
+    <span class="keyword">require</span> <span class="variable">SQL::Eval</span><span class="operator">;</span>
+    
+    <span class="comment"># Create an SQL statement; use a concrete subclass of</span>
+    <span class="comment"># SQL::Statement</span>
+    <span class="keyword">my</span> <span class="variable">$stmt</span> <span class="operator">=</span> <span class="variable">MyStatement</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"SELECT * FROM foo, bar"</span><span class="operator">,</span>
+                                <span class="variable">SQL::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'Ansi'</span><span class="operator">));</span>
+    
+    <span class="comment"># Get an eval object by calling open_tables; this</span>
+    <span class="comment"># will call MyStatement::open_table</span>
+    <span class="keyword">my</span> <span class="variable">$eval</span> <span class="operator">=</span> <span class="variable">$stmt</span><span class="operator">-&gt;</span><span class="variable">open_tables</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+    
+    <span class="comment"># Set parameter 0 to 'Van Gogh'</span>
+    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">param</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">'Van Gogh'</span><span class="operator">);</span>
+    <span class="comment"># Get parameter 2</span>
+    <span class="keyword">my</span> <span class="variable">$param</span> <span class="operator">=</span> <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">param</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+    
+    <span class="comment"># Get the SQL::Eval::Table object referring the 'foo' table</span>
+    <span class="keyword">my</span> <span class="variable">$fooTable</span> <span class="operator">=</span> <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">table</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module implements two classes that can be used for deriving subclasses to evaluate SQL::Statement objects. The SQL::Eval object can be thought as an abstract state engine for executing SQL queries and the SQL::Eval::Table object is a table abstraction. It implements methods for fetching or storing rows, retrieving column names and numbers and so on. See the <code>test.pl</code> script as an example for implementing a subclass.</p>
+
+<p>While reading on, keep in mind that these are abstract classes, you *must* implement at least some of the methods described below. In addition, you need not derive from SQL::Eval or SQL::Eval::Table, you just need to implement the method interface.</p>
+
+<p>All methods throw a Perl exception in case of errors.</p>
+
+<h2 id="Method-interface-of-SQL::Eval">Method interface of SQL::Eval</h2>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<p>Constructor; use it like this:</p>
+
+<pre><code>    <span class="variable">$eval</span> <span class="operator">=</span> <span class="variable">SQL::Eval</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\</span><span class="variable">%attr</span><span class="operator">);</span>
+</code></pre>
+
+<p>Blesses the hash ref \%attr into the SQL::Eval class (or a subclass).</p>
+
+</dd>
+<dt id="param">param</dt>
+<dd>
+
+<p>Used for getting or setting input parameters, as in the SQL query</p>
+
+<pre><code>    <span class="variable">INSERT</span> <span class="variable">INTO</span> <span class="variable">foo</span> <span class="variable">VALUES</span> <span class="operator">(</span><span class="regex">?, ?</span><span class="operator">);</span>
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">param</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="variable">$val</span><span class="operator">);</span>        <span class="comment"># Set parameter 0</span>
+    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">param</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>              <span class="comment"># Get parameter 0</span>
+</code></pre>
+
+</dd>
+<dt id="params">params</dt>
+<dd>
+
+<p>Used for getting or setting the complete array of input parameters. Example:</p>
+
+<pre><code>    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">params</span><span class="operator">(</span><span class="variable">$params</span><span class="operator">);</span>       <span class="comment"># Set the array</span>
+    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">params</span><span class="operator">();</span>              <span class="comment"># Get the array</span>
+</code></pre>
+
+</dd>
+<dt id="table">table</dt>
+<dd>
+
+<p>Returns or sets a table object. Example:</p>
+
+<pre><code>    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">table</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">,</span> <span class="variable">$fooTable</span><span class="operator">);</span>  <span class="comment"># Set the 'foo' table object</span>
+    <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">table</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">);</span>             <span class="comment"># Return the 'foo' table object</span>
+</code></pre>
+
+</dd>
+<dt id="column">column</dt>
+<dd>
+
+<p>Return the value of a column with a given name; example:</p>
+
+<pre><code>    <span class="variable">$col</span> <span class="operator">=</span> <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">column</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">,</span> <span class="string">'id'</span><span class="operator">);</span>  <span class="comment"># Return the 'id' column of</span>
+                                        <span class="comment"># the current row in the</span>
+                                        <span class="comment"># 'foo' table</span>
+</code></pre>
+
+<p>This is equivalent to and a shorthand for</p>
+
+<pre><code>    <span class="variable">$col</span> <span class="operator">=</span> <span class="variable">$eval</span><span class="operator">-&gt;</span><span class="variable">table</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">)-&gt;</span><span class="variable">column</span><span class="operator">(</span><span class="string">'id'</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="gen_access_fastpath">_gen_access_fastpath</dt>
+<dd>
+
+<p>Return a subroutine reference for fast accessing columns for read-only access. This routine simply returns the <code>_gen_access_fastpath</code> of the referenced table.</p>
+
+</dd>
+</dl>
+
+<h2 id="Method-interface-of-SQL::Eval::Table">Method interface of SQL::Eval::Table</h2>
+
+<dl>
+
+<dt id="new1">new</dt>
+<dd>
+
+<p>Constructor; use it like this:</p>
+
+<pre><code>    <span class="variable">$eval</span> <span class="operator">=</span> <span class="variable">SQL::Eval::Table</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\</span><span class="variable">%attr</span><span class="operator">);</span>
+</code></pre>
+
+<p>Blesses the hash ref \%attr into the SQL::Eval::Table class (or a subclass).</p>
+
+<p>The following attributes are used by <code>SQL::Eval::Table</code>:</p>
+
+<dl>
+
+<dt id="col_names">col_names</dt>
+<dd>
+
+<p>Array reference containing the names of the columns in order they appear in the table. This attribute <b>must</b> be provided by the derived class.</p>
+
+</dd>
+<dt id="col_nums">col_nums</dt>
+<dd>
+
+<p>Hash reference containing the column names as keys and the column indexes as values. If this is omitted (does not exist), it will be created from <code>col_names</code>.</p>
+
+</dd>
+<dt id="capabilities">capabilities</dt>
+<dd>
+
+<p>Hash reference containing additional capabilities.</p>
+
+</dd>
+<dt id="gen_access_fastpath1">_gen_access_fastpath</dt>
+<dd>
+
+<p>Return a subroutine reference for fast accessing columns for read-only access. When the instantiated object doesn&#39;t provide own methods for <code>column</code> and <code>column_num</code> a subroutine reference is returned which directly access the internal data structures. For all other cases a subroutine directly calling <code>$self-&gt;column($_[0])</code> is returned.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="row">row</dt>
+<dd>
+
+<p>Used to get the current row as an array ref. Do not confuse getting the current row with the fetch_row method! In fact this method is valid only after a successful <code>$table-&gt;fetchrow()</code>. Example:</p>
+
+<pre><code>    <span class="variable">$row</span> <span class="operator">=</span> <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">row</span><span class="operator">();</span>
+</code></pre>
+
+</dd>
+<dt id="column1">column</dt>
+<dd>
+
+<p>Get the column with a given name in the current row. Valid only after a successful <code>$table-&gt;fetchrow()</code>. Example:</p>
+
+<pre><code>    <span class="variable">$col</span> <span class="operator">=</span> <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">column</span><span class="operator">(</span><span class="variable">$colName</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="column_num">column_num</dt>
+<dd>
+
+<p>Return the number of the given column name. Column numbers start with 0. Returns undef, if a column name is not defined, so that you can use this for verifying column names. Example:</p>
+
+<pre><code>    <span class="variable">$colNum</span> <span class="operator">=</span> <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">column_num</span><span class="operator">(</span><span class="variable">$colNum</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="col_nums1">col_nums</dt>
+<dd>
+
+<p>Returns an hash ref of column names with the column names as keys and the column indexes as the values.</p>
+
+</dd>
+<dt id="col_names1">col_names</dt>
+<dd>
+
+<p>Returns an array ref of column names ordered by their index within the table.</p>
+
+</dd>
+<dt id="capability">capability</dt>
+<dd>
+
+<p>Returns a boolean value whether the table has the specified capability or not. This method might be overridden by derived classes, but ensure that in that case the parent capability method is called when the derived class does not handle the requested capability.</p>
+
+<p>The following capabilities are used (and requested) by SQL::Statement:</p>
+
+<dl>
+
+<dt id="update_one_row">update_one_row</dt>
+<dd>
+
+<p>Defines whether the table is able to update one single row. This capability is used for backward compatibility and might have (depending on table implementation) several limitations. Please carefully study the documentation of the table or ask the author of the table, if this information is not provided.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by any derived classes.</p>
+
+</dd>
+<dt id="update_specific_row">update_specific_row</dt>
+<dd>
+
+<p>Defines if the table is able to update one single row, but keeps the original content of the row to update.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+<dt id="update_current_row">update_current_row</dt>
+<dd>
+
+<p>Defines if the table is able to update the currently touched row. This capability requires the capability of <code>inplace_update</code>.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+<dt id="rowwise_update">rowwise_update</dt>
+<dd>
+
+<p>Defines if the table is able to do row-wise updates which means one of <code>update_one_row</code>, <code>update_specific_row</code> or <code>update_current_row</code>. The <code>update_current_row</code> is only evaluated if the table has the <code>inplace_update</code> capability.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+<dt id="inplace_update">inplace_update</dt>
+<dd>
+
+<p>Defines if an update of a row has side effects (capability is not available) or can be done without harming any other currently running task on the table.</p>
+
+<p>Example: The table storage is using a hash on the <code>PRIMARY KEY</code> of the table. Real perl hashes do not care when an item is updated while the hash is traversed using <code>each</code>. <code>SDBM_File</code> 1.06 has a bug, which does not adjust the traversal pointer when an item is deleted.</p>
+
+<p><code>SQL::Statement::RAM::Table</code> recognizes such situations and adjusts the traversal pointer.</p>
+
+<p>This might not be possible for all implementations which can update single rows.</p>
+
+<p>This capability could be provided by a derived class only.</p>
+
+</dd>
+<dt id="delete_one_row">delete_one_row</dt>
+<dd>
+
+<p>Defines whether the table can delete one single row by it&#39;s content or not.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+<dt id="delete_current_row">delete_current_row</dt>
+<dd>
+
+<p>Defines whether a table can delete the current traversed row or not. This capability requires the <code>inplace_delete</code> capability.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+<dt id="rowwise_delete">rowwise_delete</dt>
+<dd>
+
+<p>Defines if any row-wise delete operation is provided by the table. <code>row-wise</code> delete capabilities are <code>delete_one_row</code> and <code>delete_current_row</code>.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+<dt id="inplace_delete">inplace_delete</dt>
+<dd>
+
+<p>Defines if the deletion of a row has side effects (capability is not available) or can be done without harming any other currently running task on the table.</p>
+
+<p>This capability should be provided by a derived class only.</p>
+
+</dd>
+<dt id="insert_new_row">insert_new_row</dt>
+<dd>
+
+<p>Defines if a table can easily insert a new row without need to seek or truncate. This capability is provided by defining the table class method <code>insert_new_row</code>.</p>
+
+<p>This capability is evaluated automatically on first request and must not be handled by derived classes.</p>
+
+</dd>
+</dl>
+
+<p>If the capabilities <i>rowwise_update</i> and <i>insert_new_row</i> are provided, the table primitive <code>push_row</code> is not required anymore and may be omitted.</p>
+
+</dd>
+</dl>
+
+<p>The above methods are implemented by SQL::Eval::Table. The following methods are not, so that they *must* be implemented by the subclass. See the <code>DBD::DBM::Table</code> or <code>DBD::CSV::Table</code> for example.</p>
+
+<dl>
+
+<dt id="drop">drop</dt>
+<dd>
+
+<p>Drops the table. All resources allocated by the table must be released after <code>$table-</code>drop($data)&gt;.</p>
+
+</dd>
+<dt id="fetch_row">fetch_row</dt>
+<dd>
+
+<p>Fetches the next row from the table. Returns <code>undef</code>, if the last row was already fetched. The argument $data is for private use of the subclass. Example:</p>
+
+<pre><code>    <span class="variable">$row</span> <span class="operator">=</span> <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">fetch_row</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>Note, that you may use</p>
+
+<pre><code>    <span class="variable">$row</span> <span class="operator">=</span> <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">row</span><span class="operator">();</span>
+</code></pre>
+
+<p>for retrieving the same row again, until the next call of <code>fetch_row</code>.</p>
+
+<p><code>SQL::Statement</code> requires that the last fetched row is available again and again via <code>$table-</code>row()&gt;.</p>
+
+</dd>
+<dt id="push_row">push_row</dt>
+<dd>
+
+<p>As fetch_row except for storing rows. Example:</p>
+
+<pre><code>    <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">push_row</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="variable">$row</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="push_names">push_names</dt>
+<dd>
+
+<p>Used by the <i>CREATE TABLE</i> statement to set the column names of the new table. Receives an array ref of names. Example:</p>
+
+<pre><code>    <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">push_names</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="variable">$names</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="seek">seek</dt>
+<dd>
+
+<p>Similar to the seek method of a filehandle; used for setting the number of the next row being written. Example:</p>
+
+<pre><code>    <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">seek</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="variable">$whence</span><span class="operator">,</span> <span class="variable">$rowNum</span><span class="operator">);</span>
+</code></pre>
+
+<p>Actually the current implementation only uses <code>seek($data, 0, 0)</code> (first row) and <code>seek($data, 2, 0)</code> (beyond last row, end of file).</p>
+
+</dd>
+<dt id="truncate">truncate</dt>
+<dd>
+
+<p>Truncates a table after the current row. Example:</p>
+
+<pre><code>    <span class="variable">$table</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="INTERNALS">INTERNALS</h1>
+
+<p>The current implementation is quite simple: An SQL::Eval object is an hash ref with only two attributes. The <code>params</code> attribute is an array ref of parameters. The <code>tables</code> attribute is an hash ref of table names (keys) and table objects (values).</p>
+
+<p>SQL::Eval::Table instances are implemented as hash refs. Attributes used are <code>row</code> (the array ref of the current row), <code>col_nums</code> (an hash ref of column names as keys and column numbers as values) and <code>col_names</code>, an array ref of column names with the column numbers as indexes.</p>
+
+<h1 id="MULTITHREADING">MULTITHREADING</h1>
+
+<p>All methods are working with instance-local data only, thus the module is reentrant and thread safe, if you either don&#39;t share handles between threads or grant serialized use.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-sql-statement at rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SQL-Statement">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SQL-Statement</a>. I will be notified, and then you will automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc SQL::Eval
+    perldoc SQL::Statement</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Statement">http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Statement</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/SQL-Statement">http://annocpan.org/dist/SQL-Statement</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/s/SQL-Statement">http://cpanratings.perl.org/s/SQL-Statement</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="http://search.cpan.org/dist/SQL-Statement/">http://search.cpan.org/dist/SQL-Statement/</a></p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</h1>
+
+<p>Written by Jochen Wiedmann and currently maintained by Jens Rehsack.</p>
+
+<p>This module is Copyright (C) 1998 by</p>
+
+<pre><code>    Jochen Wiedmann
+    Am Eisteich 9
+    72555 Metzingen
+    Germany
+
+    Email: joe@ispsoft.de
+    Phone: +49 7123 14887</code></pre>
+
+<p>and Copyright (C) 2009, 2017 by</p>
+
+<pre><code>     Jens Rehsack &lt; rehsackATcpan.org&gt;</code></pre>
+
+<p>All rights reserved.</p>
+
+<p>You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="http://man.he.net/man3/SQL::Statement">SQL::Statement(3)</a></p>
+
+
+</body>
+
+</html>
+
+

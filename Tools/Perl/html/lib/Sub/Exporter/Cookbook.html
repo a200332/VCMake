@@ -1,0 +1,319 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#OVERVIEW">OVERVIEW</a></li>
+  <li><a href="#THE-RECIPES">THE RECIPES</a>
+    <ul>
+      <li><a href="#Exporting-Methods-as-Routines">Exporting Methods as Routines</a></li>
+      <li><a href="#Exporting-Methods-as-Methods">Exporting Methods as Methods</a></li>
+      <li><a href="#Mixing-in-Complex-External-Behavior">Mixing-in Complex External Behavior</a></li>
+      <li><a href="#Exporting-Constants">Exporting Constants</a></li>
+      <li><a href="#Altering-the-Importers-ISA">Altering the Importer&#39;s @ISA</a></li>
+      <li><a href="#Eating-Exporter.pms-Brain">Eating Exporter.pm&#39;s Brain</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Exporter::Cookbook - useful, demonstrative, or stupid Sub::Exporter tricks</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.987</p>
+
+<h1 id="OVERVIEW">OVERVIEW</h1>
+
+<p>Sub::Exporter is a fairly simple tool, and can be used to achieve some very simple goals. Its basic behaviors and their basic application (that is, &quot;traditional&quot; exporting of routines) are described in <a href="../../../lib/Sub/Exporter/Tutorial.html">Sub::Exporter::Tutorial</a> and <a href="../../../lib/Sub/Exporter.html">Sub::Exporter</a>. This document presents applications that may not be immediately obvious, or that can demonstrate how certain features can be put to use (for good or evil).</p>
+
+<h1 id="THE-RECIPES">THE RECIPES</h1>
+
+<h2 id="Exporting-Methods-as-Routines">Exporting Methods as Routines</h2>
+
+<p>With Exporter.pm, exporting methods is a non-starter. Sub::Exporter makes it simple. By using the <code>curry_method</code> utility provided in <a href="../../../lib/Sub/Exporter/Util.html">Sub::Exporter::Util</a>, a method can be exported with the invocant built in.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Object::Strenuous</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter::Util</span> <span class="string">'curry_method'</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">objection</span> <span class="operator">=&gt;</span> <span class="variable">curry_method</span><span class="operator">(</span><span class="string">'new'</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>With this configuration, the importing code may contain:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">objection</span><span class="operator">(</span><span class="string">"irrelevant"</span><span class="operator">);</span>
+</code></pre>
+
+<p>...and this will be equivalent to:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">Object::Strenuous</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"irrelevant"</span><span class="operator">);</span>
+</code></pre>
+
+<p>The built-in invocant is determined by the invocant for the <code>import</code> method. That means that if we were to subclass Object::Strenuous as follows:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Object::Strenuous::Repeated</span><span class="operator">;</span>
+  <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">'Object::Strenuous'</span><span class="operator">;</span>
+</code></pre>
+
+<p>...then importing <code>objection</code> from the subclass would build-in that subclass.</p>
+
+<p>Finally, since the invocant can be an object, you can write something like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Cypher</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter::Util</span> <span class="string">'curry_method'</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">encypher</span> <span class="operator">=&gt;</span> <span class="variable">curry_method</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>with the expectation that <code>import</code> will be called on an instantiated Cypher object:</p>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$cypher</span> <span class="operator">=</span> <span class="variable">Cypher</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+    <span class="variable">$cypher</span><span class="operator">-&gt;</span><span class="variable">import</span><span class="operator">(</span><span class="string">'encypher'</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Now there is a globally-available <code>encypher</code> routine which calls the encypher method on an otherwise unavailable Cypher object.</p>
+
+<h2 id="Exporting-Methods-as-Methods">Exporting Methods as Methods</h2>
+
+<p>While exporting modules usually export subroutines to be called as subroutines, it&#39;s easy to use Sub::Exporter to export subroutines meant to be called as methods on the importing package or its objects.</p>
+
+<p>Here&#39;s a trivial (and naive) example:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Mixin::DumpObj</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(dump)</span> <span class="operator">]</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> dump </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="keyword">return</span> <span class="variable">Dumper</span><span class="operator">(</span><span class="variable">$self</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>When writing your own object class, you can then import <code>dump</code> to be used as a method, called like so:</p>
+
+<pre><code>  <span class="variable">$object</span><span class="operator">-&gt;</span><span class="variable">dump</span><span class="operator">;</span>
+</code></pre>
+
+<p>By assuming that the importing class will provide a certain interface, a method-exporting module can be used as a simple plugin:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Number::Plugin::Upto</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">into</span>    <span class="operator">=&gt;</span> <span class="string">'Number'</span><span class="operator">,</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(upto)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">groups</span>  <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">default</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(upto)</span> <span class="operator">]</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> upto </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="keyword">return</span> <span class="number">1</span> <span class="operator">..</span> <span class="keyword">abs</span><span class="operator">(</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">as_integer</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>into</code> line in the configuration says that this plugin will export, by default, into the Number package, not into the <code>use</code>-ing package. It can be exported anyway, though, and will work as long as the destination provides an <code>as_integer</code> method like the one it expects. To import it to a different destination, one can just write:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Number::Plugin::Upto</span> <span class="operator">{</span> <span class="string">into</span> <span class="operator">=&gt;</span> <span class="string">'Quantity'</span> <span class="operator">};</span>    
+</code></pre>
+
+<h2 id="Mixing-in-Complex-External-Behavior">Mixing-in Complex External Behavior</h2>
+
+<p>When exporting methods to be used as methods (see above), one very powerful option is to export methods that are generated routines that maintain an enclosed reference to the exporting module. This allows a user to import a single method which is implemented in terms of a complete, well-structured package.</p>
+
+<p>Here is a very small example:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Data::Analyzer</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">analyze</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="string">'_generate_analyzer'</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> _generate_analyzer </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$mixin</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="variable">$arg</span><span class="operator">,</span> <span class="variable">$col</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+    <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$values</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">values</span> <span class="operator">]</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$analyzer</span> <span class="operator">=</span> <span class="variable">$mixin</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$values</span><span class="operator">);</span>
+      <span class="variable">$analyzer</span><span class="operator">-&gt;</span><span class="variable">perform_analysis</span><span class="operator">;</span>
+      <span class="variable">$analyzer</span><span class="operator">-&gt;</span><span class="variable">aggregate_results</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$analyzer</span><span class="operator">-&gt;</span><span class="variable">summary</span><span class="operator">;</span>
+    <span class="operator">};</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>If imported by any package providing a <code>values</code> method, this plugin will provide a single <code>analyze</code> method that acts as a simple interface to a more complex set of behaviors.</p>
+
+<p>Even more importantly, because the <code>$mixin</code> value will be the invocant on which the <code>import</code> was actually called, one can subclass <code>Data::Analyzer</code> and replace only individual pieces of the complex behavior, making it easy to write complex, subclassable toolkits with simple single points of entry for external interfaces.</p>
+
+<h2 id="Exporting-Constants">Exporting Constants</h2>
+
+<p>While Sub::Exporter isn&#39;t in the constant-exporting business, it&#39;s easy to export constants by using one of its sister modules, Package::Generator.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Important::Constants</span><span class="operator">;</span>
+   
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">collectors</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">constants</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="string">'_set_constants'</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+   
+  <span class="keyword">sub</span><span class="variable"> _set_constants </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+   
+    <span class="variable">Package::Generator</span><span class="operator">-&gt;</span><span class="variable">assign_symbols</span><span class="operator">(</span>
+      <span class="variable">$data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">into</span><span class="operator">}</span><span class="operator">,</span>
+      <span class="operator">[</span>
+        <span class="string">MEANING_OF_LIFE</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="number">42</span><span class="operator">,</span>
+        <span class="string">ONE_TRUE_BASE</span>   <span class="operator">=&gt;</span> <span class="operator">\</span><span class="number">13</span><span class="operator">,</span>
+        <span class="string">FACTORS</span>         <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">6</span><span class="operator">,</span> <span class="number">9</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+  
+    <span class="keyword">return</span> <span class="number">1</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Then, someone can write:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Important::Constants</span> <span class="string">'constants'</span><span class="operator">;</span>
+  
+  <span class="keyword">print</span> <span class="string">"The factors </span><span class="variable">@FACTORS</span><span class="string"> produce </span><span class="variable">$MEANING_OF_LIFE</span><span class="string"> in </span><span class="variable">$ONE_TRUE_BASE</span><span class="string">."</span><span class="operator">;</span>
+</code></pre>
+
+<p>(The constants must be exported via a collector, because they are effectively altering the importing class in a way other than installing subroutines.)</p>
+
+<h2 id="Altering-the-Importers-ISA">Altering the Importer&#39;s @ISA</h2>
+
+<p>It&#39;s trivial to make a collector that changes the inheritance of an importing package:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">collectors</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-base</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="string">'_make_base'</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> _make_base </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+    <span class="keyword">my</span> <span class="variable">$target</span> <span class="operator">=</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">into</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span><span class="string">"</span><span class="variable">$target</span><span class="string">\::ISA"</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">$class</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Then, the user of your class can write:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Some::Class</span> <span class="operator">-</span><span class="variable">base</span><span class="operator">;</span>
+</code></pre>
+
+<p>and become a subclass. This can be quite useful in building, for example, a module that helps build plugins. We may want a few utilities imported, but we also want to inherit behavior from some base plugin class;</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Framework::Util</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span>    <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(log global_config)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">groups</span>     <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">_plugin</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(log global_config)</span> <span class="operator">]</span>
+    <span class="string">collectors</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">'-plugin'</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="string">'_become_plugin'</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> _become_plugin </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$value</span><span class="operator">,</span> <span class="variable">$data</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+    <span class="keyword">my</span> <span class="variable">$target</span> <span class="operator">=</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">into</span><span class="operator">}</span><span class="operator">;</span>
+    <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span><span class="string">"</span><span class="variable">$target</span><span class="string">\::ISA"</span><span class="operator">}</span><span class="operator">,</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">plugin_base_class</span><span class="operator">;</span>
+  
+    <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">import_args</span><span class="operator">}</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">'-_plugin'</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Now, you can write a plugin like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Framework::Plugin::AirFreshener</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Framework::Util</span> <span class="operator">-</span><span class="variable">plugin</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Eating-Exporter.pms-Brain">Eating Exporter.pm&#39;s Brain</h2>
+
+<p>You probably shouldn&#39;t actually do this in production. It&#39;s offered more as a demonstration than a suggestion.</p>
+
+<pre><code> <span class="keyword">sub</span><span class="variable"> exporter_upgrade </span><span class="operator">{</span>
+   <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$pkg</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+   <span class="keyword">my</span> <span class="variable">$new_pkg</span> <span class="operator">=</span> <span class="string">"</span><span class="variable">$pkg</span><span class="string">\::UsingSubExporter"</span><span class="operator">;</span>
+ 
+   <span class="keyword">return</span> <span class="variable">$new_pkg</span> <span class="keyword">if</span> <span class="variable">$new_pkg</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="variable">$pkg</span><span class="operator">);</span>
+ 
+   <span class="variable">Sub::Exporter::setup_exporter</span><span class="operator">(</span><span class="operator">{</span>
+     <span class="string">as</span>      <span class="operator">=&gt;</span> <span class="string">'import'</span><span class="operator">,</span>
+     <span class="string">into</span>    <span class="operator">=&gt;</span> <span class="variable">$new_pkg</span><span class="operator">,</span>
+     <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">@</span><span class="operator">{</span><span class="string">"</span><span class="variable">$pkg</span><span class="string">\::EXPORT_OK"</span><span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+     <span class="string">groups</span>  <span class="operator">=&gt;</span> <span class="operator">{</span>
+       <span class="variable">%</span><span class="operator">{</span><span class="string">"</span><span class="variable">$pkg</span><span class="string">\::EXPORT_TAG"</span><span class="operator">}</span><span class="operator">,</span>
+       <span class="string">default</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">@</span><span class="operator">{</span><span class="string">"</span><span class="variable">$pkg</span><span class="string">\::EXPORTS"</span><span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+     <span class="operator">}</span><span class="operator">,</span>
+   <span class="operator">}</span><span class="operator">);</span>
+ 
+   <span class="variable">@</span><span class="operator">{</span><span class="string">"</span><span class="variable">$new_pkg</span><span class="string">\::ISA"</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">$pkg</span><span class="operator">;</span>
+   <span class="keyword">return</span> <span class="variable">$new_pkg</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>This routine, given the name of an existing package configured to use Exporter.pm, returns the name of a new package with a Sub::Exporter-powered <code>import</code> routine. This lets you import <code>Toolkit::exported_sub</code> into the current package with the name <code>foo</code> by writing:</p>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span>
+    <span class="keyword">require</span> <span class="variable">Toolkit</span><span class="operator">;</span>
+    <span class="variable">exporter_upgrade</span><span class="operator">(</span><span class="string">'Toolkit'</span><span class="operator">)-&gt;</span><span class="variable">import</span><span class="operator">(</span><span class="string">exported_sub</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span> <span class="operator">}</span><span class="operator">)</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>If you&#39;re feeling particularly naughty, this routine could have been declared in the UNIVERSAL package, meaning you could write:</p>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span>
+    <span class="keyword">require</span> <span class="variable">Toolkit</span><span class="operator">;</span>
+    <span class="variable">Toolkit</span><span class="operator">-&gt;</span><span class="variable">exporter_upgrade</span><span class="operator">-&gt;</span><span class="variable">import</span><span class="operator">(</span><span class="string">exported_sub</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span> <span class="operator">}</span><span class="operator">)</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The new package will have all the same exporter configuration as the original, but will support export and group renaming, including exporting into scalar references. Further, since Sub::Exporter uses <code>can</code> to find the routine being exported, the new package may be subclassed and some of its exports replaced.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2007 by Ricardo Signes.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

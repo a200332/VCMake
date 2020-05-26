@@ -1,0 +1,503 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#ESSENTIALS">ESSENTIALS</a></li>
+      <li><a href="#SHORTCUTS">SHORTCUTS</a></li>
+      <li><a href="#CUSTOM-ATTRIBUTE-DEFAULTS">CUSTOM ATTRIBUTE DEFAULTS</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXECUTION-ORDER">EXECUTION ORDER</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Tools::Spec - RSPEC implementation on top of Test2::Workflow</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This uses <a>Test::Workflow</a> to implement an RSPEC variant. This variant supports isolation and/or concurrency via forking or threads.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Bundle::Extended</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Test2::Tools::Spec</span><span class="operator">;</span>
+    
+    <span class="variable">describe</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">before_all</span>  <span class="string">once</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+        <span class="variable">before_each</span> <span class="string">many</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+        <span class="variable">after_all</span>  <span class="string">once</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+        <span class="variable">after_each</span> <span class="string">many</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+        <span class="variable">case</span> <span class="string">condition_a</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+        <span class="variable">case</span> <span class="string">condition_b</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+        <span class="variable">tests</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+        <span class="variable">tests</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">done_testing</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>All of these use the same argument pattern. The first argument must always be a name for the block. The last argument must always be a code reference. Optionally a configuration hash can be inserted between the name and the code reference.</p>
+
+<pre><code>    <span class="variable">FUNCTION</span> <span class="string">"name"</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+    <span class="variable">FUNCTION</span> <span class="string">"name"</span> <span class="operator">=&gt;</span> <span class="operator">{</span><span class="operator">...</span><span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<dl>
+
+<dt id="NAME1">NAME</dt>
+<dd>
+
+<p>The first argument to a Test2::Tools::Spec function MUST be a name. The name does not need to be unique.</p>
+
+</dd>
+<dt id="PARAMS">PARAMS</dt>
+<dd>
+
+<p>This argument is optional. If present this should be a hashref.</p>
+
+<p>Here are the valid keys for the hashref:</p>
+
+<dl>
+
+<dt id="flat-bool">flat =&gt; $bool</dt>
+<dd>
+
+<p>If this is set to true then the block will not render as a subtest, instead the events will be inline with the parent subtest (or main test).</p>
+
+</dd>
+<dt id="async-bool">async =&gt; $bool</dt>
+<dd>
+
+<p>Set this to true to mark a block as being capable of running concurrently with other test blocks. This does not mean the block WILL be run concurrently, just that it can be.</p>
+
+</dd>
+<dt id="iso-bool">iso =&gt; $bool</dt>
+<dd>
+
+<p>Set this to true if the block MUST be run in isolation. If this is true then the block will run in its own thread or fork.</p>
+
+</dd>
+<dt id="todo-reason">todo =&gt; $reason</dt>
+<dd>
+
+<p>Use this to mark an entire block as TODO.</p>
+
+</dd>
+<dt id="skip-reason">skip =&gt; $reason</dt>
+<dd>
+
+<p>Use this to prevent a block from running at all.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="CODEREF">CODEREF</dt>
+<dd>
+
+<p>This argument is required. This should be a code reference that will run some assertions.</p>
+
+</dd>
+</dl>
+
+<h2 id="ESSENTIALS">ESSENTIALS</h2>
+
+<dl>
+
+<dt id="tests-NAME-sub">tests NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="tests-NAME-params-sub">tests NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="tests-NAME-PARAMS-CODE">tests($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+</dd>
+<dt id="it-NAME-sub">it NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="it-NAME-params-sub">it NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="it-NAME-PARAMS-CODE">it($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>This defines a test block. Test blocks are essentially subtests. All test blocks will be run, and are expected to produce events. Test blocks can run multiple times if the <code>case()</code> function is also used.</p>
+
+<p><code>it()</code> is an alias to <code>tests()</code>.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="case-NAME-sub">case NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="case-NAME-params-sub">case NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="case-NAME-PARAMS-CODE">case($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>This lets you specify multiple conditions in which the test blocks should be run. Every test block within the same group (<code>describe</code>) will be run once per case.</p>
+
+<p>These ARE NOT inherited by nested describe blocks, but nested describe blocks will be executed once per case.</p>
+
+</dd>
+<dt id="before_each-NAME-sub">before_each NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="before_each-NAME-params-sub">before_each NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="before_each-NAME-PARAMS-CODE">before_each($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Specify a codeblock that should be run multiple times, once before each <code>tests()</code> block is run. These will run AFTER <code>case()</code> blocks but before <code>tests()</code> blocks.</p>
+
+<p>These ARE inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="before_case-NAME-sub">before_case NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="before_case-NAME-params-sub">before_case NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="before_case-NAME-PARAMS-CODE">before_case($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Same as <code>before_each()</code>, except these blocks run BEFORE <code>case()</code> blocks.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="before_all-NAME-sub">before_all NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="before_all-NAME-params-sub">before_all NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="before_all-NAME-PARAMS-CODE">before_all($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Specify a codeblock that should be run once, before all the test blocks run.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="around_each-NAME-sub">around_each NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="around_each-NAME-params-sub">around_each NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="around_each-NAME-PARAMS-CODE">around_each($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Specify a codeblock that should wrap around each test block. These blocks are run AFTER case blocks, but before test blocks.</p>
+
+<pre><code>    <span class="variable">around_each</span> <span class="string">wrapit</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$cont</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="keyword">local</span> <span class="variable">%ENV</span> <span class="operator">=</span> <span class="operator">(</span> <span class="operator">...</span> <span class="operator">);</span>
+    
+        <span class="variable">$cont</span><span class="operator">-&gt;();</span>
+    
+        <span class="operator">...</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>The first argument to the codeblock will be a callback that MUST be called somewhere inside the sub in order for nested items to run.</p>
+
+<p>These ARE inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="around_case-NAME-sub">around_case NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="around_case-NAME-params-sub">around_case NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="around_case-NAME-PARAMS-CODE">around_case($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Same as <code>around_each</code> except these run BEFORE case blocks.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="around_all-NAME-sub">around_all NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="around_all-NAME-params-sub">around_all NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="around_all-NAME-PARAMS-CODE">around_all($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Same as <code>around_each</code> except that it only runs once to wrap ALL test blocks.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="after_each-NAME-sub">after_each NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="after_each-NAME-params-sub">after_each NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="after_each-NAME-PARAMS-CODE">after_each($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Same as <code>before_each</code> except it runs right after each test block.</p>
+
+<p>These ARE inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="after_case-NAME-sub">after_case NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="after_case-NAME-params-sub">after_case NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="after_case-NAME-PARAMS-CODE">after_case($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Same as <code>after_each</code> except it runs right after the case block, and before the test block.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+<dt id="after_all-NAME-sub">after_all NAME =&gt; sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="after_all-NAME-params-sub">after_all NAME =&gt; \%params, sub { ... }</dt>
+<dd>
+
+</dd>
+<dt id="after_all-NAME-PARAMS-CODE">after_all($NAME, \%PARAMS, \&amp;CODE)</dt>
+<dd>
+
+<p>Same as <code>before_all</code> except it runs after all test blocks have been run.</p>
+
+<p>These ARE NOT inherited by nested describe blocks.</p>
+
+</dd>
+</dl>
+
+<h2 id="SHORTCUTS">SHORTCUTS</h2>
+
+<p>These are shortcuts. Each of these is the same as <code>tests()</code> except some parameters are added for you.</p>
+
+<p>These are NOT exported by default/.</p>
+
+<dl>
+
+<dt id="mini-NAME-sub">mini NAME =&gt; sub { ... }</dt>
+<dd>
+
+<p>Same as:</p>
+
+<pre><code>    <span class="variable">tests</span> <span class="string">NAME</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">flat</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="iso-NAME-sub">iso NAME =&gt; sub { ... }</dt>
+<dd>
+
+<p>Same as:</p>
+
+<pre><code>    <span class="variable">tests</span> <span class="string">NAME</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="miso-NAME-sub">miso NAME =&gt; sub { ... }</dt>
+<dd>
+
+<p>Same as:</p>
+
+<pre><code>    <span class="variable">tests</span> <span class="string">NAME</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">mini</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="async-NAME-sub">async NAME =&gt; sub { ... }</dt>
+<dd>
+
+<p>Same as:</p>
+
+<pre><code>    <span class="variable">tests</span> <span class="string">NAME</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">async</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p><b>Note:</b> This conflicts with the <code>async()</code> exported from <a href="../../../lib/threads.html">threads</a>. Don&#39;t import both.</p>
+
+</dd>
+<dt id="masync-NAME-sub">masync NAME =&gt; sub { ... }</dt>
+<dd>
+
+<p>Same as:</p>
+
+<pre><code>    <span class="variable">tests</span> <span class="string">NAME</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">minit</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">async</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="CUSTOM-ATTRIBUTE-DEFAULTS">CUSTOM ATTRIBUTE DEFAULTS</h2>
+
+<p>Sometimes you want to apply default attributes to all <code>tests()</code> or <code>case()</code> blocks. This can be done, and is lexical to your describe or package root!</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Bundle::Extended</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Test2::Tools::Spec</span> <span class="string">':ALL'</span><span class="operator">;</span>
+    
+    <span class="comment"># All 'tests' blocks after this declaration will have C&lt;&lt;iso =&gt; 1&gt;&gt; by default</span>
+    <span class="variable">spec_defaults</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    
+    <span class="variable">tests</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span> <span class="comment"># isolated</span>
+    
+    <span class="variable">tests</span> <span class="variable">foo</span><span class="operator">,</span> <span class="operator">{</span><span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">}</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span> <span class="comment"># Not isolated</span>
+    
+    <span class="variable">spec_defaults</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">);</span> <span class="comment"># Turn it off again</span>
+</code></pre>
+
+<p>Defaults are inherited by nested describe blocks. You can also override the defaults for the scope of the describe:</p>
+
+<pre><code>    <span class="variable">spec_defaults</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    
+    <span class="variable">describe</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">spec_defaults</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">async</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span> <span class="comment"># Scoped to this describe and any child describes</span>
+    
+        <span class="variable">tests</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span> <span class="comment"># both iso and async</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">tests</span> <span class="string">baz</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span> <span class="comment"># Just iso, no async.</span>
+</code></pre>
+
+<p>You can apply defaults to any type of blocks:</p>
+
+<pre><code>    <span class="variable">spec_defaults</span> <span class="string">case</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span> <span class="comment"># All cases are 'iso';</span>
+</code></pre>
+
+<p>Defaults are not inherited when a builder&#39;s return is captured.</p>
+
+<pre><code>    <span class="variable">spec_defaults</span> <span class="string">tests</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">iso</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+    
+    <span class="comment"># Note we are not calling this in void context, that is the key here.</span>
+    <span class="keyword">my</span> <span class="variable">$d</span> <span class="operator">=</span> <span class="variable">describe</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="variable">tests</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span> <span class="comment"># Not iso</span>
+    <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="EXECUTION-ORDER">EXECUTION ORDER</h1>
+
+<p>As each function is encountered it executes, just like any other function. The <code>describe()</code> function will immediately execute the codeblock it is given. All other functions will stash their codeblocks to be run later. When <code>done_testing()</code> is run the workflow will be compiled, at which point all other blocks will run.</p>
+
+<p>Here is an overview of the order in which blocks get called once compiled (at <code>done_testing()</code>).</p>
+
+<pre><code>    <span class="variable">before_all</span>
+        <span class="keyword">for</span><span class="operator">-</span><span class="keyword">each</span><span class="operator">-</span><span class="variable">case</span> <span class="operator">{</span>
+            <span class="variable">before_case</span>
+                <span class="variable">case</span>
+            <span class="variable">after_case</span>
+    
+            <span class="comment"># AND/OR nested describes</span>
+            <span class="variable">before_each</span>
+                <span class="variable">tests</span>
+            <span class="variable">after_each</span>
+        <span class="operator">}</span>
+    <span class="variable">after_all</span>
+</code></pre>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Workflow can be found at <i>http://github.com/Test-More/Test2-Workflow/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2016 Chad Granum &lt;exodist7@gmail.com&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

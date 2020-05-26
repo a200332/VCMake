@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Pure-Perl-version">Pure-Perl version</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Identify - Retrieve names of code references</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Sub::Identify</span> <span class="string">':all'</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$subname</span> <span class="operator">=</span> <span class="variable">sub_name</span><span class="operator">(</span> <span class="variable">$some_coderef</span> <span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$packagename</span> <span class="operator">=</span> <span class="variable">stash_name</span><span class="operator">(</span> <span class="variable">$some_coderef</span> <span class="operator">);</span>
+    <span class="comment"># or, to get all at once...</span>
+    <span class="keyword">my</span> <span class="variable">$fully_qualified_name</span> <span class="operator">=</span> <span class="variable">sub_fullname</span><span class="operator">(</span> <span class="variable">$some_coderef</span> <span class="operator">);</span>
+    <span class="keyword">defined</span> <span class="variable">$subname</span>
+        <span class="keyword">and</span> <span class="keyword">say</span> <span class="string">"this coderef points to sub </span><span class="variable">$subname</span><span class="string"> in package </span><span class="variable">$packagename</span><span class="string">"</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$file</span><span class="operator">,</span> <span class="variable">$line</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">get_code_location</span><span class="operator">(</span> <span class="variable">$some_coderef</span> <span class="operator">);</span>
+    <span class="variable">$file</span>
+        <span class="keyword">and</span> <span class="keyword">say</span> <span class="string">"this coderef is defined at line </span><span class="variable">$line</span><span class="string"> in file </span><span class="variable">$file</span><span class="string">"</span><span class="operator">;</span>
+    <span class="variable">is_sub_constant</span><span class="operator">(</span> <span class="variable">$some_coderef</span> <span class="operator">)</span>
+        <span class="keyword">and</span> <span class="keyword">say</span> <span class="string">"this coderef points to a constant subroutine"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>Sub::Identify</code> allows you to retrieve the real name of code references.</p>
+
+<p>It provides six functions, all of them taking a code reference.</p>
+
+<p><code>sub_name</code> returns the name of the code reference passed as an argument (or <code>__ANON__</code> if it&#39;s an anonymous code reference), <code>stash_name</code> returns its package, and <code>sub_fullname</code> returns the concatenation of the two.</p>
+
+<p><code>get_code_info</code> returns a list of two elements, the package and the subroutine name (in case of you want both and are worried by the speed.)</p>
+
+<p>In case of subroutine aliasing, those functions always return the original name.</p>
+
+<p><code>get_code_location</code> returns a two-element list containing the file name and the line number where the subroutine has been defined.</p>
+
+<p><code>is_sub_constant</code> returns a boolean value indicating whether the subroutine is a constant or not.</p>
+
+<h2 id="Pure-Perl-version">Pure-Perl version</h2>
+
+<p>By default <code>Sub::Identify</code> tries to load an XS implementation of the <code>get_code_info</code>, <code>get_code_location</code> and (on perl versions 5.16.0 and later) <code>is_sub_constant</code> functions, for speed; if that fails, or if the environment variable <code>PERL_SUB_IDENTIFY_PP</code> is defined to a true value, it will fall back to a pure perl implementation, that uses perl&#39;s introspection mechanism, provided by the <code>B</code> module.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/Sub/Util.html">Sub::Util</a>, part of the module distribution <a>Scalar::List::Utils</a> since version 1.40. Since this will be a core module starting with perl 5.22.0, it is encouraged to migrate to Sub::Util when possible.</p>
+
+<p><a href="../../lib/Sub/Name.html">Sub::Name</a></p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>A git repository for the sources is at <a href="https://github.com/rgs/Sub-Identify">https://github.com/rgs/Sub-Identify</a>.</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>(c) Rafael Garcia-Suarez (rgs at consttype dot org) 2005, 2008, 2012, 2014, 2015</p>
+
+<p>This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

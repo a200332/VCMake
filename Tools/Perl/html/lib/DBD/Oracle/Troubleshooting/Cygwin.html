@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#General-Info">General Info</a></li>
+  <li><a href="#Compiling-DBD::Oracle-using-the-Oracle-Instant-Client-Cygwin-Perl-and-gcc">Compiling DBD::Oracle using the Oracle Instant Client, Cygwin Perl and gcc</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::Oracle::Troubleshooting::Cygwin - Tips and Hints to Troubleshoot DBD::Oracle on Cygwin</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.74</p>
+
+<h1 id="General-Info">General Info</h1>
+
+<p>Makefile.PL should find and make use of OCI include files, but you have to build an import library for OCI.DLL and put it somewhere in library search path. one of the possible ways to do this is issuing command</p>
+
+<pre><code>    dlltool --input-def oci.def --output-lib liboci.a</code></pre>
+
+<p>in the directory where you unpacked DBD::Oracle distribution archive. this will create import library for Oracle 8.0.4.</p>
+
+<p>Note: make clean removes &#39;*.a&#39; files, so put a copy in a safe place.</p>
+
+<h1 id="Compiling-DBD::Oracle-using-the-Oracle-Instant-Client-Cygwin-Perl-and-gcc">Compiling DBD::Oracle using the Oracle Instant Client, Cygwin Perl and gcc</h1>
+
+<ol>
+
+<li><p>Download these two packages from Oracle&#39;s Instant Client for Windows site (http://www.oracle.com/technology/software/tech/oci/instantclient/htdocs/winsoft.html):</p>
+
+<p>Instant Client Package - Basic: All files required to run OCI, OCCI, and JDBC-OCI applications</p>
+
+<p>Instant Client Package - SDK: Additional header files and an example makefile for developing Oracle applications with Instant Client</p>
+
+<p>(I usually just use the latest version of the client)</p>
+
+</li>
+<li><p>Unpack both into C:\oracle\instantclient_11_1</p>
+
+</li>
+<li><p>Download and unpack DBD::Oracle from CPAN to some place with no spaces in the path (I used /tmp/DBD-Oracle) and cd to it.</p>
+
+</li>
+<li><p>Set up some environment variables (it didn&#39;t work until I got the DSN right):</p>
+
+<pre><code>      <span class="variable">ORACLE_DSN</span><span class="operator">=</span><span class="variable">DBI</span><span class="operator">:</span><span class="variable">Oracle</span><span class="operator">:</span><span class="variable">host</span><span class="operator">=</span><span class="variable">oraclehost</span><span class="operator">;</span><span class="variable">sid</span><span class="operator">=</span><span class="variable">oracledb1</span>
+      <span class="variable">ORACLE_USERID</span><span class="operator">=</span><span class="variable">username</span><span class="operator">/</span><span class="variable">password</span>
+</code></pre>
+
+</li>
+<li><p></p>
+
+<pre><code>      perl Makefile.PL
+      make
+      make test
+      make install</code></pre>
+
+</li>
+</ol>
+
+<p>Note, the TNS Names stuff doesn&#39;t always seem to work with the instant client so Perl scripts need to explicitly use host/sid in the DSN, like this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$dbh</span> <span class="operator">=</span> <span class="variable">DBI</span><span class="operator">-&gt;</span><span class="variable">connect</span><span class="operator">(</span><span class="string">'dbi:Oracle:host=oraclehost;sid=oracledb1'</span><span class="operator">,</span>
+    <span class="string">'username'</span><span class="operator">,</span> <span class="string">'password'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Tim Bunce &lt;timb@cpan.org&gt;</p>
+
+</li>
+<li><p>John Scoles &lt;byterock@cpan.org&gt;</p>
+
+</li>
+<li><p>Yanick Champoux &lt;yanick@cpan.org&gt;</p>
+
+</li>
+<li><p>Martin J. Evans &lt;mjevans@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 1994 by Tim Bunce.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

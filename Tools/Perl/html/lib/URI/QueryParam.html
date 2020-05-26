@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>URI::QueryParam - Additional query methods for URIs</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">URI</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">URI::QueryParam</span><span class="operator">;</span>
+  
+  <span class="variable">$u</span> <span class="operator">=</span> <span class="variable">URI</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">""</span><span class="operator">,</span> <span class="string">"http"</span><span class="operator">);</span>
+  <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span><span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="number">2</span><span class="operator">,</span> <span class="number">3</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query</span><span class="operator">;</span>    <span class="comment"># prints foo=1&amp;foo=2&amp;foo=3</span>
+  
+  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$key</span> <span class="operator">(</span><span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"</span><span class="variable">$key</span><span class="string">: "</span><span class="operator">,</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">", "</span><span class="operator">,</span> <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span><span class="variable">$key</span><span class="operator">)),</span> <span class="string">"\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Loading the <code>URI::QueryParam</code> module adds some extra methods to URIs that support query methods. These methods provide an alternative interface to the $u-&gt;query_form data.</p>
+
+<p>The query_param_* methods have deliberately been made identical to the interface of the corresponding <code>CGI.pm</code> methods.</p>
+
+<p>The following additional methods are made available:</p>
+
+<dl>
+
+<dt id="keys-u-query_param">@keys = $u-&gt;query_param</dt>
+<dd>
+
+</dd>
+<dt id="values-u-query_param-key">@values = $u-&gt;query_param( $key )</dt>
+<dd>
+
+</dd>
+<dt id="first_value-u-query_param-key">$first_value = $u-&gt;query_param( $key )</dt>
+<dd>
+
+</dd>
+<dt id="u-query_param-key-value">$u-&gt;query_param( $key, $value,... )</dt>
+<dd>
+
+<p>If $u-&gt;query_param is called with no arguments, it returns all the distinct parameter keys of the URI. In a scalar context it returns the number of distinct keys.</p>
+
+<p>When a $key argument is given, the method returns the parameter values with the given key. In a scalar context, only the first parameter value is returned.</p>
+
+<p>If additional arguments are given, they are used to update successive parameters with the given key. If any of the values provided are array references, then the array is dereferenced to get the actual values.</p>
+
+<p>Please note that you can supply multiple values to this method, but you cannot supply multiple keys.</p>
+
+<p>Do this:</p>
+
+<pre><code>    <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span> <span class="string">widget_id</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="number">9</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Do NOT do this:</p>
+
+<pre><code>    <span class="variable">$uri</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span> <span class="string">widget_id</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">frobnicator_id</span> <span class="operator">=&gt;</span> <span class="number">99</span> <span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="u-query_param_append-key-value">$u-&gt;query_param_append($key, $value,...)</dt>
+<dd>
+
+<p>Adds new parameters with the given key without touching any old parameters with the same key. It can be explained as a more efficient version of:</p>
+
+<pre><code>   <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span><span class="variable">$key</span><span class="operator">,</span>
+                   <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span><span class="variable">$key</span><span class="operator">),</span>
+                   <span class="variable">$value</span><span class="operator">,...);</span>
+</code></pre>
+
+<p>One difference is that this expression would return the old values of $key, whereas the query_param_append() method does not.</p>
+
+</dd>
+<dt id="values-u-query_param_delete-key">@values = $u-&gt;query_param_delete($key)</dt>
+<dd>
+
+</dd>
+<dt id="first_value-u-query_param_delete-key">$first_value = $u-&gt;query_param_delete($key)</dt>
+<dd>
+
+<p>Deletes all key/value pairs with the given key. The old values are returned. In a scalar context, only the first value is returned.</p>
+
+<p>Using the query_param_delete() method is slightly more efficient than the equivalent:</p>
+
+<pre><code>   <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_param</span><span class="operator">(</span><span class="variable">$key</span><span class="operator">,</span> <span class="operator">[]</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="hashref-u-query_form_hash">$hashref = $u-&gt;query_form_hash</dt>
+<dd>
+
+</dd>
+<dt id="u-query_form_hash-new_form">$u-&gt;query_form_hash( \%new_form )</dt>
+<dd>
+
+<p>Returns a reference to a hash that represents the query form&#39;s key/value pairs. If a key occurs multiple times, then the hash value becomes an array reference.</p>
+
+<p>Note that sequence information is lost. This means that:</p>
+
+<pre><code>   <span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_form_hash</span><span class="operator">(</span><span class="variable">$u</span><span class="operator">-&gt;</span><span class="variable">query_form_hash</span><span class="operator">);</span>
+</code></pre>
+
+<p>is not necessarily a no-op, as it may reorder the key/value pairs. The values returned by the query_param() method should stay the same though.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/URI.html">URI</a>, <a href="../../lib/CGI.html">CGI</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2002 Gisle Aas.</p>
+
+
+</body>
+
+</html>
+
+

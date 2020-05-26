@@ -1,0 +1,181 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>IPC::Run3::ProfReporter - base class for handling profiling data</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>See <a href="../../../lib/IPC/Run3/ProfPP.html">IPC::Run3::ProfPP</a> and for an example subclass.</p>
+
+<p>This class just notes and accumulates times; subclasses use methods like &quot;handle_app_call&quot;, &quot;handle_run_exit&quot; and &quot;handle_app_exit&quot; to emit reports on it. The default methods for these handlers are noops.</p>
+
+<p>If run from the command line, a reporter will be created and run on each logfile given as a command line parameter or on run3.out if none are given.</p>
+
+<p>This allows reports to be run like:</p>
+
+<pre><code>    perl -MIPC::Run3::ProfPP -e1
+    perl -MIPC::Run3::ProfPP -e1 foo.out bar.out</code></pre>
+
+<p>Use &quot;-&quot; to read from STDIN (the log file format is meant to be moderately greppable):</p>
+
+<pre><code>    grep &quot;^cvs &quot; run3.out perl -MIPC::Run3::ProfPP -e1 -</code></pre>
+
+<p>Use --app to show only application level statistics (ie don&#39;t emit a report section for each command run).</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="IPC::Run3::ProfReporter-new"><code>IPC::Run3::ProfReporter-&gt;new</code></dt>
+<dd>
+
+<p>Returns a new profile reporting object.</p>
+
+</dd>
+<dt id="reporter-handle_app_call"><code>$reporter-&gt;handle_app_call( ... )</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-handle_app_exit"><code>$reporter-&gt;handle_app_exit( ... )</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-handle_run_exit"><code>$reporter-&gt;handle_run_exit( ... )</code></dt>
+<dd>
+
+<p>These methods are called by the handled events (see below).</p>
+
+</dd>
+<dt id="reporter-app_call-cmd-time"><code>$reporter-&gt;app_call(\@cmd, $time)</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-app_exit-time"><code>$reporter-&gt;app_exit($time)</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-run_exit-times"><code>$reporter-&gt;run_exit(@times)</code></dt>
+<dd>
+
+<pre><code>   <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">app_call</span><span class="operator">(</span> <span class="variable">$time</span> <span class="operator">);</span>
+   <span class="keyword">my</span> <span class="variable">$time</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">get_app_call_time</span><span class="operator">;</span>
+</code></pre>
+
+<p>Sets the time (in floating point seconds) when the application, run3(), or system() was called or exited. If no time parameter is passed, uses IPC::Run3&#39;s time routine.</p>
+
+<p>Use get_...() to retrieve these values (and _accum values, too). This is a separate method to speed the execution time of the setters just a bit.</p>
+
+</dd>
+<dt id="reporter-get_run_count"><code>$reporter-&gt;get_run_count()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_app_call_time"><code>$reporter-&gt;get_app_call_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_app_exit_time"><code>$reporter-&gt;get_app_exit_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_app_cmd"><code>$reporter-&gt;get_app_cmd()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_app_time"><code>$reporter-&gt;get_app_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_app_cumulative_time"><code>$reporter-&gt;get_app_cumulative_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_run_call_time"><code>$reporter-&gt;get_run_call_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_run_exit_time"><code>$reporter-&gt;get_run_exit_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_run_time"><code>$reporter-&gt;get_run_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_run_cumulative_time"><code>$reporter-&gt;get_run_cumulative_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_sys_call_time"><code>$reporter-&gt;get_sys_call_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_sys_exit_time"><code>$reporter-&gt;get_sys_exit_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_sys_time"><code>$reporter-&gt;get_sys_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_sys_cumulative_time"><code>$reporter-&gt;get_sys_cumulative_time()</code></dt>
+<dd>
+
+</dd>
+<dt id="reporter-get_run_cmd"><code>$reporter-&gt;get_run_cmd()</code></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<pre><code>    Copyright 2003, R. Barrie Slaymaker, Jr., All Rights Reserved</code></pre>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>You may use this module under the terms of the BSD, Artistic, or GPL licenses, any version.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Barrie Slaymaker &lt;barries@slaysys.com&gt;</p>
+
+
+</body>
+
+</html>
+
+

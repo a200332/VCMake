@@ -1,0 +1,1293 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a>
+    <ul>
+      <li><a href="#ADVANCED">ADVANCED</a></li>
+    </ul>
+  </li>
+  <li><a href="#COMPARISON-TOOLS">COMPARISON TOOLS</a>
+    <ul>
+      <li><a href="#QUICK-CHECKS">QUICK CHECKS</a></li>
+      <li><a href="#VALUE-SPECIFICATIONS">VALUE SPECIFICATIONS</a></li>
+      <li><a href="#SET-BUILDERS">SET BUILDERS</a></li>
+      <li><a href="#HASH-BUILDER">HASH BUILDER</a></li>
+      <li><a href="#ARRAY-BUILDER">ARRAY BUILDER</a></li>
+      <li><a href="#BAG-BUILDER">BAG BUILDER</a></li>
+      <li><a href="#ORDERED-SUBSET-BUILDER">ORDERED SUBSET BUILDER</a></li>
+      <li><a href="#META-BUILDER">META BUILDER</a></li>
+      <li><a href="#OBJECT-BUILDER">OBJECT BUILDER</a></li>
+      <li><a href="#EVENT-BUILDERS">EVENT BUILDERS</a>
+        <ul>
+          <li><a href="#USE-IN-OTHER-BUILDERS">USE IN OTHER BUILDERS</a></li>
+          <li><a href="#SPECIFICS">SPECIFICS</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Tools::Compare - Tools for comparing deep data structures.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><a href="../../../lib/Test/More.html">Test::More</a> had <code>is_deeply()</code>. This library is the <a href="../../../lib/Test2.html">Test2</a> version that can be used to compare data structures, but goes a step further in that it provides tools for building a data structure specification against which you can verify your data. There are both &#39;strict&#39; and &#39;relaxed&#39; versions of the tools.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Tools::Compare</span><span class="operator">;</span>
+    
+    <span class="comment"># Hash for demonstration purposes</span>
+    <span class="keyword">my</span> <span class="variable">$some_hash</span> <span class="operator">=</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="string">c</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">}</span><span class="operator">;</span>
+    
+    <span class="comment"># Strict checking, everything must match</span>
+    <span class="variable">is</span><span class="operator">(</span>
+        <span class="variable">$some_hash</span><span class="operator">,</span>
+        <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="string">c</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"The hash we got matches our expectations"</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># Relaxed Checking, only fields we care about are checked, and we can use a</span>
+    <span class="comment"># regex to approximate a field.</span>
+    <span class="variable">like</span><span class="operator">(</span>
+        <span class="variable">$some_hash</span><span class="operator">,</span>
+        <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="string">qr/[0-9]+/</span><span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"'a' is 1, 'b' is an integer, we don't care about 'c'."</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h2 id="ADVANCED">ADVANCED</h2>
+
+<p>Declarative hash, array, and objects builders are available that allow you to generate specifications. These are more verbose than simply providing a hash, but have the advantage that every component you specify has a line number associated. This is helpful for debugging as the failure output will tell you not only which fields was incorrect, but also the line on which you declared the field.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Tools::Compare</span> <span class="string">qw{
+        is like isnt unlike
+        match mismatch validator
+        hash array bag object meta number float string subset bool
+        in_set not_in_set check_set
+        item field call call_list call_hash prop check all_items all_keys all_vals all_values
+        etc end filter_items
+        T F D DNE FDNE E
+        event fail_events
+        exact_ref
+    }</span><span class="operator">;</span>
+    
+    <span class="variable">is</span><span class="operator">(</span>
+        <span class="variable">$some_hash</span><span class="operator">,</span>
+        <span class="variable">hash</span> <span class="operator">{</span>
+            <span class="variable">field</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+            <span class="variable">field</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">;</span>
+            <span class="variable">field</span> <span class="string">c</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">;</span>
+        <span class="operator">},</span>
+        <span class="string">"Hash matches spec"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="COMPARISON-TOOLS">COMPARISON TOOLS</h1>
+
+<dl>
+
+<dt id="bool-is-got-expect">$bool = is($got, $expect)</dt>
+<dd>
+
+</dd>
+<dt id="bool-is-got-expect-name">$bool = is($got, $expect, $name)</dt>
+<dd>
+
+</dd>
+<dt id="bool-is-got-expect-name-diag">$bool = is($got, $expect, $name, @diag)</dt>
+<dd>
+
+<p><code>$got</code> is the data structure you want to check. <code>$expect</code> is what you want <code>$got</code> to look like. <code>$name</code> is an optional name for the test. <code>@diag</code> is optional diagnostics messages that will be printed to STDERR in event of failure, they will not be displayed when the comparison is successful. The boolean true/false result of the comparison is returned.</p>
+
+<p>This is the strict checker. The strict checker requires a perfect match between <code>$got</code> and <code>$expect</code>. All hash fields must be specified, all array items must be present, etc. All non-scalar/hash/array/regex references must be identical (same memory address). Scalar, hash and array references will be traversed and compared. Regex references will be compared to see if they have the same pattern.</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span>
+        <span class="variable">$some_hash</span><span class="operator">,</span>
+        <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="string">c</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"The hash we got matches our expectations"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>The only exception to strictness is when it is given an <code>$expect</code> object that was built from a specification, in which case the specification determines the strictness. Strictness only applies to literal values/references that are provided and converted to a specification for you.</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span>
+        <span class="variable">$some_hash</span><span class="operator">,</span>
+        <span class="variable">hash</span> <span class="operator">{</span>    <span class="comment"># Note: the hash function is not exported by default</span>
+            <span class="variable">field</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+            <span class="variable">field</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">match</span><span class="operator">(</span><span class="string">qr/[0-9]+/</span><span class="operator">);</span>    <span class="comment"># Note: The match function is not exported by default</span>
+            <span class="comment"># Don't care about other fields.</span>
+        <span class="operator">},</span>
+        <span class="string">"The hash comparison is not strict"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This works for both deep and shallow structures. For instance you can use this to compare two strings:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">,</span> <span class="string">'foo'</span><span class="operator">,</span> <span class="string">"strings match"</span><span class="operator">);</span>
+</code></pre>
+
+<p><b>Note</b>: This is not the tool to use if you want to check if two references are the same exact reference, use <code>ref_is()</code> from the <a href="../../../lib/Test2/Tools/Ref.html">Test2::Tools::Ref</a> plugin instead. <i>Most</i> of the time this will work as well, however there are problems if your reference contains a cycle and refers back to itself at some point. If this happens, an exception will be thrown to break an otherwise infinite recursion.</p>
+
+<p><b>Note</b>: Non-reference values will be compared as strings using <code>eq</code>, so that means &#39;2.0&#39; and &#39;2&#39; will match.</p>
+
+</dd>
+<dt id="bool-isnt-got-expect">$bool = isnt($got, $expect)</dt>
+<dd>
+
+</dd>
+<dt id="bool-isnt-got-expect-name">$bool = isnt($got, $expect, $name)</dt>
+<dd>
+
+</dd>
+<dt id="bool-isnt-got-expect-name-diag">$bool = isnt($got, $expect, $name, @diag)</dt>
+<dd>
+
+<p>Opposite of <code>is()</code>. Does all the same checks, but passes when there is a mismatch.</p>
+
+</dd>
+<dt id="like-got-expect">like($got, $expect)</dt>
+<dd>
+
+</dd>
+<dt id="like-got-expect-name">like($got, $expect, $name)</dt>
+<dd>
+
+</dd>
+<dt id="like-got-expect-name-diag">like($got, $expect, $name, @diag)</dt>
+<dd>
+
+<p><code>$got</code> is the data structure you want to check. <code>$expect</code> is what you want <code>$got</code> to look like. <code>$name</code> is an optional name for the test. <code>@diag</code> is optional diagnostics messages that will be printed to STDERR in event of failure, they will not be displayed when the comparison is successful. The boolean true/false result of the comparison is returned.</p>
+
+<p>This is the relaxed checker. This will ignore hash keys or array indexes that you do not actually specify in your <code>$expect</code> structure. In addition regex and sub references will be used as validators. If you provide a regex using <code>qr/.../</code>, the regex itself will be used to validate the corresponding value in the <code>$got</code> structure. The same is true for coderefs, the value is passed in as the first argument (and in <code>$_</code>) and the sub should return a boolean value. In this tool regexes will stringify the thing they are checking.</p>
+
+<pre><code>    <span class="variable">like</span><span class="operator">(</span>
+        <span class="variable">$some_hash</span><span class="operator">,</span>
+        <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="string">qr/[0-9]+/</span><span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"'a' is 1, 'b' is an integer, we don't care about other fields"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This works for both deep and shallow structures. For instance you can use this to compare two strings:</p>
+
+<pre><code>    <span class="variable">like</span><span class="operator">(</span><span class="string">'foo bar'</span><span class="operator">,</span> <span class="string">qr/^foo/</span><span class="operator">,</span> <span class="string">"string matches the pattern"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="unlike-got-expect">unlike($got, $expect)</dt>
+<dd>
+
+</dd>
+<dt id="unlike-got-expect-name">unlike($got, $expect, $name)</dt>
+<dd>
+
+</dd>
+<dt id="unlike-got-expect-name-diag">unlike($got, $expect, $name, @diag)</dt>
+<dd>
+
+<p>Opposite of <code>like()</code>. Does all the same checks, but passes when there is a mismatch.</p>
+
+</dd>
+</dl>
+
+<h2 id="QUICK-CHECKS">QUICK CHECKS</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<p>Quick checks are a way to quickly generate a common value specification. These can be used in structures passed into <code>is</code> and <code>like</code> through the <code>$expect</code> argument.</p>
+
+<p>Example:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">,</span> <span class="variable">T</span><span class="operator">(),</span> <span class="string">'$foo has a true value'</span><span class="operator">);</span>
+</code></pre>
+
+<dl>
+
+<dt id="check-T">$check = T()</dt>
+<dd>
+
+<p>This verifies that the value in the corresponding <code>$got</code> structure is true, any true value will do.</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">,</span> <span class="variable">T</span><span class="operator">(),</span> <span class="string">'$foo has a true value'</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="string">'xxx'</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="variable">T</span><span class="operator">()</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"The 'a' key is true"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="check-F">$check = F()</dt>
+<dd>
+
+<p>This verifies that the value in the corresponding <code>$got</code> structure is false, any false value will do, <b>but the value must exist</b>.</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">,</span> <span class="variable">F</span><span class="operator">(),</span> <span class="string">'$foo has a false value'</span><span class="operator">);</span>
+    
+    <span class="variable">is</span><span class="operator">(</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">0</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="variable">F</span><span class="operator">()</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"The 'a' key is false"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>It is important to note that a nonexistent value does not count as false. This check will generate a failing test result:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">F</span><span class="operator">()</span> <span class="operator">}</span><span class="operator">,</span>
+        <span class="string">"The 'b' key is false"</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This will produce the following output:</p>
+
+<pre><code>    <span class="keyword">not</span> <span class="variable">ok</span> <span class="number">1</span> <span class="operator">-</span> <span class="variable">The</span> <span class="variable">b</span> <span class="variable">key</span> <span class="variable">is</span> <span class="variable">false</span>
+    <span class="comment"># Failed test "The 'b' key is false"</span>
+    <span class="comment"># at some_file.t line 10.</span>
+    <span class="comment"># +------+------------------+-------+---------+</span>
+    <span class="comment"># | PATH | GOT              | OP    | CHECK   |</span>
+    <span class="comment"># +------+------------------+-------+---------+</span>
+    <span class="comment"># | {b}  | &lt;DOES NOT EXIST&gt; | FALSE | FALSE() |</span>
+    <span class="comment"># +------+------------------+-------+---------+</span>
+</code></pre>
+
+<p>In Perl, you can have behavior that is different for a missing key vs. a false key, so it was decided not to count a completely absent value as false. See the <code>DNE()</code> shortcut below for checking that a field is missing.</p>
+
+<p>If you want to check for false and/or DNE use the <code>FDNE()</code> check.</p>
+
+</dd>
+<dt id="check-D">$check = D()</dt>
+<dd>
+
+<p>This is to verify that the value in the <code>$got</code> structure is defined. Any value other than <code>undef</code> will pass.</p>
+
+<p>This will pass:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">,</span> <span class="variable">D</span><span class="operator">(),</span> <span class="string">'foo is defined'</span><span class="operator">);</span>
+</code></pre>
+
+<p>This will fail:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="variable">D</span><span class="operator">(),</span> <span class="string">'foo is defined'</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="check-U">$check = U()</dt>
+<dd>
+
+<p>This is to verify that the value in the <code>$got</code> structure is undefined.</p>
+
+<p>This will pass:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="variable">U</span><span class="operator">(),</span> <span class="string">'not defined'</span><span class="operator">);</span>
+</code></pre>
+
+<p>This will fail:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="string">'foo'</span><span class="operator">,</span> <span class="variable">U</span><span class="operator">(),</span> <span class="string">'not defined'</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="check-DF">$check = DF()</dt>
+<dd>
+
+<p>This is to verify that the value in the <code>$got</code> structure is defined but false. Any false value other than <code>undef</code> will pass.</p>
+
+<p>This will pass:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="variable">DF</span><span class="operator">(),</span> <span class="string">'foo is defined but false'</span><span class="operator">);</span>
+</code></pre>
+
+<p>These will fail:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">,</span> <span class="variable">DF</span><span class="operator">(),</span> <span class="string">'foo is defined but false'</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="variable">DF</span><span class="operator">(),</span> <span class="string">'foo is defined but false'</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="check-E">$check = E()</dt>
+<dd>
+
+<p>This can be used to check that a value exists. This is useful to check that an array has more values, or to check that a key exists in a hash, even if the value is undefined.</p>
+
+<p>These pass:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">,</span> <span class="keyword">undef</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">,</span> <span class="variable">E</span><span class="operator">()</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"There is a third item in the array"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">E</span><span class="operator">()</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"The 'b' key exists in the hash"</span><span class="operator">);</span>
+</code></pre>
+
+<p>These will fail:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">,</span> <span class="variable">E</span><span class="operator">()</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"Third item exists"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">E</span><span class="operator">()</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"'b' key exists"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="check-DNE">$check = DNE()</dt>
+<dd>
+
+<p>This can be used to check that no value exists. This is useful to check the end bound of an array, or to check that a key does not exist in a hash.</p>
+
+<p>These pass:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">,</span> <span class="variable">DNE</span><span class="operator">()</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"There is no third item in the array"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">()</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"The 'b' key does not exist in the hash"</span><span class="operator">);</span>
+</code></pre>
+
+<p>These will fail:</p>
+
+<pre><code>    <span class="variable">is</span><span class="operator">(</span><span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">,</span> <span class="string">'c'</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">[</span><span class="string">'a'</span><span class="operator">,</span> <span class="string">'b'</span><span class="operator">,</span> <span class="variable">DNE</span><span class="operator">()</span><span class="operator">]</span><span class="operator">,</span> <span class="string">"No third item"</span><span class="operator">);</span>
+    <span class="variable">is</span><span class="operator">(</span><span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">}</span><span class="operator">,</span> <span class="operator">{</span><span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">()</span><span class="operator">}</span><span class="operator">,</span> <span class="string">"No 'b' key"</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="check-FDNE">$check = FDNE()</dt>
+<dd>
+
+<p>This is a combination of <code>F()</code> and <code>DNE()</code>. This will pass for a false value, or a nonexistent value.</p>
+
+</dd>
+</dl>
+
+<h2 id="VALUE-SPECIFICATIONS">VALUE SPECIFICATIONS</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<dl>
+
+<dt id="check-string">$check = string &quot;...&quot;</dt>
+<dd>
+
+<p>Verify that the value matches the given string using the <code>eq</code> operator.</p>
+
+</dd>
+<dt id="check-string1">$check = !string &quot;...&quot;</dt>
+<dd>
+
+<p>Verify that the value does not match the given string using the <code>ne</code> operator.</p>
+
+</dd>
+<dt id="check-number">$check = number ...;</dt>
+<dd>
+
+<p>Verify that the value matches the given number using the <code>==</code> operator.</p>
+
+</dd>
+<dt id="check-number1">$check = !number ...;</dt>
+<dd>
+
+<p>Verify that the value does not match the given number using the <code>!=</code> operator.</p>
+
+</dd>
+<dt id="check-float">$check = float ...;</dt>
+<dd>
+
+<p>Verify that the value matches the given float within a +/- tolerance using the <code>==</code> operator.</p>
+
+<p>Default tolerance is 1e-08 and can be overridden with &#39;tolerance&#39; parameter.</p>
+
+</dd>
+<dt id="check-float1">$check = !float ...;</dt>
+<dd>
+
+<p>Verify that the value does not match the given float within a +/- tolerance, using the <code>!=</code> operator.</p>
+
+<p>Default tolerance is 1e-08 and can be overridden with &#39;tolerance&#39; parameter.</p>
+
+</dd>
+<dt id="check-bool">$check = bool ...;</dt>
+<dd>
+
+<p>Verify the value has the same boolean value as the given argument (XNOR).</p>
+
+</dd>
+<dt id="check-bool1">$check = !bool ...;</dt>
+<dd>
+
+<p>Verify the value has a different boolean value from the given argument (XOR).</p>
+
+</dd>
+<dt id="check-match-qr">$check = match qr/.../</dt>
+<dd>
+
+</dd>
+<dt id="check-mismatch-qr">$check = !mismatch qr/.../</dt>
+<dd>
+
+<p>Verify that the value matches the regex pattern. This form of pattern check will <b>NOT</b> stringify references being checked.</p>
+
+<p><b>Note:</b> <code>!mismatch()</code> is documented for completion, please do not use it.</p>
+
+</dd>
+<dt id="check-match-qr1">$check = !match qr/.../</dt>
+<dd>
+
+</dd>
+<dt id="check-mismatch-qr1">$check = mismatch qr/.../</dt>
+<dd>
+
+<p>Verify that the value does not match the regex pattern. This form of pattern check will <b>NOT</b> stringify references being checked.</p>
+
+<p><b>Note:</b> <code>mismatch()</code> was created before overloading of <code>!</code> for <code>match()</code> was a thing.</p>
+
+</dd>
+<dt id="check-validator-sub">$check = validator(sub{ ... })</dt>
+<dd>
+
+</dd>
+<dt id="check-validator-NAME-sub">$check = validator($NAME =&gt; sub{ ... })</dt>
+<dd>
+
+</dd>
+<dt id="check-validator-OP-NAME-sub">$check = validator($OP, $NAME, sub{ ... })</dt>
+<dd>
+
+<p>The coderef is the only required argument. The coderef should check that the value is what you expect and return a boolean true or false. Optionally, you can specify a name and operator that are used in diagnostics. They are also provided to the sub itself as named parameters.</p>
+
+<p>Check the value using this sub. The sub gets the value in <code>$_</code>, and it receives the value and several other items as named parameters.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">validator</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">%params</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="comment"># These both work:</span>
+        <span class="keyword">my</span> <span class="variable">$got</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$got</span> <span class="operator">=</span> <span class="variable">$params</span><span class="operator">{</span><span class="string">got</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="comment"># Check if a value exists at all</span>
+        <span class="keyword">my</span> <span class="variable">$exists</span> <span class="operator">=</span> <span class="variable">$params</span><span class="operator">{</span><span class="string">exists</span><span class="operator">}</span>
+    
+        <span class="comment"># What $OP (if any) did we specify when creating the validator</span>
+        <span class="keyword">my</span> <span class="variable">$operator</span> <span class="operator">=</span> <span class="variable">$params</span><span class="operator">{</span><span class="string">operator</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="comment"># What name (if any) did we specify when creating the validator</span>
+        <span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">$params</span><span class="operator">{</span><span class="string">name</span><span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="operator">...</span>
+    
+        <span class="keyword">return</span> <span class="variable">$bool</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="check-exact_ref-ref">$check = exact_ref($ref)</dt>
+<dd>
+
+<p>Check that the value is exactly the same reference as the one provided.</p>
+
+</dd>
+</dl>
+
+<h2 id="SET-BUILDERS">SET BUILDERS</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<dl>
+
+<dt id="my-check-check_set-check1-check2">my $check = check_set($check1, $check2, ...)</dt>
+<dd>
+
+<p>Check that the value matches ALL of the specified checks.</p>
+
+</dd>
+<dt id="my-check-in_set-check1-check2">my $check = in_set($check1, $check2, ...)</dt>
+<dd>
+
+<p>Check that the value matches ONE OR MORE of the specified checks.</p>
+
+</dd>
+<dt id="not_in_set-check1-check2">not_in_set($check1, $check2, ...)</dt>
+<dd>
+
+<p>Check that the value DOES NOT match ANY of the specified checks.</p>
+
+</dd>
+<dt id="check-thing">check $thing</dt>
+<dd>
+
+<p>Check that the value matches the specified thing.</p>
+
+</dd>
+</dl>
+
+<h2 id="HASH-BUILDER">HASH BUILDER</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<pre><code>    <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">hash</span> <span class="operator">{</span>
+        <span class="variable">field</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+        <span class="variable">field</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">;</span>
+    
+        <span class="comment"># Ensure the 'baz' keys does not even exist in the hash.</span>
+        <span class="variable">field</span> <span class="string">baz</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">();</span>
+    
+        <span class="comment"># Ensure the key exists, but is set to undef</span>
+        <span class="variable">field</span> <span class="string">bat</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">;</span>
+    
+        <span class="comment"># Any check can be used</span>
+        <span class="variable">field</span> <span class="string">boo</span> <span class="operator">=&gt;</span> <span class="variable">$check</span><span class="operator">;</span>
+    
+        <span class="comment"># Set checks that apply to all keys or values. Can be done multiple</span>
+        <span class="comment"># times, and each call can define multiple checks, all will be run.</span>
+        <span class="variable">all_vals</span> <span class="variable">match</span> <span class="string">qr/a/</span><span class="operator">,</span> <span class="variable">match</span> <span class="string">qr/b/</span><span class="operator">;</span>    <span class="comment"># All keys must have an 'a' and a 'b'</span>
+        <span class="variable">all_keys</span> <span class="variable">match</span> <span class="string">qr/x/</span><span class="operator">;</span>                 <span class="comment"># All keys must have an 'x'</span>
+    
+        <span class="operator">...</span>
+    
+        <span class="variable">end</span><span class="operator">();</span> <span class="comment"># optional, enforces that no other keys are present.</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<dl>
+
+<dt id="check-hash">$check = hash { ... }</dt>
+<dd>
+
+<p>This is used to define a hash check.</p>
+
+</dd>
+<dt id="field-NAME-VAL">field $NAME =&gt; $VAL</dt>
+<dd>
+
+</dd>
+<dt id="field-NAME-CHECK">field $NAME =&gt; $CHECK</dt>
+<dd>
+
+<p>Specify a field check. This will check the hash key specified by <code>$NAME</code> and ensure it matches the value in <code>$VAL</code>. You can put any valid check in <code>$VAL</code>, such as the result of another call to <code><span class="variable">array</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code>, <code>DNE()</code>, etc.</p>
+
+<p><b>Note:</b> This function can only be used inside a hash builder sub, and must be called in void context.</p>
+
+</dd>
+<dt id="all_keys-CHECK1-CHECK2">all_keys($CHECK1, $CHECK2, ...)</dt>
+<dd>
+
+<p>Add checks that apply to all keys. You can put this anywhere in the hash block, and can call it any number of times with any number of arguments.</p>
+
+</dd>
+<dt id="all_vals-CHECK1-CHECK2">all_vals($CHECK1, $CHECK2, ...)</dt>
+<dd>
+
+</dd>
+<dt id="all_values-CHECK1-CHECK2">all_values($CHECK1, $CHECK2, ...)</dt>
+<dd>
+
+<p>Add checks that apply to all values. You can put this anywhere in the hash block, and can call it any number of times with any number of arguments.</p>
+
+</dd>
+<dt id="end">end()</dt>
+<dd>
+
+<p>Enforce that no keys are found in the hash other than those specified. This is essentially the <code>use strict</code> of a hash check. This can be used anywhere in the hash builder, though typically it is placed at the end.</p>
+
+</dd>
+<dt id="etc">etc()</dt>
+<dd>
+
+<p>Ignore any extra keys found in the hash. This is the opposite of <code>end()</code>. This can be used anywhere in the hash builder, though typically it is placed at the end.</p>
+
+</dd>
+<dt id="DNE">DNE()</dt>
+<dd>
+
+<p>This is a handy check that can be used with <code>field()</code> to ensure that a field (D)oes (N)ot (E)xist.</p>
+
+<pre><code>    <span class="variable">field</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">();</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="ARRAY-BUILDER">ARRAY BUILDER</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<pre><code>    <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">array</span> <span class="operator">{</span>
+        <span class="comment"># Uses the next index, in this case index 0;</span>
+        <span class="variable">item</span> <span class="string">'a'</span><span class="operator">;</span>
+    
+        <span class="comment"># Gets index 1 automatically</span>
+        <span class="variable">item</span> <span class="string">'b'</span><span class="operator">;</span>
+    
+        <span class="comment"># Specify the index</span>
+        <span class="variable">item</span> <span class="number">2</span> <span class="operator">=&gt;</span> <span class="string">'c'</span><span class="operator">;</span>
+    
+        <span class="comment"># We skipped index 3, which means we don't care what it is.</span>
+        <span class="variable">item</span> <span class="number">4</span> <span class="operator">=&gt;</span> <span class="string">'e'</span><span class="operator">;</span>
+    
+        <span class="comment"># Gets index 5.</span>
+        <span class="variable">item</span> <span class="string">'f'</span><span class="operator">;</span>
+    
+        <span class="comment"># Remove any REMAINING items that contain 0-9.</span>
+        <span class="variable">filter_items</span> <span class="operator">{</span> <span class="keyword">grep</span> <span class="operator">{!</span><span class="regex">m/[0-9]/</span><span class="operator">}</span> <span class="variable">@_</span> <span class="operator">};</span>
+    
+        <span class="comment"># Set checks that apply to all items. Can be done multiple times, and</span>
+        <span class="comment"># each call can define multiple checks, all will be run.</span>
+        <span class="variable">all_items</span> <span class="variable">match</span> <span class="string">qr/a/</span><span class="operator">,</span> <span class="variable">match</span> <span class="string">qr/b/</span><span class="operator">;</span>
+        <span class="variable">all_items</span> <span class="variable">match</span> <span class="string">qr/x/</span><span class="operator">;</span>
+    
+        <span class="comment"># Of the remaining items (after the filter is applied) the next one</span>
+        <span class="comment"># (which is now index 6) should be 'g'.</span>
+        <span class="variable">item</span> <span class="number">6</span> <span class="operator">=&gt;</span> <span class="string">'g'</span><span class="operator">;</span>
+    
+        <span class="variable">item</span> <span class="number">7</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">;</span> <span class="comment"># Ensure index 7 does not exist.</span>
+    
+        <span class="variable">end</span><span class="operator">();</span> <span class="comment"># Ensure no other indexes exist.</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<dl>
+
+<dt id="check-array">$check = array { ... }</dt>
+<dd>
+
+</dd>
+<dt id="item-VAL">item $VAL</dt>
+<dd>
+
+</dd>
+<dt id="item-CHECK">item $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="item-IDX-VAL">item $IDX, $VAL</dt>
+<dd>
+
+</dd>
+<dt id="item-IDX-CHECK">item $IDX, $CHECK</dt>
+<dd>
+
+<p>Add an expected item to the array. If <code>$IDX</code> is not specified it will automatically calculate it based on the last item added. You can skip indexes, which means you do not want them to be checked.</p>
+
+<p>You can provide any value to check in <code>$VAL</code>, or you can provide any valid check object.</p>
+
+<p><b>Note:</b> Items MUST be added in order.</p>
+
+<p><b>Note:</b> This function can only be used inside an array, bag or subset builder sub, and must be called in void context.</p>
+
+</dd>
+<dt id="filter_items-my-remaining-_-...-return-filtered">filter_items { my @remaining = @_; ...; return @filtered }</dt>
+<dd>
+
+<p>This function adds a filter, all items remaining in the array from the point the filter is reached will be passed into the filter sub as arguments, the sub should return only the items that should be checked.</p>
+
+<p><b>Note:</b> This function can only be used inside an array builder sub, and must be called in void context.</p>
+
+</dd>
+<dt id="all_items-CHECK1-CHECK2">all_items($CHECK1, $CHECK2, ...)</dt>
+<dd>
+
+<p>Add checks that apply to all items. You can put this anywhere in the array block, and can call it any number of times with any number of arguments.</p>
+
+</dd>
+<dt id="end1">end()</dt>
+<dd>
+
+<p>Enforce that there are no indexes after the last one specified. This will not force checking of skipped indexes.</p>
+
+</dd>
+<dt id="etc1">etc()</dt>
+<dd>
+
+<p>Ignore any extra items found in the array. This is the opposite of <code>end()</code>. This can be used anywhere in the array builder, though typically it is placed at the end.</p>
+
+</dd>
+<dt id="DNE1">DNE()</dt>
+<dd>
+
+<p>This is a handy check that can be used with <code>item()</code> to ensure that an index (D)oes (N)ot (E)xist.</p>
+
+<pre><code>    <span class="variable">item</span> <span class="number">5</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">();</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="BAG-BUILDER">BAG BUILDER</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<pre><code>    <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">bag</span> <span class="operator">{</span>
+        <span class="variable">item</span> <span class="string">'a'</span><span class="operator">;</span>
+        <span class="variable">item</span> <span class="string">'b'</span><span class="operator">;</span>
+    
+        <span class="variable">end</span><span class="operator">();</span> <span class="comment"># Ensure no other elements exist.</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>A bag is like an array, but we don&#39;t care about the order of the items. In the example, <code>$check</code> would match both <code>[&#39;a&#39;,&#39;b&#39;]</code> and <code>[&#39;b&#39;,&#39;a&#39;]</code>.</p>
+
+<dl>
+
+<dt id="check-bag">$check = bag { ... }</dt>
+<dd>
+
+</dd>
+<dt id="item-VAL1">item $VAL</dt>
+<dd>
+
+</dd>
+<dt id="item-CHECK1">item $CHECK</dt>
+<dd>
+
+<p>Add an expected item to the bag.</p>
+
+<p>You can provide any value to check in <code>$VAL</code>, or you can provide any valid check object.</p>
+
+<p><b>Note:</b> This function can only be used inside an array, bag or subset builder sub, and must be called in void context.</p>
+
+</dd>
+<dt id="end2">end()</dt>
+<dd>
+
+<p>Enforce that there are no more items after the last one specified.</p>
+
+</dd>
+<dt id="etc2">etc()</dt>
+<dd>
+
+<p>Ignore any extra items found in the array. This is the opposite of <code>end()</code>. This can be used anywhere in the bag builder, though typically it is placed at the end.</p>
+
+</dd>
+</dl>
+
+<h2 id="ORDERED-SUBSET-BUILDER">ORDERED SUBSET BUILDER</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<pre><code>    <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">subset</span> <span class="operator">{</span>
+        <span class="variable">item</span> <span class="string">'a'</span><span class="operator">;</span>
+        <span class="variable">item</span> <span class="string">'b'</span><span class="operator">;</span>
+        <span class="variable">item</span> <span class="string">'c'</span><span class="operator">;</span>
+    
+        <span class="comment"># Doesn't matter if the array has 'd', the check will skip past any</span>
+        <span class="comment"># unknown items until it finds the next one in our subset.</span>
+    
+        <span class="variable">item</span> <span class="string">'e'</span><span class="operator">;</span>
+        <span class="variable">item</span> <span class="string">'f'</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<dl>
+
+<dt id="check-subset">$check = subset { ... }</dt>
+<dd>
+
+</dd>
+<dt id="item-VAL2">item $VAL</dt>
+<dd>
+
+</dd>
+<dt id="item-CHECK2">item $CHECK</dt>
+<dd>
+
+<p>Add an expected item to the subset.</p>
+
+<p>You can provide any value to check in <code>$VAL</code>, or you can provide any valid check object.</p>
+
+<p><b>Note:</b> Items MUST be added in order.</p>
+
+<p><b>Note:</b> This function can only be used inside an array, bag or subset builder sub, and must be called in void context.</p>
+
+</dd>
+</dl>
+
+<h2 id="META-BUILDER">META BUILDER</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">meta</span> <span class="operator">{</span>
+        <span class="variable">prop</span> <span class="string">blessed</span> <span class="operator">=&gt;</span> <span class="string">'My::Module'</span><span class="operator">;</span> <span class="comment"># Ensure value is blessed as our package</span>
+        <span class="variable">prop</span> <span class="string">reftype</span> <span class="operator">=&gt;</span> <span class="string">'HASH'</span><span class="operator">;</span>       <span class="comment"># Ensure value is a blessed hash</span>
+        <span class="variable">prop</span> <span class="string">size</span>    <span class="operator">=&gt;</span> <span class="number">4</span><span class="operator">;</span>            <span class="comment"># Check the number of hash keys</span>
+        <span class="variable">prop</span> <span class="string">this</span>    <span class="operator">=&gt;</span> <span class="operator">...;</span>          <span class="comment"># Check the item itself</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<dl>
+
+<dt id="meta">meta { ... }</dt>
+<dd>
+
+</dd>
+<dt id="meta_check">meta_check { ... }</dt>
+<dd>
+
+<p>Build a meta check. If you are using <a href="../../../lib/Moose.html">Moose</a> then the <code>meta()</code> function would conflict with the one exported by <a href="../../../lib/Moose.html">Moose</a>, in such cases <code>meta_check()</code> is available. Neither is exported by default.</p>
+
+</dd>
+<dt id="prop-NAME-VAL">prop $NAME =&gt; $VAL</dt>
+<dd>
+
+</dd>
+<dt id="prop-NAME-CHECK">prop $NAME =&gt; $CHECK</dt>
+<dd>
+
+<p>Check the property specified by <code>$name</code> against the value or check.</p>
+
+<p>Valid properties are:</p>
+
+<dl>
+
+<dt id="blessed">&#39;blessed&#39;</dt>
+<dd>
+
+<p>What package (if any) the thing is blessed as.</p>
+
+</dd>
+<dt id="reftype">&#39;reftype&#39;</dt>
+<dd>
+
+<p>Reference type (if any) the thing is.</p>
+
+</dd>
+<dt id="this">&#39;this&#39;</dt>
+<dd>
+
+<p>The thing itself.</p>
+
+</dd>
+<dt id="size">&#39;size&#39;</dt>
+<dd>
+
+<p>For array references this returns the number of elements. For hashes this returns the number of keys. For everything else this returns undef.</p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h2 id="OBJECT-BUILDER">OBJECT BUILDER</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">object</span> <span class="operator">{</span>
+        <span class="variable">call</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span> <span class="comment"># Call the 'foo' method, check the result.</span>
+    
+        <span class="comment"># Call the specified sub-ref as a method on the object, check the</span>
+        <span class="comment"># result. This is useful for wrapping methods that return multiple</span>
+        <span class="comment"># values.</span>
+        <span class="variable">call</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span> <span class="keyword">shift</span><span class="operator">-&gt;</span><span class="variable">get_list</span> <span class="operator">]</span> <span class="operator">}</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="operator">...</span><span class="operator">]</span><span class="operator">;</span>
+    
+        <span class="comment"># This can be used to ensure a method does not exist.</span>
+        <span class="variable">call</span> <span class="string">nope</span> <span class="operator">=&gt;</span> <span class="variable">DNE</span><span class="operator">();</span>
+    
+        <span class="comment"># Check the hash key 'foo' of the underlying reference, this only works</span>
+        <span class="comment"># on blessed hashes.</span>
+        <span class="variable">field</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+    
+        <span class="comment"># Check the value of index 4 on the underlying reference, this only</span>
+        <span class="comment"># works on blessed arrays.</span>
+        <span class="variable">item</span> <span class="number">4</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span><span class="operator">;</span>
+    
+        <span class="comment"># Check the meta-property 'blessed' of the object.</span>
+        <span class="variable">prop</span> <span class="string">blessed</span> <span class="operator">=&gt;</span> <span class="string">'My::Module'</span><span class="operator">;</span>
+    
+        <span class="comment"># Ensure only the specified hash keys or array indexes are present in</span>
+        <span class="comment"># the underlying hash. Has no effect on meta-property checks or method</span>
+        <span class="comment"># checks.</span>
+        <span class="variable">end</span><span class="operator">();</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<dl>
+
+<dt id="check-object">$check = object { ... }</dt>
+<dd>
+
+<p>Specify an object check for use in comparisons.</p>
+
+</dd>
+<dt id="call-METHOD_NAME-RESULT">call $METHOD_NAME =&gt; $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call-METHOD_NAME-CHECK">call $METHOD_NAME =&gt; $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="call-METHOD_NAME-METHOD_ARGS-RESULT">call [$METHOD_NAME, @METHOD_ARGS] =&gt; $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call-METHOD_NAME-METHOD_ARGS-CHECK">call [$METHOD_NAME, @METHOD_ARGS] =&gt; $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="call-sub-...-RESULT">call sub { ... }, $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call-sub-...-CHECK">call sub { ... }, $CHECK</dt>
+<dd>
+
+<p>Call the specified method (or coderef) and verify the result. If you pass an arrayref, the first element must be the method name, the others are the arguments it will be called with.</p>
+
+<p>The coderef form is useful if you need to do something more complex.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ref</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">local</span> <span class="variable">$SOME::GLOBAL::THING</span> <span class="operator">=</span> <span class="number">3</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="operator">[</span><span class="keyword">shift</span><span class="operator">-&gt;</span><span class="variable">get_values_for</span><span class="operator">(</span><span class="string">'thing'</span><span class="operator">)</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">call</span> <span class="variable">$ref</span> <span class="operator">=&gt;</span> <span class="operator">...;</span>
+</code></pre>
+
+</dd>
+<dt id="call_list-METHOD_NAME-RESULT">call_list $METHOD_NAME =&gt; $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call_list-METHOD_NAME-CHECK">call_list $METHOD_NAME =&gt; $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="call_list-METHOD_NAME-METHOD_ARGS-RESULT">call_list [$METHOD_NAME, @METHOD_ARGS] =&gt; $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call_list-METHOD_NAME-METHOD_ARGS-CHECK">call_list [$METHOD_NAME, @METHOD_ARGS] =&gt; $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="call_list-sub-...-RESULT">call_list sub { ... }, $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call_list-sub-...-CHECK">call_list sub { ... }, $CHECK</dt>
+<dd>
+
+<p>Same as <code>call</code>, but the method is invoked in list context, and the result is always an arrayref.</p>
+
+<pre><code>    <span class="variable">call_list</span> <span class="string">get_items</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="call_hash-METHOD_NAME-RESULT">call_hash $METHOD_NAME =&gt; $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call_hash-METHOD_NAME-CHECK">call_hash $METHOD_NAME =&gt; $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="call_hash-METHOD_NAME-METHOD_ARGS-RESULT">call_hash [$METHOD_NAME, @METHOD_ARGS] =&gt; $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call_hash-METHOD_NAME-METHOD_ARGS-CHECK">call_hash [$METHOD_NAME, @METHOD_ARGS] =&gt; $CHECK</dt>
+<dd>
+
+</dd>
+<dt id="call_hash-sub-...-RESULT">call_hash sub { ... }, $RESULT</dt>
+<dd>
+
+</dd>
+<dt id="call_hash-sub-...-CHECK">call_hash sub { ... }, $CHECK</dt>
+<dd>
+
+<p>Same as <code>call</code>, but the method is invoked in list context, and the result is always a hashref. This will warn if the method returns an odd number of values.</p>
+
+<pre><code>    <span class="variable">call_hash</span> <span class="string">get_items</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="field-NAME-VAL1">field $NAME =&gt; $VAL</dt>
+<dd>
+
+<p>Works just like it does for hash checks.</p>
+
+</dd>
+<dt id="item-VAL3">item $VAL</dt>
+<dd>
+
+</dd>
+<dt id="item-IDX-VAL1">item $IDX, $VAL</dt>
+<dd>
+
+<p>Works just like it does for array checks.</p>
+
+</dd>
+<dt id="prop-NAME-VAL1">prop $NAME =&gt; $VAL</dt>
+<dd>
+
+</dd>
+<dt id="prop-NAME-CHECK1">prop $NAME =&gt; $CHECK</dt>
+<dd>
+
+<p>Check the property specified by <code>$name</code> against the value or check.</p>
+
+<p>Valid properties are:</p>
+
+<dl>
+
+<dt id="blessed1">&#39;blessed&#39;</dt>
+<dd>
+
+<p>What package (if any) the thing is blessed as.</p>
+
+</dd>
+<dt id="reftype1">&#39;reftype&#39;</dt>
+<dd>
+
+<p>Reference type (if any) the thing is.</p>
+
+</dd>
+<dt id="this1">&#39;this&#39;</dt>
+<dd>
+
+<p>The thing itself.</p>
+
+</dd>
+<dt id="size1">&#39;size&#39;</dt>
+<dd>
+
+<p>For array references this returns the number of elements. For hashes this returns the number of keys. For everything else this returns undef.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="DNE2">DNE()</dt>
+<dd>
+
+<p>Can be used with <code>item</code>, or <code>field</code> to ensure the hash field or array index does not exist. Can also be used with <code>call</code> to ensure a method does not exist.</p>
+
+</dd>
+<dt id="end3">end()</dt>
+<dd>
+
+<p>Turn on strict array/hash checking, ensuring that no extra keys/indexes are present.</p>
+
+</dd>
+<dt id="etc3">etc()</dt>
+<dd>
+
+<p>Ignore any extra items found in the hash/array. This is the opposite of <code>end()</code>. This can be used anywhere in the builder, though typically it is placed at the end.</p>
+
+</dd>
+</dl>
+
+<h2 id="EVENT-BUILDERS">EVENT BUILDERS</h2>
+
+<p><b>Note: None of these are exported by default. You need to request them.</b></p>
+
+<p>Check that we got an event of a specified type:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">event</span> <span class="string">'Ok'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Check for details about the event:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">event</span> <span class="string">Ok</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="comment"># Check for a failure</span>
+        <span class="variable">call</span> <span class="string">pass</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">;</span>
+    
+        <span class="comment"># Effective pass after TODO/SKIP are accounted for.</span>
+        <span class="variable">call</span> <span class="string">effective_pass</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+    
+        <span class="comment"># Check the diagnostics</span>
+        <span class="variable">call</span> <span class="string">diag</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">match</span> <span class="string">qr/Failed test foo/</span> <span class="operator">]</span><span class="operator">;</span>
+    
+        <span class="comment"># Check the file the event reports to</span>
+        <span class="variable">prop</span> <span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">'foo.t'</span><span class="operator">;</span>
+    
+        <span class="comment"># Check the line number the event reports o</span>
+        <span class="variable">prop</span> <span class="string">line</span> <span class="operator">=&gt;</span> <span class="string">'42'</span><span class="operator">;</span>
+    
+        <span class="comment"># You can check the todo/skip values as well:</span>
+        <span class="variable">prop</span> <span class="string">skip</span> <span class="operator">=&gt;</span> <span class="string">'broken'</span><span class="operator">;</span>
+        <span class="variable">prop</span> <span class="string">todo</span> <span class="operator">=&gt;</span> <span class="string">'fixme'</span><span class="operator">;</span>
+    
+        <span class="comment"># Thread-id and process-id where event was generated</span>
+        <span class="variable">prop</span> <span class="string">tid</span> <span class="operator">=&gt;</span> <span class="number">123</span><span class="operator">;</span>
+        <span class="variable">prop</span> <span class="string">pid</span> <span class="operator">=&gt;</span> <span class="number">123</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>You can also provide a fully qualified event package with the &#39;+&#39; prefix:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">event</span> <span class="string">'+My::Event'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>You can also provide a hashref instead of a sub to directly check hash values of the event:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">event</span> <span class="string">Ok</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">pass</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h3 id="USE-IN-OTHER-BUILDERS">USE IN OTHER BUILDERS</h3>
+
+<p>You can use these all in other builders, simply use them in void context to have their value(s) appended to the build.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$check</span> <span class="operator">=</span> <span class="variable">array</span> <span class="operator">{</span>
+        <span class="variable">event</span> <span class="string">Ok</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">;</span>
+        <span class="variable">event</span> <span class="string">Note</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span><span class="operator">;</span>
+    
+        <span class="variable">fail_events</span> <span class="string">Ok</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">pass</span> <span class="operator">=&gt;</span> <span class="number">0</span> <span class="operator">}</span><span class="operator">;</span>
+        <span class="comment"># Get a Diag for free.</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<h3 id="SPECIFICS">SPECIFICS</h3>
+
+<dl>
+
+<dt id="check-event-TYPE">$check = event $TYPE;</dt>
+<dd>
+
+</dd>
+<dt id="check-event-TYPE-sub">$check = event $TYPE =&gt; sub { ... };</dt>
+<dd>
+
+</dd>
+<dt id="check-event-TYPE1">$check = event $TYPE =&gt; { ... };</dt>
+<dd>
+
+<p>This works just like an object builder. In addition to supporting everything the object check supports, you also have to specify the event type, and many extra meta-properties are available.</p>
+
+<p>Extra properties are:</p>
+
+<dl>
+
+<dt id="file">&#39;file&#39;</dt>
+<dd>
+
+<p>File name to which the event reports (for use in diagnostics).</p>
+
+</dd>
+<dt id="line">&#39;line&#39;</dt>
+<dd>
+
+<p>Line number to which the event reports (for use in diagnostics).</p>
+
+</dd>
+<dt id="package">&#39;package&#39;</dt>
+<dd>
+
+<p>Package to which the event reports (for use in diagnostics).</p>
+
+</dd>
+<dt id="subname">&#39;subname&#39;</dt>
+<dd>
+
+<p>Sub that was called to generate the event (example: <code>ok()</code>).</p>
+
+</dd>
+<dt id="skip">&#39;skip&#39;</dt>
+<dd>
+
+<p>Set to the skip value if the result was generated by skipping tests.</p>
+
+</dd>
+<dt id="todo">&#39;todo&#39;</dt>
+<dd>
+
+<p>Set to the todo value if TODO was set when the event was generated.</p>
+
+</dd>
+<dt id="trace">&#39;trace&#39;</dt>
+<dd>
+
+<p>The <code>at file foo.t line 42</code> string that will be used in diagnostics.</p>
+
+</dd>
+<dt id="tid">&#39;tid&#39;</dt>
+<dd>
+
+<p>Thread ID in which the event was generated.</p>
+
+</dd>
+<dt id="pid">&#39;pid&#39;</dt>
+<dd>
+
+<p>Process ID in which the event was generated.</p>
+
+</dd>
+</dl>
+
+<p><b>NOTE</b>: Event checks have an implicit <code>etc()</code> added. This means you need to use <code>end()</code> if you want to fail on unexpected hash keys or array indexes. This implicit <code>etc()</code> extends to all forms, including builder, hashref, and no argument.</p>
+
+</dd>
+<dt id="checks-fail_events-TYPE">@checks = fail_events $TYPE;</dt>
+<dd>
+
+</dd>
+<dt id="checks-fail_events-TYPE-sub">@checks = fail_events $TYPE =&gt; sub { ... };</dt>
+<dd>
+
+</dd>
+<dt id="checks-fail_events-TYPE1">@checks = fail_events $TYPE =&gt; { ... };</dt>
+<dd>
+
+<p>Just like <code>event()</code> documented above. The difference is that this produces two events, the one you specify, and a <code>Diag</code> after it. There are no extra checks in the Diag.</p>
+
+<p>Use this to validate a simple failure where you do not want to be bothered with the default diagnostics. It only adds a single Diag check, so if your failure has custom diagnostics you will need to add checks for them.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,326 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#MyException-Trace-boolean">MyException-&gt;Trace($boolean)</a></li>
+      <li><a href="#MyException-UnsafeRefCapture-boolean">MyException-&gt;UnsafeRefCapture($boolean)</a></li>
+      <li><a href="#MyException-RespectOverload-boolean">MyException-&gt;RespectOverload($boolean)</a></li>
+      <li><a href="#MyException-MaxArgLength-boolean">MyException-&gt;MaxArgLength($boolean)</a></li>
+      <li><a href="#MyException-Fields">MyException-&gt;Fields</a></li>
+      <li><a href="#MyException-throw-message">MyException-&gt;throw( $message )</a></li>
+      <li><a href="#MyException-throw-message-message">MyException-&gt;throw( message =&gt; $message )</a></li>
+      <li><a href="#MyException-throw-error-error">MyException-&gt;throw( error =&gt; $error )</a></li>
+      <li><a href="#MyException-new">MyException-&gt;new(...)</a></li>
+      <li><a href="#MyException-description">MyException-&gt;description</a></li>
+      <li><a href="#exception-rethrow">$exception-&gt;rethrow</a></li>
+      <li><a href="#exception-message">$exception-&gt;message</a></li>
+      <li><a href="#exception-error">$exception-&gt;error</a></li>
+      <li><a href="#exception-pid">$exception-&gt;pid</a></li>
+      <li><a href="#exception-uid">$exception-&gt;uid</a></li>
+      <li><a href="#exception-gid">$exception-&gt;gid</a></li>
+      <li><a href="#exception-euid">$exception-&gt;euid</a></li>
+      <li><a href="#exception-egid">$exception-&gt;egid</a></li>
+      <li><a href="#exception-time">$exception-&gt;time</a></li>
+      <li><a href="#exception-package">$exception-&gt;package</a></li>
+      <li><a href="#exception-file">$exception-&gt;file</a></li>
+      <li><a href="#exception-line">$exception-&gt;line</a></li>
+      <li><a href="#exception-context_hash">$exception-&gt;context_hash</a></li>
+      <li><a href="#exception-field_hash">$exception-&gt;field_hash</a></li>
+      <li><a href="#exception-trace">$exception-&gt;trace</a></li>
+      <li><a href="#exception-show_trace-boolean">$exception-&gt;show_trace($boolean)</a></li>
+      <li><a href="#exception-as_string">$exception-&gt;as_string</a></li>
+      <li><a href="#exception-full_message">$exception-&gt;full_message</a></li>
+    </ul>
+  </li>
+  <li><a href="#LIGHTWEIGHT-EXCEPTIONS">LIGHTWEIGHT EXCEPTIONS</a></li>
+  <li><a href="#OVERLOADING">OVERLOADING</a></li>
+  <li><a href="#OVERRIDING-THE-as_string-METHOD">OVERRIDING THE as_string METHOD</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Exception::Class::Base - A base class for exception objects</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.43</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Exception::Class</span> <span class="string">'MyException'</span><span class="operator">;</span>
+  
+  <span class="keyword">eval</span> <span class="operator">{</span> <span class="variable">MyException</span><span class="operator">-&gt;</span><span class="variable">throw</span><span class="operator">(</span> <span class="string">error</span> <span class="operator">=&gt;</span> <span class="string">'I feel funny.'</span> <span class="operator">)</span> <span class="operator">};</span>
+  
+  <span class="keyword">print</span> <span class="variable">$@</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class is the base class for all exceptions created by <a href="../../../lib/Exception/Class.html">Exception::Class</a>. It provides a number of methods for getting information about the exception.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="MyException-Trace-boolean">MyException-&gt;Trace($boolean)</h2>
+
+<p>Each <code>Exception::Class::Base</code> subclass can be set individually to include a stacktrace when the <code>as_string</code> method is called. The default is to not include a stacktrace. Calling this method with a value changes this behavior. It always returns the current value (after any change is applied).</p>
+
+<p>This value is inherited by any subclasses. However, if this value is set for a subclass, it will thereafter be independent of the value in <code>Exception::Class::Base</code>.</p>
+
+<p>Do not call this on the <code>Exception::Class::Base</code> class directly or you&#39;ll change it for all exception classes that use <a href="../../../lib/Exception/Class.html">Exception::Class</a>, including ones created in modules you don&#39;t control.</p>
+
+<p>This is a class method, not an object method.</p>
+
+<h2 id="MyException-UnsafeRefCapture-boolean">MyException-&gt;UnsafeRefCapture($boolean)</h2>
+
+<p>When a <code>Devel::StackTrace</code> object is created, it walks through the stack and stores the arguments which were passed to each subroutine on the stack. If any of these arguments are references, then that means that the <code>Devel::StackTrace</code> ends up increasing the ref count of these references, delaying their destruction.</p>
+
+<p>Since <code>Exception::Class::Base</code> uses <code>Devel::StackTrace</code> internally, this method provides a way to tell <code>Devel::StackTrace</code> not to store these references. Instead, <code>Devel::StackTrace</code> replaces references with their stringified representation.</p>
+
+<p>This method defaults to false. As with <code>Trace</code>, it is inherited by subclasses but setting it in a subclass makes it independent thereafter.</p>
+
+<p>Do not call this on the <code>Exception::Class::Base</code> class directly or you&#39;ll change it for all exception classes that use <a href="../../../lib/Exception/Class.html">Exception::Class</a>, including ones created in modules you don&#39;t control.</p>
+
+<h2 id="MyException-RespectOverload-boolean">MyException-&gt;RespectOverload($boolean)</h2>
+
+<p>When a <code>Devel::StackTrace</code> object stringifies, by default it ignores stringification overloading on any objects being dealt with.</p>
+
+<p>Since <code>Exception::Class::Base</code> uses <code>Devel::StackTrace</code> internally, this method provides a way to tell <code>Devel::StackTrace</code> to respect overloading.</p>
+
+<p>This method defaults to false. As with <code>Trace</code>, it is inherited by subclasses but setting it in a subclass makes it independent thereafter.</p>
+
+<p>Do not call this on the <code>Exception::Class::Base</code> class directly or you&#39;ll change it for all exception classes that use <a href="../../../lib/Exception/Class.html">Exception::Class</a>, including ones created in modules you don&#39;t control.</p>
+
+<h2 id="MyException-MaxArgLength-boolean">MyException-&gt;MaxArgLength($boolean)</h2>
+
+<p>When a <code>Devel::StackTrace</code> object stringifies, by default it displays the full argument for each function. This parameter can be used to limit the maximum length of each argument.</p>
+
+<p>Since <code>Exception::Class::Base</code> uses <code>Devel::StackTrace</code> internally, this method provides a way to tell <code>Devel::StackTrace</code> to limit the length of arguments.</p>
+
+<p>This method defaults to 0. As with <code>Trace</code>, it is inherited by subclasses but setting it in a subclass makes it independent thereafter.</p>
+
+<p>Do not call this on the <code>Exception::Class::Base</code> class directly or you&#39;ll change it for all exception classes that use <a href="../../../lib/Exception/Class.html">Exception::Class</a>, including ones created in modules you don&#39;t control.</p>
+
+<h2 id="MyException-Fields">MyException-&gt;Fields</h2>
+
+<p>This method returns the extra fields defined for the given class, as a list.</p>
+
+<p>Do not call this on the <code>Exception::Class::Base</code> class directly or you&#39;ll change it for all exception classes that use <a href="../../../lib/Exception/Class.html">Exception::Class</a>, including ones created in modules you don&#39;t control.</p>
+
+<h2 id="MyException-throw-message">MyException-&gt;throw( $message )</h2>
+
+<h2 id="MyException-throw-message-message">MyException-&gt;throw( message =&gt; $message )</h2>
+
+<h2 id="MyException-throw-error-error">MyException-&gt;throw( error =&gt; $error )</h2>
+
+<p>This method creates a new object with the given error message. If no error message is given, this will be an empty string. It then dies with this object as its argument.</p>
+
+<p>This method also takes a <code>show_trace</code> parameter which indicates whether or not the particular exception object being created should show a stacktrace when its <code>as_string</code> method is called. This overrides the value of <code>Trace</code> for this class if it is given.</p>
+
+<p>The frames included in the trace can be controlled by the <code>ignore_class</code> and <code>ignore_package</code> parameters. These are passed directly to Devel::Stacktrace&#39;s constructor. See <code>Devel::Stacktrace</code> for more details.</p>
+
+<p>If only a single value is given to the constructor it is assumed to be the message parameter.</p>
+
+<p>Additional keys corresponding to the fields defined for the particular exception subclass will also be accepted.</p>
+
+<h2 id="MyException-new">MyException-&gt;new(...)</h2>
+
+<p>This method takes the same parameters as <code>throw</code>, but instead of dying simply returns a new exception object.</p>
+
+<p>This method is always called when constructing a new exception object via the <code>throw</code> method.</p>
+
+<h2 id="MyException-description">MyException-&gt;description</h2>
+
+<p>Returns the description for the given <code>Exception::Class::Base</code> subclass. The <code>Exception::Class::Base</code> class&#39;s description is &quot;Generic exception&quot; (this may change in the future). This is also an object method.</p>
+
+<h2 id="exception-rethrow">$exception-&gt;rethrow</h2>
+
+<p>Simply dies with the object as its sole argument. It&#39;s just syntactic sugar. This does not change any of the object&#39;s attribute values. However, it will cause <code>caller</code> to report the die as coming from within the <code>Exception::Class::Base</code> class rather than where rethrow was called.</p>
+
+<p>Of course, you always have access to the original stacktrace for the exception object.</p>
+
+<h2 id="exception-message">$exception-&gt;message</h2>
+
+<h2 id="exception-error">$exception-&gt;error</h2>
+
+<p>Returns the error/message associated with the exception.</p>
+
+<h2 id="exception-pid">$exception-&gt;pid</h2>
+
+<p>Returns the pid at the time the exception was thrown.</p>
+
+<h2 id="exception-uid">$exception-&gt;uid</h2>
+
+<p>Returns the real user id at the time the exception was thrown.</p>
+
+<h2 id="exception-gid">$exception-&gt;gid</h2>
+
+<p>Returns the real group id at the time the exception was thrown.</p>
+
+<h2 id="exception-euid">$exception-&gt;euid</h2>
+
+<p>Returns the effective user id at the time the exception was thrown.</p>
+
+<h2 id="exception-egid">$exception-&gt;egid</h2>
+
+<p>Returns the effective group id at the time the exception was thrown.</p>
+
+<h2 id="exception-time">$exception-&gt;time</h2>
+
+<p>Returns the time in seconds since the epoch at the time the exception was thrown.</p>
+
+<h2 id="exception-package">$exception-&gt;package</h2>
+
+<p>Returns the package from which the exception was thrown.</p>
+
+<h2 id="exception-file">$exception-&gt;file</h2>
+
+<p>Returns the file within which the exception was thrown.</p>
+
+<h2 id="exception-line">$exception-&gt;line</h2>
+
+<p>Returns the line where the exception was thrown.</p>
+
+<h2 id="exception-context_hash">$exception-&gt;context_hash</h2>
+
+<p>Returns a hash reference with the following keys:</p>
+
+<ul>
+
+<li><p>time</p>
+
+</li>
+<li><p>pid</p>
+
+</li>
+<li><p>uid</p>
+
+</li>
+<li><p>euid</p>
+
+</li>
+<li><p>gid</p>
+
+</li>
+<li><p>egid</p>
+
+</li>
+</ul>
+
+<h2 id="exception-field_hash">$exception-&gt;field_hash</h2>
+
+<p>Returns a hash reference where the keys are any fields defined for the exception class and the values are the values associated with the field in the given object.</p>
+
+<h2 id="exception-trace">$exception-&gt;trace</h2>
+
+<p>Returns the trace object associated with the object.</p>
+
+<h2 id="exception-show_trace-boolean">$exception-&gt;show_trace($boolean)</h2>
+
+<p>This method can be used to set whether or not a stack trace is included when the as_string method is called or the object is stringified.</p>
+
+<h2 id="exception-as_string">$exception-&gt;as_string</h2>
+
+<p>Returns a string form of the error message (something like what you&#39;d expect from die). If the class or object is set to show traces then then the full trace is also included. The result looks like <code>Carp::confess</code>.</p>
+
+<h2 id="exception-full_message">$exception-&gt;full_message</h2>
+
+<p>Called by the <code>as_string</code> method to get the message. By default, this is the same as calling the <code>message</code> method, but may be overridden by a subclass. See below for details.</p>
+
+<h1 id="LIGHTWEIGHT-EXCEPTIONS">LIGHTWEIGHT EXCEPTIONS</h1>
+
+<p>A lightweight exception is one which records no information about its context when it is created. This can be achieved by setting <code>$class-&gt;NoContextInfo</code> to a true value.</p>
+
+<p>You can make this the default for a class of exceptions by setting it after creating the class:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Exception::Class</span> <span class="operator">(</span>
+      <span class="string">'LightWeight'</span><span class="operator">,</span>
+      <span class="string">'HeavyWeight'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">LightWeight</span><span class="operator">-&gt;</span><span class="variable">NoContextInfo</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>A lightweight exception does have a stack trace object, nor does it record the time, pid, uid, euid, gid, or egid. It only has a message.</p>
+
+<h1 id="OVERLOADING">OVERLOADING</h1>
+
+<p><code>Exception::Class::Base</code> objects are overloaded so that stringification produces a normal error message. This just calls the <code>$exception-&gt;as_string</code> method described above. This means that you can just <code>print $@</code> after an <code>eval</code> and not worry about whether or not its an actual object. It also means an application or module could do this:</p>
+
+<pre><code>  <span class="variable">$SIG</span><span class="operator">{</span><span class="string">__DIE__</span><span class="operator">}</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">Exception::Class::Base</span><span class="operator">-&gt;</span><span class="variable">throw</span><span class="operator">(</span> <span class="string">error</span> <span class="operator">=&gt;</span> <span class="keyword">join</span> <span class="string">''</span><span class="operator">,</span> <span class="variable">@_</span> <span class="operator">);</span> <span class="operator">};</span>
+</code></pre>
+
+<p>and this would probably not break anything (unless someone was expecting a different type of exception object from <code>die</code>).</p>
+
+<h1 id="OVERRIDING-THE-as_string-METHOD">OVERRIDING THE as_string METHOD</h1>
+
+<p>By default, the <code>as_string</code> method simply returns the value <code>message</code> or <code>error</code> param plus a stack trace, if the class&#39;s <code>Trace</code> method returns a true value or <code>show_trace</code> was set when creating the exception.</p>
+
+<p>However, once you add new fields to a subclass, you may want to include those fields in the stringified error.</p>
+
+<p>Inside the <code>as_string</code> method, the message (non-stack trace) portion of the error is generated by calling the <code>full_message</code> method. This can be easily overridden. For example:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> full_message </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">my</span> <span class="variable">$msg</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">message</span><span class="operator">;</span>
+  
+      <span class="variable">$msg</span> <span class="operator">.=</span> <span class="string">" and foo was "</span> <span class="operator">.</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$msg</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Exception-Class/issues">https://github.com/houseabsolute/Exception-Class/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Exception-Class can be found at <a href="https://github.com/houseabsolute/Exception-Class">https://github.com/houseabsolute/Exception-Class</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2017 by Dave Rolsky.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

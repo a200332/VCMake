@@ -1,0 +1,366 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Declaration-and-Access-of-Arrays-of-Arrays">Declaration and Access of Arrays of Arrays</a></li>
+      <li><a href="#Growing-Your-Own">Growing Your Own</a></li>
+      <li><a href="#Access-and-Printing">Access and Printing</a></li>
+      <li><a href="#Slices">Slices</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>perllol - Manipulating Arrays of Arrays in Perl</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="Declaration-and-Access-of-Arrays-of-Arrays">Declaration and Access of Arrays of Arrays</h2>
+
+<p>The simplest two-level data structure to build in Perl is an array of arrays, sometimes casually called a list of lists. It&#39;s reasonably easy to understand, and almost everything that applies here will also be applicable later on with the fancier data structures.</p>
+
+<p>An array of an array is just a regular old array @AoA that you can get at with two subscripts, like <code>$AoA[3][2]</code>. Here&#39;s a declaration of the array:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="number">5.010</span><span class="operator">;</span>  <span class="comment"># so we can use say()</span>
+    
+    <span class="comment"># assign to our array, an array of array references</span>
+    <span class="variable">@AoA</span> <span class="operator">=</span> <span class="operator">(</span>
+           <span class="operator">[</span> <span class="string">"fred"</span><span class="operator">,</span> <span class="string">"barney"</span><span class="operator">,</span> <span class="string">"pebbles"</span><span class="operator">,</span> <span class="string">"bambam"</span><span class="operator">,</span> <span class="string">"dino"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+           <span class="operator">[</span> <span class="string">"george"</span><span class="operator">,</span> <span class="string">"jane"</span><span class="operator">,</span> <span class="string">"elroy"</span><span class="operator">,</span> <span class="string">"judy"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+           <span class="operator">[</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">"bart"</span><span class="operator">,</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">"maggie"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    <span class="keyword">say</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">2</span><span class="operator">][</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+      <span class="variable">bart</span>
+</code></pre>
+
+<p>Now you should be very careful that the outer bracket type is a round one, that is, a parenthesis. That&#39;s because you&#39;re assigning to an @array, so you need parentheses. If you wanted there <i>not</i> to be an @AoA, but rather just a reference to it, you could do something more like this:</p>
+
+<pre><code>    <span class="comment"># assign a reference to array of array references</span>
+    <span class="variable">$ref_to_AoA</span> <span class="operator">=</span> <span class="operator">[</span>
+        <span class="operator">[</span> <span class="string">"fred"</span><span class="operator">,</span> <span class="string">"barney"</span><span class="operator">,</span> <span class="string">"pebbles"</span><span class="operator">,</span> <span class="string">"bambam"</span><span class="operator">,</span> <span class="string">"dino"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">"george"</span><span class="operator">,</span> <span class="string">"jane"</span><span class="operator">,</span> <span class="string">"elroy"</span><span class="operator">,</span> <span class="string">"judy"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">[</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">"bart"</span><span class="operator">,</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">"maggie"</span><span class="operator">,</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">]</span><span class="operator">;</span>
+    <span class="keyword">say</span> <span class="variable">$ref_to_AoA</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">2</span><span class="operator">][</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>
+      <span class="variable">bart</span>
+</code></pre>
+
+<p>Notice that the outer bracket type has changed, and so our access syntax has also changed. That&#39;s because unlike C, in perl you can&#39;t freely interchange arrays and references thereto. $ref_to_AoA is a reference to an array, whereas @AoA is an array proper. Likewise, <code>$AoA[2]</code> is not an array, but an array ref. So how come you can write these:</p>
+
+<pre><code>    $AoA[2][2]
+    $ref_to_AoA-&gt;[2][2]</code></pre>
+
+<p>instead of having to write these:</p>
+
+<pre><code>    $AoA[2]-&gt;[2]
+    $ref_to_AoA-&gt;[2]-&gt;[2]</code></pre>
+
+<p>Well, that&#39;s because the rule is that on adjacent brackets only (whether square or curly), you are free to omit the pointer dereferencing arrow. But you cannot do so for the very first one if it&#39;s a scalar containing a reference, which means that $ref_to_AoA always needs it.</p>
+
+<h2 id="Growing-Your-Own">Growing Your Own</h2>
+
+<p>That&#39;s all well and good for declaration of a fixed data structure, but what if you wanted to add new elements on the fly, or build it up entirely from scratch?</p>
+
+<p>First, let&#39;s look at reading it in from a file. This is something like adding a row at a time. We&#39;ll assume that there&#39;s a flat file in which each line is a row and each word an element. If you&#39;re trying to develop an @AoA array containing all these, here&#39;s the right way to do that:</p>
+
+<pre><code>    <span class="keyword">while</span> <span class="operator">(&lt;&gt;)</span> <span class="operator">{</span>
+        <span class="variable">@tmp</span> <span class="operator">=</span> <span class="keyword">split</span><span class="operator">;</span>
+        <span class="keyword">push</span> <span class="variable">@AoA</span><span class="operator">,</span> <span class="operator">[</span> <span class="variable">@tmp</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>You might also have loaded that from a function:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Or you might have had a temporary variable sitting around with the array in it.</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">@tmp</span> <span class="operator">=</span> <span class="variable">somefunc</span><span class="operator">(</span><span class="variable">$i</span><span class="operator">);</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="variable">@tmp</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>It&#39;s important you make sure to use the <code>[ ]</code> array reference constructor. That&#39;s because this wouldn&#39;t work:</p>
+
+<pre><code>    <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="variable">@tmp</span><span class="operator">;</span>   <span class="comment"># WRONG!</span>
+</code></pre>
+
+<p>The reason that doesn&#39;t do what you want is because assigning a named array like that to a scalar is taking an array in scalar context, which means just counts the number of elements in @tmp.</p>
+
+<p>If you are running under <code>use strict</code> (and if you aren&#39;t, why in the world aren&#39;t you?), you&#39;ll have to add some declarations to make it happy:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">my</span><span class="operator">(</span><span class="variable">@AoA</span><span class="operator">,</span> <span class="variable">@tmp</span><span class="operator">);</span>
+    <span class="keyword">while</span> <span class="operator">(&lt;&gt;)</span> <span class="operator">{</span>
+        <span class="variable">@tmp</span> <span class="operator">=</span> <span class="keyword">split</span><span class="operator">;</span>
+        <span class="keyword">push</span> <span class="variable">@AoA</span><span class="operator">,</span> <span class="operator">[</span> <span class="variable">@tmp</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Of course, you don&#39;t need the temporary array to have a name at all:</p>
+
+<pre><code>    <span class="keyword">while</span> <span class="operator">(&lt;&gt;)</span> <span class="operator">{</span>
+        <span class="keyword">push</span> <span class="variable">@AoA</span><span class="operator">,</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>You also don&#39;t have to use push(). You could just make a direct assignment if you knew where you wanted to put it:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">@AoA</span><span class="operator">,</span> <span class="variable">$i</span><span class="operator">,</span> <span class="variable">$line</span><span class="operator">);</span>
+    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$line</span> <span class="operator">=</span> <span class="operator">&lt;&gt;;</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="string">" "</span><span class="operator">,</span> <span class="variable">$line</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>or even just</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">@AoA</span><span class="operator">,</span> <span class="variable">$i</span><span class="operator">);</span>
+    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="string">" "</span><span class="operator">,</span> <span class="operator">&lt;&gt;</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>You should in general be leery of using functions that could potentially return lists in scalar context without explicitly stating such. This would be clearer to the casual reader:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">@AoA</span><span class="operator">,</span> <span class="variable">$i</span><span class="operator">);</span>
+    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span> <span class="operator">=</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="string">" "</span><span class="operator">,</span> <span class="keyword">scalar</span><span class="operator">(&lt;&gt;)</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>If you wanted to have a $ref_to_AoA variable as a reference to an array, you&#39;d have to do something like this:</p>
+
+<pre><code>    <span class="keyword">while</span> <span class="operator">(&lt;&gt;)</span> <span class="operator">{</span>
+        <span class="keyword">push</span> <span class="variable">@$ref_to_AoA</span><span class="operator">,</span> <span class="operator">[</span> <span class="keyword">split</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Now you can add new rows. What about adding new columns? If you&#39;re dealing with just matrices, it&#39;s often easiest to use simple assignment:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$x</span> <span class="operator">(</span><span class="number">1</span> <span class="operator">..</span> <span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">for</span> <span class="variable">$y</span> <span class="operator">(</span><span class="number">1</span> <span class="operator">..</span> <span class="number">10</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$x</span><span class="operator">][</span><span class="variable">$y</span><span class="operator">]</span> <span class="operator">=</span> <span class="variable">func</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">,</span> <span class="variable">$y</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">for</span> <span class="variable">$x</span> <span class="operator">(</span> <span class="number">3</span><span class="operator">,</span> <span class="number">7</span><span class="operator">,</span> <span class="number">9</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$x</span><span class="operator">][</span><span class="number">20</span><span class="operator">]</span> <span class="operator">+=</span> <span class="variable">func2</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>It doesn&#39;t matter whether those elements are already there or not: it&#39;ll gladly create them for you, setting intervening elements to <code>undef</code> as need be.</p>
+
+<p>If you wanted just to append to a row, you&#39;d have to do something a bit funnier looking:</p>
+
+<pre><code>    <span class="comment"># add new columns to an existing row</span>
+    <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">"wilma"</span><span class="operator">,</span> <span class="string">"betty"</span><span class="operator">;</span>   <span class="comment"># explicit deref</span>
+</code></pre>
+
+<h2 id="Access-and-Printing">Access and Printing</h2>
+
+<p>Now it&#39;s time to print your data structure out. How are you going to do that? Well, if you want only one of the elements, it&#39;s trivial:</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">0</span><span class="operator">][</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you want to print the whole thing, though, you can&#39;t say</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="variable">@AoA</span><span class="operator">;</span>         <span class="comment"># WRONG</span>
+</code></pre>
+
+<p>because you&#39;ll get just references listed, and perl will never automatically dereference things for you. Instead, you have to roll yourself a loop or two. This prints the whole structure, using the shell-style for() construct to loop across the outer set of subscripts.</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$aref</span> <span class="operator">(</span> <span class="variable">@AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">say</span> <span class="string">"\t [ @</span><span class="variable">$aref</span><span class="string"> ],"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>If you wanted to keep track of subscripts, you might do this:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">say</span> <span class="string">"\t elt </span><span class="variable">$i</span><span class="string"> is [ @{</span><span class="variable">$AoA</span><span class="string">[</span><span class="variable">$i</span><span class="string">]} ],"</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>or maybe even this. Notice the inner loop.</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">for</span> <span class="variable">$j</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]}</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">say</span> <span class="string">"elt </span><span class="variable">$i</span><span class="string"> </span><span class="variable">$j</span><span class="string"> is </span><span class="variable">$AoA</span><span class="string">[</span><span class="variable">$i</span><span class="string">][</span><span class="variable">$j</span><span class="string">]"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>As you can see, it&#39;s getting a bit complicated. That&#39;s why sometimes is easier to take a temporary on your way through:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$aref</span> <span class="operator">=</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span><span class="operator">;</span>
+        <span class="keyword">for</span> <span class="variable">$j</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#</span><span class="operator">{</span><span class="variable">$aref</span><span class="operator">}</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">say</span> <span class="string">"elt </span><span class="variable">$i</span><span class="string"> </span><span class="variable">$j</span><span class="string"> is </span><span class="variable">$AoA</span><span class="string">[</span><span class="variable">$i</span><span class="string">][</span><span class="variable">$j</span><span class="string">]"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Hmm... that&#39;s still a bit ugly. How about this:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="variable">$i</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$#AoA</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$aref</span> <span class="operator">=</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$i</span><span class="operator">]</span><span class="operator">;</span>
+        <span class="variable">$n</span> <span class="operator">=</span> <span class="variable">@$aref</span> <span class="operator">-</span> <span class="number">1</span><span class="operator">;</span>
+        <span class="keyword">for</span> <span class="variable">$j</span> <span class="operator">(</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$n</span> <span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">say</span> <span class="string">"elt </span><span class="variable">$i</span><span class="string"> </span><span class="variable">$j</span><span class="string"> is </span><span class="variable">$AoA</span><span class="string">[</span><span class="variable">$i</span><span class="string">][</span><span class="variable">$j</span><span class="string">]"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>When you get tired of writing a custom print for your data structures, you might look at the standard <a href="../../lib/Dumpvalue.html">Dumpvalue</a> or <a href="../../lib/Data/Dumper.html">Data::Dumper</a> modules. The former is what the Perl debugger uses, while the latter generates parsable Perl code. For example:</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">v5</span><span class="number">.14</span><span class="operator">;</span>     <span class="comment"># using the + prototype, new to v5.14</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> show</span><span class="operator">(</span>+<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">require</span> <span class="variable">Dumpvalue</span><span class="operator">;</span>
+        <span class="keyword">state</span> <span class="variable">$prettily</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">Dumpvalue:</span>:
+                            <span class="string">tick</span>        <span class="operator">=&gt;</span> <span class="string">q(")</span><span class="operator">,</span>
+                            <span class="string">compactDump</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>  <span class="comment"># comment these two lines</span>
+                                               <span class="comment"># out</span>
+                            <span class="string">veryCompact</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>  <span class="comment"># if you want a bigger</span>
+                                               <span class="comment"># dump</span>
+                        <span class="operator">;</span>
+        <span class="variable">dumpValue</span> <span class="variable">$prettily</span> <span class="variable">@_</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># Assign a list of array references to an array.</span>
+ <span class="keyword">my</span> <span class="variable">@AoA</span> <span class="operator">=</span> <span class="operator">(</span>
+           <span class="operator">[</span> <span class="string">"fred"</span><span class="operator">,</span> <span class="string">"barney"</span> <span class="operator">]</span><span class="operator">,</span>
+           <span class="operator">[</span> <span class="string">"george"</span><span class="operator">,</span> <span class="string">"jane"</span><span class="operator">,</span> <span class="string">"elroy"</span> <span class="operator">]</span><span class="operator">,</span>
+           <span class="operator">[</span> <span class="string">"homer"</span><span class="operator">,</span> <span class="string">"marge"</span><span class="operator">,</span> <span class="string">"bart"</span> <span class="operator">]</span><span class="operator">,</span>
+ <span class="operator">);</span>
+ <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span><span class="operator">,</span> <span class="string">"wilma"</span><span class="operator">,</span> <span class="string">"betty"</span><span class="operator">;</span>
+ <span class="variable">show</span> <span class="variable">@AoA</span><span class="operator">;</span>
+</code></pre>
+
+<p>will print out:</p>
+
+<pre><code>    0  0..3  &quot;fred&quot; &quot;barney&quot; &quot;wilma&quot; &quot;betty&quot;
+    1  0..2  &quot;george&quot; &quot;jane&quot; &quot;elroy&quot;
+    2  0..2  &quot;homer&quot; &quot;marge&quot; &quot;bart&quot;</code></pre>
+
+<p>Whereas if you comment out the two lines I said you might wish to, then it shows it to you this way instead:</p>
+
+<pre><code>    0  ARRAY(0x8031d0)
+       0  &quot;fred&quot;
+       1  &quot;barney&quot;
+       2  &quot;wilma&quot;
+       3  &quot;betty&quot;
+    1  ARRAY(0x803d40)
+       0  &quot;george&quot;
+       1  &quot;jane&quot;
+       2  &quot;elroy&quot;
+    2  ARRAY(0x803e10)
+       0  &quot;homer&quot;
+       1  &quot;marge&quot;
+       2  &quot;bart&quot;</code></pre>
+
+<h2 id="Slices">Slices</h2>
+
+<p>If you want to get at a slice (part of a row) in a multidimensional array, you&#39;re going to have to do some fancy subscripting. That&#39;s because while we have a nice synonym for single elements via the pointer arrow for dereferencing, no such convenience exists for slices.</p>
+
+<p>Here&#39;s how to do one operation using a loop. We&#39;ll assume an @AoA variable as before.</p>
+
+<pre><code>    <span class="variable">@part</span> <span class="operator">=</span> <span class="operator">();</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="number">4</span><span class="operator">;</span>
+    <span class="keyword">for</span> <span class="operator">(</span><span class="variable">$y</span> <span class="operator">=</span> <span class="number">7</span><span class="operator">;</span> <span class="variable">$y</span> <span class="operator">&lt;</span> <span class="number">13</span><span class="operator">;</span> <span class="variable">$y</span><span class="operator">++)</span> <span class="operator">{</span>
+        <span class="keyword">push</span> <span class="variable">@part</span><span class="operator">,</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$x</span><span class="operator">][</span><span class="variable">$y</span><span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>That same loop could be replaced with a slice operation:</p>
+
+<pre><code>    <span class="variable">@part</span> <span class="operator">=</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">$AoA</span><span class="operator">[</span><span class="number">4</span><span class="operator">]}[</span><span class="number">7</span><span class="operator">..</span><span class="number">12</span><span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>or spaced out a bit:</p>
+
+<pre><code>    <span class="variable">@part</span> <span class="operator">=</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="number">4</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">[</span> <span class="number">7</span><span class="operator">..</span><span class="number">12</span> <span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>But as you might well imagine, this can get pretty rough on the reader.</p>
+
+<p>Ah, but what if you wanted a <i>two-dimensional slice</i>, such as having $x run from 4..8 and $y run from 7 to 12? Hmm... here&#39;s the simple way:</p>
+
+<pre><code>    <span class="variable">@newAoA</span> <span class="operator">=</span> <span class="operator">();</span>
+    <span class="keyword">for</span> <span class="operator">(</span><span class="variable">$startx</span> <span class="operator">=</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="number">4</span><span class="operator">;</span> <span class="variable">$x</span> <span class="operator">&lt;=</span> <span class="number">8</span><span class="operator">;</span> <span class="variable">$x</span><span class="operator">++)</span> <span class="operator">{</span>
+        <span class="keyword">for</span> <span class="operator">(</span><span class="variable">$starty</span> <span class="operator">=</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="number">7</span><span class="operator">;</span> <span class="variable">$y</span> <span class="operator">&lt;=</span> <span class="number">12</span><span class="operator">;</span> <span class="variable">$y</span><span class="operator">++)</span> <span class="operator">{</span>
+            <span class="variable">$newAoA</span><span class="operator">[</span><span class="variable">$x</span> <span class="operator">-</span> <span class="variable">$startx</span><span class="operator">][</span><span class="variable">$y</span> <span class="operator">-</span> <span class="variable">$starty</span><span class="operator">]</span> <span class="operator">=</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$x</span><span class="operator">][</span><span class="variable">$y</span><span class="operator">]</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>We can reduce some of the looping through slices</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span><span class="variable">$x</span> <span class="operator">=</span> <span class="number">4</span><span class="operator">;</span> <span class="variable">$x</span> <span class="operator">&lt;=</span> <span class="number">8</span><span class="operator">;</span> <span class="variable">$x</span><span class="operator">++)</span> <span class="operator">{</span>
+        <span class="keyword">push</span> <span class="variable">@newAoA</span><span class="operator">,</span> <span class="operator">[</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$x</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">[</span> <span class="number">7</span><span class="operator">..</span><span class="number">12</span> <span class="operator">]</span> <span class="operator">]</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>If you were into Schwartzian Transforms, you would probably have selected map for that</p>
+
+<pre><code>    <span class="variable">@newAoA</span> <span class="operator">=</span> <span class="keyword">map</span> <span class="operator">{</span> <span class="operator">[</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$AoA</span><span class="operator">[</span><span class="variable">$_</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">[</span> <span class="number">7</span><span class="operator">..</span><span class="number">12</span> <span class="operator">]</span> <span class="operator">]</span> <span class="operator">}</span> <span class="number">4</span> <span class="operator">..</span> <span class="number">8</span><span class="operator">;</span>
+</code></pre>
+
+<p>Although if your manager accused you of seeking job security (or rapid insecurity) through inscrutable code, it would be hard to argue. :-) If I were you, I&#39;d put that in a function:</p>
+
+<pre><code>    <span class="variable">@newAoA</span> <span class="operator">=</span> <span class="variable">splice_2D</span><span class="operator">(</span> <span class="operator">\</span><span class="variable">@AoA</span><span class="operator">,</span> <span class="number">4</span> <span class="operator">=&gt;</span> <span class="number">8</span><span class="operator">,</span> <span class="number">7</span> <span class="operator">=&gt;</span> <span class="number">12</span> <span class="operator">);</span>
+    <span class="keyword">sub</span><span class="variable"> splice_2D </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$lrr</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>        <span class="comment"># ref to array of array refs!</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$x_lo</span><span class="operator">,</span> <span class="variable">$x_hi</span><span class="operator">,</span>
+            <span class="variable">$y_lo</span><span class="operator">,</span> <span class="variable">$y_hi</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="keyword">map</span> <span class="operator">{</span>
+            <span class="operator">[</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$lrr</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="variable">$_</span><span class="operator">]</span> <span class="operator">}</span> <span class="operator">[</span> <span class="variable">$y_lo</span> <span class="operator">..</span> <span class="variable">$y_hi</span> <span class="operator">]</span> <span class="operator">]</span>
+        <span class="operator">}</span> <span class="variable">$x_lo</span> <span class="operator">..</span> <span class="variable">$x_hi</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/pods/perldata.html">perldata</a>, <a href="../../lib/pods/perlref.html">perlref</a>, <a href="../../lib/pods/perldsc.html">perldsc</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Tom Christiansen &lt;<i>tchrist@perl.com</i>&gt;</p>
+
+<p>Last update: Tue Apr 26 18:30:55 MDT 2011</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,205 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#Inheriting-from-Tie::StdHash">Inheriting from Tie::StdHash</a></li>
+  <li><a href="#Inheriting-from-Tie::ExtraHash">Inheriting from Tie::ExtraHash</a></li>
+  <li><a href="#SCALAR-UNTIE-and-DESTROY">SCALAR, UNTIE and DESTROY</a></li>
+  <li><a href="#MORE-INFORMATION">MORE INFORMATION</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Tie::Hash, Tie::StdHash, Tie::ExtraHash - base class definitions for tied hashes</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">NewHash</span><span class="operator">;</span>
+    <span class="keyword">require</span> <span class="variable">Tie::Hash</span><span class="operator">;</span>
+    
+    <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">qw(Tie::Hash)</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> DELETE </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>          <span class="comment"># Provides needed method</span>
+    <span class="keyword">sub</span><span class="variable"> CLEAR </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>           <span class="comment"># Overrides inherited method</span>
+    
+    
+    <span class="keyword">package</span> <span class="variable">NewStdHash</span><span class="operator">;</span>
+    <span class="keyword">require</span> <span class="variable">Tie::Hash</span><span class="operator">;</span>
+    
+    <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">qw(Tie::StdHash)</span><span class="operator">;</span>
+    
+    <span class="comment"># All methods provided by default, define</span>
+    <span class="comment"># only those needing overrides</span>
+    <span class="comment"># Accessors access the storage in %{$_[0]};</span>
+    <span class="comment"># TIEHASH should return a reference to the actual storage</span>
+    <span class="keyword">sub</span><span class="variable"> DELETE </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+    
+    <span class="keyword">package</span> <span class="variable">NewExtraHash</span><span class="operator">;</span>
+    <span class="keyword">require</span> <span class="variable">Tie::Hash</span><span class="operator">;</span>
+    
+    <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">qw(Tie::ExtraHash)</span><span class="operator">;</span>
+    
+    <span class="comment"># All methods provided by default, define </span>
+    <span class="comment"># only those needing overrides</span>
+    <span class="comment"># Accessors access the storage in %{$_[0][0]};</span>
+    <span class="comment"># TIEHASH should return an array reference with the first element</span>
+    <span class="comment"># being the reference to the actual storage </span>
+    <span class="keyword">sub</span><span class="variable"> DELETE </span><span class="operator">{</span> 
+      <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">][</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;(</span><span class="string">'del'</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">][</span><span class="number">0</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">);</span> <span class="comment"># Call the report writer</span>
+      <span class="keyword">delete</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">][</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]}</span><span class="operator">;</span>           <span class="comment">#  $_[0]-&gt;SUPER::DELETE($_[1])</span>
+    <span class="operator">}</span>
+    
+    
+    <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+    
+    <span class="keyword">tie</span> <span class="variable">%new_hash</span><span class="operator">,</span> <span class="string">'NewHash'</span><span class="operator">;</span>
+    <span class="keyword">tie</span> <span class="variable">%new_std_hash</span><span class="operator">,</span> <span class="string">'NewStdHash'</span><span class="operator">;</span>
+    <span class="keyword">tie</span> <span class="variable">%new_extra_hash</span><span class="operator">,</span> <span class="string">'NewExtraHash'</span><span class="operator">,</span>
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span><span class="keyword">warn</span> <span class="string">"Doing \U</span><span class="variable">$_</span><span class="string">[1]\E of </span><span class="variable">$_</span><span class="string">[2].\n"</span><span class="operator">};</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides some skeletal methods for hash-tying classes. See <a href="../../lib/pods/perltie.html">perltie</a> for a list of the functions required in order to tie a hash to a package. The basic <b>Tie::Hash</b> package provides a <code>new</code> method, as well as methods <code>TIEHASH</code>, <code>EXISTS</code> and <code>CLEAR</code>. The <b>Tie::StdHash</b> and <b>Tie::ExtraHash</b> packages provide most methods for hashes described in <a href="../../lib/pods/perltie.html">perltie</a> (the exceptions are <code>UNTIE</code> and <code>DESTROY</code>). They cause tied hashes to behave exactly like standard hashes, and allow for selective overwriting of methods. <b>Tie::Hash</b> grandfathers the <code>new</code> method: it is used if <code>TIEHASH</code> is not defined in the case a class forgets to include a <code>TIEHASH</code> method.</p>
+
+<p>For developers wishing to write their own tied hashes, the required methods are briefly defined below. See the <a href="../../lib/pods/perltie.html">perltie</a> section for more detailed descriptive, as well as example code:</p>
+
+<dl>
+
+<dt id="TIEHASH-classname-LIST">TIEHASH classname, LIST</dt>
+<dd>
+
+<p>The method invoked by the command <code>tie %hash, classname</code>. Associates a new hash instance with the specified class. <code>LIST</code> would represent additional arguments (along the lines of <a href="../../lib/AnyDBM_File.html">AnyDBM_File</a> and compatriots) needed to complete the association.</p>
+
+</dd>
+<dt id="STORE-this-key-value">STORE this, key, value</dt>
+<dd>
+
+<p>Store datum <i>value</i> into <i>key</i> for the tied hash <i>this</i>.</p>
+
+</dd>
+<dt id="FETCH-this-key">FETCH this, key</dt>
+<dd>
+
+<p>Retrieve the datum in <i>key</i> for the tied hash <i>this</i>.</p>
+
+</dd>
+<dt id="FIRSTKEY-this">FIRSTKEY this</dt>
+<dd>
+
+<p>Return the first key in the hash.</p>
+
+</dd>
+<dt id="NEXTKEY-this-lastkey">NEXTKEY this, lastkey</dt>
+<dd>
+
+<p>Return the next key in the hash.</p>
+
+</dd>
+<dt id="EXISTS-this-key">EXISTS this, key</dt>
+<dd>
+
+<p>Verify that <i>key</i> exists with the tied hash <i>this</i>.</p>
+
+<p>The <b>Tie::Hash</b> implementation is a stub that simply croaks.</p>
+
+</dd>
+<dt id="DELETE-this-key">DELETE this, key</dt>
+<dd>
+
+<p>Delete the key <i>key</i> from the tied hash <i>this</i>.</p>
+
+</dd>
+<dt id="CLEAR-this">CLEAR this</dt>
+<dd>
+
+<p>Clear all values from the tied hash <i>this</i>.</p>
+
+</dd>
+<dt id="SCALAR-this">SCALAR this</dt>
+<dd>
+
+<p>Returns what evaluating the hash in scalar context yields.</p>
+
+<p><b>Tie::Hash</b> does not implement this method (but <b>Tie::StdHash</b> and <b>Tie::ExtraHash</b> do).</p>
+
+</dd>
+</dl>
+
+<h1 id="Inheriting-from-Tie::StdHash">Inheriting from <b>Tie::StdHash</b></h1>
+
+<p>The accessor methods assume that the actual storage for the data in the tied hash is in the hash referenced by <code>tied(%tiedhash)</code>. Thus overwritten <code>TIEHASH</code> method should return a hash reference, and the remaining methods should operate on the hash referenced by the first argument:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">ReportHash</span><span class="operator">;</span>
+  <span class="keyword">our</span> <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">'Tie::StdHash'</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> TIEHASH  </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$storage</span> <span class="operator">=</span> <span class="keyword">bless</span> <span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span><span class="operator">;</span>
+    <span class="keyword">warn</span> <span class="string">"New ReportHash created, stored in </span><span class="variable">$storage</span><span class="string">.\n"</span><span class="operator">;</span>
+    <span class="variable">$storage</span>
+  <span class="operator">}</span>
+  <span class="keyword">sub</span><span class="variable"> STORE    </span><span class="operator">{</span>
+    <span class="keyword">warn</span> <span class="string">"Storing data with key </span><span class="variable">$_</span><span class="string">[1] at </span><span class="variable">$_</span><span class="string">[0].\n"</span><span class="operator">;</span>
+    <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]{</span><span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]}</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">2</span><span class="operator">]</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="Inheriting-from-Tie::ExtraHash">Inheriting from <b>Tie::ExtraHash</b></h1>
+
+<p>The accessor methods assume that the actual storage for the data in the tied hash is in the hash referenced by <code>(tied(%tiedhash))-&gt;[0]</code>. Thus overwritten <code>TIEHASH</code> method should return an array reference with the first element being a hash reference, and the remaining methods should operate on the hash <code><span class="variable">%</span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">}</span>
+</code>:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">ReportHash</span><span class="operator">;</span>
+  <span class="keyword">our</span> <span class="variable">@ISA</span> <span class="operator">=</span> <span class="string">'Tie::ExtraHash'</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> TIEHASH  </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$storage</span> <span class="operator">=</span> <span class="keyword">bless</span> <span class="operator">[{}</span><span class="operator">,</span> <span class="variable">@_</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">$class</span><span class="operator">;</span>
+    <span class="keyword">warn</span> <span class="string">"New ReportHash created, stored in </span><span class="variable">$storage</span><span class="string">.\n"</span><span class="operator">;</span>
+    <span class="variable">$storage</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  <span class="keyword">sub</span><span class="variable"> STORE    </span><span class="operator">{</span>
+    <span class="keyword">warn</span> <span class="string">"Storing data with key </span><span class="variable">$_</span><span class="string">[1] at </span><span class="variable">$_</span><span class="string">[0].\n"</span><span class="operator">;</span>
+    <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">][</span><span class="number">0</span><span class="operator">]{</span><span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]}</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">2</span><span class="operator">]</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The default <code>TIEHASH</code> method stores &quot;extra&quot; arguments to tie() starting from offset 1 in the array referenced by <code>tied(%tiedhash)</code>; this is the same storage algorithm as in TIEHASH subroutine above. Hence, a typical package inheriting from <b>Tie::ExtraHash</b> does not need to overwrite this method.</p>
+
+<h1 id="SCALAR-UNTIE-and-DESTROY"><code>SCALAR</code>, <code>UNTIE</code> and <code>DESTROY</code></h1>
+
+<p>The methods <code>UNTIE</code> and <code>DESTROY</code> are not defined in <b>Tie::Hash</b>, <b>Tie::StdHash</b>, or <b>Tie::ExtraHash</b>. Tied hashes do not require presence of these methods, but if defined, the methods will be called in proper time, see <a href="../../lib/pods/perltie.html">perltie</a>.</p>
+
+<p><code>SCALAR</code> is only defined in <b>Tie::StdHash</b> and <b>Tie::ExtraHash</b>.</p>
+
+<p>If needed, these methods should be defined by the package inheriting from <b>Tie::Hash</b>, <b>Tie::StdHash</b>, or <b>Tie::ExtraHash</b>. See <a href="../../lib/pods/perltie.html#SCALAR">&quot;SCALAR&quot; in perltie</a> to find out what happens when <code>SCALAR</code> does not exist.</p>
+
+<h1 id="MORE-INFORMATION">MORE INFORMATION</h1>
+
+<p>The packages relating to various DBM-related implementations (<i>DB_File</i>, <i>NDBM_File</i>, etc.) show examples of general tied hashes, as does the <a href="../../lib/Config.html">Config</a> module. While these do not utilize <b>Tie::Hash</b>, they serve as good working examples.</p>
+
+
+</body>
+
+</html>
+
+

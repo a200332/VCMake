@@ -1,0 +1,131 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#quote_native">quote_native</a></li>
+      <li><a href="#quote_cmd">quote_cmd</a></li>
+      <li><a href="#quote_system_list">quote_system_list</a></li>
+      <li><a href="#quote_system_string">quote_system_string</a></li>
+      <li><a href="#quote_system">quote_system</a></li>
+      <li><a href="#quote_system_cmd">quote_system_cmd</a></li>
+      <li><a href="#quote_literal">quote_literal</a></li>
+      <li><a href="#cmd_escape">cmd_escape</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::ShellQuote - Quote argument lists for Win32</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::ShellQuote</span> <span class="string">qw(:all)</span><span class="operator">;</span>
+    
+    <span class="keyword">system</span> <span class="variable">quote_system</span><span class="operator">(</span><span class="string">'program.exe'</span><span class="operator">,</span> <span class="string">'--switch'</span><span class="operator">,</span> <span class="string">'argument with spaces or other special characters'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Quotes argument lists to be used in Win32 in several different situations.</p>
+
+<p>Windows passes its arguments as a single string instead of an array as other platforms do. In almost all cases, the standard Win32 <a href="http://msdn.microsoft.com/en-us/library/ms647232.aspx">CommandLineToArgvW</a> function is used to parse this string. <i>cmd.exe</i> has different rules for handling quoting, so extra work has to be done if it is involved. It isn&#39;t possible to consistantly create a single string that will be handled the same by <i>cmd.exe</i> and the stardard parsing rules.</p>
+
+<p>Perl will try to detect if you need the shell by detecting shell metacharacters. The routine that checks that uses different quoting rules from both <i>cmd.exe</i> and the native Win32 parsing. Extra work must therefore be done to protect against this autodetection.</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<h2 id="quote_native">quote_native</h2>
+
+<p>Quotes as a string to pass directly to a program using native methods like <a href="../../lib/Win32.html">Win32::Spawn()</a>. This is the safest option to use if possible.</p>
+
+<h2 id="quote_cmd">quote_cmd</h2>
+
+<p>Quotes as a string to be run through <i>cmd.exe</i>, such as in a batch file.</p>
+
+<h2 id="quote_system_list">quote_system_list</h2>
+
+<p>Quotes as a list to be passed to <a href="../../lib/pods/perlfunc.html#system">system</a> or <a href="../../lib/pods/perlfunc.html#exec">exec</a>. This is equally as safe as <a href="#quote_native">&quot;quote_native&quot;</a>, but you must ensure you have more than one item being quoted for the list to be usable with system.</p>
+
+<h2 id="quote_system_string">quote_system_string</h2>
+
+<p>Like <a href="#quote_system_list">&quot;quote_system_list&quot;</a>, but returns a single string. Some argument lists cannot be properly quoted using this function.</p>
+
+<h2 id="quote_system">quote_system</h2>
+
+<p>Switches between <a href="#quote_system_list">&quot;quote_system_list&quot;</a> and <a href="#quote_system_string">&quot;quote_system_string&quot;</a> based on the number of items quoted.</p>
+
+<h2 id="quote_system_cmd">quote_system_cmd</h2>
+
+<p>Quotes as a single string that will always be run with <i>cmd.exe</i>.</p>
+
+<h2 id="quote_literal">quote_literal</h2>
+
+<p>Quotes a single parameter in native form.</p>
+
+<h2 id="cmd_escape">cmd_escape</h2>
+
+<p>Escapes a string to be passed untouched by <i>cmd.exe</i>.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<ul>
+
+<li><p>Newlines (\n or \r) and null (\0) can&#39;t be properly quoted when running through <i>cmd.exe</i>.</p>
+
+</li>
+<li><p>This module re-implements some under-specified part of the perl internals to accurately perform its work.</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>haarg - Graham Knop (cpan:HAARG) &lt;haarg@haarg.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Mithaldu - Christian Walde (cpan:MITHALDU) &lt;walde.christian@googlemail.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (c) 2012 the <a href="#AUTHOR">&quot;AUTHOR&quot;</a> and <a href="#CONTRIBUTORS">&quot;CONTRIBUTORS&quot;</a> as listed above.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

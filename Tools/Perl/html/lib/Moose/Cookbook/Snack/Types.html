@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Cookbook::Snack::Types - Snippets of code for using Types and Type Constraints</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Point</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'x'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">,</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'ro'</span> <span class="operator">);</span>
+  <span class="variable">has</span> <span class="string">'y'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">,</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span> <span class="operator">);</span>
+  
+  <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Try::Tiny</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$point</span> <span class="operator">=</span> <span class="variable">try</span> <span class="operator">{</span>
+      <span class="variable">Point</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">x</span> <span class="operator">=&gt;</span> <span class="string">'fifty'</span><span class="operator">,</span> <span class="string">y</span> <span class="operator">=&gt;</span> <span class="string">'forty'</span> <span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="variable">catch</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Oops: </span><span class="variable">$_</span><span class="string">"</span><span class="operator">;</span>
+  <span class="operator">};</span>
+  
+  <span class="keyword">my</span> <span class="variable">$point</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$xval</span>             <span class="operator">=</span> <span class="string">'forty-two'</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$xattribute</span>       <span class="operator">=</span> <span class="variable">Point</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">find_attribute_by_name</span><span class="operator">(</span><span class="string">'x'</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$xtype_constraint</span> <span class="operator">=</span> <span class="variable">$xattribute</span><span class="operator">-&gt;</span><span class="variable">type_constraint</span><span class="operator">;</span>
+  
+  <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$xtype_constraint</span><span class="operator">-&gt;</span><span class="variable">check</span><span class="operator">(</span><span class="variable">$xval</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="variable">$point</span> <span class="operator">=</span> <span class="variable">Point</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">x</span> <span class="operator">=&gt;</span> <span class="variable">$xval</span><span class="operator">,</span> <span class="string">y</span> <span class="operator">=&gt;</span> <span class="number">0</span> <span class="operator">);</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Value: </span><span class="variable">$xval</span><span class="string"> is not an "</span> <span class="operator">.</span> <span class="variable">$xtype_constraint</span><span class="operator">-&gt;</span><span class="variable">name</span> <span class="operator">.</span> <span class="string">"\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is the Point example from <a href="../../../../lib/Moose/Cookbook/Basics/Point_AttributesAndSubclassing.html">Moose::Cookbook::Basics::Point_AttributesAndSubclassing</a> with type checking added.</p>
+
+<p>If we try to assign a string value to an attribute that is an <code>Int</code>, Moose will die with an explicit error message. The error will include the attribute name, as well as the type constraint name and the value which failed the constraint check.</p>
+
+<p>We use <a href="../../../../lib/Try/Tiny.html">Try::Tiny</a> to catch this error message.</p>
+
+<p>Later, we get the <a href="../../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a> object from a <a href="../../../../lib/Moose/Meta/Attribute.html">Moose::Meta::Attribute</a> and use the <a href="../../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a> to check a value directly.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="Moose::Cookbook::Basics::Point_AttributesAndSubclassing"><a href="../../../../lib/Moose/Cookbook/Basics/Point_AttributesAndSubclassing.html">Moose::Cookbook::Basics::Point_AttributesAndSubclassing</a></dt>
+<dd>
+
+</dd>
+<dt id="Moose::Util::TypeConstraints"><a href="../../../../lib/Moose/Util/TypeConstraints.html">Moose::Util::TypeConstraints</a></dt>
+<dd>
+
+</dd>
+<dt id="Moose::Meta::Attribute"><a href="../../../../lib/Moose/Meta/Attribute.html">Moose::Meta::Attribute</a></dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,288 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#TOP-AND-BOTTOM-OF-THE-STACK">&#39;TOP&#39; AND &#39;BOTTOM&#39; OF THE STACK</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Devel::StackTrace-new-named_params">Devel::StackTrace-&gt;new(%named_params)</a></li>
+      <li><a href="#trace-next_frame">$trace-&gt;next_frame</a></li>
+      <li><a href="#trace-prev_frame">$trace-&gt;prev_frame</a></li>
+      <li><a href="#trace-reset_pointer">$trace-&gt;reset_pointer</a></li>
+      <li><a href="#trace-frames">$trace-&gt;frames</a></li>
+      <li><a href="#trace-frame-index">$trace-&gt;frame($index)</a></li>
+      <li><a href="#trace-frame_count">$trace-&gt;frame_count</a></li>
+      <li><a href="#trace-as_string-p">$trace-&gt;as_string(\%p)</a></li>
+      <li><a href="#trace-message">$trace-&gt;message</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#DONATIONS">DONATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Devel::StackTrace - An object representing a stack trace</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.03</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Devel::StackTrace</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$trace</span> <span class="operator">=</span> <span class="variable">Devel::StackTrace</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  
+  <span class="keyword">print</span> <span class="variable">$trace</span><span class="operator">-&gt;</span><span class="variable">as_string</span><span class="operator">;</span> <span class="comment"># like carp</span>
+  
+  <span class="comment"># from top (most recent) of stack to bottom.</span>
+  <span class="keyword">while</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$frame</span> <span class="operator">=</span> <span class="variable">$trace</span><span class="operator">-&gt;</span><span class="variable">next_frame</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Has args\n"</span> <span class="keyword">if</span> <span class="variable">$frame</span><span class="operator">-&gt;</span><span class="variable">hasargs</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># from bottom (least recent) of stack to top.</span>
+  <span class="keyword">while</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$frame</span> <span class="operator">=</span> <span class="variable">$trace</span><span class="operator">-&gt;</span><span class="variable">prev_frame</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">print</span> <span class="string">"Sub: "</span><span class="operator">,</span> <span class="variable">$frame</span><span class="operator">-&gt;</span><span class="variable">subroutine</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>Devel::StackTrace</code> module contains two classes, <code>Devel::StackTrace</code> and <a href="../../lib/Devel/StackTrace/Frame.html">Devel::StackTrace::Frame</a>. These objects encapsulate the information that can retrieved via Perl&#39;s <code>caller</code> function, as well as providing a simple interface to this data.</p>
+
+<p>The <code>Devel::StackTrace</code> object contains a set of <code>Devel::StackTrace::Frame</code> objects, one for each level of the stack. The frames contain all the data available from <code>caller</code>.</p>
+
+<p>This code was created to support my <a href="../../lib/Exception/Class/Base.html">Exception::Class::Base</a> class (part of <a href="../../lib/Exception/Class.html">Exception::Class</a>) but may be useful in other contexts.</p>
+
+<h1 id="TOP-AND-BOTTOM-OF-THE-STACK">&#39;TOP&#39; AND &#39;BOTTOM&#39; OF THE STACK</h1>
+
+<p>When describing the methods of the trace object, I use the words &#39;top&#39; and &#39;bottom&#39;. In this context, the &#39;top&#39; frame on the stack is the most recent frame and the &#39;bottom&#39; is the least recent.</p>
+
+<p>Here&#39;s an example:</p>
+
+<pre><code>  <span class="variable">foo</span><span class="operator">();</span>  <span class="comment"># bottom frame is here</span>
+  
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+     <span class="variable">bar</span><span class="operator">();</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> bar </span><span class="operator">{</span>
+     <span class="variable">Devel::StackTrace</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>  <span class="comment"># top frame is here.</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provide the following methods:</p>
+
+<h2 id="Devel::StackTrace-new-named_params">Devel::StackTrace-&gt;new(%named_params)</h2>
+
+<p>Returns a new Devel::StackTrace object.</p>
+
+<p>Takes the following parameters:</p>
+
+<ul>
+
+<li><p>frame_filter =&gt; $sub</p>
+
+<p>By default, Devel::StackTrace will include all stack frames before the call to its constructor.</p>
+
+<p>However, you may want to filter out some frames with more granularity than &#39;ignore_package&#39; or &#39;ignore_class&#39; allow.</p>
+
+<p>You can provide a subroutine which is called with the raw frame data for each frame. This is a hash reference with two keys, &quot;caller&quot;, and &quot;args&quot;, both of which are array references. The &quot;caller&quot; key is the raw data as returned by Perl&#39;s <code>caller</code> function, and the &quot;args&quot; key are the subroutine arguments found in <code>@DB::args</code>.</p>
+
+<p>The filter should return true if the frame should be included, or false if it should be skipped.</p>
+
+</li>
+<li><p>filter_frames_early =&gt; $boolean</p>
+
+<p>If this parameter is true, <code>frame_filter</code> will be called as soon as the stacktrace is created, and before refs are stringified (if <code>unsafe_ref_capture</code> is not set), rather than being filtered lazily when <a href="../../lib/Devel/StackTrace/Frame.html">Devel::StackTrace::Frame</a> objects are first needed.</p>
+
+<p>This is useful if you want to filter based on the frame&#39;s arguments and want to be able to examine object properties, for example.</p>
+
+</li>
+<li><p>ignore_package =&gt; $package_name OR \@package_names</p>
+
+<p>Any frames where the package is one of these packages will not be on the stack.</p>
+
+</li>
+<li><p>ignore_class =&gt; $package_name OR \@package_names</p>
+
+<p>Any frames where the package is a subclass of one of these packages (or is the same package) will not be on the stack.</p>
+
+<p>Devel::StackTrace internally adds itself to the &#39;ignore_package&#39; parameter, meaning that the Devel::StackTrace package is <b>ALWAYS</b> ignored. However, if you create a subclass of Devel::StackTrace it will not be ignored.</p>
+
+</li>
+<li><p>skip_frames =&gt; $integer</p>
+
+<p>This will cause this number of stack frames to be excluded from top of the stack trace. This prevents the frames from being captured at all, and applies before the <code>frame_filter</code>, <code>ignore_package</code>, or <code>ignore_class</code> options, even with <code>filter_frames_early</code>.</p>
+
+</li>
+<li><p>unsafe_ref_capture =&gt; $boolean</p>
+
+<p>If this parameter is true, then Devel::StackTrace will store references internally when generating stacktrace frames.</p>
+
+<p><b>This option is very dangerous, and should never be used with exception objects</b>. Using this option will keep any objects or references alive past their normal lifetime, until the stack trace object goes out of scope. It can keep objects alive even after their <code>DESTROY</code> sub is called, resulting it it being called multiple times on the same object.</p>
+
+<p>If not set, Devel::StackTrace replaces any references with their stringified representation.</p>
+
+</li>
+<li><p>no_args =&gt; $boolean</p>
+
+<p>If this parameter is true, then Devel::StackTrace will not store caller arguments in stack trace frames at all.</p>
+
+</li>
+<li><p>respect_overload =&gt; $boolean</p>
+
+<p>By default, Devel::StackTrace will call <code>overload::AddrRef</code> to get the underlying string representation of an object, instead of respecting the object&#39;s stringification overloading. If you would prefer to see the overloaded representation of objects in stack traces, then set this parameter to true.</p>
+
+</li>
+<li><p>max_arg_length =&gt; $integer</p>
+
+<p>By default, Devel::StackTrace will display the entire argument for each subroutine call. Setting this parameter causes truncates each subroutine argument&#39;s string representation if it is longer than this number of characters.</p>
+
+</li>
+<li><p>message =&gt; $string</p>
+
+<p>By default, Devel::StackTrace will use &#39;Trace begun&#39; as the message for the first stack frame when you call <code>as_string</code>. You can supply an alternative message using this option.</p>
+
+</li>
+<li><p>indent =&gt; $boolean</p>
+
+<p>If this parameter is true, each stack frame after the first will start with a tab character, just like <code>Carp::confess</code>.</p>
+
+</li>
+</ul>
+
+<h2 id="trace-next_frame">$trace-&gt;next_frame</h2>
+
+<p>Returns the next <a href="../../lib/Devel/StackTrace/Frame.html">Devel::StackTrace::Frame</a> object on the stack, going down. If this method hasn&#39;t been called before it returns the first frame. It returns <code>undef</code> when it reaches the bottom of the stack and then resets its pointer so the next call to <code>$trace-&gt;next_frame</code> or <code>$trace-&gt;prev_frame</code> will work properly.</p>
+
+<h2 id="trace-prev_frame">$trace-&gt;prev_frame</h2>
+
+<p>Returns the next <a href="../../lib/Devel/StackTrace/Frame.html">Devel::StackTrace::Frame</a> object on the stack, going up. If this method hasn&#39;t been called before it returns the last frame. It returns undef when it reaches the top of the stack and then resets its pointer so the next call to <code>$trace-&gt;next_frame</code> or <code>$trace-&gt;prev_frame</code> will work properly.</p>
+
+<h2 id="trace-reset_pointer">$trace-&gt;reset_pointer</h2>
+
+<p>Resets the pointer so that the next call to <code>$trace-&gt;next_frame</code> or <code>$trace-&gt;prev_frame</code> will start at the top or bottom of the stack, as appropriate.</p>
+
+<h2 id="trace-frames">$trace-&gt;frames</h2>
+
+<p>When this method is called with no arguments, it returns a list of <a href="../../lib/Devel/StackTrace/Frame.html">Devel::StackTrace::Frame</a> objects. They are returned in order from top (most recent) to bottom.</p>
+
+<p>This method can also be used to set the object&#39;s frames if you pass it a list of <a href="../../lib/Devel/StackTrace/Frame.html">Devel::StackTrace::Frame</a> objects.</p>
+
+<p>This is useful if you want to filter the list of frames in ways that are more complex than can be handled by the <code>$trace-&gt;filter_frames</code> method:</p>
+
+<pre><code>  <span class="variable">$stacktrace</span><span class="operator">-&gt;</span><span class="variable">frames</span><span class="operator">(</span> <span class="variable">my_filter</span><span class="operator">(</span> <span class="variable">$stacktrace</span><span class="operator">-&gt;</span><span class="variable">frames</span> <span class="operator">)</span> <span class="operator">);</span>
+</code></pre>
+
+<h2 id="trace-frame-index">$trace-&gt;frame($index)</h2>
+
+<p>Given an index, this method returns the relevant frame, or undef if there is no frame at that index. The index is exactly like a Perl array. The first frame is 0 and negative indexes are allowed.</p>
+
+<h2 id="trace-frame_count">$trace-&gt;frame_count</h2>
+
+<p>Returns the number of frames in the trace object.</p>
+
+<h2 id="trace-as_string-p">$trace-&gt;as_string(\%p)</h2>
+
+<p>Calls <code>$frame-&gt;as_string</code> on each frame from top to bottom, producing output quite similar to the Carp module&#39;s cluck/confess methods.</p>
+
+<p>The optional <code>\%p</code> parameter only has one option. The <code>max_arg_length</code> parameter truncates each subroutine argument&#39;s string representation if it is longer than this number of characters.</p>
+
+<p>If all the frames in a trace are skipped then this just returns the <code>message</code> passed to the constructor or the string <code>&quot;Trace begun&quot;</code>.</p>
+
+<h2 id="trace-message">$trace-&gt;message</h2>
+
+<p>Returns the message passed to the constructor. If this wasn&#39;t passed then this method returns <code>undef</code>.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Devel-StackTrace/issues">https://github.com/houseabsolute/Devel-StackTrace/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Devel-StackTrace can be found at <a href="https://github.com/houseabsolute/Devel-StackTrace">https://github.com/houseabsolute/Devel-StackTrace</a>.</p>
+
+<h1 id="DONATIONS">DONATIONS</h1>
+
+<p>If you&#39;d like to thank me for the work I&#39;ve done on this module, please consider making a &quot;donation&quot; to me via PayPal. I spend a lot of free time creating free software, and would appreciate any support you&#39;d care to offer.</p>
+
+<p>Please note that <b>I am not suggesting that you must do this</b> in order for me to continue working on this particular software. I will continue to do so, inasmuch as I have in the past, for as long as it interests me.</p>
+
+<p>Similarly, a donation made in this way will probably not make me work on this software much more, unless I get so many donations that I can consider working on free software full time (let&#39;s all have a chuckle at that together).</p>
+
+<p>To donate, log into PayPal and send money to autarch@urth.org, or use the button at <a href="http://www.urth.org/~autarch/fs-donation.html">http://www.urth.org/~autarch/fs-donation.html</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Dagfinn Ilmari Manns&aring;ker &lt;ilmari@ilmari.org&gt;</p>
+
+</li>
+<li><p>David Cantrell &lt;david@cantrell.org.uk&gt;</p>
+
+</li>
+<li><p>Graham Knop &lt;haarg@haarg.org&gt;</p>
+
+</li>
+<li><p>Ivan Bessarabov &lt;ivan@bessarabov.ru&gt;</p>
+
+</li>
+<li><p>Mark Fowler &lt;mark@twoshortplanks.com&gt;</p>
+
+</li>
+<li><p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2000 - 2017 by David Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

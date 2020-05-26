@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li>
+    <ul>
+      <li><a href="#NAME">NAME</a></li>
+      <li><a href="#AUTHOR">AUTHOR</a></li>
+      <li><a href="#MODE-hash-of-subs">%_MODE hash of subs</a></li>
+      <li><a href="#subs_offset2-object-offset1-offset2">%subs_offset2($object, $offset1, $offset2)</a></li>
+      <li><a href="#Offset_to_value-object-offset">%Offset_to_value($object, $offset)</a></li>
+      <li><a href="#Init_quantizer-object">%Init_quantizer($object)</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="NAME">NAME</h2>
+
+<p>Set::Infinite::Arithmetic - Scalar operations used by quantize() and offset()</p>
+
+<h2 id="AUTHOR">AUTHOR</h2>
+
+<p>Flavio Soibelmann Glock - fglock@pucrs.br</p>
+
+<h2 id="MODE-hash-of-subs">%_MODE hash of subs</h2>
+
+<pre><code>    <span class="variable">$a</span><span class="operator">-&gt;</span><span class="variable">offset</span> <span class="operator">(</span> <span class="string">value</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">'offset'</span><span class="operator">,</span> <span class="string">unit</span> <span class="operator">=&gt;</span> <span class="string">'days'</span> <span class="operator">);</span>
+    
+    <span class="variable">$a</span><span class="operator">-&gt;</span><span class="variable">offset</span> <span class="operator">(</span> <span class="string">value</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span> <span class="operator">-</span><span class="number">5</span><span class="operator">,-</span><span class="number">4</span><span class="operator">]</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">'offset'</span><span class="operator">,</span> <span class="string">unit</span> <span class="operator">=&gt;</span> <span class="string">'days'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>note: if mode = circle, then &quot;-5&quot; counts from end (like a Perl negative array index).</p>
+
+<pre><code>    <span class="variable">$a</span><span class="operator">-&gt;</span><span class="variable">offset</span> <span class="operator">(</span> <span class="string">value</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">]</span><span class="operator">,</span> <span class="string">mode</span> <span class="operator">=&gt;</span> <span class="string">'offset'</span><span class="operator">,</span> <span class="string">unit</span> <span class="operator">=&gt;</span> <span class="string">'days'</span><span class="operator">,</span> <span class="string">strict</span> <span class="operator">=&gt;</span> <span class="variable">$a</span> <span class="operator">);</span>
+</code></pre>
+
+<p>option &#39;strict&#39; will return intersection($a,offset). Default: none.</p>
+
+<h2 id="subs_offset2-object-offset1-offset2">%subs_offset2($object, $offset1, $offset2)</h2>
+
+<pre><code>    <span class="operator">&amp;{</span> <span class="variable">$subs_offset2</span><span class="operator">{</span><span class="variable">$unit</span><span class="operator">}</span> <span class="operator">}</span> <span class="operator">(</span><span class="variable">$object</span><span class="operator">,</span> <span class="variable">$offset1</span><span class="operator">,</span> <span class="variable">$offset2</span><span class="operator">);</span>
+</code></pre>
+
+<p>A hash of functions that return:</p>
+
+<pre><code>    ($object+$offset1, $object+$offset2)</code></pre>
+
+<p>in $unit context.</p>
+
+<p>Returned $object+$offset1, $object+$offset2 may be scalars or objects.</p>
+
+<h2 id="Offset_to_value-object-offset">%Offset_to_value($object, $offset)</h2>
+
+<h2 id="Init_quantizer-object">%Init_quantizer($object)</h2>
+
+<pre><code>    <span class="variable">$Offset_to_value</span><span class="operator">{</span><span class="variable">$unit</span><span class="operator">}</span> <span class="operator">(</span><span class="variable">$object</span><span class="operator">,</span> <span class="variable">$offset</span><span class="operator">);</span>
+    
+    <span class="variable">$Init_quantizer</span><span class="operator">{</span><span class="variable">$unit</span><span class="operator">}</span> <span class="operator">(</span><span class="variable">$object</span><span class="operator">);</span>
+</code></pre>
+
+<p>Maps an &#39;offset value&#39; to a &#39;value&#39;</p>
+
+<p>A hash of functions that return ( int($object) + $offset ) in $unit context.</p>
+
+<p>Init_quantizer subroutines must be called before using subs_offset1 functions.</p>
+
+<p>int(object)+offset is a scalar.</p>
+
+<p>Offset_to_value is optimized for calling it multiple times on the same object, with different offsets. That&#39;s why there is a separate initialization subroutine.</p>
+
+<p>$self-&gt;{offset} is created on initialization. It is an index used by the memoization cache.</p>
+
+
+</body>
+
+</html>
+
+

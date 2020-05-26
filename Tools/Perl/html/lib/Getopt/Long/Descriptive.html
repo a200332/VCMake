@@ -1,0 +1,367 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#describe_options">describe_options</a>
+        <ul>
+          <li><a href="#usage_desc">$usage_desc</a></li>
+          <li><a href="#opt_spec">@opt_spec</a>
+            <ul>
+              <li><a href="#Special-Option-Specifications">Special Option Specifications</a></li>
+            </ul>
+          </li>
+          <li><a href="#arg">%arg</a></li>
+        </ul>
+      </li>
+      <li><a href="#prog_name">prog_name</a></li>
+    </ul>
+  </li>
+  <li><a href="#OTHER-EXPORTS">OTHER EXPORTS</a>
+    <ul>
+      <li><a href="#types">-types</a></li>
+      <li><a href="#all">-all</a></li>
+    </ul>
+  </li>
+  <li><a href="#CUSTOMIZING">CUSTOMIZING</a>
+    <ul>
+      <li><a href="#usage_class">usage_class</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.100</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Getopt::Long::Descriptive</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$opt</span><span class="operator">,</span> <span class="variable">$usage</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">describe_options</span><span class="operator">(</span>
+    <span class="string">'my-program %o &lt;some-arg&gt;'</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">'server|s=s'</span><span class="operator">,</span> <span class="string">"the server to connect to"</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span>  <span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">'port|p=i'</span><span class="operator">,</span>   <span class="string">"the port to connect to"</span><span class="operator">,</span>   <span class="operator">{</span> <span class="string">default</span>  <span class="operator">=&gt;</span> <span class="number">79</span> <span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">'verbose|v'</span><span class="operator">,</span>  <span class="string">"print extra stuff"</span>            <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">'help'</span><span class="operator">,</span>       <span class="string">"print usage message and exit"</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">shortcircuit</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">print</span><span class="operator">(</span><span class="variable">$usage</span><span class="operator">-&gt;</span><span class="variable">text</span><span class="operator">),</span> <span class="keyword">exit</span> <span class="keyword">if</span> <span class="variable">$opt</span><span class="operator">-&gt;</span><span class="variable">help</span><span class="operator">;</span>
+  
+  <span class="variable">Client</span><span class="operator">-&gt;</span><span class="variable">connect</span><span class="operator">(</span> <span class="variable">$opt</span><span class="operator">-&gt;</span><span class="variable">server</span><span class="operator">,</span> <span class="variable">$opt</span><span class="operator">-&gt;</span><span class="variable">port</span> <span class="operator">);</span>
+  
+  <span class="keyword">print</span> <span class="string">"Connected!\n"</span> <span class="keyword">if</span> <span class="variable">$opt</span><span class="operator">-&gt;</span><span class="variable">verbose</span><span class="operator">;</span>
+</code></pre>
+
+<p>...and running <code>my-program --help</code> will produce:</p>
+
+<pre><code>  my-program [-psv] [long options...] &lt;some-arg&gt;
+    -s --server     the server to connect to
+    -p --port       the port to connect to
+
+    -v --verbose    print extra stuff
+    --help          print usage message and exit</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Getopt::Long::Descriptive is yet another Getopt library. It&#39;s built atop Getopt::Long, and gets a lot of its features, but tries to avoid making you think about its huge array of options.</p>
+
+<p>It also provides usage (help) messages, data validation, and a few other useful features.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<p>Getopt::Long::Descriptive only exports one routine by default: <code>describe_options</code>. All GLD&#39;s exports are exported by <a href="../../../lib/Sub/Exporter.html">Sub::Exporter</a>.</p>
+
+<h2 id="describe_options">describe_options</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$opt</span><span class="operator">,</span> <span class="variable">$usage</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">describe_options</span><span class="operator">(</span><span class="variable">$usage_desc</span><span class="operator">,</span> <span class="variable">@opt_spec</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%arg</span><span class="operator">);</span>
+</code></pre>
+
+<p>This routine inspects <code>@ARGV</code> for options that match the supplied spec. If all the options are valid then it returns the options given and an object for generating usage messages; if not then it dies with an explanation of what was wrong and a usage message.</p>
+
+<p>The <code>$opt</code> object will be a dynamically-generated subclass of <a href="../../../lib/Getopt/Long/Descriptive/Opts.html">Getopt::Long::Descriptive::Opts</a>. In brief, each of the options in <code>@opt_spec</code> becomes an accessor method on the object, using the first-given name, with dashes converted to underscores. For more information, see the documentation for the Opts class.</p>
+
+<p>The <code>$usage</code> object will be a <a href="../../../lib/Getopt/Long/Descriptive/Usage.html">Getopt::Long::Descriptive::Usage</a> object, which provides a <code>text</code> method to get the text of the usage message and <code>die</code> to die with it. For more methods and options, consults the documentation for the Usage class.</p>
+
+<h3 id="usage_desc">$usage_desc</h3>
+
+<p>The <code>$usage_desc</code> parameter to <code>describe_options</code> is a <code>sprintf</code>-like string that is used in generating the first line of the usage message. It&#39;s a one-line summary of how the command is to be invoked. A typical usage description might be:</p>
+
+<pre><code>  <span class="variable">$usage_desc</span> <span class="operator">=</span> <span class="string">"%c %o &lt;source&gt; &lt;desc&gt;"</span><span class="operator">;</span>
+</code></pre>
+
+<p><code>%c</code> will be replaced with what Getopt::Long::Descriptive thinks is the program name (it&#39;s computed from <code>$0</code>, see <a href="#prog_name">&quot;prog_name&quot;</a>).</p>
+
+<p><code>%o</code> will be replaced with a list of the short options, as well as the text &quot;[long options...]&quot; if any have been defined.</p>
+
+<p>The rest of the usage description can be used to summarize what arguments are expected to follow the program&#39;s options, and is entirely free-form.</p>
+
+<p>Literal <code>%</code> characters will need to be written as <code>%%</code>, just like with <code>sprintf</code>.</p>
+
+<h3 id="opt_spec">@opt_spec</h3>
+
+<p>The <code>@opt_spec</code> part of the args to <code>describe_options</code> is used to configure option parsing and to produce the usage message. Each entry in the list is an arrayref describing one option, like this:</p>
+
+<pre><code>  <span class="variable">@opt_spec</span> <span class="operator">=</span> <span class="operator">(</span>
+    <span class="operator">[</span> <span class="string">"verbose|V"</span> <span class="operator">=&gt;</span> <span class="string">"be noisy"</span>       <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">"logfile=s"</span> <span class="operator">=&gt;</span> <span class="string">"file to log to"</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>The first value in the arrayref is a Getopt::Long-style option specification. In brief, they work like this: each one is a pipe-delimited list of names, optionally followed by a type declaration. Type declarations are &#39;=x&#39; or &#39;:x&#39;, where <code>=</code> means a value is required and <code>:</code> means it is optional. <i>x</i> may be &#39;s&#39; to indicate a string is required, &#39;i&#39; for an integer, or &#39;f&#39; for a number with a fractional part. The type spec may end in <code>@</code> to indicate that the option may appear multiple times.</p>
+
+<p>For more information on how these work, see the <a href="../../../lib/Getopt/Long.html">Getopt::Long</a> documentation.</p>
+
+<p>The first name given should be the canonical name, as it will be used as the accessor method on the <code>$opt</code> object. Dashes in the name will be converted to underscores, and all letters will be lowercased. For this reason, all options should generally have a long-form name.</p>
+
+<p>The second value in the arrayref is a description of the option, for use in the usage message.</p>
+
+<h4 id="Special-Option-Specifications">Special Option Specifications</h4>
+
+<p>If the option specification (arrayref) is empty, it will have no effect other than causing a blank line to appear in the usage message.</p>
+
+<p>If the option specification contains only one element, it will be printed in the usage message with no other effect.</p>
+
+<p>If the option specification contains a third element, it adds extra constraints or modifiers to the interpretation and validation of the value. These are the keys that may be present in that hashref, and how they behave:</p>
+
+<dl>
+
+<dt id="implies">implies</dt>
+<dd>
+
+<pre><code>  <span class="string">implies</span> <span class="operator">=&gt;</span> <span class="string">'bar'</span>
+  <span class="string">implies</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw(foo bar)</span><span class="operator">]</span>
+  <span class="string">implies</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">}</span>
+</code></pre>
+
+<p>If option <i>A</i> has an &quot;implies&quot; entry, then if <i>A</i> is given, other options will be enabled. The value may be a single option to set, an arrayref of options to set, or a hashref of options to set to specific values.</p>
+
+</dd>
+<dt id="required">required</dt>
+<dd>
+
+<pre><code>  required =&gt; 1</code></pre>
+
+<p>If an option is required, failure to provide the option will result in <code>describe_options</code> printing the usage message and exiting.</p>
+
+</dd>
+<dt id="hidden">hidden</dt>
+<dd>
+
+<pre><code>  hidden =&gt; 1</code></pre>
+
+<p>This option will not show up in the usage text.</p>
+
+<p>You can achieve the same behavior by using the string &quot;hidden&quot; for the option&#39;s description.</p>
+
+</dd>
+<dt id="one_of">one_of</dt>
+<dd>
+
+<pre><code>  one_of =&gt; \@subopt_specs</code></pre>
+
+<p>This is useful for a group of options that are related. Each option spec is added to the list for normal parsing and validation.</p>
+
+<p>Your option name will end up with a value of the name of the option that was chosen. For example, given the following spec:</p>
+
+<pre><code>  <span class="operator">[</span> <span class="string">"mode"</span> <span class="operator">=&gt;</span> <span class="string">hidden</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">one_of</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+    <span class="operator">[</span> <span class="string">"get|g"</span>  <span class="operator">=&gt;</span> <span class="string">"get the value"</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">"set|s"</span>  <span class="operator">=&gt;</span> <span class="string">"set the value"</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">[</span> <span class="string">"delete"</span> <span class="operator">=&gt;</span> <span class="string">"delete it"</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">]</span> <span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+</code></pre>
+
+<p>No usage text for &#39;mode&#39; will be displayed, but text for get, set, and delete will be displayed.</p>
+
+<p>If more than one of get, set, or delete is given, an error will be thrown.</p>
+
+<p>So, given the <code>@opt_spec</code> above, and an <code>@ARGV</code> of <code>(&#39;--get&#39;)</code>, the following would be true:</p>
+
+<pre><code>  <span class="variable">$opt</span><span class="operator">-&gt;</span><span class="variable">get</span> <span class="operator">==</span> <span class="number">1</span><span class="operator">;</span>
+  
+  <span class="variable">$opt</span><span class="operator">-&gt;</span><span class="variable">mode</span> <span class="keyword">eq</span> <span class="string">'get'</span><span class="operator">;</span>
+</code></pre>
+
+<p><b>Note</b>: <code>get</code> would not be set if <code>mode</code> defaulted to &#39;get&#39; and no arguments were passed in.</p>
+
+<p>Even though the option sub-specs for <code>one_of</code> are meant to be &#39;first class&#39; specs, some options don&#39;t make sense with them, e.g. <code>required</code>.</p>
+
+<p>As a further shorthand, you may specify <code>one_of</code> options using this form:</p>
+
+<pre><code>  [ mode =&gt; \@option_specs, \%constraints ]</code></pre>
+
+</dd>
+<dt id="shortcircuit">shortcircuit</dt>
+<dd>
+
+<pre><code>  shortcircuit =&gt; 1</code></pre>
+
+<p>If this option is present no other options will be returned. Other options present will be checked for proper types, but <i>not</i> for constraints. This provides a way of specifying <code>--help</code> style options.</p>
+
+</dd>
+<dt id="Params::Validate">Params::Validate</dt>
+<dd>
+
+<p>In addition, any constraint understood by Params::Validate may be used.</p>
+
+<p>For example, to accept positive integers:</p>
+
+<pre><code>  <span class="operator">[</span> <span class="string">'max-iterations=i'</span><span class="operator">,</span> <span class="string">"maximum number of iterations"</span><span class="operator">,</span>
+    <span class="operator">{</span> <span class="string">callbacks</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">positive</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">shift</span><span class="operator">()</span> <span class="operator">&gt;</span> <span class="number">0</span> <span class="operator">}</span> <span class="operator">}</span> <span class="operator">}</span> <span class="operator">]</span><span class="operator">,</span>
+</code></pre>
+
+<p>(Internally, all constraints are translated into Params::Validate options or callbacks.)</p>
+
+</dd>
+</dl>
+
+<h3 id="arg">%arg</h3>
+
+<p>The <code>%arg</code> to <code>describe_options</code> is optional. If the last parameter is a hashref, it contains extra arguments to modify the way <code>describe_options</code> works. Valid arguments are:</p>
+
+<pre><code>  getopt_conf   - an arrayref of strings, passed to Getopt::Long::Configure
+  show_defaults - a boolean which controls whether an option&#39;s default
+                  value (if applicable) is shown as part of the usage message
+                  (for backward compatibility this defaults to false)</code></pre>
+
+<h2 id="prog_name">prog_name</h2>
+
+<p>This routine, exported on demand, returns the basename of <code>$0</code>, grabbed at compile-time. You can override this guess by calling <code>prog_name($string)</code> yourself.</p>
+
+<h1 id="OTHER-EXPORTS">OTHER EXPORTS</h1>
+
+<h2 id="types"><code>-types</code></h2>
+
+<p>Any of the Params::Validate type constants (<code>SCALAR</code>, etc.) can be imported as well. You can get all of them at once by importing <code>-types</code>.</p>
+
+<h2 id="all"><code>-all</code></h2>
+
+<p>This import group will import <code>-type</code>, <code>describe_options</code>, and <code>prog_name</code>.</p>
+
+<h1 id="CUSTOMIZING">CUSTOMIZING</h1>
+
+<p>Getopt::Long::Descriptive uses <a href="../../../lib/Sub/Exporter.html">Sub::Exporter</a> to build and export the <code>describe_options</code> routine. By writing a new class that extends Getopt::Long::Descriptive, the behavior of the constructed <code>describe_options</code> routine can be changed.</p>
+
+<p>The following methods can be overridden:</p>
+
+<h2 id="usage_class">usage_class</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="variable">Getopt::Long::Descriptive</span><span class="operator">-&gt;</span><span class="variable">usage_class</span><span class="operator">;</span>
+</code></pre>
+
+<p>This returns the class to be used for constructing a Usage object, and defaults to Getopt::Long::Descriptive::Usage.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<ul>
+
+<li><p><a href="../../../lib/Getopt/Long.html">Getopt::Long</a></p>
+
+</li>
+<li><p><a href="../../../lib/Params/Validate.html">Params::Validate</a></p>
+
+</li>
+</ul>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Hans Dieter Pearcey &lt;hdp@cpan.org&gt;</p>
+
+</li>
+<li><p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Arthur Axel &#39;fREW&#39; Schmidt &lt;frioux@gmail.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Diab Jerius &lt;djerius@cfa.harvard.edu&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@pobox.com&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Harley Pig &lt;harleypig@gmail.com&gt;</p>
+
+</li>
+<li><p>hdp@cpan.org &lt;hdp@cpan.org@fc0e91e4-031c-0410-8307-be39b06d7656&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Niels Thykier &lt;niels@thykier.net&gt;</p>
+
+</li>
+<li><p>Olaf Alders &lt;olaf@wundersolutions.com&gt;</p>
+
+</li>
+<li><p>Roman Hubacek &lt;roman.hubacek@centrum.cz&gt;</p>
+
+</li>
+<li><p>Smylers &lt;SMYLERS@cpan.fsck.com&gt;</p>
+
+</li>
+<li><p>Thomas Neumann &lt;blacky+perl@fluffbunny.de&gt;</p>
+
+</li>
+<li><p>zhouzhen1 &lt;zhouzhen1@gmail.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2005 by Hans Dieter Pearcey.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

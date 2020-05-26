@@ -1,0 +1,260 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#GD::Text-new-attrib-value">GD::Text-&gt;new( attrib =&gt; value, ... )</a></li>
+      <li><a href="#GD::Text::error-or-gd_text-error">GD::Text::error() or $gd_text-&gt;error();</a></li>
+      <li><a href="#gd_text-set_font-font-size">$gd_text-&gt;set_font( font, size )</a></li>
+      <li><a href="#gd_text-set_text-some-text">$gd_text-&gt;set_text(&#39;some text&#39;)</a></li>
+      <li><a href="#gd_text-set-attrib-value">$gd_text-&gt;set( attrib =&gt; value, ... )</a></li>
+      <li><a href="#gd_text-get-attrib">$gd_text-&gt;get( attrib, ... )</a></li>
+      <li><a href="#gd_text-width-string">$gd_text-&gt;width(&#39;string&#39;)</a></li>
+      <li><a href="#gd_text-is_builtin">$gd_text-&gt;is_builtin</a></li>
+      <li><a href="#gd_text-is_ttf">$gd_text-&gt;is_ttf</a></li>
+      <li><a href="#gd_text-can_do_ttf-or-GD::Text-can_do_ttf">$gd_text-&gt;can_do_ttf() or GD::Text-&gt;can_do_ttf()</a></li>
+      <li><a href="#gd_text-font_path-path_spec-GD::Text-font_path-path_spec">$gd_text-&gt;font_path(path_spec), GD::Text-&gt;font_path(path_spec)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>GD::Text - Text utilities for use with GD</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">GD</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">GD::Text</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$gd_text</span> <span class="operator">=</span> <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">()</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">GD::Text::error</span><span class="operator">();</span>
+  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_font</span><span class="operator">(</span><span class="string">'funny.ttf'</span><span class="operator">,</span> <span class="number">12</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">error</span><span class="operator">;</span>
+  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_font</span><span class="operator">(</span><span class="variable">gdTinyFont</span><span class="operator">);</span>
+  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_font</span><span class="operator">(</span><span class="variable">GD::Font::Tiny</span><span class="operator">);</span>
+  <span class="operator">...</span>
+  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_text</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$w</span><span class="operator">,</span> <span class="variable">$h</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">get</span><span class="operator">(</span><span class="string">'width'</span><span class="operator">,</span> <span class="string">'height'</span><span class="operator">);</span>
+  
+  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">is_ttf</span><span class="operator">)</span>
+  <span class="operator">{</span>
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Or alternatively</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$gd_text</span> <span class="operator">=</span> <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">text</span> <span class="operator">=&gt;</span> <span class="string">'Some text'</span><span class="operator">,</span>
+        <span class="string">font</span> <span class="operator">=&gt;</span> <span class="string">'funny.ttf'</span><span class="operator">,</span>
+        <span class="string">ptsize</span> <span class="operator">=&gt;</span> <span class="number">14</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a font-independent way of dealing with text in GD, for use with the GD::Text::* modules and GD::Graph.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>As with all Modules for Perl: Please stick to using the interface. If you try to fiddle too much with knowledge of the internals of this module, you could get burned. I may change them at any time.</p>
+
+<p>You can only use TrueType fonts with version of GD &gt; 1.20, and then only if compiled with support for this. If you attempt to do it anyway, you will get errors.</p>
+
+<p>If you want to refer to builtin GD fonts by their short name (<code>gdTinyFont</code>, <code>gdGiantFont</code>), you will need to <code>use</code> the GD module as well as one the GD::Text modules, because it is GD that exports those names into your name space. If you don&#39;t like that, use the longer alternatives (<code>GD::Font-</code>Giant&gt;) instead.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="GD::Text-new-attrib-value">GD::Text-&gt;new( attrib =&gt; value, ... )</h2>
+
+<p>Create a new object. See the <code>set()</code> method for attributes.</p>
+
+<h2 id="GD::Text::error-or-gd_text-error">GD::Text::error() or $gd_text-&gt;error();</h2>
+
+<p>Return the last error that occured in the class. This may be imperfect.</p>
+
+<h2 id="gd_text-set_font-font-size">$gd_text-&gt;set_font( font, size )</h2>
+
+<p>Set the font to use for this string. The arguments are either a GD builtin font (like gdSmallFont or GD::Font-&gt;Small) or the name of a TrueType font file and the size of the font to use. See also <a href="#font_path">&quot;font_path&quot;</a>.</p>
+
+<p>If you are not using an absolute path to the font file, you can leave of the .ttf file extension, but you have to append it for absolute paths:</p>
+
+<pre><code>  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_font</span><span class="operator">(</span><span class="string">'arial'</span><span class="operator">,</span> <span class="number">12</span><span class="operator">);</span>
+  <span class="comment"># but</span>
+  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_font</span><span class="operator">(</span><span class="string">'/usr/fonts/arial.ttf'</span><span class="operator">,</span> <span class="number">12</span><span class="operator">);</span>
+</code></pre>
+
+<p>The first argument can be a reference to an array of fonts. The first font from the array that can be found will be used. This allows you to do something like</p>
+
+<pre><code>  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">font_path</span><span class="operator">(</span> <span class="string">'/usr/share/fonts:/usr/fonts'</span><span class="operator">);</span>
+  <span class="variable">$gd_text</span><span class="operator">-&gt;</span><span class="variable">set_font</span><span class="operator">(</span>
+    <span class="operator">[</span><span class="string">'verdana'</span><span class="operator">,</span> <span class="string">'arial'</span><span class="operator">,</span> <span class="variable">gdMediumBoldFont</span><span class="operator">]</span><span class="operator">,</span> <span class="number">14</span><span class="operator">);</span>
+</code></pre>
+
+<p>if you&#39;d prefer verdana to be used, would be satisfied with arial, but if none of that is available just want to make sure you can fall back on something that will be available.</p>
+
+<p>Returns true on success, false on error.</p>
+
+<h2 id="gd_text-set_text-some-text">$gd_text-&gt;set_text(&#39;some text&#39;)</h2>
+
+<p>Set the text to operate on. Returns true on success and false on error.</p>
+
+<h2 id="gd_text-set-attrib-value">$gd_text-&gt;set( attrib =&gt; value, ... )</h2>
+
+<p>The set method provides a convenience replacement for the various other <code>set_xxx()</code> methods. Valid attributes are:</p>
+
+<dl>
+
+<dt id="text">text</dt>
+<dd>
+
+<p>The text to operate on, see also <code>set_text()</code>.</p>
+
+</dd>
+<dt id="font-ptsize">font, ptsize</dt>
+<dd>
+
+<p>The font to use and the point size. The point size is only used for TrueType fonts. Also see <code>set_font()</code>.</p>
+
+</dd>
+</dl>
+
+<p>Returns true on success, false on any error, even if it was partially successful. When an error is returned, no guarantees are given about the correctness of the attributes.</p>
+
+<h2 id="gd_text-get-attrib">$gd_text-&gt;get( attrib, ... )</h2>
+
+<p>Get the value of an attribute. Return a list of the attribute values in list context, and the value of the first attribute in scalar context.</p>
+
+<p>The attributes that can be retrieved are all the ones that can be set, and:</p>
+
+<dl>
+
+<dt id="width-height">width, height</dt>
+<dd>
+
+<p>The width (height) of the string in pixels</p>
+
+</dd>
+<dt id="space">space</dt>
+<dd>
+
+<p>The width of a space in pixels</p>
+
+</dd>
+<dt id="char_up-char_down">char_up, char_down</dt>
+<dd>
+
+<p>The number of pixels that a character can stick out above and below the baseline. Note that this is only useful for TrueType fonts. For builtins char_up is equal to height, and char_down is always 0.</p>
+
+</dd>
+</dl>
+
+<p>Note that some of these parameters (char_up, char_down and space) are generic font properties, and not necessarily a property of the text that is set.</p>
+
+<h2 id="gd_text-width-string">$gd_text-&gt;width(&#39;string&#39;)</h2>
+
+<p>Return the length of a string in pixels, without changing the current value of the text. Returns the width of &#39;string&#39; rendered in the current font and size. On failure, returns undef.</p>
+
+<p>The use of this method is vaguely deprecated.</p>
+
+<h2 id="gd_text-is_builtin">$gd_text-&gt;is_builtin</h2>
+
+<p>Returns true if the current object is based on a builtin GD font.</p>
+
+<h2 id="gd_text-is_ttf">$gd_text-&gt;is_ttf</h2>
+
+<p>Returns true if the current object is based on a TrueType font.</p>
+
+<h2 id="gd_text-can_do_ttf-or-GD::Text-can_do_ttf">$gd_text-&gt;can_do_ttf() or GD::Text-&gt;can_do_ttf()</h2>
+
+<p>Return true if this object can handle TTF fonts.</p>
+
+<p>This depends on whether your version of GD is newer than 1.19 and has TTF support compiled into it.</p>
+
+<h2 id="gd_text-font_path-path_spec-GD::Text-font_path-path_spec">$gd_text-&gt;font_path(path_spec), GD::Text-&gt;font_path(path_spec)</h2>
+
+<p>This sets the font path for the <i>class</i> (i.e. not just for the object). The <code>set_font</code> method will search this path to find the font specified if it is a TrueType font. It should contain a list of paths. The current directory is always searched first, unless &#39;.&#39; is present in FONT_PATH. Examples:</p>
+
+<pre><code>  <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">font_path</span><span class="operator">(</span><span class="string">'/usr/ttfonts'</span><span class="operator">);</span> <span class="comment"># Unix</span>
+  <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">font_path</span><span class="operator">(</span><span class="string">'c:/fonts'</span><span class="operator">);</span>     <span class="comment"># MS-OS</span>
+</code></pre>
+
+<p>Any font name that is not an absolute path will first be looked for in the current directory, and then in /usr/ttfonts (c:\fonts).</p>
+
+<pre><code>  <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">font_path</span><span class="operator">(</span><span class="string">'/usr/ttfonts:.:lib/fonts'</span><span class="operator">);</span> <span class="comment"># Unix</span>
+  <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">font_path</span><span class="operator">(</span><span class="string">'c:/fonts;.;f:/fonts'</span><span class="operator">);</span>      <span class="comment"># MS-OS</span>
+</code></pre>
+
+<p>Any font name that is not an absolute path will first be looked for in /usr/ttfonts (c:\fonts), then in the current directory. and then in lib/fonts (f:\fonts), relative to the current directory.</p>
+
+<pre><code>  <span class="variable">GD::Text</span><span class="operator">-&gt;</span><span class="variable">font_path</span><span class="operator">(</span><span class="keyword">undef</span><span class="operator">);</span>
+</code></pre>
+
+<p>Font files are only looked for in the current directory.</p>
+
+<p>FONT_PATH is initialised at module load time from the environment variables FONT_PATH or, if that&#39;s not present, TTF_FONT_PATH, or TT_FONT_PATH.</p>
+
+<p>Returns the value the font path is set to. If called without arguments <code>font_path</code> returns the current font path.</p>
+
+<p>Note: This currently only works for unices, and (hopefully) for Microsoft based OS&#39;s. If anyone feels the urge to have a look at the code, and send me patches for their OS, I&#39;d be most grateful)</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>This module has only been tested with anglo-centric &#39;normal&#39; fonts and encodings. Fonts that have other characteristics may not work well. If that happens, please let me know how to make this work better.</p>
+
+<p>The font height gets estimated by building a string with all printable characters (with an ordinal value between 0 and 255) that pass the POSIX::isprint() test (and not the isspace() test). If your system doesn&#39;t have POSIX, I make an approximation that may be false. Under Perl 5.8.0 the [[:print:]] character class is used, since the POSIX is*() functions don&#39;t seem to work correctly.</p>
+
+<p>The whole font path thing works well on Unix, but probably not very well on other OS&#39;s. This is only a problem if you try to use a font path. If you don&#39;t use a font path, there should never be a problem. I will try to expand this in the future, but only if there&#39;s a demand for it. Suggestions welcome.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>copyright 1999 Martien Verbruggen (mgjv@comdyn.com.au)</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>GD(3), GD::Text::Wrap(3), GD::Text::Align(3)</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-197">Around line 197:</dt>
+<dd>
+
+<p>=pod directives shouldn&#39;t be over one line long!  Ignoring all 20 lines of content</p>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

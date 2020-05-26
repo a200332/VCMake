@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ValuesAndExpressions::ProhibitInterpolationOfLiterals - Always use single quotes for literal strings.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Don&#39;t use double-quotes or <code>qq//</code> if your string doesn&#39;t require interpolation. This saves the interpreter a bit of work and it lets the reader know that you really did intend the string to be literal.</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="string">"foobar"</span><span class="operator">;</span>     <span class="comment">#not ok</span>
+    <span class="keyword">print</span> <span class="string">'foobar'</span><span class="operator">;</span>     <span class="comment">#ok</span>
+    <span class="keyword">print</span> <span class="string">qq/foobar/</span><span class="operator">;</span>   <span class="comment">#not ok</span>
+    <span class="keyword">print</span> <span class="string">q/foobar/</span><span class="operator">;</span>    <span class="comment">#ok</span>
+    
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$foobar</span><span class="string">"</span><span class="operator">;</span>    <span class="comment">#ok</span>
+    <span class="keyword">print</span> <span class="string">"foobar\n"</span><span class="operator">;</span>   <span class="comment">#ok</span>
+    <span class="keyword">print</span> <span class="string">qq/</span><span class="variable">$foobar</span><span class="string">/</span><span class="operator">;</span>  <span class="comment">#ok</span>
+    <span class="keyword">print</span> <span class="string">qq/foobar\n/</span><span class="operator">;</span> <span class="comment">#ok</span>
+    
+    <span class="keyword">print</span> <span class="string">qq{</span><span class="variable">$foobar</span><span class="string">}</span><span class="operator">;</span>  <span class="comment">#preferred</span>
+    <span class="keyword">print</span> <span class="string">qq{foobar\n}</span><span class="operator">;</span> <span class="comment">#preferred</span>
+</code></pre>
+
+<p>Use of double-quotes might be reasonable if the string contains single quote (&#39;) characters:</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="string">"it's me"</span><span class="operator">;</span>    <span class="comment"># ok, if configuration flag set</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>The types of quoting styles to exempt from this policy can be configured via the <code>allow</code> option. This must be a whitespace-delimited combination of some or all of the following styles: <code><span class="string">qq{}</span>
+</code>, <code>qq()</code>, <code>qq[]</code>, and <code>qq//</code>.</p>
+
+<p>This is useful because some folks have configured their editor to apply special syntax highlighting within certain styles of quotes. For example, you can tweak <code>vim</code> to use SQL highlighting for everything that appears within <code><span class="string">qq{}</span>
+</code> or <code>qq[]</code> quotes. But if those strings are literal, Perl::Critic will complain. To prevent this, put the following in your <i>.perlcriticrc</i> file:</p>
+
+<pre><code>    <span class="operator">[</span><span class="variable">ValuesAndExpressions::ProhibitInterpolationOfLiterals</span><span class="operator">]</span>
+    <span class="variable">allow</span> <span class="operator">=</span> <span class="string">qq{}</span> <span class="string">qq[]</span>
+</code></pre>
+
+<p>The flag <code>allow_if_string_contains_single_quote</code> permits double-quoted strings if the string contains a single quote (&#39;) character. It defaults to off; to turn it on put the following in your <i>.perlcriticrc</i> file:</p>
+
+<pre><code>    [ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+    allow_if_string_contains_single_quote = 1</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../../lib/Perl/Critic/Policy/ValuesAndExpressions/RequireInterpolationOfMetachars.html">Perl::Critic::Policy::ValuesAndExpressions::RequireInterpolationOfMetachars</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,31 @@
+diff --git "a/CMakeLists.txt" "b/CMakeLists.txt"
+index 89fc301c..4826fdeb 100644
+--- "a/CMakeLists.txt"
++++ "b/CMakeLists.txt"
+@@ -405,7 +405,7 @@ endif()
+ if(WEBP_BUILD_GIF2WEBP OR WEBP_BUILD_IMG2WEBP)
+   parse_makefile_am(${CMAKE_CURRENT_SOURCE_DIR}/src/mux "WEBP_MUX_SRCS" "")
+   add_library(libwebpmux ${WEBP_MUX_SRCS})
+-  target_link_libraries(libwebpmux webp)
++  target_link_libraries(libwebpmux webp liblzma zstd)
+   target_include_directories(libwebpmux
+                              PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+                                      ${CMAKE_CURRENT_SOURCE_DIR})
+@@ -451,6 +451,8 @@ if(WEBP_BUILD_IMG2WEBP)
+                         exampleutil
+                         imagedec
+                         imageioutil
++                        liblzma
++                        zstd
+                         webp
+                         libwebpmux)
+   target_include_directories(img2webp PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src)
+@@ -515,7 +517,7 @@ if(WEBP_BUILD_EXTRAS)
+ 
+   # get_disto
+   add_executable(get_disto ${GET_DISTO_SRCS})
+-  target_link_libraries(get_disto imagedec)
++  target_link_libraries(get_disto imagedec liblzma zstd)
+   target_include_directories(get_disto
+                              PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+                                      ${CMAKE_CURRENT_SOURCE_DIR}/src

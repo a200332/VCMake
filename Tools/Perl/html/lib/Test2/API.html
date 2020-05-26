@@ -1,0 +1,925 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#INTERNALS-NOTE">***INTERNALS NOTE***</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a>
+    <ul>
+      <li><a href="#WRITING-A-TOOL">WRITING A TOOL</a></li>
+      <li><a href="#TESTING-YOUR-TOOLS">TESTING YOUR TOOLS</a>
+        <ul>
+          <li><a href="#DEEP-EVENT-INTERCEPTION">DEEP EVENT INTERCEPTION</a></li>
+        </ul>
+      </li>
+      <li><a href="#OTHER-API-FUNCTIONS">OTHER API FUNCTIONS</a></li>
+    </ul>
+  </li>
+  <li><a href="#MAIN-API-EXPORTS">MAIN API EXPORTS</a>
+    <ul>
+      <li><a href="#context">context(...)</a>
+        <ul>
+          <li><a href="#OPTIONAL-PARAMETERS">OPTIONAL PARAMETERS</a></li>
+        </ul>
+      </li>
+      <li><a href="#release">release($;$)</a></li>
+      <li><a href="#context_do">context_do(&amp;;@)</a></li>
+      <li><a href="#no_context">no_context(&amp;;$)</a></li>
+      <li><a href="#intercept">intercept(&amp;)</a></li>
+      <li><a href="#run_subtest">run_subtest(...)</a>
+        <ul>
+          <li><a href="#ARGUMENTS">ARGUMENTS:</a></li>
+          <li><a href="#BUFFERED-VS-UNBUFFERED-OR-STREAMED">BUFFERED VS UNBUFFERED (OR STREAMED)</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#OTHER-API-EXPORTS">OTHER API EXPORTS</a>
+    <ul>
+      <li><a href="#STATUS-AND-INITIALIZATION-STATE">STATUS AND INITIALIZATION STATE</a></li>
+      <li><a href="#BEHAVIOR-HOOKS">BEHAVIOR HOOKS</a></li>
+      <li><a href="#IPC-AND-CONCURRENCY">IPC AND CONCURRENCY</a></li>
+      <li><a href="#MANAGING-FORMATTERS">MANAGING FORMATTERS</a></li>
+    </ul>
+  </li>
+  <li><a href="#OTHER-EXAMPLES">OTHER EXAMPLES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#MAGIC">MAGIC</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::API - Primary interface for writing Test2 based testing tools.</p>
+
+<h1 id="INTERNALS-NOTE">***INTERNALS NOTE***</h1>
+
+<p><b>The internals of this package are subject to change at any time!</b> The public methods provided will not change in backwards-incompatible ways (once there is a stable release), but the underlying implementation details might. <b>Do not break encapsulation here!</b></p>
+
+<p>Currently the implementation is to create a single instance of the <a href="../../lib/Test2/API/Instance.html">Test2::API::Instance</a> Object. All class methods defer to the single instance. There is no public access to the singleton, and that is intentional. The class methods provided by this package provide the only functionality publicly exposed.</p>
+
+<p>This is done primarily to avoid the problems Test::Builder had by exposing its singleton. We do not want anyone to replace this singleton, rebless it, or directly muck with its internals. If you need to do something and cannot because of the restrictions placed here, then please report it as an issue. If possible, we will create a way for you to implement your functionality without exposing things that should not be exposed.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package exports all the functions necessary to write and/or verify testing tools. Using these building blocks you can begin writing test tools very quickly. You are also provided with tools that help you to test the tools you write.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<h2 id="WRITING-A-TOOL">WRITING A TOOL</h2>
+
+<p>The <code>context()</code> method is your primary interface into the Test2 framework.</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">My::Ok</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context/</span><span class="operator">;</span>
+    
+    <span class="keyword">our</span> <span class="variable">@EXPORT</span> <span class="operator">=</span> <span class="string">qw/my_ok/</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Exporter'</span><span class="operator">;</span>
+    
+    <span class="comment"># Just like ok() from Test::More</span>
+    <span class="keyword">sub</span><span class="variable"> my_ok</span><span class="operator">(</span>$;$<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span> <span class="comment"># Get a context</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">ok</span><span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">);</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span> <span class="comment"># Release the context</span>
+        <span class="keyword">return</span> <span class="variable">$bool</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>See <a href="../../lib/Test2/API/Context.html">Test2::API::Context</a> for a list of methods available on the context object.</p>
+
+<h2 id="TESTING-YOUR-TOOLS">TESTING YOUR TOOLS</h2>
+
+<p>The <code><span class="variable">intercept</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> tool lets you temporarily intercept all events generated by the test system:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/intercept/</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">My::Ok</span> <span class="string">qw/my_ok/</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$events</span> <span class="operator">=</span> <span class="variable">intercept</span> <span class="operator">{</span>
+        <span class="comment"># These events are not displayed</span>
+        <span class="variable">my_ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+        <span class="variable">my_ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"fail"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">my_ok</span><span class="operator">(</span><span class="variable">@$events</span> <span class="operator">==</span> <span class="number">2</span><span class="operator">,</span> <span class="string">"got 2 events, the pass and the fail"</span><span class="operator">);</span>
+    <span class="variable">my_ok</span><span class="operator">(</span><span class="variable">$events</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">pass</span><span class="operator">,</span> <span class="string">"first event passed"</span><span class="operator">);</span>
+    <span class="variable">my_ok</span><span class="operator">(!</span><span class="variable">$events</span><span class="operator">-&gt;</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">pass</span><span class="operator">,</span> <span class="string">"second event failed"</span><span class="operator">);</span>
+</code></pre>
+
+<h3 id="DEEP-EVENT-INTERCEPTION">DEEP EVENT INTERCEPTION</h3>
+
+<p>Normally <code><span class="variable">intercept</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> only intercepts events sent to the main hub (as added by intercept itself). Nested hubs, such as those created by subtests, will not be intercepted. This is normally what you will still see the nested events by inspecting the subtest event. However there are times where you want to verify each event as it is sent, in that case use <code><span class="variable">intercept_deep</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code>.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$events</span> <span class="operator">=</span> <span class="variable">intercept_Deep</span> <span class="operator">{</span>
+        <span class="variable">buffered_subtest</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+        <span class="operator">};</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p><code>$events</code> in this case will contain 3 items:</p>
+
+<dl>
+
+<dt id="The-event-from-ok-1-pass">The event from <code>ok(1, &quot;pass&quot;)</code></dt>
+<dd>
+
+</dd>
+<dt id="The-plan-event-for-the-subtest">The plan event for the subtest</dt>
+<dd>
+
+</dd>
+<dt id="The-subtest-event-itself-with-the-first-2-events-nested-inside-it-as-children">The subtest event itself, with the first 2 events nested inside it as children.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>This lets you see the order in which the events were sent, unlike <code><span class="variable">intercept</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code> which only lets you see events as the main hub sees them.</p>
+
+<h2 id="OTHER-API-FUNCTIONS">OTHER API FUNCTIONS</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw{
+        test2_init_done
+        test2_stack
+        test2_set_is_end
+        test2_get_is_end
+        test2_ipc
+        test2_formatter_set
+        test2_formatter
+    }</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$init</span>  <span class="operator">=</span> <span class="variable">test2_init_done</span><span class="operator">();</span>
+    <span class="keyword">my</span> <span class="variable">$stack</span> <span class="operator">=</span> <span class="variable">test2_stack</span><span class="operator">();</span>
+    <span class="keyword">my</span> <span class="variable">$ipc</span>   <span class="operator">=</span> <span class="variable">test2_ipc</span><span class="operator">();</span>
+    
+    <span class="variable">test2_formatter_set</span><span class="operator">(</span><span class="variable">$FORMATTER</span><span class="operator">)</span>
+    <span class="keyword">my</span> <span class="variable">$formatter</span> <span class="operator">=</span> <span class="variable">test2_formatter</span><span class="operator">();</span>
+    
+    <span class="operator">...</span> <span class="variable">And</span> <span class="variable">others</span> <span class="operator">...</span>
+</code></pre>
+
+<h1 id="MAIN-API-EXPORTS">MAIN API EXPORTS</h1>
+
+<p>All exports are optional. You must specify subs to import.</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context intercept run_subtest/</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is the list of exports that are most commonly needed. If you are simply writing a tool, then this is probably all you need. If you need something and you cannot find it here, then you can also look at <a href="#OTHER-API-EXPORTS">&quot;OTHER API EXPORTS&quot;</a>.</p>
+
+<p>These exports lack the &#39;test2_&#39; prefix because of how important/common they are. Exports in the <a href="#OTHER-API-EXPORTS">&quot;OTHER API EXPORTS&quot;</a> section have the &#39;test2_&#39; prefix to ensure they stand out.</p>
+
+<h2 id="context">context(...)</h2>
+
+<p>Usage:</p>
+
+<dl>
+
+<dt id="ctx-context">$ctx = context()</dt>
+<dd>
+
+</dd>
+<dt id="ctx-context-params">$ctx = context(%params)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>The <code>context()</code> function will always return the current context. If there is already a context active, it will be returned. If there is not an active context, one will be generated. When a context is generated it will default to using the file and line number where the currently running sub was called from.</p>
+
+<p>Please see <a href="../../lib/Test2/API/Context.html#CRITICAL-DETAILS">&quot;CRITICAL DETAILS&quot; in Test2::API::Context</a> for important rules about what you can and cannot do with a context once it is obtained.</p>
+
+<p><b>Note</b> This function will throw an exception if you ignore the context object it returns.</p>
+
+<p><b>Note</b> On perls 5.14+ a depth check is used to insure there are no context leaks. This cannot be safely done on older perls due to <a href="https://rt.perl.org/Public/Bug/Display.html?id=127774">https://rt.perl.org/Public/Bug/Display.html?id=127774</a> You can forcefully enable it either by setting <code><span class="variable">$ENV</span><span class="operator">{</span><span class="string">T2_CHECK_DEPTH</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1</span>
+</code> or <code>$Test2::API::DO_DEPTH_CHECK = 1</code> <b>BEFORE</b> loading <a href="../../lib/Test2/API.html">Test2::API</a>.</p>
+
+<h3 id="OPTIONAL-PARAMETERS">OPTIONAL PARAMETERS</h3>
+
+<p>All parameters to <code>context</code> are optional.</p>
+
+<dl>
+
+<dt id="level-int">level =&gt; $int</dt>
+<dd>
+
+<p>If you must obtain a context in a sub deeper than your entry point you can use this to tell it how many EXTRA stack frames to look back. If this option is not provided the default of <code>0</code> is used.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> third_party_tool </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$sub</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="operator">...</span> <span class="comment"># Does not obtain a context</span>
+        <span class="variable">$sub</span><span class="operator">-&gt;();</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">third_party_tool</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">(</span><span class="string">level</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+        <span class="operator">...</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">});</span>
+</code></pre>
+
+</dd>
+<dt id="wrapped-int">wrapped =&gt; $int</dt>
+<dd>
+
+<p>Use this if you need to write your own tool that wraps a call to <code>context()</code> with the intent that it should return a context object.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> my_context </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">%params</span> <span class="operator">=</span> <span class="operator">(</span> <span class="string">wrapped</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span> <span class="variable">@_</span> <span class="operator">);</span>
+        <span class="variable">$params</span><span class="operator">{</span><span class="string">wrapped</span><span class="operator">}</span><span class="operator">++;</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">(</span><span class="variable">%params</span><span class="operator">);</span>
+        <span class="operator">...</span>
+        <span class="keyword">return</span> <span class="variable">$ctx</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_tool </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">my_context</span><span class="operator">();</span>
+        <span class="operator">...</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>If you do not do this, then tools you call that also check for a context will notice that the context they grabbed was created at the same stack depth, which will trigger protective measures that warn you and destroy the existing context.</p>
+
+</dd>
+<dt id="stack-stack">stack =&gt; $stack</dt>
+<dd>
+
+<p>Normally <code>context()</code> looks at the global hub stack. If you are maintaining your own <a href="../../lib/Test2/API/Stack.html">Test2::API::Stack</a> instance you may pass it in to be used instead of the global one.</p>
+
+</dd>
+<dt id="hub-hub">hub =&gt; $hub</dt>
+<dd>
+
+<p>Use this parameter if you want to obtain the context for a specific hub instead of whatever one happens to be at the top of the stack.</p>
+
+</dd>
+<dt id="on_init-sub">on_init =&gt; sub { ... }</dt>
+<dd>
+
+<p>This lets you provide a callback sub that will be called <b>ONLY</b> if your call to <code>context()</code> generated a new context. The callback <b>WILL NOT</b> be called if <code>context()</code> is returning an existing context. The only argument passed into the callback will be the context object itself.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">(</span><span class="string">on_init</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'will run'</span> <span class="operator">});</span>
+    
+        <span class="keyword">my</span> <span class="variable">$inner</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="comment"># This callback is not run since we are getting the existing</span>
+            <span class="comment"># context from our parent sub.</span>
+            <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">(</span><span class="string">on_init</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'will NOT run'</span> <span class="operator">});</span>
+            <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">$inner</span><span class="operator">-&gt;();</span>
+    
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="on_release-sub">on_release =&gt; sub { ... }</dt>
+<dd>
+
+<p>This lets you provide a callback sub that will be called when the context instance is released. This callback will be added to the returned context even if an existing context is returned. If multiple calls to context add callbacks, then all will be called in reverse order when the context is finally released.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">(</span><span class="string">on_release</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'will run second'</span> <span class="operator">});</span>
+    
+        <span class="keyword">my</span> <span class="variable">$inner</span> <span class="operator">=</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">(</span><span class="string">on_release</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="string">'will run first'</span> <span class="operator">});</span>
+    
+            <span class="comment"># Neither callback runs on this release</span>
+            <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">$inner</span><span class="operator">-&gt;();</span>
+    
+        <span class="comment"># Both callbacks run here.</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="release">release($;$)</h2>
+
+<p>Usage:</p>
+
+<dl>
+
+<dt id="release-ctx">release $ctx;</dt>
+<dd>
+
+</dd>
+<dt id="release-ctx1">release $ctx, ...;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>This is intended as a shortcut that lets you release your context and return a value in one statement. This function will get your context, and an optional return value. It will release your context, then return your value. Scalar context is always assumed.</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> tool </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+        <span class="operator">...</span>
+    
+        <span class="keyword">return</span> <span class="variable">release</span> <span class="variable">$ctx</span><span class="operator">,</span> <span class="number">1</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This tool is most useful when you want to return the value you get from calling a function that needs to see the current context:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    <span class="keyword">my</span> <span class="variable">$out</span> <span class="operator">=</span> <span class="variable">some_tool</span><span class="operator">(...);</span>
+    <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="keyword">return</span> <span class="variable">$out</span><span class="operator">;</span>
+</code></pre>
+
+<p>We can combine the last 3 lines of the above like so:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    <span class="variable">release</span> <span class="variable">$ctx</span><span class="operator">,</span> <span class="variable">some_tool</span><span class="operator">(...);</span>
+</code></pre>
+
+<h2 id="context_do">context_do(&amp;;@)</h2>
+
+<p>Usage:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> my_tool </span><span class="operator">{</span>
+        <span class="variable">context_do</span> <span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">@args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+            <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+    
+            <span class="operator">...</span>
+    
+            <span class="comment"># No need to call $ctx-&gt;release, done for you on scope exit.</span>
+        <span class="operator">}</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Using this inside your test tool takes care of a lot of boilerplate for you. It will ensure a context is acquired. It will capture and rethrow any exception. It will insure the context is released when you are done. It preserves the subroutine call context (array, scalar, void).</p>
+
+<p>This is the safest way to write a test tool. The only two downsides to this are a slight performance decrease, and some extra indentation in your source. If the indentation is a problem for you then you can take a peek at the next section.</p>
+
+<h2 id="no_context">no_context(&amp;;$)</h2>
+
+<p>Usage:</p>
+
+<dl>
+
+<dt id="no_context1">no_context { ... };</dt>
+<dd>
+
+</dd>
+<dt id="no_context-...-hid">no_context { ... } $hid;</dt>
+<dd>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> my_tool</span><span class="operator">(</span>&amp;<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+        <span class="operator">...</span>
+    
+        <span class="variable">no_context</span> <span class="operator">{</span>
+            <span class="comment"># Things in here will not see our current context, they get a new</span>
+            <span class="comment"># one.</span>
+    
+            <span class="variable">$code</span><span class="operator">-&gt;();</span>
+        <span class="operator">};</span>
+    
+        <span class="operator">...</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<p>This tool will hide a context for the provided block of code. This means any tools run inside the block will get a completely new context if they acquire one. The new context will be inherited by tools nested below the one that acquired it.</p>
+
+<p>This will normally hide the current context for the top hub. If you need to hide the context for a different hub you can pass in the optional <code>$hid</code> parameter.</p>
+
+<h2 id="intercept">intercept(&amp;)</h2>
+
+<p>Usage:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$events</span> <span class="operator">=</span> <span class="variable">intercept</span> <span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"pass"</span><span class="operator">);</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"fail"</span><span class="operator">);</span>
+        <span class="operator">...</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>This function takes a codeblock as its only argument, and it has a prototype. It will execute the codeblock, intercepting any generated events in the process. It will return an array reference with all the generated event objects. All events should be subclasses of <a href="../../lib/Test2/Event.html">Test2::Event</a>.</p>
+
+<p>This is a very low-level subtest tool. This is useful for writing tools which produce subtests. This is not intended for people simply writing tests.</p>
+
+<h2 id="run_subtest">run_subtest(...)</h2>
+
+<p>Usage:</p>
+
+<pre><code>    run_subtest($NAME, \&amp;CODE, $BUFFERED, @ARGS)
+
+    # or
+
+    run_subtest($NAME, \&amp;CODE, \%PARAMS, @ARGS)</code></pre>
+
+<p>This will run the provided codeblock with the args in <code>@args</code>. This codeblock will be run as a subtest. A subtest is an isolated test state that is condensed into a single <a href="../../lib/Test2/Event/Subtest.html">Test2::Event::Subtest</a> event, which contains all events generated inside the subtest.</p>
+
+<h3 id="ARGUMENTS">ARGUMENTS:</h3>
+
+<dl>
+
+<dt id="NAME1">$NAME</dt>
+<dd>
+
+<p>The name of the subtest.</p>
+
+</dd>
+<dt id="CODE">\&amp;CODE</dt>
+<dd>
+
+<p>The code to run inside the subtest.</p>
+
+</dd>
+<dt id="BUFFERED-or-PARAMS">$BUFFERED or \%PARAMS</dt>
+<dd>
+
+<p>If this is a simple scalar then it will be treated as a boolean for the &#39;buffered&#39; setting. If this is a hash reference then it will be used as a parameters hash. The param hash will be used for hub construction (with the specified keys removed).</p>
+
+<p>Keys that are removed and used by run_subtest:</p>
+
+<dl>
+
+<dt id="buffered-bool">&#39;buffered&#39; =&gt; $bool</dt>
+<dd>
+
+<p>Toggle buffered status.</p>
+
+</dd>
+<dt id="inherit_trace-bool">&#39;inherit_trace&#39; =&gt; $bool</dt>
+<dd>
+
+<p>Normally the subtest hub is pushed and the sub is allowed to generate its own root context for the hub. When this setting is turned on a root context will be created for the hub that shares the same trace as the current context.</p>
+
+<p>Set this to true if your tool is producing subtests without user-specified subs.</p>
+
+</dd>
+<dt id="no_fork-bool">&#39;no_fork&#39; =&gt; $bool</dt>
+<dd>
+
+<p>Defaults to off. Normally forking inside a subtest will actually fork the subtest, resulting in 2 final subtest events. This parameter will turn off that behavior, only the original process/thread will return a final subtest event.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="ARGS">@ARGS</dt>
+<dd>
+
+<p>Any extra arguments you want passed into the subtest code.</p>
+
+</dd>
+</dl>
+
+<h3 id="BUFFERED-VS-UNBUFFERED-OR-STREAMED">BUFFERED VS UNBUFFERED (OR STREAMED)</h3>
+
+<p>Normally all events inside and outside a subtest are sent to the formatter immediately by the hub. Sometimes it is desirable to hold off sending events within a subtest until the subtest is complete. This usually depends on the formatter being used.</p>
+
+<dl>
+
+<dt id="Things-not-effected-by-this-flag">Things not effected by this flag</dt>
+<dd>
+
+<p>In both cases events are generated and stored in an array. This array is eventually used to populate the <code>subevents</code> attribute on the <a href="../../lib/Test2/Event/Subtest.html">Test2::Event::Subtest</a> event that is generated at the end of the subtest. This flag has no effect on this part, it always happens.</p>
+
+<p>At the end of the subtest, the final <a href="../../lib/Test2/Event/Subtest.html">Test2::Event::Subtest</a> event is sent to the formatter.</p>
+
+</dd>
+<dt id="Things-that-are-effected-by-this-flag">Things that are effected by this flag</dt>
+<dd>
+
+<p>The <code>buffered</code> attribute of the <a href="../../lib/Test2/Event/Subtest.html">Test2::Event::Subtest</a> event will be set to the value of this flag. This means any formatter, listener, etc which looks at the event will know if it was buffered.</p>
+
+</dd>
+<dt id="Things-that-are-formatter-dependant">Things that are formatter dependant</dt>
+<dd>
+
+<p>Events within a buffered subtest may or may not be sent to the formatter as they happen. If a formatter fails to specify then the default is to <b>NOT SEND</b> the events as they are generated, instead the formatter can pull them from the <code>subevents</code> attribute.</p>
+
+<p>A formatter can specify by implementing the <code>hide_buffered()</code> method. If this method returns true then events generated inside a buffered subtest will not be sent independently of the final subtest event.</p>
+
+</dd>
+</dl>
+
+<p>An example of how this is used is the <a href="../../lib/Test2/Formatter/TAP.html">Test2::Formatter::TAP</a> formatter. For unbuffered subtests the events are rendered as they are generated. At the end of the subtest, the final subtest event is rendered, but the <code>subevents</code> attribute is ignored. For buffered subtests the opposite occurs, the events are NOT rendered as they are generated, instead the <code>subevents</code> attribute is used to render them all at once. This is useful when running subtests tests in parallel, since without it the output from subtests would be interleaved together.</p>
+
+<h1 id="OTHER-API-EXPORTS">OTHER API EXPORTS</h1>
+
+<p>Exports in this section are not commonly needed. These all have the &#39;test2_&#39; prefix to help ensure they stand out. You should look at the <a href="#MAIN-API-EXPORTS">&quot;MAIN API EXPORTS&quot;</a> section before looking here. This section is one where &quot;Great power comes with great responsibility&quot;. It is possible to break things badly if you are not careful with these.</p>
+
+<p>All exports are optional. You need to list which ones you want at import time:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/test2_init_done .../</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="STATUS-AND-INITIALIZATION-STATE">STATUS AND INITIALIZATION STATE</h2>
+
+<p>These provide access to internal state and object instances.</p>
+
+<dl>
+
+<dt id="bool-test2_init_done">$bool = test2_init_done()</dt>
+<dd>
+
+<p>This will return true if the stack and IPC instances have already been initialized. It will return false if they have not. Init happens as late as possible. It happens as soon as a tool requests the IPC instance, the formatter, or the stack.</p>
+
+</dd>
+<dt id="bool-test2_load_done">$bool = test2_load_done()</dt>
+<dd>
+
+<p>This will simply return the boolean value of the loaded flag. If Test2 has finished loading this will be true, otherwise false. Loading is considered complete the first time a tool requests a context.</p>
+
+</dd>
+<dt id="test2_set_is_end">test2_set_is_end()</dt>
+<dd>
+
+</dd>
+<dt id="test2_set_is_end-bool">test2_set_is_end($bool)</dt>
+<dd>
+
+<p>This is used to toggle Test2&#39;s belief that the END phase has already started. With no arguments this will set it to true. With arguments it will set it to the first argument&#39;s value.</p>
+
+<p>This is used to prevent the use of <code>caller()</code> in END blocks which can cause segfaults. This is only necessary in some persistent environments that may have multiple END phases.</p>
+
+</dd>
+<dt id="bool-test2_get_is_end">$bool = test2_get_is_end()</dt>
+<dd>
+
+<p>Check if Test2 believes it is the END phase.</p>
+
+</dd>
+<dt id="stack-test2_stack">$stack = test2_stack()</dt>
+<dd>
+
+<p>This will return the global <a href="../../lib/Test2/API/Stack.html">Test2::API::Stack</a> instance. If this has not yet been initialized it will be initialized now.</p>
+
+</dd>
+<dt id="test2_ipc_wait_enable">test2_ipc_wait_enable()</dt>
+<dd>
+
+</dd>
+<dt id="test2_ipc_wait_disable">test2_ipc_wait_disable()</dt>
+<dd>
+
+</dd>
+<dt id="bool-test2_ipc_wait_enabled">$bool = test2_ipc_wait_enabled()</dt>
+<dd>
+
+<p>These can be used to turn IPC waiting on and off, or check the current value of the flag.</p>
+
+<p>Waiting is turned on by default. Waiting will cause the parent process/thread to wait until all child processes and threads are finished before exiting. You will almost never want to turn this off.</p>
+
+</dd>
+<dt id="bool-test2_no_wait">$bool = test2_no_wait()</dt>
+<dd>
+
+</dd>
+<dt id="test2_no_wait-bool">test2_no_wait($bool)</dt>
+<dd>
+
+<p><b>DISCOURAGED</b>: This is a confusing interface, it is better to use <code>test2_ipc_wait_enable()</code>, <code>test2_ipc_wait_disable()</code> and <code>test2_ipc_wait_enabled()</code>.</p>
+
+<p>This can be used to get/set the no_wait status. Waiting is turned on by default. Waiting will cause the parent process/thread to wait until all child processes and threads are finished before exiting. You will almost never want to turn this off.</p>
+
+</dd>
+<dt id="fh-test2_stdout">$fh = test2_stdout()</dt>
+<dd>
+
+</dd>
+<dt id="fh-test2_stderr">$fh = test2_stderr()</dt>
+<dd>
+
+<p>These functions return the filehandles that test output should be written to. They are primarily useful when writing a custom formatter and code that turns events into actual output (TAP, etc.) They will return a dupe of the original filehandles that formatted output can be sent to regardless of whatever state the currently running test may have left STDOUT and STDERR in.</p>
+
+</dd>
+<dt id="test2_reset_io">test2_reset_io()</dt>
+<dd>
+
+<p>Re-dupe the internal filehandles returned by <code>test2_stdout()</code> and <code>test2_stderr()</code> from the current STDOUT and STDERR. You shouldn&#39;t need to do this except in very peculiar situations (for example, you&#39;re testing a new formatter and you need control over where the formatter is sending its output.)</p>
+
+</dd>
+</dl>
+
+<h2 id="BEHAVIOR-HOOKS">BEHAVIOR HOOKS</h2>
+
+<p>These are hooks that allow you to add custom behavior to actions taken by Test2 and tools built on top of it.</p>
+
+<dl>
+
+<dt id="test2_add_callback_exit-sub">test2_add_callback_exit(sub { ... })</dt>
+<dd>
+
+<p>This can be used to add a callback that is called after all testing is done. This is too late to add additional results, the main use of this callback is to set the exit code.</p>
+
+<pre><code>    <span class="variable">test2_add_callback_exit</span><span class="operator">(</span>
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$context</span><span class="operator">,</span> <span class="variable">$exit</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">$new_exit</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>The <code>$context</code> passed in will be an instance of <a href="../../lib/Test2/API/Context.html">Test2::API::Context</a>. The <code>$exit</code> argument will be the original exit code before anything modified it. <code>$$new_exit</code> is a reference to the new exit code. You may modify this to change the exit code. Please note that <code>$$new_exit</code> may already be different from <code>$exit</code></p>
+
+</dd>
+<dt id="test2_add_callback_post_load-sub">test2_add_callback_post_load(sub { ... })</dt>
+<dd>
+
+<p>Add a callback that will be called when Test2 is finished loading. This means the callback will be run once, the first time a context is obtained. If Test2 has already finished loading then the callback will be run immediately.</p>
+
+</dd>
+<dt id="test2_add_callback_context_acquire-sub">test2_add_callback_context_acquire(sub { ... })</dt>
+<dd>
+
+<p>Add a callback that will be called every time someone tries to acquire a context. This will be called on EVERY call to <code>context()</code>. It gets a single argument, a reference to the hash of parameters being used the construct the context. This is your chance to change the parameters by directly altering the hash.</p>
+
+<pre><code>    <span class="variable">test2_add_callback_context_acquire</span><span class="operator">(</span><span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$params</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="variable">$params</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">level</span><span class="operator">}</span><span class="operator">++;</span>
+    <span class="operator">});</span>
+</code></pre>
+
+<p>This is a very scary API function. Please do not use this unless you need to. This is here for <a href="../../lib/Test/Builder.html">Test::Builder</a> and backwards compatibility. This has you directly manipulate the hash instead of returning a new one for performance reasons.</p>
+
+</dd>
+<dt id="test2_add_callback_context_init-sub">test2_add_callback_context_init(sub { ... })</dt>
+<dd>
+
+<p>Add a callback that will be called every time a new context is created. The callback will receive the newly created context as its only argument.</p>
+
+</dd>
+<dt id="test2_add_callback_context_release-sub">test2_add_callback_context_release(sub { ... })</dt>
+<dd>
+
+<p>Add a callback that will be called every time a context is released. The callback will receive the released context as its only argument.</p>
+
+</dd>
+<dt id="test2_add_callback_pre_subtest-sub">test2_add_callback_pre_subtest(sub { ... })</dt>
+<dd>
+
+<p>Add a callback that will be called every time a subtest is going to be run. The callback will receive the subtest name, coderef, and any arguments.</p>
+
+</dd>
+<dt id="list-test2_list_context_acquire_callbacks">@list = test2_list_context_acquire_callbacks()</dt>
+<dd>
+
+<p>Return all the context acquire callback references.</p>
+
+</dd>
+<dt id="list-test2_list_context_init_callbacks">@list = test2_list_context_init_callbacks()</dt>
+<dd>
+
+<p>Returns all the context init callback references.</p>
+
+</dd>
+<dt id="list-test2_list_context_release_callbacks">@list = test2_list_context_release_callbacks()</dt>
+<dd>
+
+<p>Returns all the context release callback references.</p>
+
+</dd>
+<dt id="list-test2_list_exit_callbacks">@list = test2_list_exit_callbacks()</dt>
+<dd>
+
+<p>Returns all the exit callback references.</p>
+
+</dd>
+<dt id="list-test2_list_post_load_callbacks">@list = test2_list_post_load_callbacks()</dt>
+<dd>
+
+<p>Returns all the post load callback references.</p>
+
+</dd>
+<dt id="list-test2_list_pre_subtest_callbacks">@list = test2_list_pre_subtest_callbacks()</dt>
+<dd>
+
+<p>Returns all the pre-subtest callback references.</p>
+
+</dd>
+</dl>
+
+<h2 id="IPC-AND-CONCURRENCY">IPC AND CONCURRENCY</h2>
+
+<p>These let you access, or specify, the IPC system internals.</p>
+
+<dl>
+
+<dt id="bool-test2_has_ipc">$bool = test2_has_ipc()</dt>
+<dd>
+
+<p>Check if IPC is enabled.</p>
+
+</dd>
+<dt id="ipc-test2_ipc">$ipc = test2_ipc()</dt>
+<dd>
+
+<p>This will return the global <a href="../../lib/Test2/IPC/Driver.html">Test2::IPC::Driver</a> instance. If this has not yet been initialized it will be initialized now.</p>
+
+</dd>
+<dt id="test2_ipc_add_driver-DRIVER">test2_ipc_add_driver($DRIVER)</dt>
+<dd>
+
+<p>Add an IPC driver to the list. This will add the driver to the start of the list.</p>
+
+</dd>
+<dt id="drivers-test2_ipc_drivers">@drivers = test2_ipc_drivers()</dt>
+<dd>
+
+<p>Get the list of IPC drivers.</p>
+
+</dd>
+<dt id="bool-test2_ipc_polling">$bool = test2_ipc_polling()</dt>
+<dd>
+
+<p>Check if polling is enabled.</p>
+
+</dd>
+<dt id="test2_ipc_enable_polling">test2_ipc_enable_polling()</dt>
+<dd>
+
+<p>Turn on polling. This will cull events from other processes and threads every time a context is created.</p>
+
+</dd>
+<dt id="test2_ipc_disable_polling">test2_ipc_disable_polling()</dt>
+<dd>
+
+<p>Turn off IPC polling.</p>
+
+</dd>
+<dt id="test2_ipc_enable_shm">test2_ipc_enable_shm()</dt>
+<dd>
+
+<p>Turn on IPC SHM. Only some IPC drivers use this, and most will turn it on themselves.</p>
+
+</dd>
+<dt id="test2_ipc_set_pending-uniq_val">test2_ipc_set_pending($uniq_val)</dt>
+<dd>
+
+<p>Tell other processes and events that an event is pending. <code>$uniq_val</code> should be a unique value no other thread/process will generate.</p>
+
+<p><b>Note:</b> After calling this <code>test2_ipc_get_pending()</code> will return 1. This is intentional, and not avoidable.</p>
+
+</dd>
+<dt id="pending-test2_ipc_get_pending">$pending = test2_ipc_get_pending()</dt>
+<dd>
+
+<p>This returns -1 if there is no way to check (assume yes)</p>
+
+<p>This returns 0 if there are (most likely) no pending events.</p>
+
+<p>This returns 1 if there are (likely) pending events. Upon return it will reset, nothing else will be able to see that there were pending events.</p>
+
+</dd>
+<dt id="timeout-test2_ipc_get_timeout">$timeout = test2_ipc_get_timeout()</dt>
+<dd>
+
+</dd>
+<dt id="test2_ipc_set_timeout-timeout">test2_ipc_set_timeout($timeout)</dt>
+<dd>
+
+<p>Get/Set the timeout value for the IPC system. This timeout is how long the IPC system will wait for child processes and threads to finish before aborting.</p>
+
+<p>The default value is <code>30</code> seconds.</p>
+
+</dd>
+</dl>
+
+<h2 id="MANAGING-FORMATTERS">MANAGING FORMATTERS</h2>
+
+<p>These let you access, or specify, the formatters that can/should be used.</p>
+
+<dl>
+
+<dt id="formatter-test2_formatter">$formatter = test2_formatter</dt>
+<dd>
+
+<p>This will return the global formatter class. This is not an instance. By default the formatter is set to <a href="../../lib/Test2/Formatter/TAP.html">Test2::Formatter::TAP</a>.</p>
+
+<p>You can override this default using the <code>T2_FORMATTER</code> environment variable.</p>
+
+<p>Normally &#39;Test2::Formatter::&#39; is prefixed to the value in the environment variable:</p>
+
+<pre><code>    $ T2_FORMATTER=&#39;TAP&#39; perl test.t     # Use the Test2::Formatter::TAP formatter
+    $ T2_FORMATTER=&#39;Foo&#39; perl test.t     # Use the Test2::Formatter::Foo formatter</code></pre>
+
+<p>If you want to specify a full module name you use the &#39;+&#39; prefix:</p>
+
+<pre><code>    $ T2_FORMATTER=&#39;+Foo::Bar&#39; perl test.t     # Use the Foo::Bar formatter</code></pre>
+
+</dd>
+<dt id="test2_formatter_set-class_or_instance">test2_formatter_set($class_or_instance)</dt>
+<dd>
+
+<p>Set the global formatter class. This can only be set once. <b>Note:</b> This will override anything specified in the &#39;T2_FORMATTER&#39; environment variable.</p>
+
+</dd>
+<dt id="formatters-test2_formatters">@formatters = test2_formatters()</dt>
+<dd>
+
+<p>Get a list of all loaded formatters.</p>
+
+</dd>
+<dt id="test2_formatter_add-class_or_instance">test2_formatter_add($class_or_instance)</dt>
+<dd>
+
+<p>Add a formatter to the list. Last formatter added is used at initialization. If this is called after initialization a warning will be issued.</p>
+
+</dd>
+</dl>
+
+<h1 id="OTHER-EXAMPLES">OTHER EXAMPLES</h1>
+
+<p>See the <code>/Examples/</code> directory included in this distribution.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/Test2/API/Context.html">Test2::API::Context</a> - Detailed documentation of the context object.</p>
+
+<p><a href="../../lib/Test2/IPC.html">Test2::IPC</a> - The IPC system used for threading/fork support.</p>
+
+<p><a href="../../lib/Test2/Formatter.html">Test2::Formatter</a> - Formatters such as TAP live here.</p>
+
+<p><a href="../../lib/Test2/Event.html">Test2::Event</a> - Events live in this namespace.</p>
+
+<p><a href="../../lib/Test2/Hub.html">Test2::Hub</a> - All events eventually funnel through a hub. Custom hubs are how <code>intercept()</code> and <code>run_subtest()</code> are implemented.</p>
+
+<h1 id="MAGIC">MAGIC</h1>
+
+<p>This package has an END block. This END block is responsible for setting the exit code based on the test results. This end block also calls the callbacks that can be added to this package.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

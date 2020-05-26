@@ -1,0 +1,237 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#General-Use">General Use</a></li>
+      <li><a href="#Benefits">Benefits</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#INSTALLATION-NOTES">INSTALLATION NOTES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#DISCLAIMER">DISCLAIMER</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::Pipe - Win32 Named Pipe</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>To use this extension, follow these basic steps. First, you need to &#39;use&#39; the pipe extension:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::Pipe</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then you need to create a server side of a named pipe:</p>
+
+<pre><code>    <span class="variable">$Pipe</span> <span class="operator">=</span> <span class="variable">Win32::Pipe</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"My Pipe Name"</span><span class="operator">);</span>
+</code></pre>
+
+<p>or if you are going to connect to pipe that has already been created:</p>
+
+<pre><code>    <span class="variable">$Pipe</span> <span class="operator">=</span> <span class="variable">Win32::Pipe</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"\\\\server\\pipe\\My Pipe Name"</span><span class="operator">);</span>
+    
+    <span class="variable">NOTE</span><span class="operator">:</span> <span class="variable">The</span> <span class="string">"\\\\server\\pipe\\"</span> <span class="variable">is</span> <span class="variable">necessary</span> <span class="keyword">when</span> <span class="variable">connecting</span>
+          <span class="variable">to</span> <span class="variable">an</span> <span class="variable">existing</span> <span class="keyword">pipe</span><span class="operator">!</span> <span class="variable">If</span> <span class="variable">you</span> <span class="variable">are</span> <span class="variable">accessing</span> <span class="variable">the</span> <span class="variable">same</span>
+          <span class="variable">machine</span> <span class="variable">you</span> <span class="variable">could</span> <span class="keyword">use</span> <span class="string">"\\\\.\\pipe\\"</span> <span class="variable">but</span> <span class="variable">either</span> <span class="variable">way</span>
+          <span class="variable">works</span> <span class="variable">fine</span><span class="operator">.</span>
+</code></pre>
+
+<p>You should check to see if <code>$Pipe</code> is indeed defined otherwise there has been an error.</p>
+
+<p>Whichever end is the server, it must now wait for a connection...</p>
+
+<pre><code>    <span class="variable">$Result</span> <span class="operator">=</span> <span class="variable">$Pipe</span><span class="operator">-&gt;</span><span class="variable">Connect</span><span class="operator">();</span>
+    
+    <span class="variable">NOTE</span><span class="operator">:</span> <span class="variable">The</span> <span class="variable">client</span> <span class="variable">end</span> <span class="variable">does</span> <span class="keyword">not</span> <span class="keyword">do</span> <span class="variable">this</span><span class="operator">!</span> <span class="variable">When</span> <span class="variable">the</span> <span class="variable">client</span> <span class="variable">creates</span>
+          <span class="variable">the</span> <span class="keyword">pipe</span> <span class="variable">it</span> <span class="variable">has</span> <span class="variable">already</span> <span class="variable">connected</span><span class="operator">!</span>
+</code></pre>
+
+<p>Now you can read and write data from either end of the pipe:</p>
+
+<pre><code>    <span class="variable">$Data</span> <span class="operator">=</span> <span class="variable">$Pipe</span><span class="operator">-&gt;</span><span class="variable">Read</span><span class="operator">();</span>
+    
+    <span class="variable">$Result</span> <span class="operator">=</span> <span class="variable">$Pipe</span><span class="operator">-&gt;</span><span class="variable">Write</span><span class="operator">(</span><span class="string">"Howdy! This is cool!"</span><span class="operator">);</span>
+</code></pre>
+
+<p>When the server is finished it must disconnect:</p>
+
+<pre><code>    <span class="variable">$Pipe</span><span class="operator">-&gt;</span><span class="variable">Disconnect</span><span class="operator">();</span>
+</code></pre>
+
+<p>Now the server could <code>Connect</code> again (and wait for another client) or it could destroy the named pipe...</p>
+
+<pre><code>    <span class="variable">$Data</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<p>The client should <code>Close</code> in order to properly end the session.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="General-Use">General Use</h2>
+
+<p>This extension gives Win32 Perl the ability to use Named Pipes. Why? Well considering that Win32 Perl does not (yet) have the ability to <code>fork</code> I could not see what good the <code>pipe(X,Y)</code> was. Besides, where I am as an admin I must have several perl daemons running on several NT Servers. It dawned on me one day that if I could pipe all these daemons&#39; output to my workstation (across the net) then it would be much easier to monitor. This was the impetus for an extension using Named Pipes. I think that it is kinda cool. :)</p>
+
+<h2 id="Benefits">Benefits</h2>
+
+<p>And what are the benefits of this module?</p>
+
+<ul>
+
+<li><p>You may create as many named pipes as you want (uh, well, as many as your resources will allow).</p>
+
+</li>
+<li><p>Currently there is a limit of 256 instances of a named pipe (once a pipe is created you can have 256 client/server connections to that name).</p>
+
+</li>
+<li><p>The default buffer size is 512 bytes; this can be altered by the <code>ResizeBuffer</code> method.</p>
+
+</li>
+<li><p>All named pipes are byte streams. There is currently no way to alter a pipe to be message based.</p>
+
+</li>
+<li><p>Other things that I cannot think of right now... :)</p>
+
+</li>
+</ul>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<dl>
+
+<dt id="new-NAME">new ( NAME )</dt>
+<dd>
+
+<p>Creates a named pipe if used in server context or a connection to the specified named pipe if used in client context. Client context is determined by prepending $Name with &quot;\\\\&quot;.</p>
+
+<p>Returns <i>true</i> on success, <i>false</i> on failure.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="BufferSize">BufferSize ()</dt>
+<dd>
+
+<p>Returns the size of the instance of the buffer of the named pipe.</p>
+
+</dd>
+<dt id="Connect">Connect ()</dt>
+<dd>
+
+<p>Tells the named pipe to create an instance of the named pipe and wait until a client connects. Returns <i>true</i> on success, <i>false</i> on failure.</p>
+
+</dd>
+<dt id="Close">Close ()</dt>
+<dd>
+
+<p>Closes the named pipe.</p>
+
+</dd>
+<dt id="Disconnect">Disconnect ()</dt>
+<dd>
+
+<p>Disconnects (and destroys) the instance of the named pipe from the client. Returns <i>true</i> on success, <i>false</i> on failure.</p>
+
+</dd>
+<dt id="Error">Error ()</dt>
+<dd>
+
+<p>Returns the last error messages pertaining to the named pipe. If used in context to the package. Returns a list containing <code>ERROR_NUMBER</code> and <code>ERROR_TEXT</code>.</p>
+
+</dd>
+<dt id="Read">Read ()</dt>
+<dd>
+
+<p>Reads from the named pipe. Returns data read from the pipe on success, undef on failure.</p>
+
+</dd>
+<dt id="ResizeBuffer-SIZE">ResizeBuffer ( SIZE )</dt>
+<dd>
+
+<p>Sets the size of the buffer of the instance of the named pipe to <code>SIZE</code>. Returns the size of the buffer on success, <i>false</i> on failure.</p>
+
+</dd>
+<dt id="Write-DATA">Write ( DATA )</dt>
+<dd>
+
+<p>Writes <code>DATA</code> to the named pipe. Returns <i>true</i> on success, <i>false</i> on failure.</p>
+
+</dd>
+</dl>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>What known problems does this thing have?</p>
+
+<ul>
+
+<li><p>If someone is waiting on a <code>Read</code> and the other end terminates then you will wait for one <b>REALLY</b> long time! (If anyone has an idea on how I can detect the termination of the other end let me know!)</p>
+
+</li>
+<li><p>All pipes are blocking. I am considering using threads and callbacks into Perl to perform async IO but this may be too much for my time stress. ;)</p>
+
+</li>
+<li><p>There is no security placed on these pipes.</p>
+
+</li>
+<li><p>This module has neither been optimized for speed nor optimized for memory consumption. This may run into memory bloat.</p>
+
+</li>
+</ul>
+
+<h1 id="INSTALLATION-NOTES">INSTALLATION NOTES</h1>
+
+<p>If you wish to use this module with a build of Perl other than ActivePerl, you may wish to fetch the source distribution for this module. The source is included as part of the <code>libwin32</code> bundle, which you can find in any CPAN mirror here:</p>
+
+<pre><code>  modules/by-authors/Gurusamy_Sarathy/libwin32-0.151.tar.gz</code></pre>
+
+<p>The source distribution also contains a pair of sample client/server test scripts. For the latest information on this module, consult the following web site:</p>
+
+<pre><code>  http://www.roth.net/perl</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Roth &lt;rothd@roth.net&gt;</p>
+
+<h1 id="DISCLAIMER">DISCLAIMER</h1>
+
+<p>I do not guarantee <b>ANYTHING</b> with this package. If you use it you are doing so <b>AT YOUR OWN RISK</b>! I may or may not support this depending on my time schedule.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 1996 Dave Roth. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

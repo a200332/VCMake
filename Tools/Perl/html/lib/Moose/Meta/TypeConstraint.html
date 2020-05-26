@@ -1,0 +1,253 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Moose::Meta::TypeConstraint-new-options">Moose::Meta::TypeConstraint-&gt;new(%options)</a></li>
+      <li><a href="#constraint-equals-type_name_or_object">$constraint-&gt;equals($type_name_or_object)</a></li>
+      <li><a href="#constraint-is_subtype_of-type_name_or_object">$constraint-&gt;is_subtype_of($type_name_or_object)</a></li>
+      <li><a href="#constraint-is_a_type_of-type_name_or_object">$constraint-&gt;is_a_type_of($type_name_or_object)</a></li>
+      <li><a href="#constraint-coerce-value">$constraint-&gt;coerce($value)</a></li>
+      <li><a href="#constraint-assert_coerce-value">$constraint-&gt;assert_coerce($value)</a></li>
+      <li><a href="#constraint-check-value">$constraint-&gt;check($value)</a></li>
+      <li><a href="#constraint-validate-value">$constraint-&gt;validate($value)</a></li>
+      <li><a href="#constraint-assert_valid-value">$constraint-&gt;assert_valid($value)</a></li>
+      <li><a href="#constraint-name">$constraint-&gt;name</a></li>
+      <li><a href="#constraint-parent">$constraint-&gt;parent</a></li>
+      <li><a href="#constraint-has_parent">$constraint-&gt;has_parent</a></li>
+      <li><a href="#constraint-parents">$constraint-&gt;parents</a></li>
+      <li><a href="#constraint-constraint">$constraint-&gt;constraint</a></li>
+      <li><a href="#constraint-get_message-value">$constraint-&gt;get_message($value)</a></li>
+      <li><a href="#constraint-has_message">$constraint-&gt;has_message</a></li>
+      <li><a href="#constraint-message">$constraint-&gt;message</a></li>
+      <li><a href="#constraint-coercion">$constraint-&gt;coercion</a></li>
+      <li><a href="#constraint-has_coercion">$constraint-&gt;has_coercion</a></li>
+      <li><a href="#constraint-can_be_inlined">$constraint-&gt;can_be_inlined</a></li>
+      <li><a href="#constraint-create_child_type-options">$constraint-&gt;create_child_type(%options)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Meta::TypeConstraint - The Moose Type Constraint metaclass</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class represents a single type constraint. Moose&#39;s built-in type constraints, as well as constraints you define, are all stored in a <a href="../../../lib/Moose/Meta/TypeConstraint/Registry.html">Moose::Meta::TypeConstraint::Registry</a> object as objects of this class.</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>Moose::Meta::TypeConstraint</code> is a subclass of <a href="../../../lib/Class/MOP/Object.html">Class::MOP::Object</a>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Moose::Meta::TypeConstraint-new-options">Moose::Meta::TypeConstraint-&gt;new(%options)</h2>
+
+<p>This creates a new type constraint based on the provided <code>%options</code>:</p>
+
+<ul>
+
+<li><p>name</p>
+
+<p>The constraint name. If a name is not provided, it will be set to &quot;__ANON__&quot;.</p>
+
+</li>
+<li><p>parent</p>
+
+<p>A <code>Moose::Meta::TypeConstraint</code> object which is the parent type for the type being created. This is optional.</p>
+
+</li>
+<li><p>constraint</p>
+
+<p>This is the subroutine reference that implements the actual constraint check. This defaults to a subroutine which always returns true.</p>
+
+</li>
+<li><p>message</p>
+
+<p>A subroutine reference which is used to generate an error message when the constraint fails. This is optional.</p>
+
+</li>
+<li><p>coercion</p>
+
+<p>A <a href="../../../lib/Moose/Meta/TypeCoercion.html">Moose::Meta::TypeCoercion</a> object representing the coercions to the type. This is optional.</p>
+
+</li>
+<li><p>inlined</p>
+
+<p>A subroutine which returns a string suitable for inlining this type constraint. It will be called as a method on the type constraint object, and will receive a single additional parameter, a variable name to be tested (usually <code>&quot;$_&quot;</code> or <code>&quot;$_[0]&quot;</code>.</p>
+
+<p>This is optional.</p>
+
+</li>
+<li><p>inline_environment</p>
+
+<p>A hash reference of variables to close over. The keys are variables names, and the values are <i>references</i> to the variables.</p>
+
+</li>
+</ul>
+
+<h2 id="constraint-equals-type_name_or_object">$constraint-&gt;equals($type_name_or_object)</h2>
+
+<p>Returns true if the supplied name or type object is the same as the current type.</p>
+
+<h2 id="constraint-is_subtype_of-type_name_or_object">$constraint-&gt;is_subtype_of($type_name_or_object)</h2>
+
+<p>Returns true if the supplied name or type object is a parent of the current type.</p>
+
+<h2 id="constraint-is_a_type_of-type_name_or_object">$constraint-&gt;is_a_type_of($type_name_or_object)</h2>
+
+<p>Returns true if the given type is the same as the current type, or is a parent of the current type. This is a shortcut for checking <code>equals</code> and <code>is_subtype_of</code>.</p>
+
+<h2 id="constraint-coerce-value">$constraint-&gt;coerce($value)</h2>
+
+<p>This will attempt to coerce the value to the type. If the type does not have any defined coercions this will throw an error.</p>
+
+<p>If no coercion can produce a value matching <code>$constraint</code>, the original value is returned.</p>
+
+<h2 id="constraint-assert_coerce-value">$constraint-&gt;assert_coerce($value)</h2>
+
+<p>This method behaves just like <code>coerce</code>, but if the result is not valid according to <code>$constraint</code>, an error is thrown.</p>
+
+<h2 id="constraint-check-value">$constraint-&gt;check($value)</h2>
+
+<p>Returns true if the given value passes the constraint for the type.</p>
+
+<h2 id="constraint-validate-value">$constraint-&gt;validate($value)</h2>
+
+<p>This is similar to <code>check</code>. However, if the type <i>is valid</i> then the method returns an explicit <code>undef</code>. If the type is not valid, we call <code>$self-&gt;get_message($value)</code> internally to generate an error message.</p>
+
+<h2 id="constraint-assert_valid-value">$constraint-&gt;assert_valid($value)</h2>
+
+<p>Like <code>check</code> and <code>validate</code>, this method checks whether <code>$value</code> is valid under the constraint. If it is, it will return true. If it is not, an exception will be thrown with the results of <code>$self-&gt;get_message($value)</code>.</p>
+
+<h2 id="constraint-name">$constraint-&gt;name</h2>
+
+<p>Returns the type&#39;s name, as provided to the constructor.</p>
+
+<h2 id="constraint-parent">$constraint-&gt;parent</h2>
+
+<p>Returns the type&#39;s parent, as provided to the constructor, if any.</p>
+
+<h2 id="constraint-has_parent">$constraint-&gt;has_parent</h2>
+
+<p>Returns true if the type has a parent type.</p>
+
+<h2 id="constraint-parents">$constraint-&gt;parents</h2>
+
+<p>Returns all of the types parents as an list of type constraint objects.</p>
+
+<h2 id="constraint-constraint">$constraint-&gt;constraint</h2>
+
+<p>Returns the type&#39;s constraint, as provided to the constructor.</p>
+
+<h2 id="constraint-get_message-value">$constraint-&gt;get_message($value)</h2>
+
+<p>This generates a method for the given value. If the type does not have an explicit message, we generate a default message.</p>
+
+<h2 id="constraint-has_message">$constraint-&gt;has_message</h2>
+
+<p>Returns true if the type has a message.</p>
+
+<h2 id="constraint-message">$constraint-&gt;message</h2>
+
+<p>Returns the type&#39;s message as a subroutine reference.</p>
+
+<h2 id="constraint-coercion">$constraint-&gt;coercion</h2>
+
+<p>Returns the type&#39;s <a href="../../../lib/Moose/Meta/TypeCoercion.html">Moose::Meta::TypeCoercion</a> object, if one exists.</p>
+
+<h2 id="constraint-has_coercion">$constraint-&gt;has_coercion</h2>
+
+<p>Returns true if the type has a coercion.</p>
+
+<h2 id="constraint-can_be_inlined">$constraint-&gt;can_be_inlined</h2>
+
+<p>Returns true if this type constraint can be inlined. A type constraint which subtypes an inlinable constraint and does not add an additional constraint &quot;inherits&quot; its parent type&#39;s inlining.</p>
+
+<h2 id="constraint-create_child_type-options">$constraint-&gt;create_child_type(%options)</h2>
+
+<p>This returns a new type constraint of the same class using the provided <code>%options</code>. The <code>parent</code> option will be the current type.</p>
+
+<p>This method exists so that subclasses of this class can override this behavior and change how child types are created.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

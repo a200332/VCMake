@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#THE-tie-INTERFACE">THE tie INTERFACE</a></li>
+      <li><a href="#FOREIGN-MEMORY-ALLOCATORS">FOREIGN MEMORY ALLOCATORS</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#MAINTAINER">MAINTAINER</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::API::Struct - C struct support package for Win32::API</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  
+  <span class="variable">Win32::API::Struct</span><span class="operator">-&gt;</span><span class="variable">typedef</span><span class="operator">(</span> <span class="string">'POINT'</span><span class="operator">,</span> <span class="string">qw(
+    LONG x; 
+    LONG y; 
+  )</span><span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$Point</span> <span class="operator">=</span> <span class="variable">Win32::API::Struct</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'POINT'</span> <span class="operator">);</span> 
+  <span class="variable">$Point</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">x</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1024</span><span class="operator">;</span>
+  <span class="variable">$Point</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">y</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">768</span><span class="operator">;</span>
+  
+  <span class="comment">#### alternatively</span>
+  
+  <span class="keyword">tie</span> <span class="variable">%Point</span><span class="operator">,</span> <span class="string">'Win32::API::Struct'</span><span class="operator">,</span> <span class="string">'POINT'</span><span class="operator">;</span>
+  <span class="variable">$Point</span><span class="operator">{</span><span class="string">x</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1024</span><span class="operator">;</span>
+  <span class="variable">$Point</span><span class="operator">{</span><span class="string">y</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">768</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<p>This module enables you to define C structs for use with Win32::API.</p>
+
+<p>See <a href="../../../lib/Win32/API.html#USING-STRUCTURES">&quot;USING STRUCTURES&quot; in Win32::API</a> for more info about its usage.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is automatically imported by Win32::API, so you don&#39;t need to &#39;use&#39; it explicitly. The main methods are <code>typedef</code> and <code>new</code>, which are documented below.</p>
+
+<dl>
+
+<dt id="typedef-NAME-TYPE-MEMBER-TYPE-MEMBER"><code>typedef NAME, TYPE, MEMBER, TYPE, MEMBER, ...</code></dt>
+<dd>
+
+<p>This method defines a structure named <code>NAME</code>. The definition consists of types and member names, just like in C. In fact, most of the times you can cut the C definition for a structure and paste it verbatim to your script, enclosing it in a <code>qw()</code> block. The function takes care of removing the semicolon after the member name. Win32::API::Struct does <b>NOT</b> support Enums, Unions, or Bitfields. <code>NAME</code> must not end in <code>*</code>, typedef creates structs, not struct pointers. See <a href="../../../lib/Win32/API/Type.html#typedef">&quot;typedef&quot; in Win32::API::Type</a> on how to create a struct pointer type. Returns true on success, and undef on error. On error it <a href="../../../lib/pods/perlfunc.html#warn">warns</a> with the specific reason.</p>
+
+<p>The synopsis example could be written like this:</p>
+
+<pre><code>  <span class="variable">Win32::API::Struct</span><span class="operator">-&gt;</span><span class="variable">typedef</span><span class="operator">(</span><span class="string">'POINT'</span><span class="operator">,</span> <span class="string">'LONG'</span><span class="operator">,</span> <span class="string">'x'</span><span class="operator">,</span> <span class="string">'LONG'</span><span class="operator">,</span> <span class="string">'y'</span><span class="operator">);</span>
+</code></pre>
+
+<p>But it could also be written like this (note the indirect object syntax), which is pretty cool:</p>
+
+<pre><code>  <span class="variable">typedef</span> <span class="variable">Win32::API::Struct</span> <span class="string">POINT</span> <span class="operator">=&gt;</span> <span class="string">qw{
+    LONG x; 
+    LONG y; 
+  }</span><span class="operator">;</span>
+</code></pre>
+
+<p><a href="../../../lib/Win32/API.html#Call">&quot;Call&quot; in Win32::API</a> automatically knows that an &#39;LPNAME&#39; type, refers to a &#39;NAME&#39; type struct. Also see <a href="../../../lib/Win32/API/Type.html#typedef">&quot;typedef&quot; in Win32::API::Type</a> on how to declare pointers to struct types.</p>
+
+<p>Unlike in Win32::API, a single non-array char or CHAR struct member in a struct is numeric, NOT the first character of a string. UTF16 strings pointers will be garbage on read back (passing in works, returning doesn&#39;t) since the NULL character will often be the 2nd byte of the UTF16 string.</p>
+
+</dd>
+<dt id="new-NAME"><code>new NAME</code></dt>
+<dd>
+
+<p>This creates a structure (a Win32::API::Struct object) of the type <code>NAME</code> (it must have been defined with <code>typedef</code>). In Perl, when you create a structure, all the members are undefined. But when you use that structure in C (eg. a Win32::API call), you can safely assume that they will be treated as zero (or NULL).</p>
+
+</dd>
+<dt id="sizeof"><code>sizeof</code></dt>
+<dd>
+
+<p>This returns the size, in bytes, of the structure. Acts just like the C function of the same name. It is particularly useful for structures that need a member to be initialized to the structure&#39;s own size.</p>
+
+</dd>
+<dt id="align-SIZE"><code>align [SIZE]</code></dt>
+<dd>
+
+<p>Sets or returns the structure alignment (eg. how the structure is stored in memory). This is a very advanced option, and you normally don&#39;t need to mess with it. All structures in the Win32 Platform SDK should work without it. But if you define your own structure, you may need to give it an explicit alignment. In most cases, passing a <code>SIZE</code> of &#39;auto&#39; should keep the world happy.</p>
+
+</dd>
+</dl>
+
+<h2 id="THE-tie-INTERFACE">THE <code>tie</code> INTERFACE</h2>
+
+<p>Instead of creating an object with the <code>new</code> method, you can tie a hash, which will hold the desired structure, using the <code>tie</code> builtin function:</p>
+
+<pre><code>  <span class="keyword">tie</span> <span class="variable">%structure</span><span class="operator">,</span> <span class="variable">Win32::API::Struct</span> <span class="operator">=&gt;</span> <span class="string">'NAME'</span><span class="operator">;</span>
+</code></pre>
+
+<p>The differences between the tied and non-tied approaches are:</p>
+
+<ul>
+
+<li><p>with tied structures, you can access members directly as hash lookups, eg.</p>
+
+<pre><code>  <span class="comment"># tied              # non-tied</span>
+  <span class="variable">$Point</span><span class="operator">{</span><span class="string">x</span><span class="operator">}</span>    <span class="variable">vs</span><span class="operator">.</span>    <span class="variable">$Point</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">x</span><span class="operator">}</span>
+</code></pre>
+
+</li>
+<li><p>with tied structures, when you try to fetch or store a member that is not part of the structure, it will result in a warning, eg.</p>
+
+<pre><code>  <span class="keyword">print</span> <span class="variable">$Point</span><span class="operator">{</span><span class="string">z</span><span class="operator">}</span><span class="operator">;</span>
+  <span class="comment"># this will warn: 'z' is not a member of Win32::API::Struct POINT</span>
+</code></pre>
+
+</li>
+<li><p>when you pass a tied structure as a Win32::API parameter, remember to backslash it, eg.</p>
+
+<pre><code>  # tied                            # non-tied
+  GetCursorPos( \%Point )    vs.    GetCursorPos( $Point )</code></pre>
+
+</li>
+</ul>
+
+<h2 id="FOREIGN-MEMORY-ALLOCATORS">FOREIGN MEMORY ALLOCATORS</h2>
+
+<p>Using Win32::API::Struct is not recommended in situations where a C function will return results to you by putting a pointer to a string or a pointer to another struct into your supplied struct. Win32::API::Struct will do its best to detect that a new pointer appeared and to read it contents into Perl, but that pointer will be tossed away after being read. If this pointer is something you must explicitly free, you have leaked it by using Win32::API::Struct to decode it. If this pointer is something you must pass back to the C API you are using, you lost/leaked it. If you pass NULL, or a ::Struct pointer in a ::Struct to C API, after the C API call, ::Struct will detect the pointer changed, it will read the new struct from the new pointer into Perl, and a new child ::Struct will appear in the hash slice of the parent ::Struct, if you pass this new child ::Struct into the C API it will be a <b>COPY</b> of the struct the C API from Perl&#39;s allocation placed in the parent ::Struct. For C++-like APIs, this will be unacceptable and lead to crashes as the C Functions tries to free a memory block that didn&#39;t come from the allocator of the C Function. Windows has many memory allocators, each CRT (VS 2, 3, 4, 5, NT/6, 7.0, 7.1, 8, 9, 10) malloc, LocalAlloc, GlobalAlloc, HeapAlloc, (each version of C++ Runtime Library) &quot;new&quot;, CoGetMalloc, CoTaskMemAlloc, NetApiBufferAllocate, VirtualAlloc, CryptMemAlloc, AllocADsMem, SHAlloc, SnmpUtilMemAlloc. None of these allocators&#39; pointers are compatible with Perl&#39;s allocator. Some C APIs give you static global buffers which never are freed or freed automatically in the next call to a function from to that DLL.</p>
+
+<p>With foreign allocators, its best to treat to write a pointer class, bless the ref to scalar integer (holding the pointer) into that class to ensure that the DESTROY method will free the pointer and you never leak it, and your write method accessors using <a href="../../../lib/pods/perlfunc.html#pack">&quot;pack&quot; in perlfunc</a>, <a href="../../../lib/Win32/API.html#ReadMemory">&quot;ReadMemory&quot; in Win32::API</a> and <a href="../../../lib/Win32/API.html#WriteMemory">&quot;WriteMemory&quot; in Win32::API</a> around the pointer.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Aldo Calpini ( <i>dada@perl.it</i> ).</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<p>Cosimo Streppone ( <i>cosimo@cpan.org</i> ).</p>
+
+
+</body>
+
+</html>
+
+

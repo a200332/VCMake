@@ -1,0 +1,292 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#Invalid-DateTimes">Invalid DateTimes</a></li>
+      <li><a href="#The-days-Parameter">The &quot;days&quot; Parameter</a></li>
+      <li><a href="#The-interval-and-start-Parameters">The &quot;interval&quot; and &quot;start&quot; Parameters</a></li>
+      <li><a href="#The-week_start_day-Parameter">The &quot;week_start_day&quot; Parameter</a></li>
+      <li><a href="#Time-Zones">Time Zones</a></li>
+      <li><a href="#Leap-Seconds">Leap Seconds</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Event::Recurrence - DateTime::Set extension for create basic recurrence sets</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">DateTime</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">year</span>   <span class="operator">=&gt;</span> <span class="number">2000</span><span class="operator">,</span>
+                         <span class="string">month</span>  <span class="operator">=&gt;</span> <span class="number">6</span><span class="operator">,</span>
+                         <span class="string">day</span>    <span class="operator">=&gt;</span> <span class="number">20</span><span class="operator">,</span>
+                       <span class="operator">);</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$daily_set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">daily</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$dt_next</span> <span class="operator">=</span> <span class="variable">$daily_set</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$dt_previous</span> <span class="operator">=</span> <span class="variable">$daily_set</span><span class="operator">-&gt;</span><span class="variable">previous</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$bool</span> <span class="operator">=</span> <span class="variable">$daily_set</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+ 
+ <span class="keyword">my</span> <span class="variable">@days</span> <span class="operator">=</span> <span class="variable">$daily_set</span><span class="operator">-&gt;</span><span class="variable">as_list</span><span class="operator">(</span> <span class="string">start</span> <span class="operator">=&gt;</span> <span class="variable">$dt1</span><span class="operator">,</span> <span class="string">end</span> <span class="operator">=&gt;</span> <span class="variable">$dt2</span> <span class="operator">);</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$daily_set</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+ 
+ <span class="keyword">while</span> <span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">next</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">' '</span><span class="operator">,</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">datetime</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides convenience methods that let you easily create <code>DateTime::Set</code> objects for various recurrences, such as &quot;once a month&quot; or &quot;every day&quot;. You can also create more complicated recurrences, such as &quot;every Monday, Wednesday and Thursday at 10:00 AM and 2:00 PM&quot;.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<ul>
+
+<li><p>yearly monthly weekly daily hourly minutely secondly</p>
+
+<p>These methods all return a new <code>DateTime::Set</code> object representing the given recurrence.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$daily_set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">daily</span><span class="operator">;</span>
+</code></pre>
+
+<p>If no parameters are given, then the set members each occur at the <i>beginning</i> of the specified recurrence.</p>
+
+<p>For example, by default, the <code>monthly()</code> method returns a set containing the first day of each month.</p>
+
+<p>Without parameters, the <code>weekly()</code> method returns a set containing <i>Mondays</i>.</p>
+
+<p>However, you can pass in parameters to alter where these datetimes fall. The parameters are the same as those given to the <code>DateTime::Duration</code> constructor for specifying the length of a duration. For example, to create a set representing a daily recurrence at 10:30 each day, we write this:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$daily_at_10_30_set</span> <span class="operator">=</span>
+      <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">daily</span><span class="operator">(</span> <span class="string">hours</span> <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">,</span> <span class="string">minutes</span> <span class="operator">=&gt;</span> <span class="number">30</span> <span class="operator">);</span>
+</code></pre>
+
+<p>To represent every <i>Tuesday</i> (second day of the week):</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$weekly_on_tuesday_set</span> <span class="operator">=</span>
+      <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">weekly</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">);</span>
+</code></pre>
+
+<p>A negative duration counts backwards from the end of the period. This is done in the same manner as is specified in RFC 2445 (iCal).</p>
+
+<p>Negative durations are useful for creating recurrences such as the <i>last day of each month</i>:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$last_day_of_month_set</span> <span class="operator">=</span>
+      <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">monthly</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">1</span> <span class="operator">);</span>
+</code></pre>
+
+<p>You can also provide multiple sets of duration arguments, such as this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">daily</span>
+                  <span class="operator">(</span> <span class="string">hours</span> <span class="operator">=&gt;</span>   <span class="operator">[</span> <span class="number">10</span><span class="operator">,</span> <span class="number">14</span><span class="operator">,</span>  <span class="operator">-</span><span class="number">1</span> <span class="operator">]</span><span class="operator">,</span>
+                    <span class="string">minutes</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">15</span><span class="operator">,</span> <span class="number">30</span><span class="operator">,</span> <span class="operator">-</span><span class="number">15</span> <span class="operator">]</span><span class="operator">,</span>
+                  <span class="operator">);</span>
+</code></pre>
+
+<p>This specifies a recurrence occurring every day at these 9 different times:</p>
+
+<pre><code>  10:15,  10:30,  10:45,   # +10h         ( +15min / +30min / last 15min (-15) )
+  14:15,  14:30,  14:45,   # +14h         ( +15min / +30min / last 15min (-15) )
+  23:15,  23:30,  23:45,   # last 1h (-1) ( +15min / +30min / last 15min (-15) )</code></pre>
+
+<p>To create a set of recurrences occurring every thirty seconds, we could do this:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$every_30_seconds_set</span> <span class="operator">=</span>
+        <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">minutely</span><span class="operator">(</span> <span class="string">seconds</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">0</span><span class="operator">,</span> <span class="number">30</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The following is also valid. See the section on the &quot;interval&quot; parameter:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$every_30_seconds_set</span> <span class="operator">=</span>
+        <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">secondly</span><span class="operator">(</span> <span class="string">interval</span> <span class="operator">=&gt;</span> <span class="number">30</span> <span class="operator">);</span>
+        
+</code></pre>
+
+</li>
+</ul>
+
+<h2 id="Invalid-DateTimes">Invalid DateTimes</h2>
+
+<p>Invalid values are skipped at run time.</p>
+
+<p>For example, when days are added to a month, the result is checked for a nonexisting day (such as 31 or 30), and the invalid datetimes are skipped.</p>
+
+<p>Another example of this would be creating a set via the <code>daily()</code> method and specifying <code>hours =&gt; 25</code>.</p>
+
+<h2 id="The-days-Parameter">The &quot;days&quot; Parameter</h2>
+
+<p>The &quot;days&quot; parameter can be combined with yearly, monthly, and weekly recurrences, resulting in six possible meanings:</p>
+
+<pre><code>    <span class="comment"># tuesday of every week</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">weekly</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">);</span>
+    
+    <span class="comment"># 10th day of every month</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">monthly</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">10</span> <span class="operator">);</span>
+    
+    <span class="comment"># second full week of every month, on tuesday</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">monthly</span><span class="operator">(</span> <span class="string">weeks</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">);</span>
+    
+    <span class="comment"># 10th day of every year</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">yearly</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">10</span> <span class="operator">);</span>
+    
+    <span class="comment"># 10th day of every december</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">yearly</span><span class="operator">(</span> <span class="string">months</span> <span class="operator">=&gt;</span> <span class="number">12</span><span class="operator">,</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">10</span> <span class="operator">);</span>
+    
+    <span class="comment"># second week of every year, on tuesday</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">yearly</span><span class="operator">(</span> <span class="string">weeks</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Week days can also be called by name, as is specified in RFC 2445 (iCal):</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$weekly_on_tuesday_set</span> <span class="operator">=</span>
+      <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">weekly</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="string">'tu'</span> <span class="operator">);</span>
+      
+</code></pre>
+
+<p>The &quot;days&quot; parameter defaults to &quot;the first day&quot;. See also the section on the &quot;week_start_day&quot; parameter.</p>
+
+<pre><code>    <span class="comment"># second full week of every month, on monday</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">monthly</span><span class="operator">(</span> <span class="string">weeks</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">);</span>
+    
+    <span class="comment"># second tuesday of every month</span>
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">monthly</span><span class="operator">(</span> <span class="string">weeks</span> <span class="operator">=&gt;</span> <span class="number">2</span><span class="operator">,</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="string">"tu"</span><span class="operator">,</span> <span class="string">week_start_day</span> <span class="operator">=&gt;</span> <span class="string">"1tu"</span> <span class="operator">);</span>
+</code></pre>
+
+<h2 id="The-interval-and-start-Parameters">The &quot;interval&quot; and &quot;start&quot; Parameters</h2>
+
+<p>The &quot;interval&quot; parameter represents how often the recurrence rule repeats.</p>
+
+<p>The optional &quot;start&quot; parameter specifies where to start counting:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$dt_start</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">2003</span><span class="operator">,</span> <span class="string">month</span> <span class="operator">=&gt;</span> <span class="number">6</span><span class="operator">,</span> <span class="string">day</span> <span class="operator">=&gt;</span> <span class="number">15</span> <span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">daily</span>
+                  <span class="operator">(</span> <span class="string">interval</span> <span class="operator">=&gt;</span> <span class="number">11</span><span class="operator">,</span>
+                    <span class="string">hours</span>    <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">,</span>
+                    <span class="string">minutes</span>  <span class="operator">=&gt;</span> <span class="number">30</span><span class="operator">,</span>
+                    <span class="string">start</span>    <span class="operator">=&gt;</span> <span class="variable">$dt_start</span><span class="operator">,</span>
+                  <span class="operator">);</span>
+</code></pre>
+
+<p>This specifies a recurrence that happens at 10:30 on the day specified by <code>start =&gt; $dt</code>, and then every 11 days <i>before and after</i> <code>$dt</code>. So we get a set like this:</p>
+
+<pre><code>    ...
+    2003-06-04T10:30:00,
+    2003-06-15T10:30:00,
+    2003-06-26T10:30:00,
+    ...</code></pre>
+
+<p>In this case, the method is used to specify the unit, so <code>daily()</code> means that our unit is a day, and <code>interval =&gt; 11</code> specifies the quantity of our unit.</p>
+
+<p>The &quot;start&quot; parameter should have no time zone.</p>
+
+<h2 id="The-week_start_day-Parameter">The &quot;week_start_day&quot; Parameter</h2>
+
+<p>The <code>week_start_day</code> represents how the &#39;first week&#39; of a period is calculated:</p>
+
+<p>&quot;mo&quot;, &quot;tu&quot;, &quot;we&quot;, &quot;th&quot;, &quot;fr&quot;, &quot;sa&quot;, &quot;su&quot; - The first week is one that starts on this week-day, and has <i>the most days</i> in this period. Works for <code>weekly</code> and <code>yearly</code> recurrences.</p>
+
+<p>&quot;1mo&quot;, &quot;1tu&quot;, &quot;1we&quot;, &quot;1th&quot;, &quot;1fr&quot;, &quot;1sa&quot;, &quot;1su&quot; - The first week is one that starts on this week-day, and has <i>all days</i> in this period. This works for <code>weekly()</code>, <code>monthly()</code> and <code>yearly()</code> recurrences.</p>
+
+<p>The <code>week_start_day</code> defaults to &quot;1mo&quot;, except in yearly (<code>yearly()</code>) recurrences which default to &quot;mo&quot;.</p>
+
+<h2 id="Time-Zones">Time Zones</h2>
+
+<p>Recurrences are created in the &#39;floating&#39; time zone, as specified in the <code>DateTime</code> module.</p>
+
+<p>If you want to specify a time zone for a recurrence, you can do this by calling <code>set_time_zone()</code> on the returned set:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$daily</span> <span class="operator">=</span> <span class="variable">DateTime::Event::Recurrence</span><span class="operator">-&gt;</span><span class="variable">daily</span><span class="operator">;</span>
+  <span class="variable">$daily</span><span class="operator">-&gt;</span><span class="variable">set_time_zone</span><span class="operator">(</span> <span class="string">'Europe/Berlin'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>You can also pass a <code>DateTime.pm</code> object with a time zone to the set&#39;s <code>next()</code> and <code>previous()</code> methods:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">today</span><span class="operator">(</span> <span class="string">time_zone</span> <span class="operator">=&gt;</span> <span class="string">'Europe/Berlin'</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$next</span> <span class="operator">=</span> <span class="variable">$daily</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">(</span><span class="variable">$dt</span><span class="operator">);</span>
+</code></pre>
+
+<p>A recurrence can be affected DST changes, so it would be possible to specify a recurrence that creates nonexistent datetimes. Because <code>DateTime.pm</code> throws an exception if asked to create a non-existent datetime, please be careful when setting a time zone for your recurrence.</p>
+
+<p>It might be preferable to always use &quot;UTC&quot; for your sets, and then convert the returned object to the desired time zone.</p>
+
+<h2 id="Leap-Seconds">Leap Seconds</h2>
+
+<p>There are no leap seconds, because the recurrences are created in the &#39;floating&#39; time zone.</p>
+
+<p>The value <code>60</code> for seconds (the leap second) is ignored. If you <i>really</i> want the leap second, then specify the second as <code>-1</code>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Flavio Soibelmann Glock fglock@gmail.com</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>The API was developed with help from the people in the datetime@perl.org list.</p>
+
+<p>Special thanks to Dave Rolsky, Ron Hill and Matt Sisk for being around with ideas.</p>
+
+<p>If you can understand what this module does by reading the docs, you should thank Dave Rolsky. If you can&#39;t understand it, yell at him. He also helped removing weird idioms from the code.</p>
+
+<p>Jerrad Pierce came with the idea to move &quot;interval&quot; from DateTime::Event::ICal to here.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2003 Flavio Soibelmann Glock. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>datetime@perl.org mailing list</p>
+
+<p>DateTime Web page at http://datetime.perl.org/</p>
+
+<p>DateTime - date and time :)</p>
+
+<p>DateTime::Set - for recurrence-set accessors docs. You can use DateTime::Set to specify recurrences using callback subroutines.</p>
+
+<p>DateTime::Event::ICal - if you need more complex recurrences.</p>
+
+<p>DateTime::SpanSet - sets of intervals, including recurring sets of intervals.</p>
+
+
+</body>
+
+</html>
+
+

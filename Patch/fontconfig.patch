@@ -1,0 +1,53 @@
+ CMakeLists.txt | 20 ++++++++++----------
+ config.h       |  2 +-
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 007c353..a84fb0c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,7 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+ if(MSVC)
+ 	find_package(iconv)
+ 	list(APPEND LIBRARIES_TO_LINK ${ICONV_LIBRARIES})
+-	list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_CRT_NONSTDC_NO_WARNINGS)
++	list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_CRT_NONSTDC_NO_WARNINGS -DXML_STATIC)
+ 	include_directories(${ICONV_INCLUDE_DIR})
+ endif()
+ 
+@@ -98,13 +98,13 @@ if(BUILD_STATIC)
+ 	set_target_properties(fontconfig-static PROPERTIES COMPILE_DEFINITIONS "-DDLL_EXPORT")
+ endif()
+ 
+-target_link_libraries(fc-arch fontconfig)
+-target_link_libraries(fc-cache fontconfig)
+-target_link_libraries(fc-case fontconfig)
+-target_link_libraries(fc-cat fontconfig)
+-target_link_libraries(fc-glyphname fontconfig)
+-target_link_libraries(fc-lang fontconfig)
+-target_link_libraries(fc-match fontconfig)
+-target_link_libraries(fc-query fontconfig)
+-target_link_libraries(fc-scan fontconfig)
++target_link_libraries(fc-arch fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-cache fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-case fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-cat fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-glyphname fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-lang fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-match fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-query fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
++target_link_libraries(fc-scan fontconfig-static zlib libpng16 harfbuzz libexpat bz2)
+ 
+diff --git a/config.h b/config.h
+index 2a96a0d..e54156f 100644
+--- a/config.h
++++ b/config.h
+@@ -32,7 +32,7 @@
+ #    define W_OK 0x02
+ #endif
+ 
+-#define snprintf _snprintf
++//#define snprintf _snprintf
+ /* Font configuration directory */
+ #define CONFDIR "c:/windows/etc"
+ 

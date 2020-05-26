@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Class-Methods">Class Methods</a>
+        <ul>
+          <li><a href="#new">new</a></li>
+        </ul>
+      </li>
+      <li><a href="#Instance-Methods">Instance Methods</a>
+        <ul>
+          <li><a href="#initialize">_initialize</a></li>
+          <li><a href="#croak">_croak</a></li>
+          <li><a href="#confess">_confess</a></li>
+          <li><a href="#construct">_construct</a></li>
+          <li><a href="#mk_methods">mk_methods</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>TAP::Object - Base class that provides common functionality to all <code>TAP::*</code> modules</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 3.39</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">TAP::Whatever</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'TAP::Object'</span><span class="operator">;</span>
+    
+    <span class="comment"># new() implementation by TAP::Object</span>
+    <span class="keyword">sub</span><span class="variable"> _initialize </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$self</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="comment"># initialize your object</span>
+        <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="comment"># ... later ...</span>
+    <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">TAP::Whatever</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">@args</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>TAP::Object</code> provides a default constructor and exception model for all <code>TAP::*</code> classes. Exceptions are raised using <a href="../../lib/Carp.html">Carp</a>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Class-Methods">Class Methods</h2>
+
+<h3 id="new"><code>new</code></h3>
+
+<p>Create a new object. Any arguments passed to <code>new</code> will be passed on to the <a href="#initialize">&quot;_initialize&quot;</a> method. Returns a new object.</p>
+
+<h2 id="Instance-Methods">Instance Methods</h2>
+
+<h3 id="initialize"><code>_initialize</code></h3>
+
+<p>Initializes a new object. This method is a stub by default, you should override it as appropriate.</p>
+
+<p><i>Note:</i> <a href="#new">&quot;new&quot;</a> expects you to return <code>$self</code> or raise an exception. See <a href="#croak">&quot;_croak&quot;</a>, and <a href="../../lib/Carp.html">Carp</a>.</p>
+
+<h3 id="croak"><code>_croak</code></h3>
+
+<p>Raise an exception using <code>croak</code> from <a href="../../lib/Carp.html">Carp</a>, eg:</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_croak</span><span class="operator">(</span> <span class="string">'why me?'</span><span class="operator">,</span> <span class="string">'aaarrgh!'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>May also be called as a <i>class</i> method.</p>
+
+<pre><code>    <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">_croak</span><span class="operator">(</span> <span class="string">'this works too'</span> <span class="operator">);</span>
+</code></pre>
+
+<h3 id="confess"><code>_confess</code></h3>
+
+<p>Raise an exception using <code>confess</code> from <a href="../../lib/Carp.html">Carp</a>, eg:</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_confess</span><span class="operator">(</span> <span class="string">'why me?'</span><span class="operator">,</span> <span class="string">'aaarrgh!'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>May also be called as a <i>class</i> method.</p>
+
+<pre><code>    <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">_confess</span><span class="operator">(</span> <span class="string">'this works too'</span> <span class="operator">);</span>
+</code></pre>
+
+<h3 id="construct"><code>_construct</code></h3>
+
+<p>Create a new instance of the specified class.</p>
+
+<h3 id="mk_methods"><code>mk_methods</code></h3>
+
+<p>Create simple getter/setters.</p>
+
+<pre><code> <span class="keyword">__PACKAGE__</span><span class="operator">-&gt;</span><span class="variable">mk_methods</span><span class="operator">(</span><span class="variable">@method_names</span><span class="operator">);</span>
+</code></pre>
+
+
+</body>
+
+</html>
+
+

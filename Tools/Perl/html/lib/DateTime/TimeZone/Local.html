@@ -1,0 +1,153 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#DateTime::TimeZone::Local-TimeZone">DateTime::TimeZone::Local-&gt;TimeZone()</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUBCLASSING">SUBCLASSING</a>
+    <ul>
+      <li><a href="#class-Methods">$class-&gt;Methods()</a></li>
+      <li><a href="#class-FromEnv">$class-&gt;FromEnv()</a></li>
+      <li><a href="#class-EnvVars">$class-&gt;EnvVars()</a></li>
+      <li><a href="#class-_IsValidName-name">$class-&gt;_IsValidName($name)</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLE-SUBCLASS">EXAMPLE SUBCLASS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::TimeZone::Local - Determine the local system&#39;s time zone</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.15</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$tz</span> <span class="operator">=</span> <span class="variable">DateTime::TimeZone</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'local'</span> <span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$tz</span> <span class="operator">=</span> <span class="variable">DateTime::TimeZone::Local</span><span class="operator">-&gt;</span><span class="variable">TimeZone</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides an interface for determining the local system&#39;s time zone. Most of the functionality for doing this is in OS-specific subclasses.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>This class provides the following methods:</p>
+
+<h2 id="DateTime::TimeZone::Local-TimeZone">DateTime::TimeZone::Local-&gt;TimeZone()</h2>
+
+<p>This attempts to load an appropriate subclass and asks it to find the local time zone. This method is called by when you pass &quot;local&quot; as the time zone name to <code>DateTime:TimeZone-&gt;new()</code>.</p>
+
+<p>If your OS is not explicitly handled, you can create a module with a name of the form <code>DateTime::TimeZone::Local::$^O</code>. If it exists, it will be used instead of falling back to the Unix subclass.</p>
+
+<p>If no OS-specific module exists, we fall back to using the Unix subclass.</p>
+
+<p>See <a href="../../../lib/DateTime/TimeZone/Local/Unix.html">DateTime::TimeZone::Local::Unix</a>, <a>DateTime::TimeZone::Local::Win32</a>, and <a href="../../../lib/DateTime/TimeZone/Local/VMS.html">DateTime::TimeZone::Local::VMS</a> for OS-specific details.</p>
+
+<h1 id="SUBCLASSING">SUBCLASSING</h1>
+
+<p>If you want to make a new OS-specific subclass, there are several methods provided by this module you should know about.</p>
+
+<h2 id="class-Methods">$class-&gt;Methods()</h2>
+
+<p>This method should be provided by your class. It should provide a list of methods that will be called to try to determine the local time zone.</p>
+
+<p>Each of these methods is expected to return a new <code>DateTime::TimeZone</code> object if it determines the time zone.</p>
+
+<h2 id="class-FromEnv">$class-&gt;FromEnv()</h2>
+
+<p>This method tries to find a valid time zone in an <code>%ENV</code> value. It calls <code>$class-&gt;EnvVars()</code> to determine which keys to look at.</p>
+
+<p>To use this from a subclass, simply return &quot;FromEnv&quot; as one of the items from <code>$class-&gt;Methods()</code>.</p>
+
+<h2 id="class-EnvVars">$class-&gt;EnvVars()</h2>
+
+<p>This method should be provided by your subclass. It should return a list of env vars to be checked by <code>$class-&gt;FromEnv()</code>.</p>
+
+<h2 id="class-_IsValidName-name">$class-&gt;_IsValidName($name)</h2>
+
+<p>Given a possible time zone name, this returns a boolean indicating whether or not the name looks valid. It always return false for &quot;local&quot; in order to avoid infinite loops.</p>
+
+<h1 id="EXAMPLE-SUBCLASS">EXAMPLE SUBCLASS</h1>
+
+<p>Here is a simple example subclass:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">DateTime::TimeZone::SomeOS</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'DateTime::TimeZone::Local'</span><span class="operator">;</span>
+  
+  
+  <span class="keyword">sub</span><span class="variable"> Methods </span><span class="operator">{</span> <span class="string">qw( FromEnv FromEther )</span> <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> EnvVars </span><span class="operator">{</span> <span class="string">qw( TZ ZONE )</span> <span class="operator">}</span>
+  
+  <span class="keyword">sub</span><span class="variable"> FromEther
+  </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/DateTime-TimeZone/issues">https://github.com/houseabsolute/DateTime-TimeZone/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for DateTime-TimeZone can be found at <a href="https://github.com/houseabsolute/DateTime-TimeZone">https://github.com/houseabsolute/DateTime-TimeZone</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2017 by Dave Rolsky.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

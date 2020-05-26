@@ -1,0 +1,302 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#PLANNING">PLANNING</a></li>
+      <li><a href="#ASSERTIONS">ASSERTIONS</a></li>
+      <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+      <li><a href="#META">META</a></li>
+    </ul>
+  </li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Tools::Basic - Test2 implementation of the basic testing tools.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a <a href="../../../lib/Test2.html">Test2</a> based implementation of the more basic tools originally provided by <a href="../../../lib/Test/More.html">Test::More</a>. Not all <a href="../../../lib/Test/More.html">Test::More</a> tools are provided by this package, only the basic/simple ones. Some tools have been modified for better diagnostics capabilities.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::Tools::Basic</span><span class="operator">;</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">,</span> <span class="string">"simple test"</span><span class="operator">);</span>
+    
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$passing</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">pass</span><span class="operator">(</span><span class="string">'a passing test'</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    <span class="keyword">else</span> <span class="operator">{</span>
+        <span class="variable">fail</span><span class="operator">(</span><span class="string">'a failing test'</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">diag</span> <span class="string">"This is a diagnostics message on STDERR"</span><span class="operator">;</span>
+    <span class="variable">note</span> <span class="string">"This is a diagnostics message on STDOUT"</span><span class="operator">;</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$todo</span> <span class="operator">=</span> <span class="variable">todo</span> <span class="string">"Reason for todo"</span><span class="operator">;</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"this test is todo"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"this test is not todo"</span><span class="operator">);</span>
+    
+    <span class="variable">todo</span> <span class="string">"reason"</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"this test is todo"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"this test is not todo"</span><span class="operator">);</span>
+    
+    <span class="variable">SKIP</span><span class="operator">:</span> <span class="operator">{</span>
+        <span class="variable">skip</span> <span class="string">"This will wipe your drive"</span><span class="operator">;</span>
+    
+        <span class="comment"># This never gets run:</span>
+        <span class="variable">ok</span><span class="operator">(!</span><span class="keyword">system</span><span class="operator">(</span><span class="string">'sudo rm -rf /'</span><span class="operator">),</span> <span class="string">"Wipe drive"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">done_testing</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>All subs are exported by default.</p>
+
+<h2 id="PLANNING">PLANNING</h2>
+
+<dl>
+
+<dt id="plan-num">plan($num)</dt>
+<dd>
+
+</dd>
+<dt id="plan-tests-num">plan(&#39;tests&#39; =&gt; $num)</dt>
+<dd>
+
+</dd>
+<dt id="plan-skip_all-reason">plan(&#39;skip_all&#39; =&gt; $reason)</dt>
+<dd>
+
+<p>Set the number of tests that are expected. This must be done first or last, never in the middle of testing.</p>
+
+<p>For legacy compatibility you can specify &#39;tests&#39; as the first argument before the number. You can also use this to skip all with the &#39;skip_all&#39; prefix, followed by a reason for skipping.</p>
+
+</dd>
+<dt id="skip_all-reason">skip_all($reason)</dt>
+<dd>
+
+<p>Set the plan to 0 with a reason, then exit true. This should be used before any tests are run.</p>
+
+</dd>
+<dt id="done_testing">done_testing</dt>
+<dd>
+
+<p>Used to mark the end of testing. This is a safe way to have a dynamic or unknown number of tests.</p>
+
+</dd>
+<dt id="bail_out-reason">bail_out($reason)</dt>
+<dd>
+
+<p>Invoked when something has gone horribly wrong: stop everything, kill all threads and processes, end the process with a false exit status.</p>
+
+</dd>
+</dl>
+
+<h2 id="ASSERTIONS">ASSERTIONS</h2>
+
+<dl>
+
+<dt id="ok-bool">ok($bool)</dt>
+<dd>
+
+</dd>
+<dt id="ok-bool-name">ok($bool, $name)</dt>
+<dd>
+
+</dd>
+<dt id="ok-bool-name-diag">ok($bool, $name, @diag)</dt>
+<dd>
+
+<p>Simple assertion. If <code>$bool</code> is true the test passes, and if it is false the test fails. The test name is optional, and all arguments after the name are added as diagnostics message if and only if the test fails. If the test passes all the diagnostics arguments will be ignored.</p>
+
+</dd>
+<dt id="pass">pass()</dt>
+<dd>
+
+</dd>
+<dt id="pass-name">pass($name)</dt>
+<dd>
+
+<p>Fire off a passing test (a single Ok event). The name is optional</p>
+
+</dd>
+<dt id="fail">fail()</dt>
+<dd>
+
+</dd>
+<dt id="fail-name">fail($name)</dt>
+<dd>
+
+</dd>
+<dt id="fail-name-diag">fail($name, @diag)</dt>
+<dd>
+
+<p>Fire off a failing test (a single Ok event). The name and diagnostics are optional.</p>
+
+</dd>
+</dl>
+
+<h2 id="DIAGNOSTICS">DIAGNOSTICS</h2>
+
+<dl>
+
+<dt id="diag-messages">diag(@messages)</dt>
+<dd>
+
+<p>Write diagnostics messages. All items in <code>@messages</code> will be joined into a single string with no separator. When using TAP, diagnostics are sent to STDERR.</p>
+
+</dd>
+<dt id="note-messages">note(@messages)</dt>
+<dd>
+
+<p>Write note-diagnostics messages. All items in <code>@messages</code> will be joined into a single string with no separator. When using TAP, notes are sent to STDOUT.</p>
+
+</dd>
+</dl>
+
+<h2 id="META">META</h2>
+
+<dl>
+
+<dt id="todo-todo-reason">$todo = todo($reason)</dt>
+<dd>
+
+</dd>
+<dt id="todo-reason-sub">todo $reason =&gt; sub { ... }</dt>
+<dd>
+
+<p>This is used to mark some results as TODO. TODO means that the test may fail, but will not cause the overall test suite to fail.</p>
+
+<p>There are two ways to use this. The first is to use a codeblock, and the TODO will only apply to the codeblock.</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"before"</span><span class="operator">);</span> <span class="comment"># Not TODO</span>
+    
+    <span class="variable">todo</span> <span class="string">'this will fail'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="comment"># This is TODO, as is any other test in this block.</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"blah"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"after"</span><span class="operator">);</span> <span class="comment"># Not TODO</span>
+</code></pre>
+
+<p>The other way is to use a scoped variable. TODO will end when the variable is destroyed or set to undef.</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"before"</span><span class="operator">);</span> <span class="comment"># Not TODO</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$todo</span> <span class="operator">=</span> <span class="variable">todo</span> <span class="string">'this will fail'</span><span class="operator">;</span>
+    
+        <span class="comment"># This is TODO, as is any other test in this block.</span>
+        <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"blah"</span><span class="operator">);</span>
+    <span class="operator">};</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"after"</span><span class="operator">);</span> <span class="comment"># Not TODO</span>
+</code></pre>
+
+<p>This is the same thing, but without the <code><span class="operator">{...}</span>
+</code> scope.</p>
+
+<pre><code>    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"before"</span><span class="operator">);</span> <span class="comment"># Not TODO</span>
+    
+    <span class="keyword">my</span> <span class="variable">$todo</span> <span class="operator">=</span> <span class="variable">todo</span> <span class="string">'this will fail'</span><span class="operator">;</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">"blah"</span><span class="operator">);</span> <span class="comment"># TODO</span>
+    
+    <span class="variable">$todo</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span>
+    
+    <span class="variable">ok</span><span class="operator">(</span><span class="number">1</span><span class="operator">,</span> <span class="string">"after"</span><span class="operator">);</span> <span class="comment"># Not TODO</span>
+</code></pre>
+
+</dd>
+<dt id="skip-why">skip($why)</dt>
+<dd>
+
+</dd>
+<dt id="skip-why-count">skip($why, $count)</dt>
+<dd>
+
+<p>This is used to skip some tests. This requires you to wrap your tests in a block labeled <code>SKIP:</code>. This is somewhat magical. If no <code>$count</code> is specified then it will issue a single result. If you specify <code>$count</code> it will issue that many results.</p>
+
+<pre><code>    <span class="variable">SKIP</span><span class="operator">:</span> <span class="operator">{</span>
+        <span class="variable">skip</span> <span class="string">"This will wipe your drive"</span><span class="operator">;</span>
+    
+        <span class="comment"># This never gets run:</span>
+        <span class="variable">ok</span><span class="operator">(!</span><span class="keyword">system</span><span class="operator">(</span><span class="string">'sudo rm -rf /'</span><span class="operator">),</span> <span class="string">"Wipe drive"</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

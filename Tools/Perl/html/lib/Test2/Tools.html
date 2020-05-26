@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FAQ">FAQ</a></li>
+  <li><a href="#HOW-DO-I-WRITE-A-TOOLS-MODULE">HOW DO I WRITE A &#39;TOOLS&#39; MODULE?</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Tools - Documentation for Tools.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Tools are packages that export test functions, typically all related to a specific aspect of testing. If you have a couple different categories of exports then you may want to break them into separate modules.</p>
+
+<p>Tools should export testing functions. Loading tools <b>should not</b> have side effects, or alter the behavior of other tools. If you want to alter behaviors or create side effects then you probably want to write a <a href="../../lib/Test2/Plugin.html">Test2::Plugin</a>.</p>
+
+<h1 id="FAQ">FAQ</h1>
+
+<dl>
+
+<dt id="Why-is-it-called-Test2::Tools-and-not-Test2::Tool">Why is it called Test2::Tools, and not Test2::Tool?</dt>
+<dd>
+
+<p>This question arises since Tools is the only namespace in the plural. This is because each Plugin should be a distinct unit of functionality, but a Tools dist can (and usually should) export several tools. A bundle is also typically described as a single unit. Nobody would like Test2::Bundles::Foo.</p>
+
+</dd>
+<dt id="Should-my-tools-subclass-Test2::Tools">Should my tools subclass Test2::Tools?</dt>
+<dd>
+
+<p>No. Currently this class is empty. Eventually we may want to add behavior, in which case we do not want anyone to already be subclassing it.</p>
+
+</dd>
+</dl>
+
+<h1 id="HOW-DO-I-WRITE-A-TOOLS-MODULE">HOW DO I WRITE A &#39;TOOLS&#39; MODULE?</h1>
+
+<p>It is very easy to write tools:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Test2::Tools::Mine</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="comment"># All tools should use the context() function.</span>
+    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context/</span><span class="operator">;</span>
+    
+    <span class="keyword">our</span> <span class="variable">@EXPORTS</span> <span class="operator">=</span> <span class="string">qw/ok plan/</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Exporter'</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> ok</span><span class="operator">(</span>$;$<span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="comment"># All tool functions should start by grabbing a context</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+    
+        <span class="comment"># The context is the primary interface for generating events</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">ok</span><span class="operator">(</span><span class="variable">$bool</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">);</span>
+    
+        <span class="comment"># When you are done you release the context</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    
+        <span class="keyword">return</span> <span class="variable">$bool</span> <span class="operator">?</span> <span class="number">1</span> <span class="operator">:</span> <span class="number">0</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> plan </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$max</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">plan</span><span class="operator">(</span><span class="variable">$max</span><span class="operator">);</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>See <a href="../../lib/Test2/API/Context.html">Test2::API::Context</a> for documentation on what the <code>$ctx</code> object can do.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

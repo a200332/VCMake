@@ -1,0 +1,287 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ROLE-COMPOSITION">ROLE COMPOSITION</a></li>
+  <li><a href="#IMPORTED-SUBROUTINES">IMPORTED SUBROUTINES</a>
+    <ul>
+      <li><a href="#requires">requires</a></li>
+      <li><a href="#with">with</a></li>
+      <li><a href="#before">before</a></li>
+      <li><a href="#around">around</a></li>
+      <li><a href="#after">after</a></li>
+      <li><a href="#Strict-and-Warnings">Strict and Warnings</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#does_role">does_role</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#apply_roles_to_package">apply_roles_to_package</a></li>
+      <li><a href="#apply_roles_to_object">apply_roles_to_object</a></li>
+      <li><a href="#create_class_with_roles">create_class_with_roles</a></li>
+      <li><a href="#is_role">is_role</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Role::Tiny - Roles. Like a nouvelle cuisine portion size slice of Moose.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">package</span> <span class="variable">Some::Role</span><span class="operator">;</span>
+ 
+ <span class="keyword">use</span> <span class="variable">Role::Tiny</span><span class="operator">;</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> bar </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+ 
+ <span class="variable">around</span> <span class="string">baz</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+ 
+ <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>elsewhere</p>
+
+<pre><code> <span class="keyword">package</span> <span class="variable">Some::Class</span><span class="operator">;</span>
+ 
+ <span class="keyword">use</span> <span class="variable">Role::Tiny::With</span><span class="operator">;</span>
+ 
+ <span class="comment"># bar gets imported, but not foo</span>
+ <span class="variable">with</span> <span class="string">'Some::Role'</span><span class="operator">;</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+ 
+ <span class="comment"># baz is wrapped in the around modifier by Class::Method::Modifiers</span>
+ <span class="keyword">sub</span><span class="variable"> baz </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+ 
+ <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you wanted attributes as well, look at <a>Moo::Role</a>.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>Role::Tiny</code> is a minimalist role composition tool.</p>
+
+<h1 id="ROLE-COMPOSITION">ROLE COMPOSITION</h1>
+
+<p>Role composition can be thought of as much more clever and meaningful multiple inheritance. The basics of this implementation of roles is:</p>
+
+<ul>
+
+<li><p>If a method is already defined on a class, that method will not be composed in from the role. A method inherited by a class gets overridden by the role&#39;s method of the same name, though.</p>
+
+</li>
+<li><p>If a method that the role <a href="#requires">&quot;requires&quot;</a> to be implemented is not implemented, role application will fail loudly.</p>
+
+</li>
+</ul>
+
+<p>Unlike <a href="../../lib/Class/C3.html">Class::C3</a>, where the <b>last</b> class inherited from &quot;wins,&quot; role composition is the other way around, where the class wins. If multiple roles are applied in a single call (single with statement), then if any of their provided methods clash, an exception is raised unless the class provides a method since this conflict indicates a potential problem.</p>
+
+<h1 id="IMPORTED-SUBROUTINES">IMPORTED SUBROUTINES</h1>
+
+<h2 id="requires">requires</h2>
+
+<pre><code> <span class="variable">requires</span> <span class="string">qw(foo bar)</span><span class="operator">;</span>
+</code></pre>
+
+<p>Declares a list of methods that must be defined to compose role.</p>
+
+<h2 id="with">with</h2>
+
+<pre><code> <span class="variable">with</span> <span class="string">'Some::Role1'</span><span class="operator">;</span>
+ 
+ <span class="variable">with</span> <span class="string">'Some::Role1'</span><span class="operator">,</span> <span class="string">'Some::Role2'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Composes another role into the current role (or class via <a href="../../lib/Role/Tiny/With.html">Role::Tiny::With</a>).</p>
+
+<p>If you have conflicts and want to resolve them in favour of Some::Role1 you can instead write:</p>
+
+<pre><code> <span class="variable">with</span> <span class="string">'Some::Role1'</span><span class="operator">;</span>
+ <span class="variable">with</span> <span class="string">'Some::Role2'</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you have conflicts and want to resolve different conflicts in favour of different roles, please refactor your codebase.</p>
+
+<h2 id="before">before</h2>
+
+<pre><code> <span class="variable">before</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<p>See <a>&quot;before method(s) =&gt; sub { ... }&quot; in Class::Method::Modifiers</a> for full documentation.</p>
+
+<p>Note that since you are not required to use method modifiers, <a>Class::Method::Modifiers</a> is lazily loaded and we do not declare it as a dependency. If your <a href="../../lib/Role/Tiny.html">Role::Tiny</a> role uses modifiers you must depend on both <a>Class::Method::Modifiers</a> and <a href="../../lib/Role/Tiny.html">Role::Tiny</a>.</p>
+
+<h2 id="around">around</h2>
+
+<pre><code> <span class="variable">around</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<p>See <a>&quot;around method(s) =&gt; sub { ... }&quot; in Class::Method::Modifiers</a> for full documentation.</p>
+
+<p>Note that since you are not required to use method modifiers, <a>Class::Method::Modifiers</a> is lazily loaded and we do not declare it as a dependency. If your <a href="../../lib/Role/Tiny.html">Role::Tiny</a> role uses modifiers you must depend on both <a>Class::Method::Modifiers</a> and <a href="../../lib/Role/Tiny.html">Role::Tiny</a>.</p>
+
+<h2 id="after">after</h2>
+
+<pre><code> <span class="variable">after</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<p>See <a>&quot;after method(s) =&gt; sub { ... }&quot; in Class::Method::Modifiers</a> for full documentation.</p>
+
+<p>Note that since you are not required to use method modifiers, <a>Class::Method::Modifiers</a> is lazily loaded and we do not declare it as a dependency. If your <a href="../../lib/Role/Tiny.html">Role::Tiny</a> role uses modifiers you must depend on both <a>Class::Method::Modifiers</a> and <a href="../../lib/Role/Tiny.html">Role::Tiny</a>.</p>
+
+<h2 id="Strict-and-Warnings">Strict and Warnings</h2>
+
+<p>In addition to importing subroutines, using <code>Role::Tiny</code> applies <a href="../../lib/strict.html">strict</a> and <a href="../../lib/warnings.html">warnings</a> to the caller.</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<h2 id="does_role">does_role</h2>
+
+<pre><code> <span class="keyword">if</span> <span class="operator">(</span><span class="variable">Role::Tiny::does_role</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">,</span> <span class="string">'Some::Role'</span><span class="operator">))</span> <span class="operator">{</span>
+   <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>Returns true if class has been composed with role.</p>
+
+<p>This subroutine is also installed as -&gt;does on any class a Role::Tiny is composed into unless that class already has an -&gt;does method, so</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$foo</span><span class="operator">-&gt;</span><span class="variable">does</span><span class="operator">(</span><span class="string">'Some::Role'</span><span class="operator">))</span> <span class="operator">{</span>
+    <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>will work for classes but to test a role, one must use ::does_role directly.</p>
+
+<p>Additionally, Role::Tiny will override the standard Perl <code>DOES</code> method for your class. However, if <code>any</code> class in your class&#39; inheritance hierarchy provides <code>DOES</code>, then Role::Tiny will not override it.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="apply_roles_to_package">apply_roles_to_package</h2>
+
+<pre><code> <span class="variable">Role::Tiny</span><span class="operator">-&gt;</span><span class="variable">apply_roles_to_package</span><span class="operator">(</span>
+   <span class="string">'Some::Package'</span><span class="operator">,</span> <span class="string">'Some::Role'</span><span class="operator">,</span> <span class="string">'Some::Other::Role'</span>
+ <span class="operator">);</span>
+</code></pre>
+
+<p>Composes role with package. See also <a href="../../lib/Role/Tiny/With.html">Role::Tiny::With</a>.</p>
+
+<h2 id="apply_roles_to_object">apply_roles_to_object</h2>
+
+<pre><code> <span class="variable">Role::Tiny</span><span class="operator">-&gt;</span><span class="variable">apply_roles_to_object</span><span class="operator">(</span><span class="variable">$foo</span><span class="operator">,</span> <span class="string">qw(Some::Role1 Some::Role2)</span><span class="operator">);</span>
+</code></pre>
+
+<p>Composes roles in order into object directly. Object is reblessed into the resulting class. Note that the object&#39;s methods get overridden by the role&#39;s ones with the same names.</p>
+
+<h2 id="create_class_with_roles">create_class_with_roles</h2>
+
+<pre><code> <span class="variable">Role::Tiny</span><span class="operator">-&gt;</span><span class="variable">create_class_with_roles</span><span class="operator">(</span><span class="string">'Some::Base'</span><span class="operator">,</span> <span class="string">qw(Some::Role1 Some::Role2)</span><span class="operator">);</span>
+</code></pre>
+
+<p>Creates a new class based on base, with the roles composed into it in order. New class is returned.</p>
+
+<h2 id="is_role">is_role</h2>
+
+<pre><code> Role::Tiny-&gt;is_role(&#39;Some::Role1&#39;)</code></pre>
+
+<p>Returns true if the given package is a role.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<ul>
+
+<li><p>On perl 5.8.8 and earlier, applying a role to an object won&#39;t apply any overloads from the role to other copies of the object.</p>
+
+</li>
+<li><p>On perl 5.16 and earlier, applying a role to a class won&#39;t apply any overloads from the role to any existing instances of the class.</p>
+
+</li>
+</ul>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/Role/Tiny.html">Role::Tiny</a> is the attribute-less subset of <a>Moo::Role</a>; <a>Moo::Role</a> is a meta-protocol-less subset of the king of role systems, <a href="../../lib/Moose/Role.html">Moose::Role</a>.</p>
+
+<p>Ovid&#39;s <a>Role::Basic</a> provides roles with a similar scope, but without method modifiers, and having some extra usage restrictions.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>mst - Matt S. Trout (cpan:MSTROUT) &lt;mst@shadowcat.co.uk&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<p>dg - David Leadbeater (cpan:DGL) &lt;dgl@dgl.cx&gt;</p>
+
+<p>frew - Arthur Axel &quot;fREW&quot; Schmidt (cpan:FREW) &lt;frioux@gmail.com&gt;</p>
+
+<p>hobbs - Andrew Rodland (cpan:ARODLAND) &lt;arodland@cpan.org&gt;</p>
+
+<p>jnap - John Napiorkowski (cpan:JJNAPIORK) &lt;jjn1056@yahoo.com&gt;</p>
+
+<p>ribasushi - Peter Rabbitson (cpan:RIBASUSHI) &lt;ribasushi@cpan.org&gt;</p>
+
+<p>chip - Chip Salzenberg (cpan:CHIPS) &lt;chip@pobox.com&gt;</p>
+
+<p>ajgb - Alex J. G. Burzy&#x144;ski (cpan:AJGB) &lt;ajgb@cpan.org&gt;</p>
+
+<p>doy - Jesse Luehrs (cpan:DOY) &lt;doy at tozt dot net&gt;</p>
+
+<p>perigrin - Chris Prather (cpan:PERIGRIN) &lt;chris@prather.org&gt;</p>
+
+<p>Mithaldu - Christian Walde (cpan:MITHALDU) &lt;walde.christian@googlemail.com&gt;</p>
+
+<p>ilmari - Dagfinn Ilmari Manns&aring;ker (cpan:ILMARI) &lt;ilmari@ilmari.org&gt;</p>
+
+<p>tobyink - Toby Inkster (cpan:TOBYINK) &lt;tobyink@cpan.org&gt;</p>
+
+<p>haarg - Graham Knop (cpan:HAARG) &lt;haarg@haarg.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2010-2012 the Role::Tiny <a href="#AUTHOR">&quot;AUTHOR&quot;</a> and <a href="#CONTRIBUTORS">&quot;CONTRIBUTORS&quot;</a> as listed above.</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software and may be distributed under the same terms as perl itself.</p>
+
+
+</body>
+
+</html>
+
+

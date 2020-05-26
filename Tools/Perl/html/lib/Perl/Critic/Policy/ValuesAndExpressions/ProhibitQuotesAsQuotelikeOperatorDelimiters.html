@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#SUGGESTED-BY">SUGGESTED BY</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters - Don&#39;t use quotes (<code>&#39;</code>, <code>&quot;</code>, <code>`</code>) as delimiters for the quote-like operators.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>With the obvious exception of using single-quotes to prevent interpolation, using quotes with the quote-like operators kind of defeats the purpose of them and produces obfuscated code, causing problems for future maintainers and their editors/IDEs.</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">q"q"</span><span class="operator">;</span>                <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">q'q'</span><span class="operator">;</span>                <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">q`q`</span><span class="operator">;</span>                <span class="comment">#not ok</span>
+    
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">qq"q"</span><span class="operator">;</span>               <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">qr"r"</span><span class="operator">;</span>               <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">qw"w"</span><span class="operator">;</span>               <span class="comment">#not ok</span>
+    
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">qx`date`</span><span class="operator">;</span>            <span class="comment">#not ok</span>
+    
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">m"m"</span><span class="operator">;</span>               <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">s"s"x"</span><span class="operator">;</span>             <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">tr"t"r"</span><span class="operator">;</span>            <span class="comment">#not ok</span>
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">y"x"y"</span><span class="operator">;</span>             <span class="comment">#not ok</span>
+    
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">m'</span><span class="variable">$x</span><span class="regex">'</span><span class="operator">;</span>              <span class="comment">#ok</span>
+    <span class="variable">$x</span> <span class="operator">=~</span> <span class="regex">s'</span><span class="variable">$x</span><span class="regex">'y'</span><span class="operator">;</span>            <span class="comment">#ok</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">qr'</span><span class="variable">$x</span><span class="string">'m</span><span class="operator">;</span>             <span class="comment">#ok</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="string">qx'finger foo</span><span class="variable">@bar</span><span class="string">'</span><span class="operator">;</span>  <span class="comment">#ok</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This policy has three options: <code>single_quote_allowed_operators</code>, <code>double_quote_allowed_operators</code>, and <code>back_quote_allowed_operators</code>, which control which operators are allowed to use each of <code>&#39;</code>, <code>&quot;</code>, <code>`</code> as delimiters, respectively.</p>
+
+<p>The values allowed for these options are a whitespace delimited selection of the <code>m</code>, <code>q</code>, <code>qq</code>, <code>qr</code>, <code>qw</code>, <code>qx</code>, <code>s</code>, <code>tr</code>, and <code>y</code> operators.</p>
+
+<p>By default, double quotes and back quotes (backticks) are not allowed as delimiters for any operators and single quotes are allowed as delimiters for the <code>m</code>, <code>qr</code>, <code>qx</code>, and <code>s</code> operators. These defaults are equivalent to having the following in your <i>.perlcriticrc</i>:</p>
+
+<pre><code>    [ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+    single_quote_allowed_operators = m s qr qx
+    double_quote_allowed_operators =
+    back_quote_allowed_operators =</code></pre>
+
+<h1 id="SUGGESTED-BY">SUGGESTED BY</h1>
+
+<p>Michael Schwern</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Elliot Shank <code>&lt;perl@galumph.com&gt;</code></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2007-2011 Elliot Shank.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

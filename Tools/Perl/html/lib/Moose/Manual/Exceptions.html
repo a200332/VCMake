@@ -1,0 +1,248 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#EXCEPTIONS-IN-MOOSE">EXCEPTIONS IN MOOSE</a></li>
+  <li><a href="#EXCEPTION-STRINGIFICATION">EXCEPTION STRINGIFICATION</a></li>
+  <li><a href="#HANDLING-MOOSE-EXCEPTIONS">HANDLING MOOSE EXCEPTIONS</a>
+    <ul>
+      <li><a href="#Catching-with-Try::Tiny">Catching with Try::Tiny</a></li>
+      <li><a href="#Example-of-catching-ValidationFailedForTypeConstraint">Example of catching ValidationFailedForTypeConstraint</a></li>
+      <li><a href="#Example-of-catching-AttributeIsRequired">Example of catching AttributeIsRequired</a></li>
+    </ul>
+  </li>
+  <li><a href="#MOOSE-EXCEPTION-CLASSES">MOOSE EXCEPTION CLASSES</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::Exceptions - Moose&#39;s exceptions</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="EXCEPTIONS-IN-MOOSE">EXCEPTIONS IN MOOSE</h1>
+
+<p>Moose will throw an exception for all error conditions. This applies both to code in the Moose core <i>as well</i> as to all code generated when a class is made immutable. All exceptions are subclasses of the <code>Moose::Exception</code> class.</p>
+
+<p>Each type of error has its own unique subclass, and many subclasses have additional attributes to provide more information about the error&#39;s context, such as what classes or roles were involved.</p>
+
+<h1 id="EXCEPTION-STRINGIFICATION">EXCEPTION STRINGIFICATION</h1>
+
+<p>By default, Moose exceptions remove Moose internals from the stack trace. If you set the <code>MOOSE_FULL_EXCEPTION</code> environment variable to a true value, then the Moose internals will be included in the trace.</p>
+
+<h1 id="HANDLING-MOOSE-EXCEPTIONS">HANDLING MOOSE EXCEPTIONS</h1>
+
+<p>Because Moose&#39;s exceptions use the standard <code>die</code> mechanism, you are free to catch and handle errors however you like. You could use an <code>eval</code> block to catch Moose exceptions. However, the Moose team strongly recommends using <a href="../../../lib/Try/Tiny.html">Try::Tiny</a> instead. Please refer to <a href="../../../lib/Try/Tiny.html">Try::Tiny</a>&#39;s documentation for a discussion of how <code>eval</code> is dangerous.</p>
+
+<p>The following example demonstrates how to catch and inspect a <a href="../../../lib/Moose/Exception.html">Moose::Exception</a>. For the sake of simplicity, we will cause a very simple error. The <code>extends</code> keywords expects a list of superclass names. If we pass no superclass names, Moose will throw an instance of <a>Moose::Exception::ExtendsMissingArgs</a>.</p>
+
+<h2 id="Catching-with-Try::Tiny">Catching with Try::Tiny</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Try::Tiny</span><span class="operator">;</span>
+    
+    <span class="variable">try</span> <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">Example::Exception</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+        <span class="variable">extends</span><span class="operator">;</span>    <span class="comment"># &lt;-- error!</span>
+    <span class="operator">}</span>
+    <span class="variable">catch</span> <span class="operator">{</span>
+        <span class="comment"># $_ contains the instance of the exception thrown by the above try</span>
+        <span class="comment"># block, but $_ may get clobbered, so we should copy its value to</span>
+        <span class="comment"># another variable.</span>
+        <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">;</span>
+    
+        <span class="comment"># Exception objects are not ubiquitous in Perl, so we must check</span>
+        <span class="comment"># whether $e is blessed. We also need to ensure that $e is actually</span>
+        <span class="comment"># the kind of exception we were expecting.</span>
+        <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">blessed</span> <span class="variable">$e</span>
+            <span class="operator">&amp;&amp;</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'Moose::Exception::ExtendsMissingArgs'</span><span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+    
+            <span class="keyword">my</span> <span class="variable">$class_name</span> <span class="operator">=</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">class_name</span><span class="operator">;</span>
+            <span class="keyword">warn</span> <span class="string">"You forgot to specify a superclass for </span><span class="variable">$class_name</span><span class="string">, silly!"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    
+        <span class="comment"># It's either another type of an object or not an object at all.</span>
+        <span class="keyword">else</span> <span class="operator">{</span>
+            <span class="keyword">warn</span> <span class="string">"</span><span class="variable">$e</span><span class="string">\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Example-of-catching-ValidationFailedForTypeConstraint">Example of catching ValidationFailedForTypeConstraint</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Try::Tiny</span><span class="operator">;</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">Person</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Moose::Util::TypeConstraints</span><span class="operator">;</span>
+    
+        <span class="variable">subtype</span> <span class="string">'NameStr'</span><span class="operator">,</span>
+            <span class="variable">as</span> <span class="string">'Str'</span><span class="operator">,</span>
+            <span class="variable">where</span> <span class="operator">{</span> <span class="variable">$_</span> <span class="operator">=~</span> <span class="regex">/^[a-zA-Z]+$/</span><span class="operator">;</span> <span class="operator">};</span>
+    
+        <span class="variable">has</span> <span class="string">age</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+            <span class="string">is</span>       <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+            <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">,</span>
+            <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span>
+        <span class="operator">);</span>
+    
+        <span class="variable">has</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+            <span class="string">is</span>       <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+            <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'NameStr'</span><span class="operator">,</span>
+            <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">my</span> <span class="variable">$person</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="operator">!</span><span class="variable">$person</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">try</span> <span class="operator">{</span>
+            <span class="keyword">print</span> <span class="string">'Enter your age : '</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$age</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">STDIN</span><span class="operator">&gt;;</span>
+            <span class="keyword">chomp</span> <span class="variable">$age</span><span class="operator">;</span>
+            <span class="keyword">print</span> <span class="string">'Enter your name : '</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">STDIN</span><span class="operator">&gt;;</span>
+            <span class="keyword">chomp</span> <span class="variable">$name</span><span class="operator">;</span>
+            <span class="variable">$person</span> <span class="operator">=</span> <span class="variable">Person</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+                <span class="string">age</span>  <span class="operator">=&gt;</span> <span class="variable">$age</span><span class="operator">,</span>
+                <span class="string">name</span> <span class="operator">=&gt;</span> <span class="variable">$name</span>
+            <span class="operator">);</span>
+            <span class="keyword">my</span> <span class="variable">$person_name</span> <span class="operator">=</span> <span class="variable">$person</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$person_age</span>  <span class="operator">=</span> <span class="variable">$person</span><span class="operator">-&gt;</span><span class="variable">age</span><span class="operator">;</span>
+            <span class="keyword">print</span> <span class="string">"</span><span class="variable">$person_name</span><span class="string"> is </span><span class="variable">$person_age</span><span class="string"> years old\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">catch</span> <span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">;</span>
+    
+            <span class="keyword">if</span> <span class="operator">(</span>
+                <span class="variable">blessed</span> <span class="variable">$e</span>
+                <span class="operator">&amp;&amp;</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span>
+                    <span class="string">'Moose::Exception::ValidationFailedForTypeConstraint'</span><span class="operator">)</span>
+                <span class="operator">)</span> <span class="operator">{</span>
+    
+                <span class="keyword">my</span> <span class="variable">$attribute_name</span> <span class="operator">=</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">attribute</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+                <span class="keyword">my</span> <span class="variable">$type_name</span>      <span class="operator">=</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">type</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+                <span class="keyword">my</span> <span class="variable">$value</span>          <span class="operator">=</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">;</span>
+    
+                <span class="keyword">warn</span>
+                    <span class="string">"You entered </span><span class="variable">$value</span><span class="string"> for </span><span class="variable">$attribute_name</span><span class="string">, which is not a </span><span class="variable">$type_name</span><span class="string">!"</span><span class="operator">;</span>
+            <span class="operator">}</span>
+            <span class="keyword">else</span> <span class="operator">{</span>
+                <span class="keyword">warn</span> <span class="string">"</span><span class="variable">$e</span><span class="string">\n"</span><span class="operator">;</span>
+            <span class="operator">}</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Example-of-catching-AttributeIsRequired">Example of catching AttributeIsRequired</h2>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Try::Tiny</span><span class="operator">;</span>
+    
+    <span class="operator">{</span>
+        <span class="keyword">package</span> <span class="variable">Example::RequiredAttribute</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    
+        <span class="variable">has</span> <span class="string">required_attribute</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+            <span class="string">is</span>       <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+            <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">,</span>
+            <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span>
+        <span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="variable">try</span> <span class="operator">{</span>
+        <span class="comment"># we're not passing required_attribute, so it'll throw an exception</span>
+        <span class="keyword">my</span> <span class="variable">$object</span> <span class="operator">=</span> <span class="variable">Example::RequiredAttribute</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+    <span class="operator">}</span>
+    <span class="variable">catch</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$e</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">blessed</span> <span class="variable">$e</span> <span class="operator">&amp;&amp;</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span><span class="string">'Moose::Exception::AttributeIsRequired'</span><span class="operator">)</span> <span class="operator">)</span>
+        <span class="operator">{</span>
+            <span class="keyword">warn</span> <span class="variable">$e</span><span class="operator">-&gt;</span><span class="variable">message</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="keyword">else</span> <span class="operator">{</span>
+            <span class="keyword">warn</span> <span class="string">"</span><span class="variable">$e</span><span class="string">\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<h1 id="MOOSE-EXCEPTION-CLASSES">MOOSE EXCEPTION CLASSES</h1>
+
+<p>All the exception classes are listed in <a href="../../../lib/Moose/Manual/Exceptions/Manifest.html">Moose::Manual::Exceptions::Manifest</a>.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

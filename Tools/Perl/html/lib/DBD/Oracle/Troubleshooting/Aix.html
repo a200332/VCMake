@@ -1,0 +1,310 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#Using-Visual-Age-7-C-Compiler">Using Visual Age 7 C Compiler</a></li>
+  <li><a href="#Using-gcc-C-Compiler">Using gcc C Compiler</a></li>
+  <li><a href="#Using-xlc_r-C-Compiler">Using xlc_r C Compiler</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBD::Oracle::Troubleshooting::Aix - Tips and Hints to Troubleshoot DBD::Oracle on AIX</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.74</p>
+
+<h1 id="Using-Visual-Age-7-C-Compiler">Using Visual Age 7 C Compiler</h1>
+
+<p>Oracle 9i is only certified as a 64-bit application on AIX 5L (5.1,5.2,5.3) with 32-bit support; in other words, there is no 9i &quot;32-bit&quot; Oracle client</p>
+
+<p>Oracle 10g is certified as both a 64-bit application and a 32-bit Oracle client</p>
+
+<p>This information only pertains to deploying:</p>
+
+<pre><code>        the DBI (version 1.48)
+        and DBD-Oracle (version 1.16):
+        on AIX 5.3
+        using Oracle 9i (9.2.0.1/9.2.0.5)
+        using the existing Perl 5.8.2 (no custom-built Perl) which is 32-bit
+        using Visual Age 7.0 C/C++ compiler</code></pre>
+
+<p>Install the DBI (required for the DBD-Oracle install - no issues here) Untar the DBD-Oracle bundle Run Makefile.PL</p>
+
+<pre><code>    $ perl Makefile.PL</code></pre>
+
+<p>Edit Makefile with following commands:</p>
+
+<pre><code>    1,$s?/lib/ ?/lib32/ ?g
+    1,$s?-q64??g
+    1,$s?/lib/sysliblist?/lib32/sysliblist?g</code></pre>
+
+<p>Now perform normal commands to perform the testing/making:</p>
+
+<pre><code>    $ make
+    $ make test
+    $ make install</code></pre>
+
+<p>I&#39;ve tested the basics of the DBD-Oracle and it seems fully functional.</p>
+
+<p>Stephen de Vries</p>
+
+<h1 id="Using-gcc-C-Compiler">Using gcc C Compiler</h1>
+
+<pre><code>    <span class="variable">DBD::Oracle</span> <span class="variable">with</span> <span class="variable">gcc</span> <span class="keyword">and</span> <span class="variable">Oracle</span> <span class="variable">Instant</span> <span class="variable">Client</span> <span class="variable">on</span> <span class="variable">AIX</span>
+    <span class="operator">--------------------------------------------------------------------------------------</span>      
+    <span class="variable">Nathan</span> <span class="variable">Vonnahme</span>     <span class="variable">Dec</span> <span class="number">15</span> <span class="number">2005</span><span class="operator">,</span> <span class="number">4</span><span class="operator">:</span><span class="number">28</span> <span class="variable">pm</span>   <span class="variable">Newsgroups</span><span class="operator">:</span> <span class="variable">perl</span><span class="operator">.</span><span class="variable">dbi</span><span class="operator">.</span><span class="variable">users</span>
+    <span class="variable">See</span><span class="operator">:</span>  <span class="variable">http</span><span class="operator">:</span><span class="regex">//groups</span><span class="operator">.</span><span class="variable">google</span><span class="operator">.</span><span class="variable">com</span><span class="operator">/</span><span class="variable">group</span><span class="operator">/</span><span class="variable">perl</span><span class="operator">.</span><span class="variable">dbi</span><span class="operator">.</span><span class="variable">users</span><span class="operator">/</span><span class="variable">msg</span><span class="operator">/</span><span class="number">0b</span><span class="variable">d9097f80f2c8a9</span>
+    <span class="operator">[</span> <span class="variable">with</span> <span class="variable">updates</span> <span class="number">1</span><span class="operator">/</span><span class="number">31</span><span class="operator">/</span><span class="number">2006</span> <span class="operator">-</span> <span class="variable">DBD::Oracle</span> <span class="number">1.17</span> <span class="variable">doesn't</span> <span class="variable">need</span> <span class="variable">makefile</span> <span class="variable">hacking</span> 
+    <span class="variable">to</span> <span class="variable">work</span> <span class="variable">with</span> <span class="variable">instantclient</span> <span class="variable">on</span> <span class="variable">AIX</span> <span class="operator">]</span>
+    
+    
+    <span class="variable">Yes</span><span class="operator">!</span>  <span class="variable">It</span> <span class="variable">eluded</span> <span class="variable">me</span> <span class="keyword">last</span> <span class="variable">year</span> <span class="variable">but</span> <span class="variable">I</span> <span class="variable">finally</span> <span class="variable">got</span> <span class="variable">DBD::Oracle</span> <span class="variable">working</span> <span class="variable">on</span> <span class="variable">an</span>
+    <span class="variable">AIX</span> <span class="variable">machine</span> <span class="variable">using</span> <span class="variable">gcc</span><span class="operator">.</span>  <span class="variable">Here's</span> <span class="variable">the</span> <span class="variable">short</span> <span class="variable">version</span><span class="operator">:</span>
+    
+    <span class="variable">First</span> <span class="variable">I</span> <span class="variable">had</span> <span class="variable">to</span> <span class="variable">recompile</span> <span class="variable">perl</span> <span class="variable">with</span> <span class="variable">gcc</span><span class="operator">,</span> <span class="variable">using</span>
+            <span class="variable">sh</span> <span class="variable">Configure</span> <span class="operator">-</span><span class="variable">de</span> <span class="operator">-</span><span class="variable">Dcc</span><span class="operator">=</span><span class="variable">gcc</span>
+    <span class="variable">This</span> <span class="variable">apparently</span> <span class="variable">built</span> <span class="variable">a</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">perl</span><span class="operator">,</span> <span class="variable">someday</span> <span class="variable">I</span> <span class="variable">will</span> <span class="variable">try</span> <span class="variable">getting</span> <span class="variable">it</span> <span class="variable">to</span> <span class="variable">go</span>
+    <span class="number">64</span> <span class="variable">bit</span><span class="operator">.</span>
+    
+    <span class="variable">I</span> <span class="variable">was</span> <span class="variable">then</span> <span class="variable">able</span> <span class="variable">to</span> <span class="variable">install</span> <span class="keyword">and</span> <span class="variable">build</span> <span class="variable">DBI</span> <span class="number">1.50</span> <span class="variable">with</span> <span class="variable">the</span> <span class="variable">CPAN</span> <span class="variable">shell</span><span class="operator">.</span>
+    
+    <span class="variable">I</span> <span class="variable">downloaded</span> <span class="variable">the</span> <span class="variable">base</span> <span class="keyword">and</span> <span class="variable">sdk</span> <span class="variable">packages</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">Oracle</span> <span class="variable">Instant</span> <span class="variable">Client</span> <span class="keyword">for</span>
+    <span class="variable">AIX</span> <span class="operator">--</span> <span class="variable">first</span> <span class="variable">I</span> <span class="variable">tried</span> <span class="variable">the</span> <span class="number">64</span> <span class="variable">bit</span> <span class="variable">but</span> <span class="variable">that</span> <span class="variable">didn't</span> <span class="variable">work</span> <span class="variable">with</span> <span class="keyword">my</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">perl</span>
+    <span class="operator">--</span> <span class="variable">the</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">version</span> <span class="operator">(</span><span class="variable">still</span> <span class="variable">at</span> <span class="number">10.1</span><span class="operator">.</span><span class="number">0</span><span class="operator">.</span><span class="number">3</span><span class="operator">)</span> <span class="variable">did</span> <span class="variable">the</span> <span class="variable">trick</span><span class="operator">.</span>  <span class="variable">I</span> <span class="variable">unzipped</span>
+    <span class="variable">them</span> <span class="keyword">and</span> <span class="variable">moved</span> <span class="variable">the</span> <span class="variable">dir</span> <span class="variable">to</span> <span class="operator">/</span><span class="variable">usr</span><span class="operator">/</span><span class="keyword">local</span><span class="operator">/</span><span class="variable">oracle</span><span class="operator">/</span><span class="variable">instantclient10_1</span> <span class="keyword">and</span> <span class="variable">made</span> <span class="variable">a</span>
+    <span class="keyword">symlink</span> <span class="variable">without</span> <span class="variable">the</span> <span class="variable">version</span> <span class="variable">at</span> <span class="operator">/</span><span class="variable">usr</span><span class="operator">/</span><span class="keyword">local</span><span class="operator">/</span><span class="variable">oracle</span><span class="operator">/</span><span class="variable">instantclient</span> <span class="operator">,</span> <span class="variable">then</span>
+    <span class="variable">set</span><span class="operator">:</span>
+    
+    <span class="variable">export</span> <span class="variable">ORACLE_HOME</span><span class="operator">=</span><span class="regex">/usr/local</span><span class="operator">/</span><span class="variable">oracle</span><span class="operator">/</span><span class="variable">instantclient</span>
+    <span class="variable">export</span> <span class="variable">LIBPATH</span><span class="operator">=</span><span class="variable">$ORACLE_HOME</span>
+    
+    
+    
+    <span class="variable">Oracle</span> <span class="variable">wasn't</span> <span class="variable">providing</span> <span class="variable">the</span> <span class="variable">sqlplus</span> <span class="keyword">package</span> <span class="keyword">for</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">AIX</span> <span class="variable">so</span> <span class="variable">I</span>
+    <span class="variable">explicitly</span> <span class="variable">told</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="variable">the</span> <span class="variable">version</span><span class="operator">:</span>
+    
+    <span class="variable">perl</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="operator">-</span><span class="variable">V</span> <span class="number">10.1</span> 
+    
+    <span class="variable">make</span>
+    
+    <span class="variable">My</span> <span class="variable">test</span> <span class="variable">databases</span> <span class="variable">were</span> <span class="variable">on</span> <span class="variable">other</span> <span class="variable">machines</span> <span class="variable">so</span> <span class="variable">I</span> <span class="variable">set</span> <span class="variable">these</span> <span class="variable">environment</span> <span class="variable">variables</span> 
+    <span class="variable">to</span> <span class="variable">get</span> <span class="variable">the</span> <span class="variable">tests</span> <span class="variable">to</span> <span class="variable">run</span><span class="operator">:</span>
+    
+    <span class="variable">export</span> <span class="variable">ORACLE_DSN</span><span class="operator">=</span><span class="variable">DBI</span><span class="operator">:</span><span class="variable">Oracle</span><span class="operator">:</span><span class="regex">//host</span><span class="operator">/</span><span class="variable">dbinstance</span>
+    <span class="variable">export</span> <span class="variable">ORACLE_USERID</span><span class="operator">=</span><span class="string">"user/password"</span>
+    
+    <span class="variable">make</span> <span class="variable">test</span>
+    <span class="variable">make</span> <span class="variable">install</span>
+    
+    
+    <span class="variable">NOTE</span><span class="operator">:</span>  <span class="variable">I</span> <span class="variable">have</span> <span class="variable">an</span> <span class="variable">older</span> <span class="variable">full</span> <span class="variable">version</span> <span class="variable">of</span> <span class="variable">Oracle</span> <span class="variable">on</span> <span class="variable">this</span> <span class="variable">machine</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">the</span> 
+    <span class="variable">ORACLE_HOME</span> <span class="variable">environment</span> <span class="variable">variable</span> <span class="variable">is</span> <span class="variable">normally</span> <span class="variable">set</span> <span class="variable">to</span> <span class="variable">point</span> <span class="variable">to</span> <span class="variable">that</span><span class="operator">,</span> <span class="variable">so</span> 
+    <span class="keyword">my</span> <span class="variable">perl</span> <span class="variable">scripts</span> <span class="variable">that</span> <span class="keyword">use</span> <span class="variable">DBD::Oracle</span> <span class="variable">have</span> <span class="variable">to</span> <span class="variable">make</span> <span class="variable">sure</span> <span class="variable">to</span> <span class="variable">first</span> <span class="variable">set</span>
+    <span class="variable">$ENV</span><span class="operator">{</span><span class="string">ORACLE_HOME</span><span class="operator">}</span><span class="operator">=</span><span class="string">'/usr/local/oracle/instantclient'</span><span class="operator">;</span>
+    
+    
+    
+    
+    
+    <span class="operator">--------------------------------------------------------------------------------------</span>
+    <span class="variable">The</span> <span class="variable">following</span> <span class="variable">setup</span> <span class="variable">worked</span> <span class="variable">to</span> <span class="variable">build</span> <span class="variable">on</span> <span class="variable">AIX</span> <span class="number">5.2</span><span class="operator">:</span>
+    <span class="variable">gcc</span><span class="operator">-</span><span class="number">3.3</span><span class="operator">.</span><span class="number">2</span> <span class="operator">(</span><span class="number">32</span><span class="operator">-</span><span class="variable">bit</span><span class="operator">)</span> <span class="operator">(</span><span class="variable">configure</span> <span class="variable">opts</span> <span class="operator">[</span> <span class="operator">--</span><span class="variable">with</span><span class="operator">-</span><span class="variable">ld</span><span class="operator">=</span><span class="regex">/usr/ccs</span><span class="operator">/</span><span class="variable">bin</span><span class="operator">/</span><span class="variable">ld</span> <span class="operator">--</span><span class="variable">with</span><span class="operator">-</span><span class="variable">as</span><span class="operator">=</span><span class="regex">/usr/ccs</span><span class="operator">/</span><span class="variable">bin</span><span class="operator">/</span><span class="variable">as</span><span class="operator">]</span><span class="operator">)</span>
+    <span class="variable">Oracle</span><span class="operator">-</span><span class="number">9.2</span><span class="operator">.</span><span class="number">0</span> <span class="operator">(</span> <span class="variable">full</span> <span class="variable">install</span> <span class="variable">w</span><span class="operator">/</span><span class="number">32</span><span class="variable">bit</span> <span class="variable">support</span><span class="operator">)</span>
+    <span class="variable">perl</span><span class="operator">-</span><span class="number">5.8</span><span class="operator">.</span><span class="number">3</span> <span class="operator">(</span><span class="variable">built</span> <span class="variable">with</span> <span class="variable">above</span> <span class="variable">gcc</span><span class="operator">/</span><span class="variable">latest</span> <span class="variable">stable</span> <span class="variable">as</span> <span class="variable">of</span> <span class="variable">March</span> <span class="number">2004</span><span class="operator">)</span>
+    <span class="variable">Followed</span> <span class="variable">the</span> <span class="variable">directions</span> <span class="variable">from</span> <span class="variable">Rafael's</span> <span class="variable">email</span> <span class="variable">below</span><span class="operator">,</span> <span class="variable">only</span> <span class="variable">set</span> <span class="variable">ORACLE_HOME</span><span class="operator">,</span> <span class="operator">(</span><span class="keyword">and</span>
+    <span class="variable">the</span> <span class="variable">appropriate</span> <span class="variable">test</span> <span class="variable">environmentals</span><span class="operator">).</span>
+    <span class="number">1</span><span class="operator">)</span> <span class="variable">build</span> <span class="variable">perl</span><span class="operator">-</span><span class="number">5.8</span><span class="operator">.</span><span class="number">3</span> <span class="variable">with</span> <span class="variable">gcc</span>
+    <span class="number">2</span><span class="operator">)</span> <span class="variable">install</span> <span class="variable">DBI</span>
+    <span class="number">3</span><span class="operator">)</span> <span class="variable">ORACLE_HOME</span><span class="operator">=</span><span class="string">"your oracle home"</span>
+    <span class="variable">ORACLE_USERID</span><span class="operator">..</span>
+    <span class="variable">ORACLE_SID</span> <span class="operator">..</span>
+    <span class="operator">(</span><span class="variable">I</span> <span class="variable">ignored</span> <span class="variable">ORACCENV</span><span class="operator">,</span> <span class="variable">didn't</span> <span class="keyword">use</span> <span class="variable">it</span><span class="operator">.)</span>
+    <span class="number">4</span><span class="operator">)</span> <span class="variable">install</span> <span class="variable">DBD::Oracle</span><span class="operator">,</span> <span class="variable">after</span> <span class="variable">perl</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span><span class="operator">,</span> <span class="variable">edit</span> <span class="variable">the</span> <span class="variable">created</span> <span class="variable">Makefile</span><span class="operator">,</span>
+    <span class="variable">changing</span> <span class="variable">references</span> <span class="variable">to</span> <span class="variable">Oracle's</span> <span class="operator">..</span><span class="regex">/lib to ../lib</span><span class="number">32.</span> <span class="keyword">and</span> <span class="variable">change</span> <span class="variable">crt0_64</span><span class="operator">.</span><span class="variable">o</span> <span class="variable">to</span>
+    <span class="variable">crt0_r</span><span class="operator">.</span><span class="variable">o</span><span class="operator">.</span> <span class="variable">Remove</span> <span class="variable">the</span> <span class="operator">-</span><span class="variable">q32</span> <span class="keyword">and</span><span class="regex">/or -q64 options from the list of libraries to
+    link with.
+    5) make should be clean, make test should pass.
+    This setup worked with 8.1.7 w/</span><span class="number">32</span> <span class="variable">bit</span> <span class="variable">support</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">with</span> <span class="number">9.2</span><span class="operator">.</span><span class="number">0</span> <span class="variable">w</span><span class="operator">/</span> <span class="number">32</span><span class="operator">-</span><span class="variable">bit</span> <span class="variable">support</span><span class="operator">.</span>
+    <span class="operator">--</span><span class="variable">Adrian</span> <span class="variable">Terranova</span>
+</code></pre>
+
+<h1 id="Using-xlc_r-C-Compiler">Using xlc_r C Compiler</h1>
+
+<pre><code>    <span class="variable">From</span><span class="operator">:</span> <span class="variable">Rafael</span> <span class="variable">Caceres</span> 
+    <span class="variable">Date</span><span class="operator">:</span> <span class="number">22</span> <span class="variable">Jul</span> <span class="number">2003</span> <span class="number">10</span><span class="operator">:</span><span class="number">05</span><span class="operator">:</span><span class="number">20</span> <span class="operator">-</span><span class="number">0500</span>
+    
+    <span class="variable">The</span> <span class="variable">following</span> <span class="variable">sequence</span> <span class="variable">worked</span> <span class="keyword">for</span> <span class="variable">me</span> <span class="variable">on</span> <span class="variable">AIX</span> <span class="number">5.1</span><span class="operator">:</span>
+    
+    <span class="operator">-</span><span class="keyword">use</span> <span class="variable">Perl</span> <span class="number">5.8</span><span class="operator">.</span><span class="number">0</span> <span class="operator">(</span><span class="variable">the</span> <span class="variable">latest</span> <span class="variable">stable</span> <span class="variable">from</span> <span class="variable">CPAN</span><span class="operator">)</span>
+    
+    <span class="operator">-</span><span class="keyword">use</span> <span class="variable">the</span> <span class="variable">xlc_r</span> <span class="variable">version</span> <span class="variable">of</span> <span class="variable">IBM's</span> <span class="variable">compiler</span> <span class="keyword">and</span> <span class="variable">build</span> <span class="variable">a</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">Perl</span>
+    <span class="operator">(</span><span class="variable">which</span> <span class="variable">xlc_r</span> <span class="variable">will</span> <span class="keyword">do</span> <span class="variable">by</span> <span class="keyword">default</span><span class="operator">).</span> <span class="variable">All</span> <span class="variable">tests</span> <span class="variable">should</span> <span class="variable">be</span> <span class="variable">successful</span><span class="operator">.</span>
+    
+    <span class="operator">-</span><span class="variable">get</span> <span class="keyword">and</span> <span class="variable">install</span> <span class="variable">DBI</span> 
+    
+    <span class="operator">-</span><span class="variable">get</span> <span class="variable">DBD::Oracle</span><span class="operator">.</span> <span class="variable">Edit</span> <span class="variable">the</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="keyword">or</span> <span class="variable">Makefile</span> <span class="keyword">for</span> <span class="variable">DBD::Oracle</span><span class="operator">,</span>
+    <span class="variable">changing</span> <span class="variable">references</span> <span class="variable">to</span> <span class="variable">Oracle's</span> <span class="operator">..</span><span class="regex">/lib to ../lib</span><span class="number">32.</span> <span class="keyword">and</span> <span class="variable">change</span> <span class="variable">crt0_64</span><span class="operator">.</span><span class="variable">o</span>
+    <span class="variable">to</span> <span class="variable">crt0_r</span><span class="operator">.</span><span class="variable">o</span><span class="operator">.</span> <span class="variable">Remove</span> <span class="variable">the</span> <span class="operator">-</span><span class="variable">q32</span> <span class="keyword">and</span><span class="regex">/or -q64 options from the list of
+    libraries to link with. Do the make and make test. 
+    
+    -Set up the environment for making DBD::Oracle:
+        ORACLE_HOME="your oracle home"
+        ORACCENV = "xlc_r"
+        ORACLE_USERID..
+        ORACLE_SID ..
+    
+    -Run make, all tests should be successfull -against Oracle 9.x at least.
+    
+    You should have no problems with Oracle 8.1.7, but accessing Oracle 7.x
+    or previous is not possible (you'll core dump, or simply hang). The same
+    goes for a Linux build or a Digital build, regarding access of different
+    Oracle versions.
+    
+    Rafael Caceres
+    
+    &gt; I don't believe I compiled Oracle.  During the installation it was linked
+    &gt; but I am not sure it was compiled
+    &gt; 
+    &gt; I used a xlc compiler to compile PERL.
+    &gt; Got this message in the Perl Makefile.PL output
+    &gt; 
+    &gt; Warning: You will may need to rebuild perl using the xlc_r compiler.
+    &gt;          You may also need do: ORACCENV='cc=xlc_r'; export ORACCENV
+    &gt;          Also see the README about the -p option
+    &gt; 
+    &gt; this probably means I need to rebuild PERL with xlc_r??
+    &gt; 
+    &gt; thanx
+    &gt; 
+    &gt; Mike Paladino
+    &gt; Database Administrator
+    
+    
+    From: Rafael Caceres                                                                                  
+    &gt; 
+    &gt; Make sure you use the same compiler to build Oracle and Perl. We have
+    &gt; used xlc_r on Aix 5.1 with no problems. Your Perl build is 32 bit, so
+    &gt; when building DBD::Oracle, you should use the 32bit libraries (change
+    &gt; references to .../oracle</span><span class="operator">/</span><span class="variable">lib</span> <span class="variable">to</span> <span class="operator">...</span><span class="regex">/oracle/lib</span><span class="number">32</span> <span class="variable">in</span> <span class="variable">your</span> <span class="variable">Makefile</span><span class="operator">).</span>
+    <span class="operator">&gt;</span> <span class="variable">Remove</span> <span class="variable">the</span> <span class="variable">references</span> <span class="variable">to</span> <span class="variable">the</span> <span class="operator">-</span><span class="variable">q64</span> <span class="keyword">or</span> <span class="operator">-</span><span class="variable">q32</span> <span class="variable">parameters</span> <span class="keyword">for</span> <span class="variable">ld</span> <span class="variable">in</span> <span class="variable">Makefile</span><span class="operator">,</span>
+    <span class="operator">&gt;</span> <span class="variable">as</span> <span class="variable">they</span> <span class="variable">shouldn't</span> <span class="variable">be</span> <span class="variable">there</span><span class="operator">.</span>
+    <span class="operator">&gt;</span> 
+    <span class="operator">&gt;</span> <span class="variable">Rafael</span> <span class="variable">Caceres</span>
+    
+    
+    <span class="variable">From</span><span class="operator">:</span> <span class="string">"cartman ltd"</span> 
+    <span class="variable">Subject</span><span class="operator">:</span> <span class="variable">Tip</span> <span class="keyword">for</span> <span class="variable">DBI</span> <span class="keyword">and</span> <span class="variable">DBD::Oracle</span> <span class="variable">on</span> <span class="variable">AIX</span> <span class="number">5.1</span> <span class="keyword">and</span> <span class="variable">Oracle</span> <span class="number">9.2</span>
+    <span class="variable">Date</span><span class="operator">:</span> <span class="variable">Mon</span><span class="operator">,</span> <span class="number">11</span> <span class="variable">Aug</span> <span class="number">2003</span> <span class="number">18</span><span class="operator">:</span><span class="number">15</span><span class="operator">:</span><span class="number">38</span> <span class="operator">+</span><span class="number">0000</span>
+    <span class="variable">Message</span><span class="operator">-</span><span class="variable">ID</span><span class="operator">:</span> <span class="operator">&lt;</span><span class="variable">BAY1</span><span class="operator">-</span><span class="variable">F58Temqpg2ItZe00032a0f</span><span class="variable">@hotmail</span><span class="operator">.</span><span class="variable">com</span><span class="operator">&gt;</span>
+    
+    <span class="variable">Here</span> <span class="variable">is</span> <span class="variable">a</span> <span class="variable">tip</span> <span class="keyword">for</span> <span class="variable">compiling</span> <span class="variable">DBD::Oracle</span> <span class="variable">as</span> <span class="variable">a</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">application</span> <span class="variable">on</span> <span class="variable">AIX</span> <span class="number">5.1</span> 
+    <span class="number">64</span> <span class="variable">bit</span> <span class="keyword">and</span> <span class="variable">Oracle</span> <span class="number">9.2</span> <span class="number">64</span> <span class="variable">bit</span> <span class="variable">without</span> <span class="variable">editing</span> <span class="variable">any</span> <span class="variable">makefiles</span><span class="operator">.</span> <span class="variable">I</span> <span class="variable">hope</span> <span class="variable">people</span>
+    <span class="variable">find</span> <span class="variable">this</span> <span class="variable">useful</span><span class="operator">:</span>
+    
+    <span class="variable">First</span><span class="operator">,</span> <span class="variable">the</span> <span class="variable">versions</span> <span class="variable">of</span> <span class="variable">products</span> <span class="variable">I</span> <span class="variable">used</span><span class="operator">:</span>
+    <span class="variable">DBI</span> <span class="variable">version</span> <span class="number">1.32</span>
+    <span class="variable">DBD::Oracle</span> <span class="variable">version</span> <span class="number">1.14</span>
+    <span class="variable">Oracle</span> <span class="number">9.2</span><span class="operator">.</span><span class="number">0</span><span class="operator">.</span><span class="number">2</span> <span class="operator">-</span> <span class="keyword">default</span> <span class="number">64</span> <span class="variable">bit</span> <span class="variable">application</span> <span class="variable">with</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">libraries</span>
+    <span class="variable">AIX</span> <span class="number">5.1</span> <span class="variable">ML03</span> <span class="operator">-</span> <span class="number">64</span> <span class="variable">bit</span> <span class="variable">kernel</span> <span class="operator">-</span> <span class="variable">ships</span> <span class="variable">with</span> <span class="variable">Perl</span> <span class="variable">as</span> <span class="variable">a</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">application</span><span class="operator">.</span>
+    <span class="variable">VisualAge</span> <span class="variable">C</span><span class="operator">/</span><span class="variable">C</span><span class="operator">++</span> <span class="number">5.0</span><span class="operator">.</span><span class="number">2</span>
+    
+    <span class="variable">Basically</span> <span class="variable">DBD</span> <span class="variable">must</span> <span class="variable">be</span> <span class="variable">compiled</span> <span class="variable">as</span> <span class="number">32</span> <span class="variable">bit</span> <span class="variable">to</span> <span class="keyword">link</span> <span class="variable">with</span> <span class="variable">Perl's</span> <span class="number">32</span> <span class="variable">bit</span> 
+    <span class="variable">libraries</span><span class="operator">.</span>
+    <span class="variable">gunzip</span> <span class="keyword">-c</span> <span class="variable">DBD</span><span class="operator">-</span><span class="variable">Oracle</span><span class="operator">-</span><span class="number">1.14</span><span class="operator">.</span><span class="variable">tar</span><span class="operator">.</span><span class="variable">gz</span> <span class="operator">|</span> <span class="variable">tar</span> <span class="variable">xvf</span> 
+    <span class="variable">cd</span> <span class="variable">DBD</span><span class="operator">-</span><span class="variable">Oracle</span><span class="operator">-</span><span class="number">1.14</span>
+    <span class="variable">perl</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="operator">-</span><span class="regex">m $ORACLE_HOME/rdbms/demo/demo_rdbms32.mk
+    make
+    
+    NB: I think there is a bug in the Oracle 9.2.0.3 file 
+    $ORACLE</span><span class="variable">_HOME</span><span class="operator">/</span><span class="variable">rdbms</span><span class="operator">/</span><span class="variable">lib</span><span class="operator">/</span><span class="variable">env_rdbms</span><span class="operator">.</span><span class="variable">mk</span>
+    <span class="variable">I</span> <span class="variable">corrected</span> <span class="variable">this</span> <span class="operator">(</span><span class="variable">before</span> <span class="variable">running</span> <span class="variable">the</span> <span class="variable">above</span> <span class="variable">commands</span><span class="operator">)</span> <span class="variable">by</span> <span class="variable">replacing</span> <span class="variable">the</span> 
+    <span class="variable">invalid</span> <span class="variable">linker</span> <span class="variable">option</span>
+    <span class="variable">LDFLAGS32</span><span class="operator">=-</span><span class="variable">q32</span>
+    <span class="variable">with</span>
+    <span class="variable">LDFLAGS32</span><span class="operator">=-</span><span class="variable">b32</span>
+    
+    <span class="variable">Have</span> <span class="variable">fun</span><span class="operator">:</span> <span class="variable">KC</span><span class="operator">.</span>
+    <span class="operator">--------------------------------------------------------------------------------------</span>
+    
+    <span class="variable">Date</span><span class="operator">:</span> <span class="variable">Wed</span><span class="operator">,</span> <span class="number">30</span> <span class="variable">Jun</span> <span class="number">2004</span> <span class="number">23</span><span class="operator">:</span><span class="number">34</span><span class="operator">:</span><span class="number">24</span> <span class="operator">-</span><span class="number">0500</span>
+    <span class="variable">From</span><span class="operator">:</span> <span class="string">"SCHULTZ, DARYLE (SBCSI)"</span> 
+    
+    <span class="variable">Got</span> <span class="variable">it</span> <span class="variable">to</span> <span class="variable">work</span><span class="operator">.</span>  <span class="variable">Using</span> <span class="variable">dbd</span> <span class="number">1.16</span>
+    
+    <span class="variable">Perl</span> <span class="number">5.8</span><span class="operator">.</span><span class="number">4</span> <span class="variable">built</span> <span class="variable">like</span> <span class="variable">this</span><span class="operator">,</span> <span class="variable">with</span> <span class="variable">Visual</span> <span class="variable">Age</span> <span class="number">6.0</span><span class="operator">:</span>
+    
+    <span class="variable">config_args</span><span class="operator">=</span><span class="string">'-Dcc=xlc_r -Dusenm -Dprefix=/appl/datasync/work/perl5
+    -Dusethreads -Duse64bitall -des'</span>
+    <span class="operator">==============================================</span>
+    
+    <span class="variable">Used</span> <span class="variable">DBI</span> <span class="number">1.42</span>
+    <span class="operator">=============================================</span>
+    <span class="variable">Added</span> <span class="variable">this</span> <span class="variable">to</span> <span class="variable">top</span> <span class="variable">of</span> <span class="variable">Oracle</span><span class="operator">.</span><span class="variable">h</span><span class="operator">:</span>
+    <span class="comment">#define A_OSF</span>
+    
+    <span class="comment">#include &lt;oratypes.h&gt;</span>
+    <span class="operator">=======================</span>
+    <span class="variable">Set</span> <span class="variable">LIBPATH</span> <span class="variable">to</span> <span class="variable">point</span> <span class="variable">to</span> <span class="number">64</span><span class="variable">bit</span> <span class="variable">Oracle</span> <span class="variable">libs</span> <span class="variable">first</span><span class="operator">.</span>
+    <span class="variable">export</span> <span class="variable">LIBPATH</span><span class="operator">=</span><span class="variable">$ORACLE_HOME</span><span class="operator">/</span><span class="variable">lib</span><span class="operator">:</span><span class="variable">$ORACLE_HOME</span><span class="operator">/</span><span class="variable">lib32</span><span class="operator">:</span><span class="regex">/usr/lib</span>
+    
+    <span class="variable">Use</span><span class="operator">:</span>   <span class="variable">perl</span> <span class="variable">Makefile</span><span class="operator">.</span><span class="variable">PL</span> <span class="operator">-</span><span class="variable">nob</span>
+    
+    <span class="variable">Change</span> <span class="variable">all</span> <span class="variable">references</span> <span class="variable">in</span> <span class="variable">Makefile</span>  <span class="variable">of</span> <span class="variable">LD_RUN_PATH</span> <span class="variable">to</span> <span class="variable">be</span> <span class="variable">LIBPATH</span><span class="operator">.</span>
+    <span class="variable">Change</span> <span class="variable">nothing</span> <span class="keyword">else</span><span class="operator">,</span> <span class="variable">left</span> <span class="variable">all</span> <span class="variable">flags</span> <span class="variable">in</span> <span class="variable">Makefile</span><span class="operator">,</span> <span class="variable">including</span> <span class="operator">-</span><span class="variable">q64</span><span class="operator">.</span>
+    <span class="variable">Passed</span> <span class="variable">make</span><span class="operator">,</span> <span class="keyword">and</span> <span class="variable">all</span> <span class="variable">tests</span><span class="operator">.</span>
+    
+    <span class="operator">--------------------------------------------------------------------------------------</span>
+</code></pre>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Tim Bunce &lt;timb@cpan.org&gt;</p>
+
+</li>
+<li><p>John Scoles &lt;byterock@cpan.org&gt;</p>
+
+</li>
+<li><p>Yanick Champoux &lt;yanick@cpan.org&gt;</p>
+
+</li>
+<li><p>Martin J. Evans &lt;mjevans@cpan.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 1994 by Tim Bunce.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Elements-vs-Children">Elements vs Children</a></li>
+    </ul>
+  </li>
+  <li><a href="#STRUCTURE-CLASSES">STRUCTURE CLASSES</a>
+    <ul>
+      <li><a href="#PPI::Structure::List">PPI::Structure::List</a></li>
+      <li><a href="#PPI::Structure::For">PPI::Structure::For</a></li>
+      <li><a href="#PPI::Structure::Given">PPI::Structure::Given</a></li>
+      <li><a href="#PPI::Structure::When">PPI::Structure::When</a></li>
+      <li><a href="#PPI::Structure::Condition">PPI::Structure::Condition</a></li>
+      <li><a href="#PPI::Structure::Block">PPI::Structure::Block</a></li>
+      <li><a href="#PPI::Structure::Constructor">PPI::Structure::Constructor</a></li>
+      <li><a href="#PPI::Structure::Subscript">PPI::Structure::Subscript</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#start">start</a></li>
+      <li><a href="#finish">finish</a></li>
+      <li><a href="#braces">braces</a></li>
+    </ul>
+  </li>
+  <li><a href="#complete">complete</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI::Structure - The base class for Perl braced structures</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<pre><code>  PPI::Structure
+  isa PPI::Node
+      isa PPI::Element</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>PPI::Structure is the root class for all Perl bracing structures. This covers all forms of <code> [ ... ] </code>, <code> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span> 
+</code>, and <code> ( ... ) </code> brace types, and includes cases where only one half of the pair exist.</p>
+
+<p>The class PPI::Structure itself is full abstract and no objects of that type should actually exist in the tree.</p>
+
+<h2 id="Elements-vs-Children">Elements vs Children</h2>
+
+<p>A <b>PPI::Structure</b> has an unusual existence. Unlike a <a href="../../lib/PPI/Document.html">PPI::Document</a> or <a href="../../lib/PPI/Statement.html">PPI::Statement</a>, which both simply contain other elements, a structure <b>both</b> contains and consists of content.</p>
+
+<p>That is, the brace tokens are <b>not</b> considered to be &quot;children&quot; of the structure, but are part of it.</p>
+
+<p>In practice, this will mean that while the -&gt;elements and -&gt;tokens methods (and related) <b>will</b> return a list with the brace tokens at either end, the -&gt;children method explicitly will <b>not</b> return the brace.</p>
+
+<h1 id="STRUCTURE-CLASSES">STRUCTURE CLASSES</h1>
+
+<p>Excluding the transient <a href="../../lib/PPI/Structure/Unknown.html">PPI::Structure::Unknown</a> that exists briefly inside the parser, there are eight types of structure.</p>
+
+<h2 id="PPI::Structure::List"><a href="../../lib/PPI/Structure/List.html">PPI::Structure::List</a></h2>
+
+<p>This covers all round braces used for function arguments, in <code>foreach</code> loops, literal lists, and braces used for precedence-ordering purposes.</p>
+
+<h2 id="PPI::Structure::For"><a href="../../lib/PPI/Structure/For.html">PPI::Structure::For</a></h2>
+
+<p>Although <b>not</b> used for the <code>foreach</code> loop list, this <b>is</b> used for the special case of the round-brace three-part semicolon-separated <code>for</code> loop expression (the traditional C style for loop).</p>
+
+<h2 id="PPI::Structure::Given"><a href="../../lib/PPI/Structure/Given.html">PPI::Structure::Given</a></h2>
+
+<p>This is for the expression being matched in switch statements.</p>
+
+<h2 id="PPI::Structure::When"><a href="../../lib/PPI/Structure/When.html">PPI::Structure::When</a></h2>
+
+<p>This is for the matching expression in &quot;when&quot; statements.</p>
+
+<h2 id="PPI::Structure::Condition"><a href="../../lib/PPI/Structure/Condition.html">PPI::Structure::Condition</a></h2>
+
+<p>This round-brace structure covers boolean conditional braces, such as for <code>if</code> and <code>while</code> blocks.</p>
+
+<h2 id="PPI::Structure::Block"><a href="../../lib/PPI/Structure/Block.html">PPI::Structure::Block</a></h2>
+
+<p>This curly-brace and common structure is used for all form of code blocks. This includes those for <code>if</code>, <code>do</code> and similar, as well as <code>grep</code>, <code>map</code>, <code>sort</code>, <code>sub</code> and (labelled or anonymous) scoping blocks.</p>
+
+<h2 id="PPI::Structure::Constructor"><a href="../../lib/PPI/Structure/Constructor.html">PPI::Structure::Constructor</a></h2>
+
+<p>This class covers brace structures used for the construction of anonymous <code>ARRAY</code> and <code>HASH</code> references.</p>
+
+<h2 id="PPI::Structure::Subscript"><a href="../../lib/PPI/Structure/Subscript.html">PPI::Structure::Subscript</a></h2>
+
+<p>This class covers square-braces and curly-braces used after a -&gt; pointer to access the subscript of an <code>ARRAY</code> or <code>HASH</code>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p><code>PPI::Structure</code> itself has very few methods. Most of the time, you will be working with the more generic <a href="../../lib/PPI/Element.html">PPI::Element</a> or <a href="../../lib/PPI/Node.html">PPI::Node</a> methods, or one of the methods that are subclass-specific.</p>
+
+<h2 id="start">start</h2>
+
+<p>For lack of better terminology (like &quot;open&quot; and &quot;close&quot;) that has not already in use for some other more important purpose, the two individual braces for the structure are known within PPI as the &quot;start&quot; and &quot;finish&quot; braces (at least for method purposes).</p>
+
+<p>The <code>start</code> method returns the start brace for the structure (i.e. the opening brace).</p>
+
+<p>Returns the brace as a <a href="../../lib/PPI/Token/Structure.html">PPI::Token::Structure</a> or <code>undef</code> if the structure does not have a starting brace.</p>
+
+<p>Under normal parsing circumstances this should never occur, but may happen due to manipulation of the PDOM tree.</p>
+
+<h2 id="finish">finish</h2>
+
+<p>The <code>finish</code> method returns the finish brace for the structure (i.e. the closing brace).</p>
+
+<p>Returns the brace as a <a href="../../lib/PPI/Token/Structure.html">PPI::Token::Structure</a> or <code>undef</code> if the structure does not have a finishing brace. This can be quite common if the document is not complete (for example, from an editor where the user may be halfway through typeing a subroutine).</p>
+
+<h2 id="braces">braces</h2>
+
+<p>The <code>braces</code> method is a utility method which returns the brace type, regardless of whether both or just one of the braces is defined.</p>
+
+<p>Returns one of the three strings <code>&#39;[]&#39;</code>, <code><span class="string">'{}'</span>
+</code>, or <code>&#39;()&#39;</code>, or <code>undef</code> on error (primarily not having a start brace, as mentioned above).</p>
+
+<h1 id="complete">complete</h1>
+
+<p>The <code>complete</code> method is a convenience method that returns true if the both braces are defined for the structure, or false if only one brace is defined.</p>
+
+<p>Unlike the top level <code>complete</code> method which checks for completeness in depth, the structure complete method ONLY confirms completeness for the braces, and does not recurse downwards.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See the <a href="../../lib/PPI.html#SUPPORT">support section</a> in the main module.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

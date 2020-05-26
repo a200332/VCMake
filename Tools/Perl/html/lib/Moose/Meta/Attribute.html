@@ -1,0 +1,495 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Creation">Creation</a></li>
+      <li><a href="#Value-management">Value management</a></li>
+      <li><a href="#Attribute-Accessor-generation">Attribute Accessor generation</a></li>
+      <li><a href="#Additional-Moose-features">Additional Moose features</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Meta::Attribute - The Moose attribute metaclass</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class is a subclass of <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a> that provides additional Moose-specific functionality.</p>
+
+<p>To really understand this class, you will need to start with the <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a> documentation. This class can be understood as a set of additional features on top of the basic feature provided by that parent class.</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>Moose::Meta::Attribute</code> is a subclass of <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>Many of the documented below override methods in <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a> and add Moose specific features.</p>
+
+<h2 id="Creation">Creation</h2>
+
+<dl>
+
+<dt id="Moose::Meta::Attribute-new-name-options"><b>Moose::Meta::Attribute-&gt;new($name, %options)</b></dt>
+<dd>
+
+<p>This method overrides the <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a> constructor.</p>
+
+<p>Many of the options below are described in more detail in the <a href="../../../lib/Moose/Manual/Attributes.html">Moose::Manual::Attributes</a> document.</p>
+
+<p>It adds the following options to the constructor:</p>
+
+<ul>
+
+<li><p>is =&gt; &#39;ro&#39;, &#39;rw&#39;, &#39;bare&#39;</p>
+
+<p>This provides a shorthand for specifying the <code>reader</code>, <code>writer</code>, or <code>accessor</code> names. If the attribute is read-only (&#39;ro&#39;) then it will have a <code>reader</code> method with the same attribute as the name.</p>
+
+<p>If it is read-write (&#39;rw&#39;) then it will have an <code>accessor</code> method with the same name. If you provide an explicit <code>writer</code> for a read-write attribute, then you will have a <code>reader</code> with the same name as the attribute, and a <code>writer</code> with the name you provided.</p>
+
+<p>Use &#39;bare&#39; when you are deliberately not installing any methods (accessor, reader, etc.) associated with this attribute; otherwise, Moose will issue a warning when this attribute is added to a metaclass.</p>
+
+</li>
+<li><p>isa =&gt; $type</p>
+
+<p>This option accepts a type. The type can be a string, which should be a type name. If the type name is unknown, it is assumed to be a class name.</p>
+
+<p>This option can also accept a <a href="../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a> object.</p>
+
+<p>If you <i>also</i> provide a <code>does</code> option, then your <code>isa</code> option must be a class name, and that class must do the role specified with <code>does</code>.</p>
+
+</li>
+<li><p>does =&gt; $role</p>
+
+<p>This is short-hand for saying that the attribute&#39;s type must be an object which does the named role.</p>
+
+</li>
+<li><p>coerce =&gt; $bool</p>
+
+<p>This option is only valid for objects with a type constraint (<code>isa</code>) that defined a coercion. If this is true, then coercions will be applied whenever this attribute is set.</p>
+
+<p>You cannot make both this and the <code>weak_ref</code> option true.</p>
+
+</li>
+<li><p>trigger =&gt; $sub</p>
+
+<p>This option accepts a subroutine reference, which will be called after the attribute is set.</p>
+
+</li>
+<li><p>required =&gt; $bool</p>
+
+<p>An attribute which is required must be provided to the constructor. An attribute which is required can also have a <code>default</code> or <code>builder</code>, which will satisfy its required-ness.</p>
+
+<p>A required attribute must have a <code>default</code>, <code>builder</code> or a non-<code>undef</code> <code>init_arg</code></p>
+
+</li>
+<li><p>lazy =&gt; $bool</p>
+
+<p>A lazy attribute must have a <code>default</code> or <code>builder</code>. When an attribute is lazy, the default value will not be calculated until the attribute is read.</p>
+
+</li>
+<li><p>weak_ref =&gt; $bool</p>
+
+<p>If this is true, the attribute&#39;s value will be stored as a weak reference.</p>
+
+</li>
+<li><p>documentation</p>
+
+<p>An arbitrary string that can be retrieved later by calling <code>$attr-&gt;documentation</code>.</p>
+
+</li>
+<li><p>auto_deref =&gt; $bool</p>
+
+<p><b>Note that in cases where you want this feature you are often better served by using a <a href="../../../lib/Moose/Meta/Attribute/Native.html">Moose::Meta::Attribute::Native</a> trait instead</b>.</p>
+
+<p>If this is true, then the reader will dereference the value when it is called. The attribute must have a type constraint which defines the attribute as an array or hash reference.</p>
+
+</li>
+<li><p>lazy_build =&gt; $bool</p>
+
+<p><b>Note that use of this feature is strongly discouraged.</b> Some documentation used to encourage use of this feature as a best practice, but we have changed our minds.</p>
+
+<p>Setting this to true makes the attribute lazy and provides a number of default methods.</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>         <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">lazy_build</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>is equivalent to this:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'size'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>        <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">lazy</span>      <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+      <span class="string">builder</span>   <span class="operator">=&gt;</span> <span class="string">'_build_size'</span><span class="operator">,</span>
+      <span class="string">clearer</span>   <span class="operator">=&gt;</span> <span class="string">'clear_size'</span><span class="operator">,</span>
+      <span class="string">predicate</span> <span class="operator">=&gt;</span> <span class="string">'has_size'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>If your attribute name starts with an underscore (<code>_</code>), then the clearer and predicate will as well:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'_size'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>         <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">lazy_build</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>becomes:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'_size'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>        <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">lazy</span>      <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+      <span class="string">builder</span>   <span class="operator">=&gt;</span> <span class="string">'_build__size'</span><span class="operator">,</span>
+      <span class="string">clearer</span>   <span class="operator">=&gt;</span> <span class="string">'_clear_size'</span><span class="operator">,</span>
+      <span class="string">predicate</span> <span class="operator">=&gt;</span> <span class="string">'_has_size'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Note the doubled underscore in the builder name. Internally, Moose simply prepends the attribute name with &quot;_build_&quot; to come up with the builder name.</p>
+
+</li>
+<li><p>role_attribute =&gt; $role_attribute</p>
+
+<p>If provided, this should be a <a href="../../../lib/Moose/Meta/Role/Attribute.html">Moose::Meta::Role::Attribute</a> object.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="attr-clone-options"><b>$attr-&gt;clone(%options)</b></dt>
+<dd>
+
+<p>This creates a new attribute based on attribute being cloned. You must supply a <code>name</code> option to provide a new name for the attribute.</p>
+
+<p>The <code>%options</code> can only specify options handled by <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Value-management">Value management</h2>
+
+<dl>
+
+<dt id="attr-initialize_instance_slot-meta_instance-instance-params"><b>$attr-&gt;initialize_instance_slot($meta_instance, $instance, $params)</b></dt>
+<dd>
+
+<p>This method is used internally to initialize the attribute&#39;s slot in the object <code>$instance</code>.</p>
+
+<p>This overrides the <a href="../../../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a> method to handle lazy attributes, weak references, and type constraints.</p>
+
+</dd>
+<dt id="get_value"><b>get_value</b></dt>
+<dd>
+
+</dd>
+<dt id="set_value"><b>set_value</b></dt>
+<dd>
+
+<pre><code>  <span class="keyword">eval</span> <span class="operator">{</span> <span class="variable">$point</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">get_attribute</span><span class="operator">(</span><span class="string">'x'</span><span class="operator">)-&gt;</span><span class="variable">set_value</span><span class="operator">(</span><span class="variable">$point</span><span class="operator">,</span> <span class="string">'forty-two'</span><span class="operator">)</span> <span class="operator">};</span>
+  <span class="keyword">if</span><span class="operator">(</span><span class="variable">$@</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"Oops: $@\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p><i>Attribute (x) does not pass the type constraint (Int) with &#39;forty-two&#39;</i></p>
+
+<p>Before setting the value, a check is made on the type constraint of the attribute, if it has one, to see if the value passes it. If the value fails to pass, the set operation dies.</p>
+
+<p>Any coercion to convert values is done before checking the type constraint.</p>
+
+<p>To check a value against a type constraint before setting it, fetch the attribute instance using <a href="../../../lib/Class/MOP/Class.html#find_attribute_by_name">&quot;find_attribute_by_name&quot; in Class::MOP::Class</a>, fetch the type_constraint from the attribute using <a href="../../../lib/Moose/Meta/Attribute.html#type_constraint">&quot;type_constraint&quot; in Moose::Meta::Attribute</a> and call <a href="../../../lib/Moose/Meta/TypeConstraint.html#check">&quot;check&quot; in Moose::Meta::TypeConstraint</a>. See <a href="../../../lib/Moose/Cookbook/Basics/Company_Subtypes.html">Moose::Cookbook::Basics::Company_Subtypes</a> for an example.</p>
+
+</dd>
+</dl>
+
+<h2 id="Attribute-Accessor-generation">Attribute Accessor generation</h2>
+
+<dl>
+
+<dt id="attr-install_accessors"><b>$attr-&gt;install_accessors</b></dt>
+<dd>
+
+<p>This method overrides the parent to also install delegation methods.</p>
+
+<p>If, after installing all methods, the attribute object has no associated methods, it throws an error unless <code>is =&gt; &#39;bare&#39;</code> was passed to the attribute constructor. (Trying to add an attribute that has no associated methods is almost always an error.)</p>
+
+</dd>
+<dt id="attr-remove_accessors"><b>$attr-&gt;remove_accessors</b></dt>
+<dd>
+
+<p>This method overrides the parent to also remove delegation methods.</p>
+
+</dd>
+<dt id="attr-inline_set-instance_var-value_var"><b>$attr-&gt;inline_set($instance_var, $value_var)</b></dt>
+<dd>
+
+<p>This method return a code snippet suitable for inlining the relevant operation. It expect strings containing variable names to be used in the inlining, like <code>&#39;$self&#39;</code> or <code>&#39;$_[1]&#39;</code>.</p>
+
+</dd>
+<dt id="attr-install_delegation"><b>$attr-&gt;install_delegation</b></dt>
+<dd>
+
+<p>This method adds its delegation methods to the attribute&#39;s associated class, if it has any to add.</p>
+
+</dd>
+<dt id="attr-remove_delegation"><b>$attr-&gt;remove_delegation</b></dt>
+<dd>
+
+<p>This method remove its delegation methods from the attribute&#39;s associated class.</p>
+
+</dd>
+<dt id="attr-accessor_metaclass"><b>$attr-&gt;accessor_metaclass</b></dt>
+<dd>
+
+<p>Returns the accessor metaclass name, which defaults to <a href="../../../lib/Moose/Meta/Method/Accessor.html">Moose::Meta::Method::Accessor</a>.</p>
+
+</dd>
+<dt id="attr-delegation_metaclass"><b>$attr-&gt;delegation_metaclass</b></dt>
+<dd>
+
+<p>Returns the delegation metaclass name, which defaults to <a href="../../../lib/Moose/Meta/Method/Delegation.html">Moose::Meta::Method::Delegation</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Additional-Moose-features">Additional Moose features</h2>
+
+<p>These methods are not found in the superclass. They support features provided by Moose.</p>
+
+<dl>
+
+<dt id="attr-does-role"><b>$attr-&gt;does($role)</b></dt>
+<dd>
+
+<p>This indicates whether the <i>attribute itself</i> does the given role. The role can be given as a full class name, or as a resolvable trait name.</p>
+
+<p>Note that this checks the attribute itself, not its type constraint, so it is checking the attribute&#39;s metaclass and any traits applied to the attribute.</p>
+
+</dd>
+<dt id="Moose::Meta::Class-interpolate_class_and_new-name-options"><b>Moose::Meta::Class-&gt;interpolate_class_and_new($name, %options)</b></dt>
+<dd>
+
+<p>This is an alternate constructor that handles the <code>metaclass</code> and <code>traits</code> options.</p>
+
+<p>Effectively, this method is a factory that finds or creates the appropriate class for the given <code>metaclass</code> and/or <code>traits</code>.</p>
+
+<p>Once it has the appropriate class, it will call <code>$class-&gt;new($name, %options)</code> on that class.</p>
+
+</dd>
+<dt id="attr-clone_and_inherit_options-options"><b>$attr-&gt;clone_and_inherit_options(%options)</b></dt>
+<dd>
+
+<p>This method supports the <code>has &#39;+foo&#39;</code> feature. It does various bits of processing on the supplied <code>%options</code> before ultimately calling the <code>clone</code> method.</p>
+
+<p>One of its main tasks is to make sure that the <code>%options</code> provided does not include the options returned by the <code>illegal_options_for_inheritance</code> method.</p>
+
+</dd>
+<dt id="attr-illegal_options_for_inheritance"><b>$attr-&gt;illegal_options_for_inheritance</b></dt>
+<dd>
+
+<p>This returns a blacklist of options that can not be overridden in a subclass&#39;s attribute definition.</p>
+
+<p>This exists to allow a custom metaclass to change or add to the list of options which can not be changed.</p>
+
+</dd>
+<dt id="attr-type_constraint"><b>$attr-&gt;type_constraint</b></dt>
+<dd>
+
+<p>Returns the <a href="../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a> object for this attribute, if it has one.</p>
+
+</dd>
+<dt id="attr-has_type_constraint"><b>$attr-&gt;has_type_constraint</b></dt>
+<dd>
+
+<p>Returns true if this attribute has a type constraint.</p>
+
+</dd>
+<dt id="attr-verify_against_type_constraint-value"><b>$attr-&gt;verify_against_type_constraint($value)</b></dt>
+<dd>
+
+<p>Given a value, this method returns true if the value is valid for the attribute&#39;s type constraint. If the value is not valid, it throws an error.</p>
+
+</dd>
+<dt id="attr-handles"><b>$attr-&gt;handles</b></dt>
+<dd>
+
+<p>This returns the value of the <code>handles</code> option passed to the constructor.</p>
+
+</dd>
+<dt id="attr-has_handles"><b>$attr-&gt;has_handles</b></dt>
+<dd>
+
+<p>Returns true if this attribute performs delegation.</p>
+
+</dd>
+<dt id="attr-is_weak_ref"><b>$attr-&gt;is_weak_ref</b></dt>
+<dd>
+
+<p>Returns true if this attribute stores its value as a weak reference.</p>
+
+</dd>
+<dt id="attr-is_required"><b>$attr-&gt;is_required</b></dt>
+<dd>
+
+<p>Returns true if this attribute is required to have a value.</p>
+
+</dd>
+<dt id="attr-is_lazy"><b>$attr-&gt;is_lazy</b></dt>
+<dd>
+
+<p>Returns true if this attribute is lazy.</p>
+
+</dd>
+<dt id="attr-is_lazy_build"><b>$attr-&gt;is_lazy_build</b></dt>
+<dd>
+
+<p>Returns true if the <code>lazy_build</code> option was true when passed to the constructor.</p>
+
+</dd>
+<dt id="attr-should_coerce"><b>$attr-&gt;should_coerce</b></dt>
+<dd>
+
+<p>Returns true if the <code>coerce</code> option passed to the constructor was true.</p>
+
+</dd>
+<dt id="attr-should_auto_deref"><b>$attr-&gt;should_auto_deref</b></dt>
+<dd>
+
+<p>Returns true if the <code>auto_deref</code> option passed to the constructor was true.</p>
+
+</dd>
+<dt id="attr-trigger"><b>$attr-&gt;trigger</b></dt>
+<dd>
+
+<p>This is the subroutine reference that was in the <code>trigger</code> option passed to the constructor, if any.</p>
+
+</dd>
+<dt id="attr-has_trigger"><b>$attr-&gt;has_trigger</b></dt>
+<dd>
+
+<p>Returns true if this attribute has a trigger set.</p>
+
+</dd>
+<dt id="attr-documentation"><b>$attr-&gt;documentation</b></dt>
+<dd>
+
+<p>Returns the value that was in the <code>documentation</code> option passed to the constructor, if any.</p>
+
+</dd>
+<dt id="attr-has_documentation"><b>$attr-&gt;has_documentation</b></dt>
+<dd>
+
+<p>Returns true if this attribute has any documentation.</p>
+
+</dd>
+<dt id="attr-role_attribute"><b>$attr-&gt;role_attribute</b></dt>
+<dd>
+
+<p>Returns the <a href="../../../lib/Moose/Meta/Role/Attribute.html">Moose::Meta::Role::Attribute</a> object from which this attribute was created, if any. This may return <code>undef</code>.</p>
+
+</dd>
+<dt id="attr-has_role_attribute"><b>$attr-&gt;has_role_attribute</b></dt>
+<dd>
+
+<p>Returns true if this attribute has an associated role attribute.</p>
+
+</dd>
+<dt id="attr-applied_traits"><b>$attr-&gt;applied_traits</b></dt>
+<dd>
+
+<p>This returns an array reference of all the traits which were applied to this attribute. If none were applied, this returns <code>undef</code>.</p>
+
+</dd>
+<dt id="attr-has_applied_traits"><b>$attr-&gt;has_applied_traits</b></dt>
+<dd>
+
+<p>Returns true if this attribute has any traits applied.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

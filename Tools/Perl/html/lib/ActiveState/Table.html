@@ -1,0 +1,177 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActiveState::Table - Simple table class</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="variable">$t</span> <span class="operator">=</span> <span class="variable">ActiveState::Table</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">add_row</span><span class="operator">(</span><span class="operator">{</span> <span class="string">a</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">b</span> <span class="operator">=&gt;</span> <span class="number">2</span> <span class="operator">}</span><span class="operator">);</span>
+ <span class="keyword">print</span> <span class="variable">$t</span><span class="operator">-&gt;</span><span class="variable">as_csv</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Instances of the <code>ActiveState::Table</code> class represent a 2 dimensional table of fields (or columns if you wish) and rows. The fields are ordered and have case-sensitive names. The rows are numbered.</p>
+
+<p>The following methods are provided:</p>
+
+<dl>
+
+<dt id="t-ActiveState::Table-new">$t = ActiveState::Table-&gt;new</dt>
+<dd>
+
+<p>This creates a new empty table object.</p>
+
+</dd>
+<dt id="t-fields">$t-&gt;fields</dt>
+<dd>
+
+<p>This returns the current field names. In scalar context it returns the number of fields.</p>
+
+</dd>
+<dt id="t-rows">$t-&gt;rows</dt>
+<dd>
+
+<p>This returns the current rows. Each row is returned as reference to an array of values in the same order as the fields. The array might be shorter than the number of fields, when the trailing values are <code>undef</code>.</p>
+
+<p>In scalar context it returns the number of rows in the table.</p>
+
+</dd>
+<dt id="t-fetchrow-index">$t-&gt;fetchrow( $index )</dt>
+<dd>
+
+<p>This returns the given row. An array reference is returned in scalar context. The array might be shorter than the number of fields, when the trailing values are <code>undef</code>.</p>
+
+<p>In list context the values are returned one by one. There will be as many values as there are fields in the table. Some values might be <code>undef</code>.</p>
+
+<p>If there is no row with the given $index, then <code>undef</code> is returned in scalar context and the empty list in list context.</p>
+
+</dd>
+<dt id="t-fetchrow_arrayref-index">$t-&gt;fetchrow_arrayref( $index )</dt>
+<dd>
+
+<p>Same as fetchrow() but will return an array reference even in list context.</p>
+
+</dd>
+<dt id="t-fetchrow_hashref-index">$t-&gt;fetchrow_hashref( $index )</dt>
+<dd>
+
+<p>This returns the given row. A hash reference is returned with keys corresponding to the field names and the values corresponding to the given row. The values might be <code>undef</code>, but a key for all the fields will exist.</p>
+
+<p>If there is no row with the given $index, then <code>undef</code> is returned.</p>
+
+</dd>
+<dt id="t-add_field-field">$t-&gt;add_field( $field )</dt>
+<dd>
+
+<p>This adds another field to the table. The field must be a string. If the field already exists it is not added again, and the add_field() call does nothing.</p>
+
+<p>There is no return value.</p>
+
+</dd>
+<dt id="t-add_row-row">$t-&gt;add_row( $row )</dt>
+<dd>
+
+<p>This adds another row to the table. The row must currently be a hash reference. If the hash contains new fields they are added automatically in sorted order. To enforce an order add the fields before adding rows.</p>
+
+<p>There is no return value.</p>
+
+</dd>
+<dt id="t-add_sep">$t-&gt;add_sep</dt>
+<dd>
+
+</dd>
+<dt id="t-add_sep-index">$t-&gt;add_sep( $index )</dt>
+<dd>
+
+<p>This adds a separator to the table, shown as a horizonal line in the as_box() output. If $index is provided the separator will appear after the given row, otherwise the separator will appear after last row added.</p>
+
+</dd>
+<dt id="t-sort-comparator">$t-&gt;sort( $comparator )</dt>
+<dd>
+
+<p>This will sort the rows of the table using the given $comparator function to compare elements. The $comparator is called as for perl&#39;s builtin sort function. References to the rows to compare is available in <code>$::a</code> and <code>$::b</code> in the form returned by <code>$t-&gt;fetchrow_arrayref</code>.</p>
+
+</dd>
+<dt id="t-as_box-options">$t-&gt;as_box( %options )</dt>
+<dd>
+
+<p>This formats the table as text and returns it. The following options might be provided as key/value pairs:</p>
+
+<pre><code>   <span class="variable">name</span>                 <span class="operator">|</span> <span class="keyword">default</span>
+   <span class="operator">---------------------+----------</span>
+   <span class="variable">align</span>                <span class="operator">|</span> <span class="operator">{}</span>
+   <span class="variable">null</span>                 <span class="operator">|</span> <span class="string">"NULL"</span>
+   <span class="variable">show_header</span>          <span class="operator">|</span> <span class="number">1</span>
+   <span class="variable">show_trailer</span>         <span class="operator">|</span> <span class="number">1</span>
+   <span class="variable">box_chars</span>            <span class="operator">|</span> <span class="string">"ascii"</span>
+   <span class="variable">max_width</span>            <span class="operator">|</span> <span class="keyword">undef</span>
+   <span class="operator">---------------------+----------</span>
+</code></pre>
+
+<p>The <code>align</code> option is a hash with field names as keys and the strings &quot;left&quot;, &quot;right&quot; or &quot;center&quot; as values. Alignment for fields not found in this hash is &quot;left&quot;.</p>
+
+<p>The <code>box_chars</code> is either the name of a box drawing scheme or the 11 characters to use; starting with the upper left corner and going down one row at a time to the lower right corner, and finally the horizontal and vertical line character. The current named schemes are &quot;dos&quot; and &quot;unicode&quot;.</p>
+
+<p>If <code>max_width</code> is specified it limits how wide the box can get. The longest fields are truncated until the box is no wider than the given number of characters. Truncated fields are shown with trailing &quot;...&quot; or &quot;+&quot; marker.</p>
+
+</dd>
+<dt id="t-as_csv-options">$t-&gt;as_csv( %options )</dt>
+<dd>
+
+<p>This formats the table as a CSV file (&quot;comma-separated-values&quot;) and returns it. The following options might be provided as key/value pairs:</p>
+
+<pre><code>   name                 | default
+   ---------------------+----------
+   field_separator      | &quot;,&quot;
+   row_separator        | &quot;\n&quot;
+   null                 | &quot;NULL&quot;
+   show_header          | 1
+   ---------------------+----------</code></pre>
+
+<p>Fields that contains the <code>field_separator</code> or the quote character will be quoted.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>none.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>RFC 4180 and <a href="http://en.wikipedia.org/wiki/Comma-separated_values">http://en.wikipedia.org/wiki/Comma-separated_values</a></p>
+
+
+</body>
+
+</html>
+
+

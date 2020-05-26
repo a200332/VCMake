@@ -1,0 +1,159 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Moose::Meta::TypeConstraint::Union-new-options">Moose::Meta::TypeConstraint::Union-&gt;new(%options)</a></li>
+      <li><a href="#constraint-type_constraints">$constraint-&gt;type_constraints</a></li>
+      <li><a href="#constraint-parent">$constraint-&gt;parent</a></li>
+      <li><a href="#constraint-check-value">$constraint-&gt;check($value)</a></li>
+      <li><a href="#constraint-validate-value">$constraint-&gt;validate($value)</a></li>
+      <li><a href="#constraint-equals-type_name_or_object">$constraint-&gt;equals($type_name_or_object)</a></li>
+      <li><a href="#constraint-find_type_for-value">$constraint-&gt;find_type_for($value)</a></li>
+      <li><a href="#constraint-is_a_type_of-type_name_or_object">$constraint-&gt;is_a_type_of($type_name_or_object)</a></li>
+      <li><a href="#constraint-is_subtype_of">$constraint-&gt;is_subtype_of</a></li>
+      <li><a href="#constraint-create_child_type-options">$constraint-&gt;create_child_type(%options)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Meta::TypeConstraint::Union - A union of Moose type constraints</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This metaclass represents a union of type constraints. A union takes multiple type constraints, and is true if any one of its member constraints is true.</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>Moose::Meta::TypeConstraint::Union</code> is a subclass of <a href="../../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Moose::Meta::TypeConstraint::Union-new-options">Moose::Meta::TypeConstraint::Union-&gt;new(%options)</h2>
+
+<p>This creates a new class type constraint based on the given <code>%options</code>.</p>
+
+<p>It takes the same options as its parent. It also requires an additional option, <code>type_constraints</code>. This is an array reference containing the <a href="../../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a> objects that are the members of the union type. The <code>name</code> option defaults to the names all of these member types sorted and then joined by a pipe (|).</p>
+
+<p>The constructor sets the implementation of the constraint so that is simply calls <code>check</code> on the newly created object.</p>
+
+<p>Finally, the constructor also makes sure that the object&#39;s <code>coercion</code> attribute is a <a href="../../../../lib/Moose/Meta/TypeCoercion/Union.html">Moose::Meta::TypeCoercion::Union</a> object.</p>
+
+<h2 id="constraint-type_constraints">$constraint-&gt;type_constraints</h2>
+
+<p>This returns the array reference of <code>type_constraints</code> provided to the constructor.</p>
+
+<h2 id="constraint-parent">$constraint-&gt;parent</h2>
+
+<p>This returns the nearest common ancestor of all the components of the union.</p>
+
+<h2 id="constraint-check-value">$constraint-&gt;check($value)</h2>
+
+<h2 id="constraint-validate-value">$constraint-&gt;validate($value)</h2>
+
+<p>These two methods simply call the relevant method on each of the member type constraints in the union. If any type accepts the value, the value is valid.</p>
+
+<p>With <code>validate</code> the error message returned includes all of the error messages returned by the member type constraints.</p>
+
+<h2 id="constraint-equals-type_name_or_object">$constraint-&gt;equals($type_name_or_object)</h2>
+
+<p>A type is considered equal if it is also a union type, and the two unions have the same member types.</p>
+
+<h2 id="constraint-find_type_for-value">$constraint-&gt;find_type_for($value)</h2>
+
+<p>This returns the first member type constraint for which <code>check($value)</code> is true, allowing you to determine which of the Union&#39;s member type constraints a given value matches.</p>
+
+<h2 id="constraint-is_a_type_of-type_name_or_object">$constraint-&gt;is_a_type_of($type_name_or_object)</h2>
+
+<p>This returns true if all of the member type constraints return true for the <code>is_a_type_of</code> method.</p>
+
+<h2 id="constraint-is_subtype_of">$constraint-&gt;is_subtype_of</h2>
+
+<p>This returns true if all of the member type constraints return true for the <code>is_subtype_of</code> method.</p>
+
+<h2 id="constraint-create_child_type-options">$constraint-&gt;create_child_type(%options)</h2>
+
+<p>This returns a new <a href="../../../../lib/Moose/Meta/TypeConstraint.html">Moose::Meta::TypeConstraint</a> object with the type as its parent.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,196 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+  <li><a href="#PERFORMANCE">PERFORMANCE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Math::Prime::Util::PrimeArray - A tied array for primes</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.69</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># Use package and create a tied variable</span>
+  <span class="keyword">use</span> <span class="variable">Math::Prime::Util::PrimeArray</span><span class="operator">;</span>
+  <span class="keyword">tie</span> <span class="keyword">my</span> <span class="variable">@primes</span><span class="operator">,</span> <span class="string">'Math::Prime::Util::PrimeArray'</span><span class="operator">;</span>
+  
+  <span class="comment"># or all in one (allowed: @primes, @prime, @pr, @p):</span>
+  <span class="keyword">use</span> <span class="variable">Math::Prime::Util::PrimeArray</span> <span class="string">'@primes'</span><span class="operator">;</span>
+  
+  <span class="comment"># Use in a loop by index:</span>
+  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$n</span> <span class="operator">(</span><span class="number">0</span><span class="operator">..</span><span class="number">9</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"prime </span><span class="variable">$n</span><span class="string"> = </span><span class="variable">$primes</span><span class="string">[</span><span class="variable">$n</span><span class="string">]\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># Use in a loop over array:</span>
+  <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">(</span><span class="variable">@primes</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">last</span> <span class="keyword">if</span> <span class="variable">$p</span> <span class="operator">&gt;</span> <span class="number">1000</span><span class="operator">;</span>   <span class="comment"># stop sometime</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$p</span><span class="string">\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># Use via array slice:</span>
+  <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">","</span><span class="operator">,</span> <span class="variable">@primes</span><span class="operator">[</span><span class="number">0</span><span class="operator">..</span><span class="number">49</span><span class="operator">]</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+  
+  <span class="comment"># Use via each:</span>
+  <span class="keyword">use</span> <span class="number">5.012</span><span class="operator">;</span>
+  <span class="keyword">while</span><span class="operator">(</span> <span class="keyword">my</span><span class="operator">(</span><span class="variable">$index</span><span class="operator">,</span><span class="variable">$value</span><span class="operator">)</span> <span class="operator">=</span> <span class="keyword">each</span> <span class="variable">@primes</span> <span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">last</span> <span class="keyword">if</span> <span class="variable">$value</span> <span class="operator">&gt;</span> <span class="number">1000</span><span class="operator">;</span>   <span class="comment"># stop sometime</span>
+    <span class="keyword">print</span> <span class="string">"The ${index}th prime is </span><span class="variable">$value</span><span class="string">\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># Use with shift:</span>
+  <span class="keyword">while</span> <span class="operator">((</span><span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="keyword">shift</span> <span class="variable">@primes</span><span class="operator">)</span> <span class="operator">&lt;</span> <span class="number">1000</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$p</span><span class="string">\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>An array that acts like the infinite set of primes. This may be more convenient than using <a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a> directly, and in some cases it can be faster than calling <code>next_prime</code> and <code>prev_prime</code>.</p>
+
+<p>If the access pattern is ascending or descending, then a window is sieved and results returned from the window as needed. If the access pattern is random, then <code>nth_prime</code> is used.</p>
+
+<p>Shifting acts like the array is losing elements at the front, so after two shifts, <code>$primes[0] == 5</code>. Unshift will move the internal shift index back one, unless given an argument which is the number to move back. It will not shift past the beginning, so <code>unshift @primes, ~0</code> is a useful way to reset from any shifts.</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="keyword">say</span> <span class="keyword">shift</span> <span class="variable">@primes</span><span class="operator">;</span>     <span class="comment"># 2</span>
+  <span class="keyword">say</span> <span class="keyword">shift</span> <span class="variable">@primes</span><span class="operator">;</span>     <span class="comment"># 3</span>
+  <span class="keyword">say</span> <span class="keyword">shift</span> <span class="variable">@primes</span><span class="operator">;</span>     <span class="comment"># 5</span>
+  <span class="keyword">say</span> <span class="variable">$primes</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>        <span class="comment"># 7</span>
+  <span class="keyword">unshift</span> <span class="variable">@primes</span><span class="operator">;</span>       <span class="comment">#     back up one</span>
+  <span class="keyword">say</span> <span class="variable">$primes</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>        <span class="comment"># 5</span>
+  <span class="keyword">unshift</span> <span class="variable">@primes</span><span class="operator">,</span> <span class="number">2</span><span class="operator">;</span>    <span class="comment">#     back up two</span>
+  <span class="keyword">say</span> <span class="variable">$primes</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>        <span class="comment"># 2</span>
+</code></pre>
+
+<p>If you want sequential primes with low memory, I recommend using <a href="../../../../lib/Math/Prime/Util.html#forprimes">&quot;forprimes&quot; in Math::Prime::Util</a>. It is much faster, as the tied array functionality in Perl is not high performance. It isn&#39;t as flexible as the prime array, but it is a very common pattern.</p>
+
+<p>If you prefer an iterator pattern, I would recommend using <a href="../../../../lib/Math/Prime/Util.html#prime_iterator">&quot;prime_iterator&quot; in Math::Prime::Util</a>. It will be a bit faster than using this tied array, but of course you don&#39;t get random access. If you find yourself using the <code>shift</code> operation, consider the iterator.</p>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<p>The size of the array will always be shown as 2147483647 (IV32 max), even in a 64-bit environment where primes through <code>2^64</code> are available.</p>
+
+<p>Perl will mask all array arguments to 32-bit, making <code>2^32-1</code> the maximum prime through the standard array interface. It will silently wrap after that. The only way around this is using the object interface:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::Prime::Util::PrimeArray</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$o</span> <span class="operator">=</span> <span class="keyword">tie</span> <span class="keyword">my</span> <span class="variable">@primes</span><span class="operator">,</span> <span class="string">'Math::Prime::Util::PrimeArray'</span><span class="operator">;</span>
+    <span class="keyword">say</span> <span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">FETCH</span><span class="operator">(</span><span class="number">2</span><span class="operator">**</span><span class="number">36</span><span class="operator">);</span>
+</code></pre>
+
+<p>Here we store the object returned by tie, allowing us to call its FETCH method directly. This is actually faster than using the array.</p>
+
+<p>Some people find the idea of shifting a prime array abhorrent, as after two shifts, &quot;the second prime is 7?!&quot;. If this bothers you, do not use <code>shift</code> on the tied array.</p>
+
+<h1 id="PERFORMANCE">PERFORMANCE</h1>
+
+<pre><code>  <span class="variable">sumprimes</span><span class="operator">:</span>      <span class="variable">sum_primes</span><span class="operator">(</span><span class="variable">nth_prime</span><span class="operator">(</span><span class="number">100_000</span><span class="operator">))</span>
+  <span class="variable">MPU</span> <span class="variable">forprimes</span><span class="operator">:</span>  <span class="variable">forprimes</span> <span class="operator">{</span> <span class="variable">$sum</span> <span class="operator">+=</span> <span class="variable">$_</span> <span class="operator">}</span> <span class="variable">nth_prime</span><span class="operator">(</span><span class="number">100_000</span><span class="operator">);</span>
+  <span class="variable">MPU</span> <span class="variable">iterator</span><span class="operator">:</span>   <span class="keyword">my</span> <span class="variable">$it</span> <span class="operator">=</span> <span class="variable">prime_iterator</span><span class="operator">;</span> <span class="variable">$sum</span> <span class="operator">+=</span> <span class="variable">$it</span><span class="operator">-&gt;()</span> <span class="keyword">for</span> <span class="number">1</span><span class="operator">..</span><span class="number">100000</span><span class="operator">;</span>
+  <span class="variable">MPU</span> <span class="variable">array</span><span class="operator">:</span>      <span class="variable">$sum</span> <span class="operator">=</span> <span class="variable">vecsum</span><span class="operator">(</span> <span class="variable">@</span><span class="operator">{</span><span class="variable">primes</span><span class="operator">(</span><span class="variable">nth_prime</span><span class="operator">(</span><span class="number">100_000</span><span class="operator">))</span><span class="operator">}</span> <span class="operator">);</span>
+  <span class="variable">MPUPA</span><span class="operator">:</span>          <span class="keyword">tie</span> <span class="keyword">my</span> <span class="variable">@prime</span><span class="operator">,</span> <span class="operator">...;</span> <span class="variable">$sum</span> <span class="operator">+=</span> <span class="variable">$prime</span><span class="operator">[</span><span class="variable">$_</span><span class="operator">]</span> <span class="keyword">for</span> <span class="number">0</span><span class="operator">..</span><span class="number">99999</span><span class="operator">;</span>
+  <span class="variable">MPUPA</span><span class="operator">-</span><span class="variable">FETCH</span><span class="operator">:</span>    <span class="keyword">my</span> <span class="variable">$o</span><span class="operator">=</span><span class="keyword">tie</span> <span class="keyword">my</span> <span class="variable">@pr</span><span class="operator">,</span> <span class="operator">...;</span> <span class="variable">$sum</span> <span class="operator">+=</span> <span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">FETCH</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="keyword">for</span> <span class="number">0</span><span class="operator">..</span><span class="number">99999</span><span class="operator">;</span>
+  <span class="variable">MNSP</span><span class="operator">:</span>           <span class="keyword">my</span> <span class="variable">$seq</span> <span class="operator">=</span> <span class="variable">Math::NumSeq::Primes</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+                  <span class="variable">$sum</span> <span class="operator">+=</span> <span class="operator">(</span><span class="variable">$seq</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">)</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="keyword">for</span> <span class="number">1</span><span class="operator">..</span><span class="number">100000</span><span class="operator">;</span>
+  <span class="variable">MPTA</span><span class="operator">:</span>           <span class="keyword">tie</span> <span class="keyword">my</span> <span class="variable">@prime</span><span class="operator">,</span> <span class="operator">...;</span> <span class="variable">$sum</span> <span class="operator">+=</span> <span class="variable">$prime</span><span class="operator">[</span><span class="variable">$_</span><span class="operator">]</span> <span class="keyword">for</span> <span class="number">0</span><span class="operator">..</span><span class="number">99999</span><span class="operator">;</span>
+  <span class="variable">List::Gen</span>       <span class="variable">$sum</span> <span class="operator">=</span> <span class="variable">primes</span><span class="operator">-&gt;</span><span class="variable">take</span><span class="operator">(</span><span class="number">100000</span><span class="operator">)-&gt;</span><span class="variable">sum</span>
+</code></pre>
+
+<p>Memory use is comparing the delta between just loading the module and running the test. Perl 5.20.0, Math::NumSeq v70, Math::Prime::TiedArray v0.04, List::Gen 0.974.</p>
+
+<p>Summing the first 0.1M primes via walking the array:</p>
+
+<pre><code>       .3ms    56k    Math::Prime::Util      sumprimes
+       4ms     56k    Math::Prime::Util      forprimes
+       4ms    4 MB    Math::Prime::Util      sum big array
+      31ms      0     Math::Prime::Util      prime_iterator
+      68ms    644k    MPU::PrimeArray        using FETCH
+     101ms    644k    MPU::PrimeArray        array
+      95ms   1476k    Math::NumSeq::Primes   sequence iterator
+    4451ms   32 MB    List::Gen              sequence
+    6954ms   61 MB    Math::Prime::TiedArray (extend 1k)</code></pre>
+
+<p>Summing the first 1M primes via walking the array:</p>
+
+<pre><code>      0.005s  268k    Math::Prime::Util      sumprimes
+      0.05s   268k    Math::Prime::Util      forprimes
+      0.05s  41 MB    Math::Prime::Util      sum big array
+      0.3s      0     Math::Prime::Util      prime_iterator
+      0.7s    644k    MPU::PrimeArray        using FETCH
+      1.0s    644k    MPU::PrimeArray        array
+      6.1s   2428k    Math::NumSeq::Primes   sequence iterator
+    106.0s   93 MB    List::Gen              sequence
+     98.1s  760 MB    Math::Prime::TiedArray (extend 1k)</code></pre>
+
+<p>Summing the first 10M primes via walking the array:</p>
+
+<pre><code>      0.07s   432k    Math::Prime::Util      sumprimes
+      0.5s    432k    Math::Prime::Util      forprimes
+      0.6s  394 MB    Math::Prime::Util      sum big array
+      3.2s      0     Math::Prime::Util      prime_iterator
+      6.8s    772k    MPU::PrimeArray        using FETCH
+     10.2s    772k    MPU::PrimeArray        array
+   1046  s  11.1MB    Math::NumSeq::Primes   sequence iterator
+   6763  s  874 MB    List::Gen              sequence
+          &gt;5000 MB    Math::Primes::TiedArray (extend 1k)</code></pre>
+
+<p><a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a> offers four obvious solutions: the <code>sum_primes</code> function, a big array, an iterator, and the <code>forprimes</code> construct. The big array is fast but uses a <b>lot</b> of memory, forcing the user to start programming segments. Using the iterator avoids all the memory use, but isn&#39;t as fast (this may improve in a later release, as this is a new feature). The <code>forprimes</code> construct is both fast and low memory, but it isn&#39;t quite as flexible as the iterator (e.g. it doesn&#39;t lend itself to wrapping inside a filter).</p>
+
+<p><a>Math::NumSeq::Primes</a> offers an iterator alternative, and works quite well as long as you don&#39;t need lots of primes. It does not support random access. It has reasonable performance for the first few hundred thousand, but each successive value takes much longer to generate, and once past 1 million it isn&#39;t very practical. Internally it is sieving all primes up to <code>n</code> every time it makes a new segment which is why it slows down so much.</p>
+
+<p><a>List::Gen</a> includes a built-in prime sequence. It uses an inefficient Perl sieve for numbers below 10M, trial division past that. It uses too much time and memory to be practical for anything but very small inputs. It also gives incorrect results for large inputs (RT 105758).</p>
+
+<p><a>Math::Primes::TiedArray</a> is remarkably impractical for anything other than tiny numbers.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>This module uses <a href="../../../../lib/Math/Prime/Util.html">Math::Prime::Util</a> to do all the work. If you&#39;re doing anything but retrieving primes, you should examine that module to see if it has functionality you can use directly, as it may be a lot faster or easier.</p>
+
+<p>Similar functionality can be had from <a>Math::NumSeq</a> and <a>Math::Prime::TiedArray</a>.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Dana Jacobsen &lt;dana@acm.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2012-2016 by Dana Jacobsen &lt;dana@acm.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

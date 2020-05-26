@@ -1,0 +1,321 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION-FILE-SYNTAX">CONFIGURATION FILE SYNTAX</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#errstr">errstr()</a></li>
+      <li><a href="#new">new()</a></li>
+      <li><a href="#read-filename-encoding">read($filename, [$encoding])</a></li>
+      <li><a href="#read_string-string">read_string($string)</a></li>
+      <li><a href="#write-filename-encoding">write($filename, [$encoding])</a></li>
+      <li><a href="#write_string">write_string()</a></li>
+    </ul>
+  </li>
+  <li><a href="#FAQ">FAQ</a>
+    <ul>
+      <li><a href="#Why-cant-I-put-comments-at-the-ends-of-lines">Why can&#39;t I put comments at the ends of lines?</a></li>
+      <li><a href="#Why-cant-I-omit-the-signs">Why can&#39;t I omit the &#39;=&#39; signs?</a></li>
+      <li><a href="#Why-do-I-have-to-assign-the-result-of-a-method-call-to-a-variable">Why do I have to assign the result of a method call to a variable?</a></li>
+      <li><a href="#Can-I-use-a-file-called-0-zero">Can I use a file called &#39;0&#39; (zero)?</a></li>
+    </ul>
+  </li>
+  <li><a href="#CAVEATS">CAVEATS</a>
+    <ul>
+      <li><a href="#Unsupported-Section-Headers">Unsupported Section Headers</a></li>
+      <li><a href="#Setting-an-option-more-than-once">Setting an option more than once</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEGEMENTS">ACKNOWLEGEMENTS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Config::Tiny - Read/Write .ini style files with as little code as possible</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        <span class="comment"># In your configuration file</span>
+        <span class="variable">rootproperty</span><span class="operator">=</span><span class="variable">blah</span>
+        
+        <span class="operator">[</span><span class="variable">section</span><span class="operator">]</span>
+        <span class="variable">one</span><span class="operator">=</span><span class="variable">twp</span>
+        <span class="variable">three</span><span class="operator">=</span> <span class="variable">four</span>
+        <span class="variable">Foo</span> <span class="operator">=</span><span class="variable">Bar</span>
+        <span class="variable">empty</span><span class="operator">=</span>
+        
+        <span class="comment"># In your program</span>
+        <span class="keyword">use</span> <span class="variable">Config::Tiny</span><span class="operator">;</span>
+        
+        <span class="comment"># Create a config</span>
+        <span class="keyword">my</span> <span class="variable">$Config</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        
+        <span class="comment"># Open the config</span>
+        <span class="variable">$Config</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span> <span class="string">'file.conf'</span> <span class="operator">);</span>
+        <span class="variable">$Config</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span> <span class="string">'file.conf'</span><span class="operator">,</span> <span class="string">'utf8'</span> <span class="operator">);</span> <span class="comment"># Neither ':' nor '&lt;:' prefix!</span>
+        <span class="variable">$Config</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span><span class="operator">-&gt;</span><span class="variable">read</span><span class="operator">(</span> <span class="string">'file.conf'</span><span class="operator">,</span> <span class="string">'encoding(iso-8859-1)'</span><span class="operator">);</span>
+        
+        <span class="comment"># Reading properties</span>
+        <span class="keyword">my</span> <span class="variable">$rootproperty</span> <span class="operator">=</span> <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">rootproperty</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$one</span> <span class="operator">=</span> <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">section</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">one</span><span class="operator">}</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$Foo</span> <span class="operator">=</span> <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">section</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Foo</span><span class="operator">}</span><span class="operator">;</span>
+        
+        <span class="comment"># Changing data</span>
+        <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">newsection</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">{</span> <span class="string">this</span> <span class="operator">=&gt;</span> <span class="string">'that'</span> <span class="operator">}</span><span class="operator">;</span> <span class="comment"># Add a section</span>
+        <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">section</span><span class="operator">}</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Foo</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">'Not Bar!'</span><span class="operator">;</span>     <span class="comment"># Change a value</span>
+        <span class="keyword">delete</span> <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_</span><span class="operator">}</span><span class="operator">;</span>                        <span class="comment"># Delete a value or section</span>
+        
+        <span class="comment"># Save a config</span>
+        <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="variable">write</span><span class="operator">(</span> <span class="string">'file.conf'</span> <span class="operator">);</span>
+        <span class="variable">$Config</span><span class="operator">-&gt;</span><span class="variable">write</span><span class="operator">(</span> <span class="string">'file.conf'</span><span class="operator">,</span> <span class="string">'utf8'</span> <span class="operator">);</span> <span class="comment"># Neither ':' nor '&gt;:' prefix!</span>
+        
+        <span class="comment"># Shortcuts</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$rootproperty</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$$Config</span><span class="operator">{</span><span class="string">_</span><span class="operator">}{</span><span class="string">rootproperty</span><span class="operator">}</span><span class="operator">;</span>
+        
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$config</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span> <span class="operator">-&gt;</span> <span class="variable">read_string</span><span class="operator">(</span><span class="string">'alpha=bet'</span><span class="operator">);</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$value</span><span class="operator">)</span>  <span class="operator">=</span> <span class="variable">$$config</span><span class="operator">{</span><span class="string">_</span><span class="operator">}{</span><span class="string">alpha</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># $value is 'bet'.</span>
+        
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$config</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span> <span class="operator">-&gt;</span> <span class="variable">read_string</span><span class="operator">(</span><span class="string">"[init]\nalpha=bet"</span><span class="operator">);</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$value</span><span class="operator">)</span>  <span class="operator">=</span> <span class="variable">$$config</span><span class="operator">{</span><span class="string">init</span><span class="operator">}{</span><span class="string">alpha</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># $value is 'bet'.</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>Config::Tiny</code> is a Perl class to read and write .ini style configuration files with as little code as possible, reducing load time and memory overhead.</p>
+
+<p>Most of the time it is accepted that Perl applications use a lot of memory and modules.</p>
+
+<p>The <code>*::Tiny</code> family of modules is specifically intended to provide an ultralight alternative to the standard modules.</p>
+
+<p>This module is primarily for reading human written files, and anything we write shouldn&#39;t need to have documentation/comments. If you need something with more power move up to <a>Config::Simple</a>, <a>Config::General</a> or one of the many other <code>Config::*</code> modules.</p>
+
+<p>Lastly, <a href="../../lib/Config/Tiny.html">Config::Tiny</a> does <b>not</b> preserve your comments, whitespace, or the order of your config file.</p>
+
+<p>See <a>Config::Tiny::Ordered</a> (and possibly others) for the preservation of the order of the entries in the file.</p>
+
+<h1 id="CONFIGURATION-FILE-SYNTAX">CONFIGURATION FILE SYNTAX</h1>
+
+<p>Files are the same format as for MS Windows <code>*.ini</code> files. For example:</p>
+
+<pre><code>        [section]
+        var1=value1
+        var2=value2</code></pre>
+
+<p>If a property is outside of a section at the beginning of a file, it will be assigned to the <code>&quot;root section&quot;</code>, available at <code><span class="variable">$Config</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">_</span><span class="operator">}</span>
+</code>.</p>
+
+<p>Lines starting with <code>&#39;#&#39;</code> or <code><span class="string">';'</span>
+</code> are considered comments and ignored, as are blank lines.</p>
+
+<p>When writing back to the config file, all comments, custom whitespace, and the ordering of your config file elements is discarded. If you need to keep the human elements of a config when writing back, upgrade to something better, this module is not for you.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="errstr">errstr()</h2>
+
+<p>Returns a string representing the most recent error, or the empty string.</p>
+
+<p>You can also retrieve the error message from the <code>$Config::Tiny::errstr</code> variable.</p>
+
+<h2 id="new">new()</h2>
+
+<p>The constructor <code>new</code> creates and returns an empty <code>Config::Tiny</code> object.</p>
+
+<h2 id="read-filename-encoding">read($filename, [$encoding])</h2>
+
+<p>Here, the [] indicate an optional parameter.</p>
+
+<p>The <code>read</code> constructor reads a config file, $filename, and returns a new <code>Config::Tiny</code> object containing the properties in the file.</p>
+
+<p>$encoding may be used to indicate the encoding of the file, e.g. &#39;utf8&#39; or &#39;encoding(iso-8859-1)&#39;.</p>
+
+<p>Do not add a prefix to $encoding, such as &#39;&lt;&#39; or &#39;&lt;:&#39;.</p>
+
+<p>Returns the object on success, or <code>undef</code> on error.</p>
+
+<p>When <code>read</code> fails, <code>Config::Tiny</code> sets an error message internally you can recover via <code>Config::Tiny-&gt;errstr</code>. Although in <b>some</b> cases a failed <code>read</code> will also set the operating system error variable <code>$!</code>, not all errors do and you should not rely on using the <code>$!</code> variable.</p>
+
+<p>See t/04.utf8.t and t/04.utf8.txt.</p>
+
+<h2 id="read_string-string">read_string($string)</h2>
+
+<p>The <code>read_string</code> method takes as argument the contents of a config file as a string and returns the <code>Config::Tiny</code> object for it.</p>
+
+<h2 id="write-filename-encoding">write($filename, [$encoding])</h2>
+
+<p>Here, the [] indicate an optional parameter.</p>
+
+<p>The <code>write</code> method generates the file content for the properties, and writes it to disk to the filename specified.</p>
+
+<p>$encoding may be used to indicate the encoding of the file, e.g. &#39;utf8&#39; or &#39;encoding(iso-8859-1)&#39;.</p>
+
+<p>Do not add a prefix to $encoding, such as &#39;&gt;&#39; or &#39;&gt;:&#39;.</p>
+
+<p>Returns true on success or <code>undef</code> on error.</p>
+
+<p>See t/04.utf8.t and t/04.utf8.txt.</p>
+
+<h2 id="write_string">write_string()</h2>
+
+<p>Generates the file content for the object and returns it as a string.</p>
+
+<h1 id="FAQ">FAQ</h1>
+
+<h2 id="Why-cant-I-put-comments-at-the-ends-of-lines">Why can&#39;t I put comments at the ends of lines?</h2>
+
+<p>Because a line like:</p>
+
+<pre><code>        key=value # A comment</code></pre>
+
+<p>Sets key to &#39;value # A comment&#39; :-(.</p>
+
+<p>This conforms to the syntax discussed in <a href="#CONFIGURATION-FILE-SYNTAX">&quot;CONFIGURATION FILE SYNTAX&quot;</a>.</p>
+
+<h2 id="Why-cant-I-omit-the-signs">Why can&#39;t I omit the &#39;=&#39; signs?</h2>
+
+<p>E.g.:</p>
+
+<pre><code>        [Things]
+        my =
+        list =
+        of =
+        things =</code></pre>
+
+<p>Instead of:</p>
+
+<pre><code>        [Things]
+        my
+        list
+        of
+        things</code></pre>
+
+<p>Because the use of &#39;=&#39; signs is a type of mandatory documentation. It indicates that that section contains 4 items, and not 1 odd item split over 4 lines.</p>
+
+<h2 id="Why-do-I-have-to-assign-the-result-of-a-method-call-to-a-variable">Why do I have to assign the result of a method call to a variable?</h2>
+
+<p>This question comes from RT#85386.</p>
+
+<p>Yes, the syntax may seem odd, but you don&#39;t have to call both new() and read_string().</p>
+
+<p>Try:</p>
+
+<pre><code>        <span class="variable">perl</span> <span class="operator">-</span><span class="variable">MData::Dumper</span> <span class="operator">-</span><span class="variable">MConfig::Tiny</span> <span class="operator">-</span><span class="variable">E</span> <span class="string">'my $c=Config::Tiny-&gt;read_string("one=s"); say Dumper $c'</span>
+</code></pre>
+
+<p>Or:</p>
+
+<pre><code>        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$config</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">Config::Tiny</span> <span class="operator">-&gt;</span> <span class="variable">read_string</span><span class="operator">(</span><span class="string">'alpha=bet'</span><span class="operator">);</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$value</span><span class="operator">)</span>  <span class="operator">=</span> <span class="variable">$$config</span><span class="operator">{</span><span class="string">_</span><span class="operator">}{</span><span class="string">alpha</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># $value is 'bet'.</span>
+</code></pre>
+
+<p>Or even, a bit ridiculously:</p>
+
+<pre><code>        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$value</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$</span><span class="operator">{</span><span class="variable">Config::Tiny</span> <span class="operator">-&gt;</span> <span class="variable">read_string</span><span class="operator">(</span><span class="string">'alpha=bet'</span><span class="operator">)</span><span class="operator">}{</span><span class="string">_</span><span class="operator">}{</span><span class="string">alpha</span><span class="operator">}</span><span class="operator">;</span> <span class="comment"># $value is 'bet'.</span>
+</code></pre>
+
+<h2 id="Can-I-use-a-file-called-0-zero">Can I use a file called &#39;0&#39; (zero)?</h2>
+
+<p>Yes. See t/05.zero.t (test code) and t/0 (test data).</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<h2 id="Unsupported-Section-Headers">Unsupported Section Headers</h2>
+
+<p>Some edge cases in section headers are not supported, and additionally may not be detected when writing the config file.</p>
+
+<p>Specifically, section headers with leading whitespace, trailing whitespace, or newlines anywhere in the section header, will not be written correctly to the file and may cause file corruption.</p>
+
+<h2 id="Setting-an-option-more-than-once">Setting an option more than once</h2>
+
+<p><code>Config::Tiny</code> will only recognize the first time an option is set in a config file. Any further attempts to set the same option later in the config file are ignored.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs should be reported via the CPAN bug tracker at</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Tiny">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Tiny</a></p>
+
+<p>For other issues, or commercial enhancement or support, contact the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<p>Maintanence from V 2.15: Ron Savage <a href="http://savage.net.au/">http://savage.net.au/</a>.</p>
+
+<h1 id="ACKNOWLEGEMENTS">ACKNOWLEGEMENTS</h1>
+
+<p>Thanks to Sherzod Ruzmetov &lt;sherzodr@cpan.org&gt; for <a>Config::Simple</a>, which inspired this module by being not quite &quot;simple&quot; enough for me :).</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>See, amongst many: <a>Config::Simple</a> and <a>Config::General</a>.</p>
+
+<p>See <a>Config::Tiny::Ordered</a> (and possibly others) for the preservation of the order of the entries in the file.</p>
+
+<p><a>IOD</a>. Ini On Drugs.</p>
+
+<p><a>IOD::Examples</a></p>
+
+<p><a>App::IODUtils</a></p>
+
+<p><a>Config::IOD::Reader</a></p>
+
+<p><a href="../../lib/Config/Perl/V.html">Config::Perl::V</a>. Config data from Perl itself.</p>
+
+<p><a>Config::Onion</a></p>
+
+<p><a>Config::IniFiles</a></p>
+
+<p><a>Config::INIPlus</a></p>
+
+<p><a>Config::Hash</a>. Allows nested data.</p>
+
+<p><a>Config::MVP</a>. Author: RJBS. Uses Moose. Extremely complex.</p>
+
+<p><a>Config::TOML</a>. See next few lines:</p>
+
+<p><a href="https://github.com/dlc/toml">https://github.com/dlc/toml</a></p>
+
+<p><a href="https://github.com/alexkalderimis/config-toml.pl">https://github.com/alexkalderimis/config-toml.pl</a>. 1 Star rating.</p>
+
+<p><a href="https://github.com/toml-lang/toml">https://github.com/toml-lang/toml</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2002 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

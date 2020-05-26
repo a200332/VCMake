@@ -1,0 +1,175 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#install_sub">install_sub</a></li>
+      <li><a href="#reinstall_sub">reinstall_sub</a></li>
+      <li><a href="#install_installers">install_installers</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#exporter">exporter</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#EXTRA-CREDITS">EXTRA CREDITS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Install - install subroutines into packages easily</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.928</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sub::Install</span><span class="operator">;</span>
+  
+  <span class="variable">Sub::Install::install_sub</span><span class="operator">(</span><span class="operator">{</span>
+    <span class="string">code</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">},</span>
+    <span class="string">into</span> <span class="operator">=&gt;</span> <span class="variable">$package</span><span class="operator">,</span>
+    <span class="string">as</span>   <span class="operator">=&gt;</span> <span class="variable">$subname</span>
+  <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module makes it easy to install subroutines into packages without the unsightly mess of <code>no strict</code> or typeglobs lying about where just anyone can see them.</p>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="install_sub">install_sub</h2>
+
+<pre><code>  <span class="variable">Sub::Install::install_sub</span><span class="operator">(</span><span class="operator">{</span>
+   <span class="string">code</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">subroutine</span><span class="operator">,</span>
+   <span class="string">into</span> <span class="operator">=&gt;</span> <span class="string">"Finance::Shady"</span><span class="operator">,</span>
+   <span class="string">as</span>   <span class="operator">=&gt;</span> <span class="string">'launder'</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>This routine installs a given code reference into a package as a normal subroutine. The above is equivalent to:</p>
+
+<pre><code>  <span class="keyword">no</span> <span class="variable">strict</span> <span class="string">'refs'</span><span class="operator">;</span>
+  <span class="variable">*</span><span class="operator">{</span><span class="string">"Finance::Shady"</span> <span class="operator">.</span> <span class="string">'::'</span> <span class="operator">.</span> <span class="string">"launder"</span><span class="operator">}</span> <span class="operator">=</span> <span class="operator">\&amp;</span><span class="variable">subroutine</span><span class="operator">;</span>
+</code></pre>
+
+<p>If <code>into</code> is not given, the sub is installed into the calling package.</p>
+
+<p>If <code>code</code> is not a code reference, it is looked for as an existing sub in the package named in the <code>from</code> parameter. If <code>from</code> is not given, it will look in the calling package.</p>
+
+<p>If <code>as</code> is not given, and if <code>code</code> is a name, <code>as</code> will default to <code>code</code>. If <code>as</code> is not given, but if <code>code</code> is a code ref, Sub::Install will try to find the name of the given code ref and use that as <code>as</code>.</p>
+
+<p>That means that this code:</p>
+
+<pre><code>  <span class="variable">Sub::Install::install_sub</span><span class="operator">(</span><span class="operator">{</span>
+    <span class="string">code</span> <span class="operator">=&gt;</span> <span class="string">'twitch'</span><span class="operator">,</span>
+    <span class="string">from</span> <span class="operator">=&gt;</span> <span class="string">'Person::InPain'</span><span class="operator">,</span>
+    <span class="string">into</span> <span class="operator">=&gt;</span> <span class="string">'Person::Teenager'</span><span class="operator">,</span>
+    <span class="string">as</span>   <span class="operator">=&gt;</span> <span class="string">'dance'</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>is the same as:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Person::Teenager</span><span class="operator">;</span>
+  
+  <span class="variable">Sub::Install::install_sub</span><span class="operator">(</span><span class="operator">{</span>
+    <span class="string">code</span> <span class="operator">=&gt;</span> <span class="variable">Person::InPain</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'twitch'</span><span class="operator">),</span>
+    <span class="string">as</span>   <span class="operator">=&gt;</span> <span class="string">'dance'</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="reinstall_sub">reinstall_sub</h2>
+
+<p>This routine behaves exactly like <code><a href="#install_sub">&quot;install_sub&quot;</a></code>, but does not emit a warning if warnings are on and the destination is already defined.</p>
+
+<h2 id="install_installers">install_installers</h2>
+
+<p>This routine is provided to allow Sub::Install compatibility with Sub::Installer. It installs <code>install_sub</code> and <code>reinstall_sub</code> methods into the package named by its argument.</p>
+
+<pre><code> <span class="variable">Sub::Install::install_installers</span><span class="operator">(</span><span class="string">'Code::Builder'</span><span class="operator">);</span> <span class="comment"># just for us, please</span>
+ <span class="variable">Code::Builder</span><span class="operator">-&gt;</span><span class="variable">install_sub</span><span class="operator">(</span><span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="variable">$code_ref</span> <span class="operator">}</span><span class="operator">);</span>
+ 
+ <span class="variable">Sub::Install::install_installers</span><span class="operator">(</span><span class="string">'UNIVERSAL'</span><span class="operator">);</span> <span class="comment"># feeling lucky, punk?</span>
+ <span class="variable">Anything::At::All</span><span class="operator">-&gt;</span><span class="variable">install_sub</span><span class="operator">(</span><span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="variable">$code_ref</span> <span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+<p>The installed installers are similar, but not identical, to those provided by Sub::Installer. They accept a single hash as an argument. The key/value pairs are used as the <code>as</code> and <code>code</code> parameters to the <code>install_sub</code> routine detailed above. The package name on which the method is called is used as the <code>into</code> parameter.</p>
+
+<p>Unlike Sub::Installer&#39;s <code>install_sub</code> will not eval strings into code, but will look for named code in the calling package.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>Sub::Install exports <code>install_sub</code> and <code>reinstall_sub</code> only if they are requested.</p>
+
+<h2 id="exporter">exporter</h2>
+
+<p>Sub::Install has a never-exported subroutine called <code>exporter</code>, which is used to implement its <code>import</code> routine. It takes a hashref of named arguments, only one of which is currently recognize: <code>exports</code>. This must be an arrayref of subroutines to offer for export.</p>
+
+<p>This routine is mainly for Sub::Install&#39;s own consumption. Instead, consider <a href="../../lib/Sub/Exporter.html">Sub::Exporter</a>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="Sub::Installer"><a>Sub::Installer</a></dt>
+<dd>
+
+<p>This module is (obviously) a reaction to Damian Conway&#39;s Sub::Installer, which does the same thing, but does it by getting its greasy fingers all over UNIVERSAL. I was really happy about the idea of making the installation of coderefs less ugly, but I couldn&#39;t bring myself to replace the ugliness of typeglobs and loosened strictures with the ugliness of UNIVERSAL methods.</p>
+
+</dd>
+<dt id="Sub::Exporter"><a href="../../lib/Sub/Exporter.html">Sub::Exporter</a></dt>
+<dd>
+
+<p>This is a complete Exporter.pm replacement, built atop Sub::Install.</p>
+
+</dd>
+</dl>
+
+<h1 id="EXTRA-CREDITS">EXTRA CREDITS</h1>
+
+<p>Several of the tests are adapted from tests that shipped with Damian Conway&#39;s Sub-Installer distribution.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ricardo SIGNES &lt;rjbs@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2005 by Ricardo SIGNES.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

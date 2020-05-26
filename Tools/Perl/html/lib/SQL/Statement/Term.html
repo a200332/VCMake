@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#value">value</a></li>
+      <li><a href="#DESTROY">DESTROY</a></li>
+    </ul>
+  </li>
+  <li><a href="#NAME1">NAME</a></li>
+  <li><a href="#SYNOPSIS1">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION1">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE1">INHERITANCE</a></li>
+  <li><a href="#METHODS1">METHODS</a>
+    <ul>
+      <li><a href="#new1">new</a></li>
+      <li><a href="#value1">value</a></li>
+    </ul>
+  </li>
+  <li><a href="#NAME2">NAME</a></li>
+  <li><a href="#SYNOPSIS2">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION2">DESCRIPTION</a></li>
+  <li><a href="#INHERITANCE2">INHERITANCE</a></li>
+  <li><a href="#METHODS2">METHODS</a>
+    <ul>
+      <li><a href="#new2">new</a></li>
+      <li><a href="#value2">value</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>SQL::Statement::Term - base class for all terms</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># create a term with an SQL::Statement object as owner</span>
+  <span class="keyword">my</span> <span class="variable">$term</span> <span class="operator">=</span> <span class="variable">SQL::Statement::Term</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$owner</span> <span class="operator">);</span>
+  <span class="comment"># access the value of that term</span>
+  <span class="variable">$term</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">(</span> <span class="variable">$eval</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>SQL::Statement::Term is an abstract base class providing the interface for all terms.</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<pre><code>  SQL::Statement::Term</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<p>Instantiates new term and stores a weak reference to the owner.</p>
+
+<h2 id="value">value</h2>
+
+<p><i>Abstract</i> method which will return the value of the term. Must be overridden by derived classes.</p>
+
+<h2 id="DESTROY">DESTROY</h2>
+
+<p>Destroys the term and undefines the weak reference to the owner.</p>
+
+<h1 id="NAME1">NAME</h1>
+
+<p>SQL::Statement::ConstantTerm - term for constant values</p>
+
+<h1 id="SYNOPSIS1">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># create a term with an SQL::Statement object as owner</span>
+  <span class="keyword">my</span> <span class="variable">$term</span> <span class="operator">=</span> <span class="variable">SQL::Statement::ConstantTerm</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$owner</span><span class="operator">,</span> <span class="string">'foo'</span> <span class="operator">);</span>
+  <span class="comment"># access the value of that term - returns 'foo'</span>
+  <span class="variable">$term</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">(</span> <span class="variable">$eval</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION1">DESCRIPTION</h1>
+
+<p>SQL::Statement::ConstantTerm implements a term which will always return the same constant value.</p>
+
+<h1 id="INHERITANCE1">INHERITANCE</h1>
+
+<pre><code>  SQL::Statement::ConstantTerm
+  ISA SQL::Statement::Term</code></pre>
+
+<h1 id="METHODS1">METHODS</h1>
+
+<h2 id="new1">new</h2>
+
+<p>Instantiates new term and stores the constant to deliver and a weak reference to the owner.</p>
+
+<h2 id="value1">value</h2>
+
+<p>Returns the specified constant.</p>
+
+<h1 id="NAME2">NAME</h1>
+
+<p>SQL::Statement::ColumnValue - term for column values</p>
+
+<h1 id="SYNOPSIS2">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># create a term with an SQL::Statement object as owner</span>
+  <span class="keyword">my</span> <span class="variable">$term</span> <span class="operator">=</span> <span class="variable">SQL::Statement::ColumnValue</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$owner</span><span class="operator">,</span> <span class="string">'id'</span> <span class="operator">);</span>
+  <span class="comment"># access the value of that term - returns the value of the column 'id'</span>
+  <span class="comment"># of the currently active row in $eval</span>
+  <span class="variable">$term</span><span class="operator">-&gt;</span><span class="variable">value</span><span class="operator">(</span> <span class="variable">$eval</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION2">DESCRIPTION</h1>
+
+<p>SQL::Statement::ColumnValue implements a term which will return the specified column of the active row.</p>
+
+<h1 id="INHERITANCE2">INHERITANCE</h1>
+
+<pre><code>  SQL::Statement::ColumnValue
+  ISA SQL::Statement::Term</code></pre>
+
+<h1 id="METHODS2">METHODS</h1>
+
+<h2 id="new2">new</h2>
+
+<p>Instantiates new term and stores the column name to deliver and a weak reference to the owner.</p>
+
+<h2 id="value2">value</h2>
+
+<p>Returns the specified column value.</p>
+
+<h1 id="AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</h1>
+
+<p>Copyright (c) 2009-2017 by Jens Rehsack: rehsackATcpan.org</p>
+
+<p>All rights reserved.</p>
+
+<p>You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
+
+
+</body>
+
+</html>
+
+

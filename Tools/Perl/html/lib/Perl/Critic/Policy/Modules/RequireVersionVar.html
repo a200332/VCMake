@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Modules::RequireVersionVar - Give every module a <code>$VERSION</code> number.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Every Perl file (modules, libraries, and programs) should have a package-scoped <code>$VERSION</code> variable. The <code>$VERSION</code> allows clients to insist on a particular revision of your file like this:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">SomeModule</span> <span class="number">2.4</span><span class="operator">;</span>  <span class="comment">#Only loads version 2.4</span>
+</code></pre>
+
+<p>This Policy scans your file for any package variable named <code>$VERSION</code>. I&#39;m assuming that you are using <code>strict</code>, so you&#39;ll have to declare it like one of these:</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="number">1.0611</span><span class="operator">;</span>
+    <span class="variable">$MyPackage::VERSION</span> <span class="operator">=</span> <span class="number">1.061</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">vars</span> <span class="string">qw($VERSION)</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">version</span><span class="operator">;</span> <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="variable">qv</span><span class="operator">(</span><span class="number">1.0611</span><span class="operator">);</span>
+</code></pre>
+
+<p>Perl&#39;s version system does not recognize lexical variables such as</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="number">1.0611</span><span class="operator">;</span>
+</code></pre>
+
+<p>so they are not accepted by this policy.</p>
+
+<p>A common practice is to use the <code>$Revision$</code> keyword to automatically define the <code>$VERSION</code> variable like this:</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="operator">(</span><span class="variable">$VERSION</span><span class="operator">)</span> <span class="operator">=</span> <span class="string">'$Revision$'</span> <span class="operator">=~</span> <span class="regex">m{ \$Revision: \s+ (\S+) }x</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>Conway recommends using the <code>version</code> pragma instead of raw numbers or &#39;v-strings.&#39; However, this Policy only insists that the <code>$VERSION</code> be defined somehow. I may try to extend this in the future.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>Add check that <code>$VERSION</code> is independently evaluatable. In particular, prohibit this:</p>
+
+<pre><code>    <span class="keyword">our</span> <span class="variable">$VERSION</span> <span class="operator">=</span> <span class="variable">$Other::Module::VERSION</span><span class="operator">;</span>
+</code></pre>
+
+<p>This doesn&#39;t work because PAUSE and other tools literally copy your version declaration out of your module and evaluates it in isolation, at which point there&#39;s nothing in <code>Other::Module</code>, and so the <code>$VERSION</code> is undefined.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a>
+    <ul>
+      <li><a href="#IO::File-new">IO::File-&gt;new</a></li>
+      <li><a href="#Is-it-the-right-lexical">Is it the right lexical?</a></li>
+    </ul>
+  </li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::InputOutput::RequireBriefOpen - Close filehandles as soon as possible after opening them.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>One way that production systems fail unexpectedly is by running out of filehandles. Filehandles are a finite resource on every operating system that I&#39;m aware of, and running out of them is virtually impossible to recover from. The solution is to not run out in the first place. What causes programs to run out of filehandles? Usually, it&#39;s leaks: you open a filehandle and forget to close it, or just wait a really long time before closing it.</p>
+
+<p>This problem is rarely exposed by test systems, because the tests rarely run long enough or have enough load to hit the filehandle limit. So, the best way to avoid the problem is 1) always close all filehandles that you open and 2) close them as soon as is practical.</p>
+
+<p>This policy takes note of calls to <code>open()</code> where there is no matching <code>close()</code> call within <code>N</code> lines of code. If you really need to do a lot of processing on an open filehandle, then you can move that processing to another method like this:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> process_data_file </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$filename</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="variable">$filename</span>
+            <span class="keyword">or</span> <span class="variable">croak</span> <span class="string">'Failed to read datafile '</span> <span class="operator">.</span>  <span class="variable">$filename</span> <span class="operator">.</span> <span class="string">'; '</span> <span class="operator">.</span> <span class="variable">$OS_ERROR</span><span class="operator">;</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">_parse_input_data</span><span class="operator">(</span><span class="variable">$fh</span><span class="operator">);</span>
+        <span class="keyword">close</span> <span class="variable">$fh</span><span class="operator">;</span>
+        <span class="keyword">return</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    <span class="keyword">sub</span><span class="variable"> _parse_input_data </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$fh</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">my</span> <span class="variable">$line</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">$fh</span><span class="operator">&gt;)</span> <span class="operator">{</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+        <span class="keyword">return</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>As a special case, this policy also allows code to return the filehandle after the <code>open</code> instead of closing it. Just like the close, however, that <code>return</code> has to be within the right number of lines. From there, you&#39;re on your own to figure out whether the code is promptly closing the filehandle.</p>
+
+<p>The STDIN, STDOUT, and STDERR handles are exempt from this policy.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This policy allows <code>close()</code> invocations to be up to <code>N</code> lines after their corresponding <code>open()</code> calls, where <code>N</code> defaults to 9. You can override this to set it to a different number with the <code>lines</code> setting. To do this, put entries in a <i>.perlcriticrc</i> file like this:</p>
+
+<pre><code>  [InputOutput::RequireBriefOpen]
+  lines = 5</code></pre>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<h2 id="IO::File-new"><code>IO::File-&gt;new</code></h2>
+
+<p>This policy only looks for explicit <code>open</code> calls. It does not detect calls to <code>CORE::open</code> or <code>IO::File-&gt;new</code> or the like.</p>
+
+<h2 id="Is-it-the-right-lexical">Is it the right lexical?</h2>
+
+<p>We don&#39;t currently check for redeclared filehandles. So the following code is false negative, for example, because the outer scoped filehandle is not closed:</p>
+
+<pre><code>    <span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="variable">$file1</span> <span class="keyword">or</span> <span class="variable">croak</span><span class="operator">;</span>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="variable">$file2</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="operator">&lt;</span><span class="variable">$fh</span><span class="operator">&gt;;</span>
+        <span class="keyword">close</span> <span class="variable">$fh</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This is a contrived example, but it isn&#39;t uncommon for people to use <code>$fh</code> for the name of the filehandle every time. Perhaps it&#39;s time to think of better variable names...</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>Initial development of this policy was supported by a grant from the Perl Foundation.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2007-2011 Chris Dolan. Many rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module</p>
+
+
+</body>
+
+</html>
+
+

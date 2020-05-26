@@ -1,0 +1,372 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INSTALLATION">INSTALLATION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#How-can-I-use-SQL::Statement-to-access-and-modify-data">How can I use SQL::Statement to access and modify data?</a></li>
+      <li><a href="#How-can-I-use-it-to-parse-and-examine-the-structure-of-SQL-statements">How can I use it to parse and examine the structure of SQL statements?</a></li>
+      <li><a href="#How-can-I-use-it-to-embed-a-SQL-engine-in-a-DBD-or-other-module">How can I use it to embed a SQL engine in a DBD or other module?</a></li>
+      <li><a href="#What-SQL-Syntax-is-supported">What SQL Syntax is supported?</a></li>
+      <li><a href="#How-can-I-extend-the-supported-SQL-syntax">How can I extend the supported SQL syntax?</a></li>
+    </ul>
+  </li>
+  <li><a href="#How-can-I-participate-in-ongoing-development">How can I participate in ongoing development?</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#capability">capability</a></li>
+      <li><a href="#open_table">open_table</a></li>
+      <li><a href="#new">new</a></li>
+      <li><a href="#prepare">prepare</a></li>
+      <li><a href="#execute">execute</a></li>
+      <li><a href="#errstr">errstr</a></li>
+      <li><a href="#fetch_row">fetch_row</a></li>
+      <li><a href="#fetch_rows">fetch_rows</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a>
+    <ul>
+      <li><a href="#Where-can-I-go-for-help">Where can I go for help?</a></li>
+      <li><a href="#Where-can-I-go-for-help-with-a-concrete-version">Where can I go for help with a concrete version?</a></li>
+      <li><a href="#Business-support-and-maintenance">Business support and maintenance</a></li>
+    </ul>
+  </li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>SQL::Statement - SQL parsing and processing engine</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># ... depends on what you want to do, see below</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The SQL::Statement module implements a pure Perl SQL parsing and execution engine. While it by no means implements full ANSI standard, it does support many features including column and table aliases, built-in and user-defined functions, implicit and explicit joins, complex nested search conditions, and other features.</p>
+
+<p>SQL::Statement is a small embeddable Database Management System (DBMS). This means that it provides all of the services of a simple DBMS except that instead of a persistent storage mechanism, it has two things: 1) an in-memory storage mechanism that allows you to prepare, execute, and fetch from SQL statements using temporary tables and 2) a set of software sockets where any author can plug in any storage mechanism.</p>
+
+<p>There are three main uses for SQL::Statement. One or another (hopefully not all) may be irrelevant for your needs: 1) to access and manipulate data in CSV, XML, and other formats 2) to build your own DBD for a new data source 3) to parse and examine the structure of SQL statements.</p>
+
+<h1 id="INSTALLATION">INSTALLATION</h1>
+
+<p>There are no prerequisites for using this as a standalone parser. If you want to access persistent stored data, you either need to write a subclass or use one of the DBI DBD drivers. You can install this module using CPAN.pm, CPANPLUS.pm, PPM, apt-get, or other packaging tools or you can download the tar.gz file from CPAN and use the standard perl mantra:</p>
+
+<pre><code>  perl Makefile.PL
+  make
+  make test
+  make install</code></pre>
+
+<p>It works fine on all platforms it has been tested on. On Windows, you can use ppm or with the mantra use nmake, dmake, or make depending on which is available.</p>
+
+<h1 id="USAGE">USAGE</h1>
+
+<h2 id="How-can-I-use-SQL::Statement-to-access-and-modify-data">How can I use SQL::Statement to access and modify data?</h2>
+
+<p>SQL::Statement provides the SQL engine for a number of existing DBI drivers including <a href="../../lib/DBD/CSV.html">DBD::CSV</a>, <a href="../../lib/DBD/DBM.html">DBD::DBM</a>, <a>DBD::AnyData</a>, <a>DBD::Excel</a>, <a>DBD::Amazon</a>, and others.</p>
+
+<p>These modules provide access to Comma Separated Values, Fixed Length, XML, HTML and many other kinds of text files, to Excel Spreadsheets, to BerkeleyDB and other DBM formats, and to non-traditional data sources like on-the-fly Amazon searches.</p>
+
+<p>If you are interested in accessing and manipulating persistent data, you may not really want to use SQL::Statement directly, but use <a href="../../lib/DBI.html">DBI</a> along with one of the DBDs mentioned above instead. You will be using SQL::Statement, but under the hood of the DBD. See <a href="http://dbi.perl.org">http://dbi.perl.org</a> for help with DBI and see <a href="../../lib/SQL/Statement/Syntax.html">SQL::Statement::Syntax</a> for a description of the SQL syntax that SQL::Statement provides for these modules and see the documentation for whichever DBD you are using for additional details.</p>
+
+<h2 id="How-can-I-use-it-to-parse-and-examine-the-structure-of-SQL-statements">How can I use it to parse and examine the structure of SQL statements?</h2>
+
+<p>SQL::Statement can be used stand-alone (without a subclass and without DBI) to parse and examine the structure of SQL statements. See <a href="../../lib/SQL/Statement/Structure.html">SQL::Statement::Structure</a> for details.</p>
+
+<h2 id="How-can-I-use-it-to-embed-a-SQL-engine-in-a-DBD-or-other-module">How can I use it to embed a SQL engine in a DBD or other module?</h2>
+
+<p>SQL::Statement is designed to be easily embedded in other modules and is especially suited for developing new DBI drivers (DBDs). See <a href="../../lib/SQL/Statement/Embed.html">SQL::Statement::Embed</a>.</p>
+
+<h2 id="What-SQL-Syntax-is-supported">What SQL Syntax is supported?</h2>
+
+<p>SQL::Statement supports a small but powerful subset of SQL commands. See <a href="../../lib/SQL/Statement/Syntax.html">SQL::Statement::Syntax</a>.</p>
+
+<h2 id="How-can-I-extend-the-supported-SQL-syntax">How can I extend the supported SQL syntax?</h2>
+
+<p>You can modify and extend the SQL syntax either by issuing SQL commands or by subclassing SQL::Statement. See <a href="../../lib/SQL/Statement/Syntax.html">SQL::Statement::Syntax</a>.</p>
+
+<h1 id="How-can-I-participate-in-ongoing-development">How can I participate in ongoing development?</h1>
+
+<p>SQL::Statement is a large module with many potential future directions. You are invited to help plan, code, test, document, or kibbitz about these directions. If you want to join the development team, or just hear more about the development, write Jeff (&lt;jzuckerATcpan.org&gt;) or Jens (&lt;rehsackATcpan.org&gt;) a note.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>The following methods can or must be overridden by derived classes.</p>
+
+<h2 id="capability">capability</h2>
+
+<pre><code>  <span class="variable">$has_capability</span> <span class="operator">=</span> <span class="variable">$h</span><span class="operator">-&gt;</span><span class="variable">capability</span><span class="operator">(</span><span class="string">'capability_name'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns a true value if the specified capability is available.</p>
+
+<p>Currently no capabilities are defined and this is a placeholder for future use. It is envisioned it will be used like <code>SQL::Eval::Table::capability</code>.</p>
+
+<h2 id="open_table">open_table</h2>
+
+<p>The <code>open_table</code> method must be overridden by derived classes to provide the capability of opening data tables. This is a necessity.</p>
+
+<p>Arguments given to open_table call:</p>
+
+<dl>
+
+<dt id="data"><code>$data</code></dt>
+<dd>
+
+<p>The database memo parameter. See <a href="#execute">&quot;execute&quot;</a>.</p>
+
+</dd>
+<dt id="table"><code>$table</code></dt>
+<dd>
+
+<p>The name of the table to open as parsed from SQL statement.</p>
+
+</dd>
+<dt id="createMode"><code>$createMode</code></dt>
+<dd>
+
+<p>A flag indicating the mode (<code>CREATE TABLE ...</code>) the table should be opened with. Set to a true value in create mode.</p>
+
+</dd>
+<dt id="lockMode"><code>$lockMode</code></dt>
+<dd>
+
+<p>A flag indicating whether the table should be opened for writing (any other than <code>SELECT ...</code>). Set to a true value if the table is to be opened for write access.</p>
+
+</dd>
+</dl>
+
+<p>The following methods are required to use SQL::Statement in a DBD (for example).</p>
+
+<h2 id="new">new</h2>
+
+<p>Instantiates a new SQL::Statement object.</p>
+
+<p>Arguments:</p>
+
+<dl>
+
+<dt id="sql"><code>$sql</code></dt>
+<dd>
+
+<p>The SQL statement for later actions.</p>
+
+</dd>
+<dt id="parser"><code>$parser</code></dt>
+<dd>
+
+<p>An instance of a <a href="../../lib/SQL/Parser.html">SQL::Parser</a> object or flags for it&#39;s instantiation. If omitted, default flags are used.</p>
+
+</dd>
+</dl>
+
+<p>When the basic initialization is completed, <code>$self-&gt;prepare($sql, $parser)</code> is invoked.</p>
+
+<h2 id="prepare">prepare</h2>
+
+<p>Prepares SQL::Statement to execute a SQL statement.</p>
+
+<p>Arguments:</p>
+
+<dl>
+
+<dt id="sql1"><code>$sql</code></dt>
+<dd>
+
+<p>The SQL statement to parse and prepare.</p>
+
+</dd>
+<dt id="parser1"><code>$parser</code></dt>
+<dd>
+
+<p>Instance of a <a href="../../lib/SQL/Parser.html">SQL::Parser</a> object to parse the provided SQL statement.</p>
+
+</dd>
+</dl>
+
+<h2 id="execute">execute</h2>
+
+<p>Executes a prepared statement.</p>
+
+<p>Arguments:</p>
+
+<dl>
+
+<dt id="data1"><code>$data</code></dt>
+<dd>
+
+<p>Memo field passed through to calls of the instantiated <code>$table</code> objects or <code>open_table</code> calls. In <code>CREATE</code> with subquery, <code><span class="variable">$data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Database</span><span class="operator">}</span>
+</code> must be a DBI database handle object.</p>
+
+</dd>
+<dt id="params"><code>$params</code></dt>
+<dd>
+
+<p>Bound params via DBI ...</p>
+
+</dd>
+</dl>
+
+<h2 id="errstr">errstr</h2>
+
+<p>Gives the error string of the last error, if any.</p>
+
+<h2 id="fetch_row">fetch_row</h2>
+
+<p>Fetches the next row from the result data set (implies removing the fetched row from the result data set).</p>
+
+<h2 id="fetch_rows">fetch_rows</h2>
+
+<p>Fetches all (remaining) rows from the result data set.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc SQL::Statement</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Statement">http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Statement</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/SQL-Statement">http://annocpan.org/dist/SQL-Statement</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/s/SQL-Statement">http://cpanratings.perl.org/s/SQL-Statement</a></p>
+
+</li>
+<li><p>CPAN Search</p>
+
+<p><a href="http://search.cpan.org/dist/SQL-Statement/">http://search.cpan.org/dist/SQL-Statement/</a></p>
+
+</li>
+</ul>
+
+<h2 id="Where-can-I-go-for-help">Where can I go for help?</h2>
+
+<p>For questions about installation or usage, please ask on the dbi-users@perl.org mailing list (see http://dbi.perl.org) or post a question on PerlMonks (<a href="http://www.perlmonks.org/">http://www.perlmonks.org/</a>, where Jeff is known as jZed). Jens does not visit PerlMonks on a regular basis.</p>
+
+<p>If you have a bug report, a patch or a suggestion, please open a new report ticket at CPAN (but please check previous reports first in case your issue has already been addressed). You can mail any of the module maintainers, but you are more assured of an answer by posting to the dbi-users list or reporting the issue in RT.</p>
+
+<p>Report tickets should contain a detailed description of the bug or enhancement request and at least an easily verifiable way of reproducing the issue or fix. Patches are always welcome, too.</p>
+
+<h2 id="Where-can-I-go-for-help-with-a-concrete-version">Where can I go for help with a concrete version?</h2>
+
+<p>Bugs and feature requests are accepted against the latest version only. To get patches for earlier versions, you need to get an agreement with a developer of your choice - who may or not report the issue and a suggested fix upstream (depends on the license you have chosen).</p>
+
+<h2 id="Business-support-and-maintenance">Business support and maintenance</h2>
+
+<p>For business support you can contact Jens via his CPAN email address rehsackATcpan.org. Please keep in mind that business support is neither available for free nor are you eligible to receive any support based on the license distributed with this package.</p>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Jochen Wiedmann created the original module as an XS (C) extension in 1998. Jeff Zucker took over the maintenance in 2001 and rewrote all of the C portions in Perl and began extending the SQL support. More recently Ilya Sterin provided help with SQL::Parser, Tim Bunce provided both general and specific support, Dan Wright and Dean Arnold have contributed extensively to the code, and dozens of people from around the world have submitted patches, bug reports, and suggestions.</p>
+
+<p>In 2008 Jens Rehsack took over the maintenance of the extended module from Jeff. Together with H.Merijn Brand (who has taken DBD::CSV), Detlef Wartke and Volker Schubbert (especially between 1.16 developer versions until 1.22) and all submitters of bug reports via RT a lot of issues have been fixed.</p>
+
+<p>Thanks to all!</p>
+
+<p>If you&#39;re interested in helping develop SQL::Statement or want to use it with your own modules, feel free to contact Jeff or Jens.</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<ul>
+
+<li><p>Currently we treat NULL and &#39;&#39; as the same in AnyData/CSV mode - eventually fix.</p>
+
+</li>
+<li><p>No nested C-style comments allowed as SQL99 says.</p>
+
+</li>
+<li><p>There are some issues regarding combining outer joins with where clauses.</p>
+
+</li>
+<li><p>Aggregate functions cannot be used in where clause.</p>
+
+</li>
+<li><p>Some SQL commands/features are not supported (most of them cannot by design), as <code>LOCK TABLE</code>, using indices, sub-selects etc.</p>
+
+<p>Currently the statement for missing features is: I plan to create a SQL::Statement v2.00 based on a pure Backus-Naur-Form parser and a fully object oriented command pattern based engine implementation. When the time is available, I will do it. Until then bugs will be fixed or other Perl modules under my maintainership will receive my time. Features which can be added without deep design changes might be applied earlier - especially when their addition allows studying effective ways to implement the feature in upcoming 2.00.</p>
+
+</li>
+<li><p>Some people report that SQL::Statement is slower since the XS parts were implemented in pure Perl. This might be true, but on the other hand a large number of features have been added including support for ANSI SQL 99.</p>
+
+<p>For SQL::Statement 1.xx it&#39;s not planned to add new XS parts.</p>
+
+</li>
+<li><p>Wildcards are expanded to lower cased identifiers. This might confuse some people, but it was easier to implement.</p>
+
+<p>The warning in <a href="../../lib/DBI.html">DBI</a> to never trust the case of returned column names should be read more often. If you need to rely on identifiers, always use <code><span class="variable">sth</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">NAME_lc</span><span class="operator">}</span>
+</code> or <code><span class="variable">sth</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">NAME_uc</span><span class="operator">}</span>
+</code> - never rely on <code><span class="variable">sth</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">NAME</span><span class="operator">}</span>
+</code>:</p>
+
+<pre><code>  <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">FetchHashKeyName</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">'NAME_lc'</span><span class="operator">;</span>
+  <span class="variable">$sth</span> <span class="operator">=</span> <span class="variable">$dbh</span><span class="operator">-&gt;</span><span class="variable">prepare</span><span class="operator">(</span><span class="string">"SELECT FOO, BAR, ID, NAME, BAZ FROM TABLE"</span><span class="operator">);</span>
+  <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">execute</span><span class="operator">;</span>
+  <span class="variable">$hash_ref</span> <span class="operator">=</span> <span class="variable">$sth</span><span class="operator">-&gt;</span><span class="variable">fetchall_hashref</span><span class="operator">(</span><span class="string">'id'</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"Name for id 42 is </span><span class="variable">$hash_ref</span><span class="string">-&gt;{42}-&gt;{name}\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>See <a href="../../lib/DBI.html#FetchHashKeyName">&quot;FetchHashKeyName&quot; in DBI</a> for more information.</p>
+
+</li>
+<li><p>Unable to use the same table twice with different aliases. <b>Workaround</b>: Temporary tables: <code>CREATE TEMP TABLE t_foo AS SELECT * FROM foo</code>. Than both tables can be used independently.</p>
+
+</li>
+</ul>
+
+<p>Patches to fix bugs/limitations (or a grant to do it) would be very welcome. Please note, that any patches <b>must</b> successfully pass all the <code>SQL::Statement</code>, <a href="../../lib/DBD/File.html">DBD::File</a> and <a href="../../lib/DBD/CSV.html">DBD::CSV</a> tests and must be a general improvement.</p>
+
+<h1 id="AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</h1>
+
+<p>Jochen Wiedmann created the original module as an XS (C) extension in 1998. Jeff Zucker took over the maintenance in 2001 and rewrote all of the C portions in perl and began extending the SQL support. Since 2008, Jens Rehsack is the maintainer.</p>
+
+<p>Copyright (c) 2001,2005 by Jeff Zucker: jzuckerATcpan.org Copyright (c) 2007-2017 by Jens Rehsack: rehsackATcpan.org</p>
+
+<p>Portions Copyright (C) 1998 by Jochen Wiedmann: jwiedATcpan.org</p>
+
+<p>All rights reserved.</p>
+
+<p>You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
+
+
+</body>
+
+</html>
+
+

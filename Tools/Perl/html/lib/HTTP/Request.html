@@ -1,0 +1,157 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTTP::Request - HTTP style request message</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 6.13</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">require</span> <span class="variable">HTTP::Request</span><span class="operator">;</span>
+ <span class="variable">$request</span> <span class="operator">=</span> <span class="variable">HTTP::Request</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">GET</span> <span class="operator">=&gt;</span> <span class="string">'http://www.example.com/'</span><span class="operator">);</span>
+</code></pre>
+
+<p>and usually used like this:</p>
+
+<pre><code> <span class="variable">$ua</span> <span class="operator">=</span> <span class="variable">LWP::UserAgent</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$response</span> <span class="operator">=</span> <span class="variable">$ua</span><span class="operator">-&gt;</span><span class="variable">request</span><span class="operator">(</span><span class="variable">$request</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>HTTP::Request</code> is a class encapsulating HTTP style requests, consisting of a request line, some headers, and a content body. Note that the LWP library uses HTTP style requests even for non-HTTP protocols. Instances of this class are usually passed to the request() method of an <code>LWP::UserAgent</code> object.</p>
+
+<p><code>HTTP::Request</code> is a subclass of <code>HTTP::Message</code> and therefore inherits its methods. The following additional methods are available:</p>
+
+<dl>
+
+<dt id="r-HTTP::Request-new-method-uri">$r = HTTP::Request-&gt;new( $method, $uri )</dt>
+<dd>
+
+</dd>
+<dt id="r-HTTP::Request-new-method-uri-header">$r = HTTP::Request-&gt;new( $method, $uri, $header )</dt>
+<dd>
+
+</dd>
+<dt id="r-HTTP::Request-new-method-uri-header-content">$r = HTTP::Request-&gt;new( $method, $uri, $header, $content )</dt>
+<dd>
+
+<p>Constructs a new <code>HTTP::Request</code> object describing a request on the object $uri using method $method. The $method argument must be a string. The $uri argument can be either a string, or a reference to a <code>URI</code> object. The optional $header argument should be a reference to an <code>HTTP::Headers</code> object or a plain array reference of key/value pairs. The optional $content argument should be a string of bytes.</p>
+
+</dd>
+<dt id="r-HTTP::Request-parse-str">$r = HTTP::Request-&gt;parse( $str )</dt>
+<dd>
+
+<p>This constructs a new request object by parsing the given string.</p>
+
+</dd>
+<dt id="r-method">$r-&gt;method</dt>
+<dd>
+
+</dd>
+<dt id="r-method-val">$r-&gt;method( $val )</dt>
+<dd>
+
+<p>This is used to get/set the method attribute. The method should be a short string like &quot;GET&quot;, &quot;HEAD&quot;, &quot;PUT&quot;, &quot;PATCH&quot; or &quot;POST&quot;.</p>
+
+</dd>
+<dt id="r-uri">$r-&gt;uri</dt>
+<dd>
+
+</dd>
+<dt id="r-uri-val">$r-&gt;uri( $val )</dt>
+<dd>
+
+<p>This is used to get/set the uri attribute. The $val can be a reference to a URI object or a plain string. If a string is given, then it should be parsable as an absolute URI.</p>
+
+</dd>
+<dt id="r-header-field">$r-&gt;header( $field )</dt>
+<dd>
+
+</dd>
+<dt id="r-header-field-value">$r-&gt;header( $field =&gt; $value )</dt>
+<dd>
+
+<p>This is used to get/set header values and it is inherited from <code>HTTP::Headers</code> via <code>HTTP::Message</code>. See <a href="../../lib/HTTP/Headers.html">HTTP::Headers</a> for details and other similar methods that can be used to access the headers.</p>
+
+</dd>
+<dt id="r-accept_decodable">$r-&gt;accept_decodable</dt>
+<dd>
+
+<p>This will set the <code>Accept-Encoding</code> header to the list of encodings that decoded_content() can decode.</p>
+
+</dd>
+<dt id="r-content">$r-&gt;content</dt>
+<dd>
+
+</dd>
+<dt id="r-content-bytes">$r-&gt;content( $bytes )</dt>
+<dd>
+
+<p>This is used to get/set the content and it is inherited from the <code>HTTP::Message</code> base class. See <a href="../../lib/HTTP/Message.html">HTTP::Message</a> for details and other methods that can be used to access the content.</p>
+
+<p>Note that the content should be a string of bytes. Strings in perl can contain characters outside the range of a byte. The <code>Encode</code> module can be used to turn such strings into a string of bytes.</p>
+
+</dd>
+<dt id="r-as_string">$r-&gt;as_string</dt>
+<dd>
+
+</dd>
+<dt id="r-as_string-eol">$r-&gt;as_string( $eol )</dt>
+<dd>
+
+<p>Method returning a textual representation of the request.</p>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/HTTP/Headers.html">HTTP::Headers</a>, <a href="../../lib/HTTP/Message.html">HTTP::Message</a>, <a href="../../lib/HTTP/Request/Common.html">HTTP::Request::Common</a>, <a href="../../lib/HTTP/Response.html">HTTP::Response</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Gisle Aas &lt;gisle@activestate.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 1994-2017 by Gisle Aas.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

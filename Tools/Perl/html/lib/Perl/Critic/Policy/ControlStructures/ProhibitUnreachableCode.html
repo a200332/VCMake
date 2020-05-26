@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ControlStructures::ProhibitUnreachableCode - Don&#39;t write code after an unconditional <code>die, exit, or next</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This policy prohibits code following a statement which unconditionally alters the program flow. This includes calls to <code>exit</code>, <code>die</code>, <code>return</code>, <code>next</code>, <code>last</code> and <code>goto</code>. Due to common usage, <code>croak</code> and <code>confess</code> from <a href="../../../../../lib/Carp.html">Carp</a> are also included.</p>
+
+<p>Code is reachable if any of the following conditions are true:</p>
+
+<ul>
+
+<li><p>Flow-altering statement has a conditional attached to it</p>
+
+</li>
+<li><p>Statement is on the right side of an operator <code>&amp;&amp;</code>, <code>||</code>, <code>//</code>, <code>and</code>, <code>or</code>, or <code>err</code>.</p>
+
+</li>
+<li><p>Code is prefixed with a label (can potentially be reached via <code>goto</code>)</p>
+
+</li>
+<li><p>Code is a subroutine</p>
+
+</li>
+</ul>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<pre><code>  <span class="comment"># not ok</span>
+  
+  <span class="keyword">exit</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="string">"123\n"</span><span class="operator">;</span>
+  
+  <span class="comment"># ok</span>
+  
+  <span class="keyword">exit</span> <span class="keyword">if</span> <span class="operator">!</span><span class="variable">$xyz</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="string">"123\n"</span><span class="operator">;</span>
+  
+  <span class="comment"># not ok</span>
+  
+  <span class="keyword">for</span> <span class="operator">(</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">next</span><span class="operator">;</span>
+      <span class="keyword">print</span> <span class="number">1</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># ok</span>
+  
+  <span class="keyword">for</span> <span class="operator">(</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">10</span> <span class="operator">)</span> <span class="operator">{</span>
+      <span class="keyword">next</span> <span class="keyword">if</span> <span class="variable">$_</span> <span class="operator">==</span> <span class="number">5</span><span class="operator">;</span>
+      <span class="keyword">print</span> <span class="number">1</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># not ok</span>
+  
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$bar</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">return</span><span class="operator">;</span>
+      <span class="keyword">print</span> <span class="number">1</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># ok</span>
+  
+  <span class="keyword">sub</span><span class="variable"> foo </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$bar</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">$bar</span><span class="operator">-&gt;</span><span class="variable">baz</span><span class="operator">();</span>
+      <span class="keyword">print</span> <span class="number">1</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  
+  <span class="comment"># not ok</span>
+  
+  <span class="keyword">die</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="string">"123\n"</span><span class="operator">;</span>
+  
+  <span class="comment"># ok</span>
+  
+  <span class="keyword">die</span><span class="operator">;</span>
+  <span class="variable">LABEL</span><span class="operator">:</span> <span class="keyword">print</span> <span class="string">"123\n"</span><span class="operator">;</span>
+  
+  <span class="comment"># not ok</span>
+  
+  <span class="variable">croak</span><span class="operator">;</span>
+  <span class="variable">do_something</span><span class="operator">();</span>
+  
+  <span class="comment"># ok</span>
+  
+  <span class="variable">croak</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> do_something </span><span class="operator">{}</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../../lib/Perl/Critic/Policy/ControlStructures/ProhibitPostfixControls.html">Perl::Critic::Policy::ControlStructures::ProhibitPostfixControls</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Peter Guzis &lt;pguzis@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2006-2011 Peter Guzis. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,272 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#The-EventLog-Object-and-its-Methods">The EventLog Object and its Methods</a></li>
+  <li><a href="#Other-Win32::EventLog-functions">Other Win32::EventLog functions.</a></li>
+  <li><a href="#Example-1">Example 1</a></li>
+  <li><a href="#Example-2">Example 2</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::EventLog - Process Win32 Event Logs from Perl</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Win32::EventLog</span>
+        <span class="variable">$handle</span><span class="operator">=</span><span class="variable">Win32::EventLog</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"Application"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module implements most of the functionality available from the Win32 API for accessing and manipulating Win32 Event Logs. The access to the EventLog routines is divided into those that relate to an EventLog object and its associated methods and those that relate other EventLog tasks (like adding an EventLog record).</p>
+
+<h1 id="The-EventLog-Object-and-its-Methods">The EventLog Object and its Methods</h1>
+
+<p>The following methods are available to open, read, close and backup EventLogs.</p>
+
+<dl>
+
+<dt id="Win32::EventLog-new-SOURCENAME-SERVERNAME">Win32::EventLog-&gt;new(SOURCENAME [,SERVERNAME]);</dt>
+<dd>
+
+<p>The new() method creates a new EventLog object and returns a handle to it. This handle is then used to call the methods below.</p>
+
+<p>The method is overloaded in that if the supplied SOURCENAME argument contains one or more literal &#39;\&#39; characters (an illegal character in a SOURCENAME), it assumes that you are trying to open a backup eventlog and uses SOURCENAME as the backup eventlog to open. Note that when opening a backup eventlog, the SERVERNAME argument is ignored (as it is in the underlying Win32 API). For EventLogs on remote machines, the SOURCENAME parameter must therefore be specified as a UNC path.</p>
+
+</dd>
+<dt id="handle-Backup-FILENAME">$handle-&gt;Backup(FILENAME);</dt>
+<dd>
+
+<p>The Backup() method backs up the EventLog represented by $handle. It takes a single argument, FILENAME. When $handle represents an EventLog on a remote machine, FILENAME is filename on the remote machine and cannot be a UNC path (i.e you must use <i>C:\TEMP\App.EVT</i>). The method will fail if the log file already exists.</p>
+
+</dd>
+<dt id="handle-Read-FLAGS-OFFSET-HASHREF">$handle-&gt;Read(FLAGS, OFFSET, HASHREF);</dt>
+<dd>
+
+<p>The Read() method read an EventLog entry from the EventLog represented by $handle.</p>
+
+</dd>
+<dt id="handle-Close">$handle-&gt;Close();</dt>
+<dd>
+
+<p>The Close() method closes the EventLog represented by $handle. After Close() has been called, any further attempt to use the EventLog represented by $handle will fail.</p>
+
+</dd>
+<dt id="handle-GetOldest-SCALARREF">$handle-&gt;GetOldest(SCALARREF);</dt>
+<dd>
+
+<p>The GetOldest() method returns the number of the oldest EventLog record in the EventLog represented by $handle. This is required to correctly compute the OFFSET required by the Read() method.</p>
+
+</dd>
+<dt id="handle-GetNumber-SCALARREF">$handle-&gt;GetNumber(SCALARREF);</dt>
+<dd>
+
+<p>The GetNumber() method returns the number of EventLog records in the EventLog represented by $handle. The number of the most recent record in the EventLog is therefore computed by</p>
+
+<pre><code>        <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">GetOldest</span><span class="operator">(</span><span class="variable">$oldest</span><span class="operator">);</span>
+        <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">GetNumber</span><span class="operator">(</span><span class="variable">$lastRec</span><span class="operator">);</span>
+        <span class="variable">$lastRecOffset</span><span class="operator">=</span><span class="variable">$oldest</span><span class="operator">+</span><span class="variable">$lastRec</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="handle-Clear-FILENAME">$handle-&gt;Clear(FILENAME);</dt>
+<dd>
+
+<p>The Clear() method clears the EventLog represented by $handle. If you provide a non-null FILENAME, the EventLog will be backed up into FILENAME before the EventLog is cleared. The method will fail if FILENAME is specified and the file referred to exists. Note also that FILENAME specifies a file local to the machine on which the EventLog resides and cannot be specified as a UNC name.</p>
+
+</dd>
+<dt id="handle-Report-HASHREF">$handle-&gt;Report(HASHREF);</dt>
+<dd>
+
+<p>The Report() method generates an EventLog entry. The HASHREF should contain the following keys:</p>
+
+<dl>
+
+<dt id="Computer"><code>Computer</code></dt>
+<dd>
+
+<p>The <code>Computer</code> field specifies which computer you want the EventLog entry recorded. If this key doesn&#39;t exist, the server name used to create the $handle is used.</p>
+
+</dd>
+<dt id="Source"><code>Source</code></dt>
+<dd>
+
+<p>The <code>Source</code> field specifies the source that generated the EventLog entry. If this key doesn&#39;t exist, the source name used to create the $handle is used.</p>
+
+</dd>
+<dt id="EventType"><code>EventType</code></dt>
+<dd>
+
+<p>The <code>EventType</code> field should be one of the constants</p>
+
+<dl>
+
+<dt id="EVENTLOG_ERROR_TYPE"><code>EVENTLOG_ERROR_TYPE</code></dt>
+<dd>
+
+<p>An Error event is being logged.</p>
+
+</dd>
+<dt id="EVENTLOG_WARNING_TYPE"><code>EVENTLOG_WARNING_TYPE</code></dt>
+<dd>
+
+<p>A Warning event is being logged.</p>
+
+</dd>
+<dt id="EVENTLOG_INFORMATION_TYPE"><code>EVENTLOG_INFORMATION_TYPE</code></dt>
+<dd>
+
+<p>An Information event is being logged.</p>
+
+</dd>
+<dt id="EVENTLOG_AUDIT_SUCCESS"><code>EVENTLOG_AUDIT_SUCCESS</code></dt>
+<dd>
+
+<p>A Success Audit event is being logged (typically in the Security EventLog).</p>
+
+</dd>
+<dt id="EVENTLOG_AUDIT_FAILURE"><code>EVENTLOG_AUDIT_FAILURE</code></dt>
+<dd>
+
+<p>A Failure Audit event is being logged (typically in the Security EventLog).</p>
+
+</dd>
+</dl>
+
+<p>These constants are exported into the main namespace by default.</p>
+
+</dd>
+<dt id="Category"><code>Category</code></dt>
+<dd>
+
+<p>The <code>Category</code> field can have any value you want. It is specific to the particular Source.</p>
+
+</dd>
+<dt id="EventID"><code>EventID</code></dt>
+<dd>
+
+<p>The <code>EventID</code> field should contain the ID of the message that this event pertains too. This assumes that you have an associated message file (indirectly referenced by the field <code>Source</code>).</p>
+
+</dd>
+<dt id="Data"><code>Data</code></dt>
+<dd>
+
+<p>The <code>Data</code> field contains raw data associated with this event.</p>
+
+</dd>
+<dt id="Strings"><code>Strings</code></dt>
+<dd>
+
+<p>The <code>Strings</code> field contains the single string that itself contains NUL terminated sub-strings. This are used with the EventID to generate the message as seen from (for example) the Event Viewer application.</p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h1 id="Other-Win32::EventLog-functions">Other Win32::EventLog functions.</h1>
+
+<p>The following functions are part of the Win32::EventLog package but are not callable from an EventLog object.</p>
+
+<dl>
+
+<dt id="GetMessageText-HASHREF">GetMessageText(HASHREF);</dt>
+<dd>
+
+<p>The GetMessageText() function assumes that HASHREF was obtained by a call to <code>$handle-&gt;Read()</code>. It returns the formatted string that represents the fully resolved text of the EventLog message (such as would be seen in the Windows NT Event Viewer). For convenience, the key &#39;Message&#39; in the supplied HASHREF is also set to the return value of this function.</p>
+
+<p>If you set the variable $Win32::EventLog::GetMessageText to 1 then each call to <code>$handle-&gt;Read()</code> will call this function automatically.</p>
+
+</dd>
+</dl>
+
+<h1 id="Example-1">Example 1</h1>
+
+<p>The following example illustrates the way in which the EventLog module can be used. It opens the System EventLog and reads through it from oldest to newest records. For each record from the <b>Source</b> EventLog it extracts the full text of the Entry and prints the EventLog message text out.</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Win32::EventLog</span><span class="operator">;</span>
+ 
+ <span class="variable">$handle</span><span class="operator">=</span><span class="variable">Win32::EventLog</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"System"</span><span class="operator">,</span> <span class="variable">$ENV</span><span class="operator">{</span><span class="string">ComputerName</span><span class="operator">}</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't open Application EventLog\n"</span><span class="operator">;</span>
+ <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">GetNumber</span><span class="operator">(</span><span class="variable">$recs</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't get number of EventLog records\n"</span><span class="operator">;</span>
+ <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">GetOldest</span><span class="operator">(</span><span class="variable">$base</span><span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't get number of oldest EventLog record\n"</span><span class="operator">;</span>
+ 
+ <span class="keyword">while</span> <span class="operator">(</span><span class="variable">$x</span> <span class="operator">&lt;</span> <span class="variable">$recs</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">Read</span><span class="operator">(</span><span class="variable">EVENTLOG_FORWARDS_READ</span><span class="operator">|</span><span class="variable">EVENTLOG_SEEK_READ</span><span class="operator">,</span>
+                                  <span class="variable">$base</span><span class="operator">+</span><span class="variable">$x</span><span class="operator">,</span>
+                                  <span class="variable">$hashRef</span><span class="operator">)</span>
+                <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't read EventLog entry #</span><span class="variable">$x</span><span class="string">\n"</span><span class="operator">;</span>
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$hashRef</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">Source</span><span class="operator">}</span> <span class="keyword">eq</span> <span class="string">"EventLog"</span><span class="operator">)</span> <span class="operator">{</span>
+                <span class="variable">Win32::EventLog::GetMessageText</span><span class="operator">(</span><span class="variable">$hashRef</span><span class="operator">);</span>
+                <span class="keyword">print</span> <span class="string">"Entry </span><span class="variable">$x</span><span class="string">: </span><span class="variable">$hashRef</span><span class="string">-&gt;{Message}\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">$x</span><span class="operator">++;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="Example-2">Example 2</h1>
+
+<p>To backup and clear the EventLogs on a remote machine, do the following :-</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Win32::EventLog</span><span class="operator">;</span>
+ 
+ <span class="variable">$myServer</span><span class="operator">=</span><span class="string">"\\\\my-server"</span><span class="operator">;</span>     <span class="comment"># your servername here.</span>
+ <span class="keyword">my</span><span class="operator">(</span><span class="variable">$date</span><span class="operator">)=</span><span class="keyword">join</span><span class="operator">(</span><span class="string">"-"</span><span class="operator">,</span> <span class="operator">((</span><span class="keyword">split</span><span class="operator">(</span><span class="regex">/\s+/</span><span class="operator">,</span> <span class="keyword">scalar</span><span class="operator">(</span><span class="keyword">localtime</span><span class="operator">)))</span><span class="operator">[</span><span class="number">0</span><span class="operator">,</span><span class="number">1</span><span class="operator">,</span><span class="number">2</span><span class="operator">,</span><span class="number">4</span><span class="operator">]</span><span class="operator">));</span>
+ <span class="keyword">my</span><span class="operator">(</span><span class="variable">$dest</span><span class="operator">);</span>
+ 
+ <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$eventLog</span> <span class="operator">(</span><span class="string">"Application"</span><span class="operator">,</span> <span class="string">"System"</span><span class="operator">,</span> <span class="string">"Security"</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">$handle</span><span class="operator">=</span><span class="variable">Win32::EventLog</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$eventLog</span><span class="operator">,</span> <span class="variable">$myServer</span><span class="operator">)</span>
+                <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't open Application EventLog on </span><span class="variable">$myServer</span><span class="string">\n"</span><span class="operator">;</span>
+ 
+        <span class="variable">$dest</span><span class="operator">=</span><span class="string">"C:\\BackupEventLogs\\</span><span class="variable">$eventLog</span><span class="string">\\</span><span class="variable">$date</span><span class="string">.evt"</span><span class="operator">;</span>
+        <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">Backup</span><span class="operator">(</span><span class="variable">$dest</span><span class="operator">)</span>
+                <span class="keyword">or</span> <span class="keyword">warn</span> <span class="string">"Could not backup and clear the </span><span class="variable">$eventLog</span><span class="string"> EventLog on </span><span class="variable">$myServer</span><span class="string"> ($^E)\n"</span><span class="operator">;</span>
+ 
+        <span class="variable">$handle</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>Note that only the Clear method is required. Note also that if the file $dest exists, the function will fail.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>None currently known.</p>
+
+<p>The test script for &#39;make test&#39; should be re-written to use the EventLog object.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Original code by Jesse Dougherty for HiP Communications. Additional fixes and updates attributed to Martin Pauley &lt;martin.pauley@ulsterbank.ltd.uk&gt;) and Bret Giddings (bret@essex.ac.uk).</p>
+
+
+</body>
+
+</html>
+
+

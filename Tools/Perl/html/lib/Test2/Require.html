@@ -1,0 +1,138 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#HOW-DO-I-WRITE-A-REQUIRE-MODULE">HOW DO I WRITE A &#39;REQUIRE&#39; MODULE?</a>
+    <ul>
+      <li><a href="#AS-A-SUBCLASS">AS A SUBCLASS</a></li>
+      <li><a href="#STAND-ALONE">STAND-ALONE</a></li>
+    </ul>
+  </li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Require - Base class and documentation for skip-unless type test packages.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Test2::Require::* packages are packages you load to ensure your test file is skipped unless a specific requirement is met. Modules in this namespace may subclass <a href="../../lib/Test2/Require.html">Test2::Require</a> if they wish, but it is not strictly necessary to do so.</p>
+
+<h1 id="HOW-DO-I-WRITE-A-REQUIRE-MODULE">HOW DO I WRITE A &#39;REQUIRE&#39; MODULE?</h1>
+
+<h2 id="AS-A-SUBCLASS">AS A SUBCLASS</h2>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Test2::Require::Widget</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">base</span> <span class="string">'Test2::Require'</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> HAVE_WIDGETS </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+    <span class="keyword">sub</span><span class="variable"> skip </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">@import_args</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    
+        <span class="keyword">if</span> <span class="operator">(</span><span class="variable">HAVE_WIDGETS</span><span class="operator">())</span> <span class="operator">{</span>
+            <span class="comment"># We have widgets, do not skip</span>
+            <span class="keyword">return</span> <span class="keyword">undef</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="keyword">else</span> <span class="operator">{</span>
+            <span class="comment"># No widgets, skip the test</span>
+            <span class="keyword">return</span> <span class="string">"Skipped because there are no widgets"</span> <span class="keyword">unless</span> <span class="variable">HAVE_WIDGETS</span><span class="operator">();</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>A subclass of <a href="../../lib/Test2/Require.html">Test2::Require</a> simply needs to implement a <code>skip()</code> method. This method will receive all import arguments. This method should return undef if the test should run, and should return a reason for skipping if the test should be skipped.</p>
+
+<h2 id="STAND-ALONE">STAND-ALONE</h2>
+
+<p>If you do not wish to subclass <a href="../../lib/Test2/Require.html">Test2::Require</a> then you should write an <code>import()</code> method:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Test2::Require::Widget</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Test2::API</span> <span class="string">qw/context/</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> HAVE_WIDGETS </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+    
+    <span class="keyword">sub</span><span class="variable"> import </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="comment"># Have widgets, should run.</span>
+        <span class="keyword">return</span> <span class="keyword">if</span> <span class="variable">HAVE_WIDGETS</span><span class="operator">();</span>
+    
+        <span class="comment"># Use the context object to create the event</span>
+        <span class="keyword">my</span> <span class="variable">$ctx</span> <span class="operator">=</span> <span class="variable">context</span><span class="operator">();</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">plan</span><span class="operator">(</span><span class="number">0</span><span class="operator">,</span> <span class="string">SKIP</span> <span class="operator">=&gt;</span> <span class="string">"Skipped because there are no widgets"</span><span class="operator">);</span>
+        <span class="variable">$ctx</span><span class="operator">-&gt;</span><span class="variable">release</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2-Suite can be found at <i>http://github.com/Test-More/Test2-Suite/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

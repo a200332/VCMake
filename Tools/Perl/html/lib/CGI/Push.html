@@ -1,0 +1,203 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USING-CGI::Push">USING CGI::Push</a>
+    <ul>
+      <li><a href="#Heterogeneous-Pages">Heterogeneous Pages</a></li>
+      <li><a href="#Changing-the-Page-Delay-on-the-Fly">Changing the Page Delay on the Fly</a></li>
+    </ul>
+  </li>
+  <li><a href="#INSTALLING-CGI::Push-SCRIPTS">INSTALLING CGI::Push SCRIPTS</a></li>
+  <li><a href="#AUTHOR-INFORMATION">AUTHOR INFORMATION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>CGI::Push - Simple Interface to Server Push</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">CGI::Push</span> <span class="string">qw(:standard)</span><span class="operator">;</span>
+    
+    <span class="variable">do_push</span><span class="operator">(</span>
+        <span class="string">-next_page</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">next_page</span><span class="operator">,</span>
+        <span class="string">-last_page</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">last_page</span><span class="operator">,</span>
+        <span class="string">-delay</span>     <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">5</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">sub</span><span class="variable"> next_page </span><span class="operator">{</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$q</span><span class="operator">,</span><span class="variable">$counter</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">undef</span> <span class="keyword">if</span> <span class="variable">$counter</span> <span class="operator">&gt;=</span> <span class="number">10</span><span class="operator">;</span>
+        <span class="operator">....</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> last_page </span><span class="operator">{</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$q</span><span class="operator">,</span><span class="variable">$counter</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>CGI::Push is a subclass of the CGI object created by CGI.pm. It is specialized for server push operations, which allow you to create animated pages whose content changes at regular intervals.</p>
+
+<p>You provide CGI::Push with a pointer to a subroutine that will draw one page. Every time your subroutine is called, it generates a new page. The contents of the page will be transmitted to the browser in such a way that it will replace what was there beforehand. The technique will work with HTML pages as well as with graphics files, allowing you to create animated GIFs.</p>
+
+<p>Only Netscape Navigator supports server push. Internet Explorer browsers do not.</p>
+
+<h1 id="USING-CGI::Push">USING CGI::Push</h1>
+
+<p>CGI::Push adds one new method to the standard CGI suite, do_push(). When you call this method, you pass it a reference to a subroutine that is responsible for drawing each new page, an interval delay, and an optional subroutine for drawing the last page. Other optional parameters include most of those recognized by the CGI header() method.</p>
+
+<p>You may call do_push() in the object oriented manner or not, as you prefer:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">CGI::Push</span><span class="operator">;</span>
+    <span class="variable">$q</span> <span class="operator">=</span> <span class="variable">CGI::Push</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="variable">$q</span><span class="operator">-&gt;</span><span class="variable">do_push</span><span class="operator">(</span><span class="string">-next_page</span><span class="operator">=&gt;\&amp;</span><span class="variable">draw_a_page</span><span class="operator">);</span>
+    
+        <span class="operator">-</span><span class="keyword">or</span><span class="operator">-</span>
+    
+    <span class="keyword">use</span> <span class="variable">CGI::Push</span> <span class="string">qw(:standard)</span><span class="operator">;</span>
+    <span class="variable">do_push</span><span class="operator">(</span><span class="string">-next_page</span><span class="operator">=&gt;\&amp;</span><span class="variable">draw_a_page</span><span class="operator">);</span>
+</code></pre>
+
+<p>Parameters are as follows:</p>
+
+<dl>
+
+<dt id="next_page">-next_page</dt>
+<dd>
+
+<pre><code>    <span class="variable">do_push</span><span class="operator">(</span><span class="string">-next_page</span><span class="operator">=&gt;\&amp;</span><span class="variable">my_draw_routine</span><span class="operator">);</span>
+</code></pre>
+
+<p>This required parameter points to a reference to a subroutine responsible for drawing each new page. The subroutine should expect two parameters consisting of the CGI object and a counter indicating the number of times the subroutine has been called. It should return the contents of the page as an <b>array</b> of one or more items to print. It can return a false value (or an empty array) in order to abort the redrawing loop and print out the final page (if any)</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> my_draw_routine </span><span class="operator">{</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$q</span><span class="operator">,</span><span class="variable">$counter</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">undef</span> <span class="keyword">if</span> <span class="variable">$counter</span> <span class="operator">&gt;</span> <span class="number">100</span><span class="operator">;</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>You are of course free to refer to create and use global variables within your draw routine in order to achieve special effects.</p>
+
+</dd>
+<dt id="last_page">-last_page</dt>
+<dd>
+
+<p>This optional parameter points to a reference to the subroutine responsible for drawing the last page of the series. It is called after the -next_page routine returns a false value. The subroutine itself should have exactly the same calling conventions as the -next_page routine.</p>
+
+</dd>
+<dt id="type">-type</dt>
+<dd>
+
+<p>This optional parameter indicates the content type of each page. It defaults to &quot;text/html&quot;. Normally the module assumes that each page is of a homogeneous MIME type. However if you provide either of the magic values &quot;heterogeneous&quot; or &quot;dynamic&quot; (the latter provided for the convenience of those who hate long parameter names), you can specify the MIME type -- and other header fields -- on a per-page basis. See &quot;heterogeneous pages&quot; for more details.</p>
+
+</dd>
+<dt id="delay">-delay</dt>
+<dd>
+
+<p>This indicates the delay, in seconds, between frames. Smaller delays refresh the page faster. Fractional values are allowed.</p>
+
+<p><b>If not specified, -delay will default to 1 second</b></p>
+
+</dd>
+<dt id="cookie--target--expires--nph">-cookie, -target, -expires, -nph</dt>
+<dd>
+
+<p>These have the same meaning as the like-named parameters in CGI::header().</p>
+
+<p>If not specified, -nph will default to 1 (as needed for many servers, see below).</p>
+
+</dd>
+</dl>
+
+<h2 id="Heterogeneous-Pages">Heterogeneous Pages</h2>
+
+<p>Ordinarily all pages displayed by CGI::Push share a common MIME type. However by providing a value of &quot;heterogeneous&quot; or &quot;dynamic&quot; in the do_push() -type parameter, you can specify the MIME type of each page on a case-by-case basis.</p>
+
+<p>If you use this option, you will be responsible for producing the HTTP header for each page. Simply modify your draw routine to look like this:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> my_draw_routine </span><span class="operator">{</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$q</span><span class="operator">,</span><span class="variable">$counter</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">header</span><span class="operator">(</span><span class="string">'text/html'</span><span class="operator">),</span>   <span class="comment"># note we're producing the header here</span>
+        <span class="operator">....</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>You can add any header fields that you like, but some (cookies and status fields included) may not be interpreted by the browser. One interesting effect is to display a series of pages, then, after the last page, to redirect the browser to a new URL. Because redirect() does b&lt;not&gt; work, the easiest way is with a -refresh header field, as shown below:</p>
+
+<pre><code>    <span class="keyword">sub</span><span class="variable"> my_draw_routine </span><span class="operator">{</span>
+        <span class="keyword">my</span><span class="operator">(</span><span class="variable">$q</span><span class="operator">,</span><span class="variable">$counter</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="keyword">undef</span> <span class="keyword">if</span> <span class="variable">$counter</span> <span class="operator">&gt;</span> <span class="number">10</span><span class="operator">;</span>
+        <span class="keyword">return</span> <span class="variable">header</span><span class="operator">(</span><span class="string">'text/html'</span><span class="operator">),</span>   <span class="comment"># note we're producing the header here</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> my_last_page </span><span class="operator">{</span>
+        <span class="keyword">return</span> <span class="variable">header</span><span class="operator">(</span><span class="string">-refresh</span><span class="operator">=&gt;</span><span class="string">'5; URL=http://somewhere.else/finished.html'</span><span class="operator">,</span>
+                      <span class="string">-type</span><span class="operator">=&gt;</span><span class="string">'text/html'</span><span class="operator">),</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h2 id="Changing-the-Page-Delay-on-the-Fly">Changing the Page Delay on the Fly</h2>
+
+<p>If you would like to control the delay between pages on a page-by-page basis, call push_delay() from within your draw routine. push_delay() takes a single numeric argument representing the number of seconds you wish to delay after the current page is displayed and before displaying the next one. The delay may be fractional. Without parameters, push_delay() just returns the current delay.</p>
+
+<h1 id="INSTALLING-CGI::Push-SCRIPTS">INSTALLING CGI::Push SCRIPTS</h1>
+
+<p>Server push scripts must be installed as no-parsed-header (NPH) scripts in order to work correctly on many servers. On Unix systems, this is most often accomplished by prefixing the script&#39;s name with &quot;nph-&quot;. Recognition of NPH scripts happens automatically with WebSTAR and Microsoft IIS. Users of other servers should see their documentation for help.</p>
+
+<p>Apache web server from version 1.3b2 on does not need server push scripts installed as NPH scripts: the -nph parameter to do_push() may be set to a false value to disable the extra headers needed by an NPH script.</p>
+
+<h1 id="AUTHOR-INFORMATION">AUTHOR INFORMATION</h1>
+
+<p>The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is distributed under GPL and the Artistic License 2.0. It is currently maintained by Lee Johnson with help from many contributors.</p>
+
+<p>Address bug reports and comments to: https://github.com/leejo/CGI.pm/issues</p>
+
+<p>The original bug tracker can be found at: https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm</p>
+
+<p>When sending bug reports, please provide the version of CGI.pm, the version of Perl, the name and version of your Web server, and the name and version of the operating system you are using. If the problem is even remotely browser dependent, please provide information about the affected browsers as well. Copyright 1995-1998, Lincoln D. Stein. All rights reserved.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>This section intentionally left blank.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/CGI/Carp.html">CGI::Carp</a>, <a href="../../lib/CGI.html">CGI</a></p>
+
+
+</body>
+
+</html>
+
+

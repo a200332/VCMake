@@ -1,0 +1,205 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Why-a-parameters-object">Why a parameters object?</a></li>
+    </ul>
+  </li>
+  <li><a href="#MooseX::Role::Parameterized::Tutorial">MooseX::Role::Parameterized::Tutorial</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>MooseX::Role::Parameterized - Moose roles with composition parameters</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.10</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Counter</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">MooseX::Role::Parameterized</span><span class="operator">;</span>
+    
+    <span class="variable">parameter</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">isa</span>      <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+        <span class="string">required</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">role</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$p</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="keyword">my</span> <span class="variable">$name</span> <span class="operator">=</span> <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">name</span><span class="operator">;</span>
+    
+        <span class="variable">has</span> <span class="variable">$name</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+            <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+            <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">,</span>
+            <span class="string">default</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+        <span class="operator">);</span>
+    
+        <span class="variable">method</span> <span class="string">"increment_</span><span class="variable">$name</span><span class="string">"</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$name</span><span class="operator">(</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$name</span> <span class="operator">+</span> <span class="number">1</span><span class="operator">);</span>
+        <span class="operator">};</span>
+    
+        <span class="variable">method</span> <span class="string">"reset_</span><span class="variable">$name</span><span class="string">"</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$name</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+        <span class="operator">};</span>
+    <span class="operator">};</span>
+    
+    <span class="keyword">package</span> <span class="variable">MyGame::Weapon</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    
+    <span class="variable">with</span> <span class="string">Counter</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'enchantment'</span> <span class="operator">}</span><span class="operator">;</span>
+    
+    <span class="keyword">package</span> <span class="variable">MyGame::Wand</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    
+    <span class="variable">with</span> <span class="string">Counter</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'zapped'</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Your parameterized role consists of two new things: parameter declarations and a <code>role</code> block.</p>
+
+<p>Parameters are declared using the <a href="#parameter">&quot;parameter&quot;</a> keyword which very much resembles <a href="../../../lib/Moose.html#has">&quot;has&quot; in Moose</a>. You can use any option that <a href="../../../lib/Moose.html#has">&quot;has&quot; in Moose</a> accepts. The default value for the <code>is</code> option is <code>ro</code> as that&#39;s a very common case. Use <code>is =&gt; &#39;bare&#39;</code> if you want no accessor. These parameters will get their values when the consuming class (or role) uses <a href="../../../lib/Moose.html#with">&quot;with&quot; in Moose</a>. A parameter object will be constructed with these values, and passed to the <code>role</code> block.</p>
+
+<p>The <code>role</code> block then uses the usual <a href="../../../lib/Moose/Role.html">Moose::Role</a> keywords to build up a role. You can shift off the parameter object to inspect what the consuming class provided as parameters. You use the parameters to customize your role however you wish.</p>
+
+<p>There are many possible implementations for parameterized roles (hopefully with a consistent enough API); I believe this to be the easiest and most flexible design. Coincidentally, Pugs originally had an eerily similar design.</p>
+
+<p>See <a href="../../../lib/MooseX/Role/Parameterized/Extending.html">MooseX::Role::Parameterized::Extending</a> for some tips on how to extend this module.</p>
+
+<h2 id="Why-a-parameters-object">Why a parameters object?</h2>
+
+<p>I&#39;ve been asked several times &quot;Why use a parameter <i>object</i> and not just a parameter <i>hashref</i>? That would eliminate the need to explicitly declare your parameters.&quot;</p>
+
+<p>The benefits of using an object are similar to the benefits of using Moose. You get an easy way to specify lazy defaults, type constraint, delegation, and so on. You get to use MooseX modules.</p>
+
+<h1 id="MooseX::Role::Parameterized::Tutorial"><a href="../../../lib/MooseX/Role/Parameterized/Tutorial.html">MooseX::Role::Parameterized::Tutorial</a></h1>
+
+<p><b>Stop!</b> If you&#39;re new here, please read <a href="../../../lib/MooseX/Role/Parameterized/Tutorial.html">MooseX::Role::Parameterized::Tutorial</a> for a much gentler introduction.</p>
+
+<p>You also get the usual introspective and intercessory abilities that come standard with the metaobject protocol. Ambitious users should be able to add traits to the parameters metaclass to further customize behavior. Please let me know if you&#39;re doing anything viciously complicated with this extension. :)</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>You must use this syntax to declare methods in the role block: <code><span class="variable">method</span> <span class="string">NAME</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code>. This is due to a limitation in Perl. In return though you can use parameters <i>in your methods</i>!</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="http://sartak.org/2009/01/parametric-roles-in-perl-5.html">http://sartak.org/2009/01/parametric-roles-in-perl-5.html</a></p>
+
+<p><a href="http://sartak.org/2009/05/the-design-of-parameterized-roles.html">http://sartak.org/2009/05/the-design-of-parameterized-roles.html</a></p>
+
+<p><a href="http://stevan-little.blogspot.com/2009/07/thoughts-on-parameterized-roles.html">http://stevan-little.blogspot.com/2009/07/thoughts-on-parameterized-roles.html</a></p>
+
+<p><a href="http://perldition.org/articles/Parameterized%20Roles%20with%20MooseX::Declare.pod">http://perldition.org/articles/Parameterized%20Roles%20with%20MooseX::Declare.pod</a></p>
+
+<p><a href="http://www.modernperlbooks.com/mt/2011/01/the-parametric-role-of-my-mvc-plugin-system.html">http://www.modernperlbooks.com/mt/2011/01/the-parametric-role-of-my-mvc-plugin-system.html</a></p>
+
+<p><a href="http://jjnapiorkowski.typepad.com/modern-perl/2010/08/parameterized-roles-and-method-traits-redo.html">http://jjnapiorkowski.typepad.com/modern-perl/2010/08/parameterized-roles-and-method-traits-redo.html</a></p>
+
+<p><a href="http://sartak.org/talks/yapc-asia-2009/(parameterized)-roles/">http://sartak.org/talks/yapc-asia-2009/(parameterized)-roles/</a></p>
+
+<p><a href="https://github.com/SamuraiJack/JooseX-Role-Parameterized">https://github.com/SamuraiJack/JooseX-Role-Parameterized</a> - this extension ported to JavaScript&#39;s Joose</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Role-Parameterized">the RT bug tracker</a> (or <a href="mailto:bug-MooseX-Role-Parameterized@rt.cpan.org">bug-MooseX-Role-Parameterized@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/moose.html">http://lists.perl.org/list/moose.html</a>.</p>
+
+<p>There is also an irc channel available for users of this distribution, at <a href="irc://irc.perl.org/#moose"><code><span class="comment">#moose</span>
+</code> on <code>irc.perl.org</code></a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Oliver Charles &lt;oliver.g.charles@googlemail.com&gt;</p>
+
+</li>
+<li><p>Yuval Kogman &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Robert &#39;phaylon&#39; Sedlacek &lt;rs@474.at&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Mark Fowler &lt;mark@twoshortplanks.com&gt;</p>
+
+</li>
+<li><p>Chris Weyl &lt;cweyl@alumni.drew.edu&gt;</p>
+
+</li>
+<li><p>Csson &lt;erik.carlsson@live.com&gt;</p>
+
+</li>
+<li><p>Andy Jack &lt;github@veracity.ca&gt;</p>
+
+</li>
+<li><p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+</li>
+<li><p>Todd Hepler &lt;thepler@employees.org&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2008 by Shawn M Moore.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

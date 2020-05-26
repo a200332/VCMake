@@ -1,0 +1,135 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CREATING-FORMATTERS">CREATING FORMATTERS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Formatter - Namespace for formatters.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is the namespace for formatters. This is an empty package.</p>
+
+<h1 id="CREATING-FORMATTERS">CREATING FORMATTERS</h1>
+
+<p>A formatter is any package or object with a <code>write($event, $num)</code> method.</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Test2::Formatter::Foo</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> write </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self_or_class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$event</span><span class="operator">,</span> <span class="variable">$assert_num</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> hide_buffered </span><span class="operator">{</span> <span class="number">1</span> <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> terminate </span><span class="operator">{</span> <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> finalize </span><span class="operator">{</span> <span class="operator">}</span>
+    
+    <span class="keyword">sub</span><span class="variable"> new_root </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$class</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="operator">...</span>
+        <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>write</code> method is a method, so it either gets a class or instance. The two arguments are the <code>$event</code> object it should record, and the <code>$assert_num</code> which is the number of the current assertion (ok), or the last assertion if this event is not itself an assertion. The assertion number may be any integer 0 or greater, and may be undefined in some cases.</p>
+
+<p>The <code>hide_buffered()</code> method must return a boolean. This is used to tell buffered subtests whether or not to send it events as they are being buffered. See <a href="../../lib/Test2/API.html#run_subtest">&quot;run_subtest(...)&quot; in Test2::API</a> for more information.</p>
+
+<p>The <code>terminate</code> and <code>finalize</code> methods are optional methods called that you can implement if the format you&#39;re generating needs to handle these cases, for example if you are generating XML and need close open tags.</p>
+
+<p>The <code>terminate</code> method is called when an event&#39;s <code>terminate</code> method returns true, for example when a <a href="../../lib/Test2/Event/Plan.html">Test2::Event::Plan</a> has a <code>&#39;skip_all&#39;</code> plan, or when a <a href="../../lib/Test2/Event/Bail.html">Test2::Event::Bail</a> event is sent. The <code>terminate</code> method is passed a single argument, the <a href="../../lib/Test2/Event.html">Test2::Event</a> object which triggered the terminate.</p>
+
+<p>The <code>finalize</code> method is always the last thing called on the formatter, <i>except when <code>terminate</code> is called for a Bail event</i>. It is passed the following arguments:</p>
+
+<p>The <code>new_root</code> method is called when <code>Test2::API::Stack</code> Initializes the root hub for the first time. Most formatters will simply have this call <code>$class-&gt;new</code>, which is the default behavior. Some formatters however may want to take extra action during construction of the root formatter, this is where they can do that.</p>
+
+<ul>
+
+<li><p>The number of tests that were planned</p>
+
+</li>
+<li><p>The number of tests actually seen</p>
+
+</li>
+<li><p>The number of tests which failed</p>
+
+</li>
+<li><p>A boolean indicating whether or not the test suite passed</p>
+
+</li>
+<li><p>A boolean indicating whether or not this call is for a subtest</p>
+
+</li>
+</ul>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

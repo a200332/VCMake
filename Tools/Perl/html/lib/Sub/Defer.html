@@ -1,0 +1,117 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#defer_sub">defer_sub</a></li>
+      <li><a href="#undefer_sub">undefer_sub</a></li>
+      <li><a href="#undefer_all">undefer_all</a></li>
+      <li><a href="#undefer_package">undefer_package</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Defer - Defer generation of subroutines until they are first called</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">Sub::Defer</span><span class="operator">;</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$deferred</span> <span class="operator">=</span> <span class="variable">defer_sub</span> <span class="string">'Logger::time_since_first_log'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$t</span> <span class="operator">=</span> <span class="keyword">time</span><span class="operator">;</span>
+    <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">time</span> <span class="operator">-</span> <span class="variable">$t</span> <span class="operator">};</span>
+ <span class="operator">};</span>
+ 
+  <span class="variable">Logger</span><span class="operator">-&gt;</span><span class="variable">time_since_first_log</span><span class="operator">;</span> <span class="comment"># returns 0 and replaces itself</span>
+  <span class="variable">Logger</span><span class="operator">-&gt;</span><span class="variable">time_since_first_log</span><span class="operator">;</span> <span class="comment"># returns time - $t</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>These subroutines provide the user with a convenient way to defer creation of subroutines and methods until they are first called.</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<h2 id="defer_sub">defer_sub</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$coderef</span> <span class="operator">=</span> <span class="variable">defer_sub</span> <span class="variable">$name</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">};</span>
+</code></pre>
+
+<p>This subroutine returns a coderef that encapsulates the provided sub - when it is first called, the provided sub is called and is -itself- expected to return a subroutine which will be goto&#39;ed to on subsequent calls.</p>
+
+<p>If a name is provided, this also installs the sub as that name - and when the subroutine is undeferred will re-install the final version for speed.</p>
+
+<p>Exported by default.</p>
+
+<h2 id="undefer_sub">undefer_sub</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$coderef</span> <span class="operator">=</span> <span class="variable">undefer_sub</span> <span class="operator">\&amp;</span><span class="variable">Foo::name</span><span class="operator">;</span>
+</code></pre>
+
+<p>If the passed coderef has been <a href="#defer_sub">deferred</a> this will &quot;undefer&quot; it. If the passed coderef has not been deferred, this will just return it.</p>
+
+<p>If this is confusing, take a look at the example in the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a>.</p>
+
+<p>Exported by default.</p>
+
+<h2 id="undefer_all">undefer_all</h2>
+
+<pre><code> <span class="variable">undefer_all</span><span class="operator">();</span>
+</code></pre>
+
+<p>This will undefer all deferred subs in one go. This can be very useful in a forking environment where child processes would each have to undefer the same subs. By calling this just before you start forking children you can undefer all currently deferred subs in the parent so that the children do not have to do it. Note this may bake the behavior of some subs that were intended to calculate their behavior later, so it shouldn&#39;t be used midway through a module load or class definition.</p>
+
+<p>Exported by default.</p>
+
+<h2 id="undefer_package">undefer_package</h2>
+
+<pre><code>  <span class="variable">undefer_package</span><span class="operator">(</span><span class="variable">$package</span><span class="operator">);</span>
+</code></pre>
+
+<p>This undefers all deferred subs in a package.</p>
+
+<p>Not exported by default.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See <a href="../../lib/Sub/Quote.html">Sub::Quote</a> for support and contact information.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>See <a href="../../lib/Sub/Quote.html">Sub::Quote</a> for authors.</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>See <a href="../../lib/Sub/Quote.html">Sub::Quote</a> for the copyright and license.</p>
+
+
+</body>
+
+</html>
+
+

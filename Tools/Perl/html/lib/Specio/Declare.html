@@ -1,0 +1,344 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#t-name">t(&#39;name&#39;)</a></li>
+      <li><a href="#declare">declare(...)</a></li>
+      <li><a href="#anon">anon(...)</a></li>
+      <li><a href="#coerce">coerce(...)</a></li>
+    </ul>
+  </li>
+  <li><a href="#DECLARATION-HELPERS">DECLARATION HELPERS</a>
+    <ul>
+      <li><a href="#any_isa_type-object_isa_type">any_isa_type, object_isa_type</a></li>
+      <li><a href="#any_does_type-object_does_type">any_does_type, object_does_type</a></li>
+      <li><a href="#any_can_type-object_can_type">any_can_type, object_can_type</a></li>
+      <li><a href="#enum">enum</a></li>
+      <li><a href="#intersection">intersection</a></li>
+      <li><a href="#union">union</a></li>
+    </ul>
+  </li>
+  <li><a href="#PARAMETERIZED-TYPES">PARAMETERIZED TYPES</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Declare - Specio declaration subroutines</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyApp::Type::Library</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">'Specio::Exporter'</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">Specio::Declare</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Specio::Library::Builtins</span><span class="operator">;</span>
+    
+    <span class="variable">declare</span><span class="operator">(</span>
+        <span class="string">'Foo'</span><span class="operator">,</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Str'</span><span class="operator">),</span>
+        <span class="string">where</span>  <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">=~</span> <span class="regex">/foo/i</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">declare</span><span class="operator">(</span>
+        <span class="string">'ArrayRefOfInt'</span><span class="operator">,</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span> <span class="string">'ArrayRef'</span><span class="operator">,</span> <span class="string">of</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">)</span> <span class="operator">),</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$even</span> <span class="operator">=</span> <span class="variable">anon</span><span class="operator">(</span>
+        <span class="string">parent</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+        <span class="string">inline</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$type</span>      <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+            <span class="keyword">my</span> <span class="variable">$value_var</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+            <span class="keyword">return</span> <span class="variable">$value_var</span> <span class="operator">.</span> <span class="string">' % 2 == 0'</span><span class="operator">;</span>
+        <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">coerce</span><span class="operator">(</span>
+        <span class="variable">t</span><span class="operator">(</span><span class="string">'ArrayRef'</span><span class="operator">),</span>
+        <span class="string">from</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Foo'</span><span class="operator">),</span>
+        <span class="string">using</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">]</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">coerce</span><span class="operator">(</span>
+        <span class="variable">$even</span><span class="operator">,</span>
+        <span class="string">from</span>  <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+        <span class="string">using</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">% </span><span class="number">2</span> <span class="operator">?</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">+</span> <span class="number">1</span> <span class="operator">:</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">},</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># Specio name is DateTime</span>
+    <span class="variable">any_isa_type</span><span class="operator">(</span><span class="string">'DateTime'</span><span class="operator">);</span>
+    
+    <span class="comment"># Specio name is DateTimeObject</span>
+    <span class="variable">object_isa_type</span><span class="operator">(</span> <span class="string">'DateTimeObject'</span><span class="operator">,</span> <span class="string">class</span> <span class="operator">=&gt;</span> <span class="string">'DateTime'</span> <span class="operator">);</span>
+    
+    <span class="variable">any_can_type</span><span class="operator">(</span>
+        <span class="string">'Duck'</span><span class="operator">,</span>
+        <span class="string">methods</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'duck_walk'</span><span class="operator">,</span> <span class="string">'quack'</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">object_can_type</span><span class="operator">(</span>
+        <span class="string">'DuckObject'</span><span class="operator">,</span>
+        <span class="string">methods</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'duck_walk'</span><span class="operator">,</span> <span class="string">'quack'</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">enum</span><span class="operator">(</span>
+        <span class="string">'Colors'</span><span class="operator">,</span>
+        <span class="string">values</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( blue green red )</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">intersection</span><span class="operator">(</span>
+        <span class="string">'HashRefAndArrayRef'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'HashRef'</span><span class="operator">),</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'ArrayRef'</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">union</span><span class="operator">(</span>
+        <span class="string">'IntOrArrayRef'</span><span class="operator">,</span>
+        <span class="string">of</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'ArrayRef'</span><span class="operator">)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This package exports a set of type declaration helpers. Importing this package also causes it to create a <code>t</code> subroutine the caller.</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<p>This module exports the following subroutines.</p>
+
+<h2 id="t-name">t(&#39;name&#39;)</h2>
+
+<p>This subroutine lets you access any types you have declared so far, as well as any types you imported from another type library.</p>
+
+<p>If you pass an unknown name, it throws an exception.</p>
+
+<h2 id="declare">declare(...)</h2>
+
+<p>This subroutine declares a named type. The first argument is the type name, followed by a set of key/value parameters:</p>
+
+<ul>
+
+<li><p>parent =&gt; $type</p>
+
+<p>The parent should be another type object. Specifically, it can be anything which does the <a href="../../lib/Specio/Constraint/Role/Interface.html">Specio::Constraint::Role::Interface</a> role. The parent can be a named or anonymous type.</p>
+
+</li>
+<li><p>where =&gt; sub { ... }</p>
+
+<p>This is a subroutine which defines the type constraint. It will be passed a single argument, the value to check, and it should return true or false to indicate whether or not the value is valid for the type.</p>
+
+<p>This parameter is mutually exclusive with the <code>inline</code> parameter.</p>
+
+</li>
+<li><p>inline =&gt; sub { ... }</p>
+
+<p>This is a subroutine that is called to generate inline code to validate the type. Inlining can be <i>much</i> faster than simply providing a subroutine with the <code>where</code> parameter, but is often more complicated to get right.</p>
+
+<p>The inline generator is called as a method on the type with one argument. This argument is a <i>string</i> containing the variable name to use in the generated code. Typically this is something like <code>&#39;$_[0]&#39;</code> or <code>&#39;$value&#39;</code>.</p>
+
+<p>The inline generator subroutine should return a <i>string</i> of code representing a single term, and it <i>should not</i> be terminated with a semicolon. This allows the inlined code to be safely included in an <code>if</code> statement, for example. You can use <code><span class="keyword">do</span> <span class="operator">{</span> <span class="operator">}</span>
+</code> blocks and ternaries to get everything into one term. Do not assign to the variable you are testing. This single term should evaluate to true or false.</p>
+
+<p>The inline generator is expected to include code to implement both the current type and all its parents. Typically, the easiest way to do this is to write a subroutine something like this:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$var</span>  <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">parent</span><span class="operator">-&gt;</span><span class="variable">inline_check</span><span class="operator">(</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span> <span class="operator">)</span>
+          <span class="operator">.</span> <span class="string">' and more checking code goes here'</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>This parameter is mutually exclusive with the <code>where</code> parameter.</p>
+
+</li>
+<li><p>message_generator =&gt; sub { ... }</p>
+
+<p>A subroutine to generate an error message when the type check fails. The default message says something like &quot;Validation failed for type named Int declared in package Specio::Library::Builtins (.../Specio/blib/lib/Specio/Library/Builtins.pm) at line 147 in sub named (eval) with value 1.1&quot;.</p>
+
+<p>You can override this to provide something more specific about the way the type failed.</p>
+
+<p>The subroutine you provide will be called as a method on the type with two arguments. The first is the description of the type (the bit in the message above that starts with &quot;type named Int ...&quot; and ends with &quot;... in sub named (eval)&quot;. This description says what the thing is and where it was defined.</p>
+
+<p>The second argument is the value that failed the type check, after any coercions that might have been applied.</p>
+
+</li>
+</ul>
+
+<h2 id="anon">anon(...)</h2>
+
+<p>This subroutine declares an anonymous type. It is identical to <code>declare</code> except that it expects a list of key/value parameters without a type name as the first parameter.</p>
+
+<h2 id="coerce">coerce(...)</h2>
+
+<p>This declares a coercion from one type to another. The first argument should be an object which does the <a href="../../lib/Specio/Constraint/Role/Interface.html">Specio::Constraint::Role::Interface</a> role. This can be either a named or anonymous type. This type is the type that the coercion is <i>to</i>.</p>
+
+<p>The remaining arguments are key/value parameters:</p>
+
+<ul>
+
+<li><p>from =&gt; $type</p>
+
+<p>This must be an object which does the <a href="../../lib/Specio/Constraint/Role/Interface.html">Specio::Constraint::Role::Interface</a> role. This is type that we are coercing <i>from</i>. Again, this can be either a named or anonymous type.</p>
+
+</li>
+<li><p>using =&gt; sub { ... }</p>
+
+<p>This is a subroutine which defines the type coercion. It will be passed a single argument, the value to coerce. It should return a new value of the type this coercion is to.</p>
+
+<p>This parameter is mutually exclusive with the <code>inline</code> parameter.</p>
+
+</li>
+<li><p>inline =&gt; sub { ... }</p>
+
+<p>This is a subroutine that is called to generate inline code to perform the coercion.</p>
+
+<p>The inline generator is called as a method on the type with one argument. This argument is a <i>string</i> containing the variable name to use in the generated code. Typically this is something like <code>&#39;$_[0]&#39;</code> or <code>&#39;$value&#39;</code>.</p>
+
+<p>The inline generator subroutine should return a <i>string</i> of code representing a single term, and it <i>should not</i> be terminated with a semicolon. This allows the inlined code to be safely included in an <code>if</code> statement, for example. You can use <code><span class="keyword">do</span> <span class="operator">{</span> <span class="operator">}</span>
+</code> blocks and ternaries to get everything into one term. This single term should evaluate to the new value.</p>
+
+</li>
+</ul>
+
+<h1 id="DECLARATION-HELPERS">DECLARATION HELPERS</h1>
+
+<p>This module also exports some helper subs for declaring certain kinds of types:</p>
+
+<h2 id="any_isa_type-object_isa_type">any_isa_type, object_isa_type</h2>
+
+<p>The <code>any_isa_type</code> helper creates a type which accepts a class name or object of the given class. The <code>object_isa_type</code> helper creates a type which only accepts an object of the given class.</p>
+
+<p>These subroutines take a type name as the first argument. The remaining arguments are key/value pairs. Currently this is just the <code>class</code> key, which should be a class name. This is the class that the type requires.</p>
+
+<p>The type name argument can be omitted to create an anonymous type.</p>
+
+<p>You can also pass just a single argument, in which case that will be used as both the type&#39;s name and the class for the constraint to check.</p>
+
+<h2 id="any_does_type-object_does_type">any_does_type, object_does_type</h2>
+
+<p>The <code>any_does_type</code> helper creates a type which accepts a class name or object which does the given role. The <code>object_does_type</code> helper creates a type which only accepts an object which does the given role.</p>
+
+<p>These subroutines take a type name as the first argument. The remaining arguments are key/value pairs. Currently this is just the <code>role</code> key, which should be a role name. This is the class that the type requires.</p>
+
+<p>This should just work (I hope) with roles created by <a href="../../lib/Moose.html">Moose</a>, <a>Mouse</a>, and <a>Moo</a> (using <a href="../../lib/Role/Tiny.html">Role::Tiny</a>).</p>
+
+<p>The type name argument can be omitted to create an anonymous type.</p>
+
+<p>You can also pass just a single argument, in which case that will be used as both the type&#39;s name and the role for the constraint to check.</p>
+
+<h2 id="any_can_type-object_can_type">any_can_type, object_can_type</h2>
+
+<p>The <code>any_can_type</code> helper creates a type which accepts a class name or object with the given methods. The <code>object_can_type</code> helper creates a type which only accepts an object with the given methods.</p>
+
+<p>These subroutines take a type name as the first argument. The remaining arguments are key/value pairs. Currently this is just the <code>methods</code> key, which can be either a string or array reference of strings. These strings are the required methods for the type.</p>
+
+<p>The type name argument can be omitted to create an anonymous type.</p>
+
+<h2 id="enum">enum</h2>
+
+<p>This creates a type which accepts a string matching a given list of acceptable values.</p>
+
+<p>The first argument is the type name. The remaining arguments are key/value pairs. Currently this is just the <code>values</code> key. This should an array reference of acceptable string values.</p>
+
+<p>The type name argument can be omitted to create an anonymous type.</p>
+
+<h2 id="intersection">intersection</h2>
+
+<p>This creates a type which is the intersection of two or more other types. A union only accepts values which match all of its underlying types.</p>
+
+<p>The first argument is the type name. The remaining arguments are key/value pairs. Currently this is just the <code>of</code> key. This should an array reference of types.</p>
+
+<p>The type name argument can be omitted to create an anonymous type.</p>
+
+<h2 id="union">union</h2>
+
+<p>This creates a type which is the union of two or more other types. A union accepts any of its underlying types.</p>
+
+<p>The first argument is the type name. The remaining arguments are key/value pairs. Currently this is just the <code>of</code> key. This should an array reference of types.</p>
+
+<p>The type name argument can be omitted to create an anonymous type.</p>
+
+<h1 id="PARAMETERIZED-TYPES">PARAMETERIZED TYPES</h1>
+
+<p>You can create a parameterized type by calling <code>t</code> with additional parameters, like this:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$arrayref_of_int</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span> <span class="string">'ArrayRef'</span><span class="operator">,</span> <span class="string">of</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">)</span> <span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$arrayref_of_hashref_of_int</span> <span class="operator">=</span> <span class="variable">t</span><span class="operator">(</span>
+      <span class="string">'ArrayRef'</span><span class="operator">,</span>
+      <span class="string">of</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span>
+          <span class="string">'HashRef'</span><span class="operator">,</span>
+          <span class="string">of</span> <span class="operator">=&gt;</span> <span class="variable">t</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">),</span>
+      <span class="operator">),</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>The <code>t</code> subroutine assumes that if it receives more than one argument, it should look up the named type and call <code>$type-&gt;parameterize(...)</code> with the additional arguments.</p>
+
+<p>If the named type cannot be parameterized, it throws an error.</p>
+
+<p>You can also call <code>$type-&gt;parameterize</code> directly if needed. See <a href="../../lib/Specio/Constraint/Parameterizable.html">Specio::Constraint::Parameterizable</a> for details.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

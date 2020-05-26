@@ -1,0 +1,249 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a>
+    <ul>
+      <li><a href="#encode_json">encode_json</a></li>
+      <li><a href="#decode_json">decode_json</a></li>
+      <li><a href="#to_json-from_json">to_json, from_json</a></li>
+      <li><a href="#JSON">JSON</a></li>
+      <li><a href="#is_bool">is_bool</a></li>
+    </ul>
+  </li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+    </ul>
+  </li>
+  <li><a href="#BOOLEANS">BOOLEANS</a></li>
+  <li><a href="#CONVERTING-FROM-JSON::Any">CONVERTING FROM JSON::Any</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#INSTALLATION">INSTALLATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>JSON::MaybeXS - Use <a>Cpanel::JSON::XS</a> with a fallback to <a>JSON::XS</a> and <a href="../../lib/JSON/PP.html">JSON::PP</a></p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$data_structure</span> <span class="operator">=</span> <span class="variable">decode_json</span><span class="operator">(</span><span class="variable">$json_input</span><span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$json_output</span> <span class="operator">=</span> <span class="variable">encode_json</span><span class="operator">(</span><span class="variable">$data_structure</span><span class="operator">);</span>
+  
+  <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">JSON</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$json_with_args</span> <span class="operator">=</span> <span class="variable">JSON::MaybeXS</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">utf8</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span> <span class="comment"># or { utf8 =&gt; 1 }</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module first checks to see if either <a>Cpanel::JSON::XS</a> or <a>JSON::XS</a> is already loaded, in which case it uses that module. Otherwise it tries to load <a>Cpanel::JSON::XS</a>, then <a>JSON::XS</a>, then <a href="../../lib/JSON/PP.html">JSON::PP</a> in order, and either uses the first module it finds or throws an error.</p>
+
+<p>It then exports the <code>encode_json</code> and <code>decode_json</code> functions from the loaded module, along with a <code>JSON</code> constant that returns the class name for calling <code>new</code> on.</p>
+
+<p>If you&#39;re writing fresh code rather than replacing <a href="../../lib/JSON.html">JSON.pm</a> usage, you might want to pass options as constructor args rather than calling mutators, so we provide our own <code>new</code> method that supports that.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p><code>encode_json</code>, <code>decode_json</code> and <code>JSON</code> are exported by default; <code>is_bool</code> is exported on request.</p>
+
+<p>To import only some symbols, specify them on the <code>use</code> line:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span> <span class="string">qw(encode_json decode_json is_bool)</span><span class="operator">;</span> <span class="comment"># functions only</span>
+  
+  <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span> <span class="string">qw(JSON)</span><span class="operator">;</span> <span class="comment"># JSON constant only</span>
+</code></pre>
+
+<p>To import all available sensible symbols (<code>encode_json</code>, <code>decode_json</code>, and <code>is_bool</code>), use <code>:all</code>:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span> <span class="string">':all'</span><span class="operator">;</span>
+</code></pre>
+
+<p>To import all symbols including those needed by legacy apps that use <a href="../../lib/JSON/PP.html">JSON::PP</a>:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span> <span class="string">':legacy'</span><span class="operator">;</span>
+</code></pre>
+
+<p>This imports the <code>to_json</code> and <code>from_json</code> symbols as well as everything in <code>:all</code>. NOTE: This is to support legacy code that makes extensive use of <code>to_json</code> and <code>from_json</code> which you are not yet in a position to refactor. DO NOT use this import tag in new code, in order to avoid the crawling horrors of getting UTF-8 support subtly wrong. See the documentation for <a href="../../lib/JSON.html">JSON</a> for further details.</p>
+
+<h2 id="encode_json">encode_json</h2>
+
+<p>This is the <code>encode_json</code> function provided by the selected implementation module, and takes a perl data structure which is serialised to JSON text.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$json_text</span> <span class="operator">=</span> <span class="variable">encode_json</span><span class="operator">(</span><span class="variable">$data_structure</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="decode_json">decode_json</h2>
+
+<p>This is the <code>decode_json</code> function provided by the selected implementation module, and takes a string of JSON text to deserialise to a perl data structure.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$data_structure</span> <span class="operator">=</span> <span class="variable">decode_json</span><span class="operator">(</span><span class="variable">$json_text</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="to_json-from_json">to_json, from_json</h2>
+
+<p>See <a href="../../lib/JSON.html">JSON</a> for details. These are included to support legacy code <b>only</b>.</p>
+
+<h2 id="JSON">JSON</h2>
+
+<p>The <code>JSON</code> constant returns the selected implementation module&#39;s name for use as a class name - so:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$json_obj</span> <span class="operator">=</span> <span class="variable">JSON</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span> <span class="comment"># returns a Cpanel::JSON::XS or JSON::PP object</span>
+</code></pre>
+
+<p>and that object can then be used normally:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$data_structure</span> <span class="operator">=</span> <span class="variable">$json_obj</span><span class="operator">-&gt;</span><span class="variable">decode</span><span class="operator">(</span><span class="variable">$json_text</span><span class="operator">);</span> <span class="comment"># etc.</span>
+</code></pre>
+
+<h2 id="is_bool">is_bool</h2>
+
+<pre><code>  $is_boolean = is_bool($scalar)</code></pre>
+
+<p>Returns true if the passed scalar represents either <code>true</code> or <code>false</code>, two constants that act like <code>1</code> and <code>0</code>, respectively and are used to represent JSON <code>true</code> and <code>false</code> values in Perl.</p>
+
+<p>Since this is a bare sub in the various backend classes, it cannot be called as a class method like the other interfaces; it must be called as a function, with no invocant. It supports the representation used in all JSON backends.</p>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<h2 id="new">new</h2>
+
+<p>With <a href="../../lib/JSON/PP.html">JSON::PP</a>, <a>JSON::XS</a> and <a>Cpanel::JSON::XS</a> you are required to call mutators to set options, such as:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">-&gt;</span><span class="variable">utf8</span><span class="operator">(</span><span class="number">1</span><span class="operator">)-&gt;</span><span class="variable">pretty</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>Since this is a trifle irritating and noticeably un-perlish, we also offer:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">JSON::MaybeXS</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">utf8</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">pretty</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>which works equivalently to the above (and in the usual tradition will accept a hashref instead of a hash, should you so desire).</p>
+
+<p>The resulting object is blessed into the underlying backend, which offers (at least) the methods <code>encode</code> and <code>decode</code>.</p>
+
+<h1 id="BOOLEANS">BOOLEANS</h1>
+
+<p>To include JSON-aware booleans (<code>true</code>, <code>false</code>) in your data, just do:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$true</span> <span class="operator">=</span> <span class="variable">JSON</span><span class="operator">-&gt;</span><span class="variable">true</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$false</span> <span class="operator">=</span> <span class="variable">JSON</span><span class="operator">-&gt;</span><span class="variable">false</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="CONVERTING-FROM-JSON::Any">CONVERTING FROM JSON::Any</h1>
+
+<p><a href="../../lib/JSON/Any.html">JSON::Any</a> used to be the favoured compatibility layer above the various JSON backends, but over time has grown a lot of extra code to deal with legacy backends (e.g. <a>JSON::Syck</a>) that are no longer needed. This is a rough guide of translating such code:</p>
+
+<p>Change code from:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">JSON::Any</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">JSON::Any</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">-&gt;</span><span class="variable">objToJson</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>    <span class="comment"># or to_json($data), or Dump($data)</span>
+</code></pre>
+
+<p>to:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">encode_json</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>Change code from:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">JSON::Any</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="variable">JSON::Any</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">-&gt;</span><span class="variable">jsonToObj</span><span class="operator">(</span><span class="variable">$json</span><span class="operator">);</span>    <span class="comment"># or from_json($json), or Load($json)</span>
+</code></pre>
+
+<p>to:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">JSON::MaybeXS</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$json</span> <span class="operator">=</span> <span class="variable">decode_json</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>The <code>new()</code> method in this module is technically a factory, not a constructor, because the objects it returns will <i>NOT</i> be blessed into the <code>JSON::MaybeXS</code> class.</p>
+
+<p>If you are using an object returned by this module as a Moo(se) attribute, this type constraint code:</p>
+
+<pre><code>    <span class="variable">is</span> <span class="string">'json'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'JSON::MaybeXS'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>will <i>NOT</i> do what you expect. Instead, either rely on the <code>JSON</code> class constant described above, as so:</p>
+
+<pre><code>    <span class="variable">is</span> <span class="string">'json'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="variable">JSON::MaybeXS::JSON</span><span class="operator">()</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Alternatively, you can use duck typing:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Moose::Util::TypeConstraints</span> <span class="string">'duck_type'</span><span class="operator">;</span>
+    <span class="variable">is</span> <span class="string">'json'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="variable">Object</span> <span class="operator">,</span> <span class="variable">duck_type</span><span class="operator">(</span><span class="operator">[</span><span class="string">qw/ encode decode /</span><span class="operator">]</span><span class="operator">));</span>
+</code></pre>
+
+<h1 id="INSTALLATION">INSTALLATION</h1>
+
+<p>At installation time, <i>Makefile.PL</i> will attempt to determine if you have a working compiler available, and therefore whether you are able to run XS code. If so, <a>Cpanel::JSON::XS</a> will be added to the prerequisite list, unless <a>JSON::XS</a> is already installed at a high enough version. <a>JSON::XS</a> may also be upgraded to fix any incompatibility issues.</p>
+
+<p>Because running XS code is not mandatory and <a href="../../lib/JSON/PP.html">JSON::PP</a> (which is in perl core) is used as a fallback backend, this module is safe to be used in a suite of code that is fatpacked or installed into a restricted-resource environment.</p>
+
+<p>You can also prevent any XS dependencies from being installed by setting <code>PUREPERL_ONLY=1</code> in <i>Makefile.PL</i> options (or in the <code>PERL_MM_OPT</code> environment variable), or using the <code>--pp</code> or <code>--pureperl</code> flags with the <a>cpanminus client</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>mst - Matt S. Trout (cpan:MSTROUT) &lt;mst@shadowcat.co.uk&gt;</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<ul>
+
+<li><p>Clinton Gormley &lt;drtech@cpan.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Kieren Diment &lt;diment@gmail.com&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2013 the <code>JSON::MaybeXS</code> <a href="#AUTHOR">&quot;AUTHOR&quot;</a> and <a href="#CONTRIBUTORS">&quot;CONTRIBUTORS&quot;</a> as listed above.</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software and may be distributed under the same terms as perl itself.</p>
+
+
+</body>
+
+</html>
+
+

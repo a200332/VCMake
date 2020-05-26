@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Topic-unnecessary-for-certain-Perl-built-in-functions">Topic unnecessary for certain Perl built-in functions</a></li>
+      <li><a href="#Topic-unnecessary-for-most-filetest-operators">Topic unnecessary for most filetest operators</a></li>
+    </ul>
+  </li>
+  <li><a href="#KNOWN-BUGS">KNOWN BUGS</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::BuiltinFunctions::ProhibitUselessTopic - Don&#39;t pass $_ to built-in functions that assume it, or to most filetest operators.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>There are a number of places where <code>$_</code>, or &quot;the topic&quot; variable, is unnecessary.</p>
+
+<h2 id="Topic-unnecessary-for-certain-Perl-built-in-functions">Topic unnecessary for certain Perl built-in functions</h2>
+
+<p>Many Perl built-in functions will operate on <code>$_</code> if no argument is passed. For example, the <code>length</code> function will operate on <code>$_</code> by default. This snippet:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">@list</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">length</span><span class="operator">(</span> <span class="variable">$_</span> <span class="operator">)</span> <span class="operator">==</span> <span class="number">4</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>
+</code></pre>
+
+<p>is more idiomatically written as:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">@list</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">length</span> <span class="operator">==</span> <span class="number">4</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>
+</code></pre>
+
+<p>In the case of the <code>split</code> function, the second argument is the one that defaults to <code>$_</code>. This snippet:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">@list</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">@args</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/\t/</span><span class="operator">,</span> <span class="variable">$_</span><span class="operator">;</span>
+</code></pre>
+
+<p>is better written as:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">@list</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">@args</span> <span class="operator">=</span> <span class="keyword">split</span> <span class="regex">/\t/</span><span class="operator">;</span>
+</code></pre>
+
+<p>There is one built-in that this policy does <b>not</b> check for: <code>reverse</code> called with <code>$_</code>.</p>
+
+<p>The <code>reverse</code> function only operates on <code>$_</code> if called in scalar context. Therefore:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">@list</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$backwards</span> <span class="operator">=</span> <span class="keyword">reverse</span> <span class="variable">$_</span><span class="operator">;</span>
+</code></pre>
+
+<p>is better written as:</p>
+
+<pre><code>    <span class="keyword">for</span> <span class="operator">(</span> <span class="variable">@list</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$backwards</span> <span class="operator">=</span> <span class="keyword">reverse</span><span class="operator">;</span>
+</code></pre>
+
+<p>However, the distinction for scalar vs. list context on <code>reverse</code> is not yet working. See <a>KNOWN BUGS</a> below.</p>
+
+<h2 id="Topic-unnecessary-for-most-filetest-operators">Topic unnecessary for most filetest operators</h2>
+
+<p>Another place that <code>$_</code> is unnecessary is with a filetest operator.</p>
+
+<pre><code>    <span class="comment"># These are identical.</span>
+    <span class="keyword">my</span> <span class="variable">$size</span> <span class="operator">=</span> <span class="keyword">-s</span> <span class="variable">$_</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$size</span> <span class="operator">=</span> <span class="keyword">-s</span><span class="operator">;</span>
+    
+    <span class="comment"># These are identical.</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">-r</span> <span class="variable">$_</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">-r</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>
+</code></pre>
+
+<p>The exception is after the <code>-t</code> filetest operator, which instead of defaulting to <code>$_</code> defaults to <code>STDIN</code>.</p>
+
+<pre><code>    <span class="comment"># These are NOT identical.</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">-t</span> <span class="variable">$_</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="keyword">-t</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>  <span class="comment"># Checks STDIN, not $_</span>
+</code></pre>
+
+<h1 id="KNOWN-BUGS">KNOWN BUGS</h1>
+
+<p>This policy flags a false positive on <code>reverse</code> called in list context, since <code>reverse</code> in list context does <i>not</i> assume <code>$_</code>.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$s</span> <span class="operator">=</span> <span class="keyword">reverse</span><span class="operator">(</span> <span class="variable">$_</span> <span class="operator">);</span> <span class="comment"># $_ is useless.</span>
+    <span class="keyword">my</span> <span class="variable">@a</span> <span class="operator">=</span> <span class="keyword">reverse</span><span class="operator">(</span> <span class="variable">$_</span> <span class="operator">);</span> <span class="comment"># $_ is not useless here.</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andy Lester &lt;andy@petdance.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2013 Andy Lester &lt;andy@petdance.com&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,145 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a>
+    <ul>
+      <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#register-function-layer">register $function =&gt; $layer, ...</a></li>
+      <li><a href="#new">new</a></li>
+    </ul>
+  </li>
+  <li><a href="#layer">layer</a>
+    <ul>
+      <li><a href="#process">process</a></li>
+    </ul>
+  </li>
+  <li><a href="#NOTES">NOTES</a>
+    <ul>
+      <li><a href="#Layer-1---Insignificant-Data-Removal">Layer 1 - Insignificant Data Removal</a></li>
+      <li><a href="#Layer-2---Significant-Element-Removal">Layer 2 - Significant Element Removal</a></li>
+      <li><a href="#Layer-3---TO-BE-COMPLETED">Layer 3 - TO BE COMPLETED</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI::Normal - Normalize Perl Documents</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>Perl Documents, as created by PPI, are typically filled with all sorts of mess such as whitespace and comments and other things that don&#39;t effect the actual meaning of the code.</p>
+
+<p>In addition, because there is more than one way to do most things, and the syntax of Perl itself is quite flexible, there are many ways in which the &quot;same&quot; code can look quite different.</p>
+
+<p>PPI::Normal attempts to resolve this by providing a variety of mechanisms and algorithms to &quot;normalize&quot; Perl Documents, and determine a sort of base form for them (although this base form will be a memory structure, and not something that can be turned back into Perl source code).</p>
+
+<p>The process itself is quite complex, and so for convenience and extensibility it has been separated into a number of layers. At a later point, it will be possible to write Plugin classes to insert additional normalization steps into the various different layers.</p>
+
+<p>In addition, you can choose to do the normalization only as deep as a particular layer, depending on aggressively you want the normalization process to be.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="register-function-layer">register $function =&gt; $layer, ...</h2>
+
+<p>The <code>register</code> method is used by normalization method providers to tell the normalization engines which functions need to be run, and in which layer they apply.</p>
+
+<p>Provide a set of key/value pairs, where the key is the full name of the function (in string form), and the value is the layer (see description of the layers above) in which it should be run.</p>
+
+<p>Returns true if all functions are registered, or <code>undef</code> on error.</p>
+
+<h2 id="new">new</h2>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$level_1</span> <span class="operator">=</span> <span class="variable">PPI::Normal</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$level_2</span> <span class="operator">=</span> <span class="variable">PPI::Normal</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+</code></pre>
+
+<p>Creates a new normalization object, to which Document objects can be passed to be normalized.</p>
+
+<p>Of course, what you probably REALLY want is just to call <a href="../../lib/PPI/Document.html">PPI::Document</a>&#39;s <code>normalize</code> method.</p>
+
+<p>Takes an optional single parameter of the normalisation layer to use, which at this time can be either &quot;1&quot; or &quot;2&quot;.</p>
+
+<p>Returns a new <code>PPI::Normal</code> object, or <code>undef</code> on error.</p>
+
+<h1 id="layer">layer</h1>
+
+<p>The <code>layer</code> accessor returns the normalisation layer of the object.</p>
+
+<h2 id="process">process</h2>
+
+<p>The <code>process</code> method takes anything that can be converted to a <a href="../../lib/PPI/Document.html">PPI::Document</a> (object, SCALAR ref, filename), loads it and applies the normalisation process to the document.</p>
+
+<p>Returns a <a href="../../lib/PPI/Document/Normalized.html">PPI::Document::Normalized</a> object, or <code>undef</code> on error.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>The following normalisation layers are implemented. When writing plugins, you should register each transformation function with the appropriate layer.</p>
+
+<h2 id="Layer-1---Insignificant-Data-Removal">Layer 1 - Insignificant Data Removal</h2>
+
+<p>The basic step common to all normalization, layer 1 scans through the Document and removes all whitespace, comments, POD, and anything else that returns false for its <code>significant</code> method.</p>
+
+<p>It also checks each Element and removes known-useless sub-element metadata such as the Element&#39;s physical position in the file.</p>
+
+<h2 id="Layer-2---Significant-Element-Removal">Layer 2 - Significant Element Removal</h2>
+
+<p>After the removal of the insignificant data, Layer 2 removed larger, more complex, and superficially &quot;significant&quot; elements, that can be removed for the purposes of normalisation.</p>
+
+<p>Examples from this layer include pragmas, now-useless statement separators (since the PDOM tree is holding statement elements), and several other minor bits and pieces.</p>
+
+<h2 id="Layer-3---TO-BE-COMPLETED">Layer 3 - TO BE COMPLETED</h2>
+
+<p>This version of the forward-port of the Perl::Compare functionality to the 0.900+ API of PPI only implements Layer 1 and 2 at this time.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>- Write the other 4-5 layers :)</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See the <a href="../../lib/PPI.html#SUPPORT">support section</a> in the main module.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2005 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

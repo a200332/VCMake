@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Using-PPI::Cache">Using PPI::Cache</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new-param-value">new param =&gt; $value, ...</a></li>
+      <li><a href="#path1">path</a></li>
+      <li><a href="#readonly1">readonly</a></li>
+      <li><a href="#get_document-md5sum-source">get_document $md5sum | \$source</a></li>
+      <li><a href="#store_document-Document">store_document $Document</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI::Cache - The PPI Document Caching Layer</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="comment"># Set the cache</span>
+  <span class="keyword">use</span> <span class="variable">PPI::Cache</span> <span class="string">path</span> <span class="operator">=&gt;</span> <span class="string">'/var/cache/ppi-cache'</span><span class="operator">;</span>
+  
+  <span class="comment"># Manually create a cache</span>
+  <span class="keyword">my</span> <span class="variable">$Cache</span> <span class="operator">=</span> <span class="variable">PPI::Cache</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+      <span class="string">path</span>     <span class="operator">=&gt;</span> <span class="string">'/var/cache/perl/class-PPI'</span><span class="operator">,</span>
+      <span class="string">readonly</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><code>PPI::Cache</code> provides the default caching functionality for <a href="../../lib/PPI.html">PPI</a>.</p>
+
+<p>It integrates automatically with <a href="../../lib/PPI.html">PPI</a> itself. Once enabled, any attempt to load a document from the filesystem will be cached via cache.</p>
+
+<p>Please note that creating a <a href="../../lib/PPI/Document.html">PPI::Document</a> from raw source or something other object will <b>not</b> be cached.</p>
+
+<h2 id="Using-PPI::Cache">Using PPI::Cache</h2>
+
+<p>The most common way of using <code>PPI::Cache</code> is to provide parameters to the <code>use</code> statement at the beginning of your program.</p>
+
+<pre><code>  <span class="comment"># Load the class but do not set a cache</span>
+  <span class="keyword">use</span> <span class="variable">PPI::Cache</span><span class="operator">;</span>
+  
+  <span class="comment"># Use a fairly normal cache location</span>
+  <span class="keyword">use</span> <span class="variable">PPI::Cache</span> <span class="string">path</span> <span class="operator">=&gt;</span> <span class="string">'/var/cache/ppi-cache'</span><span class="operator">;</span>
+</code></pre>
+
+<p>Any of the arguments that can be provided to the <code>new</code> constructor can also be provided to <code>use</code>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new-param-value">new param =&gt; $value, ...</h2>
+
+<p>The <code>new</code> constructor creates a new standalone cache object.</p>
+
+<p>It takes a number of parameters to control the cache.</p>
+
+<dl>
+
+<dt id="path">path</dt>
+<dd>
+
+<p>The <code>path</code> param sets the base directory for the cache. It must already exist, and must be writable.</p>
+
+</dd>
+<dt id="readonly">readonly</dt>
+<dd>
+
+<p>The <code>readonly</code> param is a true/false flag that allows the use of an existing cache by a less-privileged user (such as the web user).</p>
+
+<p>Existing documents will be retrieved from the cache, but new documents will not be written to it.</p>
+
+</dd>
+</dl>
+
+<p>Returns a new <code>PPI::Cache</code> object, or dies on error.</p>
+
+<h2 id="path1">path</h2>
+
+<p>The <code>path</code> accessor returns the path on the local filesystem that is the root of the cache.</p>
+
+<h2 id="readonly1">readonly</h2>
+
+<p>The <code>readonly</code> accessor returns true if documents should not be written to the cache.</p>
+
+<h2 id="get_document-md5sum-source">get_document $md5sum | \$source</h2>
+
+<p>The <code>get_document</code> method checks to see if a Document is stored in the cache and retrieves it if so.</p>
+
+<h2 id="store_document-Document">store_document $Document</h2>
+
+<p>The <code>store_document</code> method takes a <a href="../../lib/PPI/Document.html">PPI::Document</a> as argument and explicitly adds it to the cache.</p>
+
+<p>Returns true if saved, or <code>undef</code> (or dies) on error.</p>
+
+<p>FIXME (make this return either one or the other, not both)</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>- Finish the basic functionality</p>
+
+<p>- Add support for use PPI::Cache auto-setting $PPI::Document::CACHE</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See the <a href="../../lib/PPI.html#SUPPORT">support section</a> in the main module.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2005 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

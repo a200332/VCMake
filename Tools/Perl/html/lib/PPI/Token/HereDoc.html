@@ -1,0 +1,140 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Comparison-to-other-string-types">Comparison to other string types</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#heredoc">heredoc</a></li>
+      <li><a href="#terminator">terminator</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI::Token::HereDoc - Token class for the here-doc</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<pre><code>  PPI::Token::HereDoc
+  isa PPI::Token
+      isa PPI::Element</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Here-docs are incredibly handy when writing Perl, but incredibly tricky when parsing it, primarily because they don&#39;t follow the general flow of input.</p>
+
+<p>They jump ahead and nab lines directly off the input buffer. Whitespace and newlines may not matter in most Perl code, but they matter in here-docs.</p>
+
+<p>They are also tricky to store as an object. They look sort of like an operator and a string, but they don&#39;t act like it. And they have a second section that should be something like a separate token, but isn&#39;t because a string can span from above the here-doc content to below it.</p>
+
+<p>So when parsing, this is what we do.</p>
+
+<p>Firstly, the PPI::Token::HereDoc object, does not represent the <code>&lt;&lt;</code> operator, or the &quot;END_FLAG&quot;, or the content, or even the terminator.</p>
+
+<p>It represents all of them at once.</p>
+
+<p>The token itself has only the declaration part as its &quot;content&quot;.</p>
+
+<pre><code>  # This is what the content of a HereDoc token is
+  &lt;&lt;FOO
+  
+  # Or this
+  &lt;&lt;&quot;FOO&quot;
+  
+  # Or even this
+  &lt;&lt;      &#39;FOO&#39;</code></pre>
+
+<p>That is, the &quot;operator&quot;, any whitespace separator, and the quoted or bare terminator. So when you call the <code>content</code> method on a HereDoc token, you get &#39;&lt;&lt; &quot;FOO&quot;&#39;.</p>
+
+<p>As for the content and the terminator, when treated purely in &quot;content&quot; terms they do not exist.</p>
+
+<p>The content is made available with the <code>heredoc</code> method, and the name of the terminator with the <code>terminator</code> method.</p>
+
+<p>To make things work in the way you expect, PPI has to play some games when doing line/column location calculation for tokens, and also during the content parsing and generation processes.</p>
+
+<p>Documents cannot simply by recreated by stitching together the token contents, and involve a somewhat more expensive procedure, but the extra expense should be relatively negligible unless you are doing huge quantities of them.</p>
+
+<p>Please note that due to the immature nature of PPI in general, we expect <code>HereDocs</code> to be a rich (bad) source of corner-case bugs for quite a while, but for the most part they should more or less DWYM.</p>
+
+<h2 id="Comparison-to-other-string-types">Comparison to other string types</h2>
+
+<p>Although technically it can be considered a quote, for the time being <code>HereDocs</code> are being treated as a completely separate <code>Token</code> subclass, and will not be found in a search for <a href="../../../lib/PPI/Token/Quote.html">PPI::Token::Quote</a> or <a href="#PPI::Token::QuoteLike-objects">&quot;PPI::Token::QuoteLike objects&quot;</a>.</p>
+
+<p>This may change in the future, with it most likely to end up under QuoteLike.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>Although it has the standard set of <code>Token</code> methods, <code>HereDoc</code> objects have a relatively large number of unique methods all of their own.</p>
+
+<h2 id="heredoc">heredoc</h2>
+
+<p>The <code>heredoc</code> method is the authoritative method for accessing the contents of the <code>HereDoc</code> object.</p>
+
+<p>It returns the contents of the here-doc as a list of newline-terminated strings. If called in scalar context, it returns the number of lines in the here-doc, <b>excluding</b> the terminator line.</p>
+
+<h2 id="terminator">terminator</h2>
+
+<p>The <code>terminator</code> method returns the name of the terminating string for the here-doc.</p>
+
+<p>Returns the terminating string as an unescaped string (in the rare case the terminator has an escaped quote in it).</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>- Implement PPI::Token::Quote interface compatibility</p>
+
+<p>- Check CPAN for any use of the null here-doc or here-doc-in-s///e</p>
+
+<p>- Add support for the null here-doc</p>
+
+<p>- Add support for here-doc in s///e</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See the <a href="../../../lib/PPI.html#SUPPORT">support section</a> in the main module.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

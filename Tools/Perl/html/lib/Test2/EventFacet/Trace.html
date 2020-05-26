@@ -1,0 +1,246 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#FACET-FIELDS">FACET FIELDS</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::EventFacet::Trace - Debug information for events</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <a href="../../../lib/Test2/API/Context.html">Test2::API::Context</a> object, as well as all <a href="../../../lib/Test2/Event.html">Test2::Event</a> types need to have access to information about where they were created. This object represents that information.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Test2::EventFacet::Trace</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$trace</span> <span class="operator">=</span> <span class="variable">Test2::EventFacet::Trace</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">frame</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="variable">$package</span><span class="operator">,</span> <span class="variable">$file</span><span class="operator">,</span> <span class="variable">$line</span><span class="operator">,</span> <span class="variable">$subname</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="FACET-FIELDS">FACET FIELDS</h1>
+
+<dl>
+
+<dt id="string-trace--details">$string = $trace-&gt;{details}</dt>
+<dd>
+
+</dd>
+<dt id="string-trace-details">$string = $trace-&gt;details()</dt>
+<dd>
+
+<p>Used as a custom trace message that will be used INSTEAD of <code>at &lt;FILE&gt; line &lt;LINE&gt;</code> when calling <code>$trace-&gt;debug</code>.</p>
+
+</dd>
+<dt id="frame-trace--frame">$frame = $trace-&gt;{frame}</dt>
+<dd>
+
+</dd>
+<dt id="frame-trace-frame">$frame = $trace-&gt;frame()</dt>
+<dd>
+
+<p>Get the call frame arrayref.</p>
+
+</dd>
+<dt id="int-trace--pid">$int = $trace-&gt;{pid}</dt>
+<dd>
+
+</dd>
+<dt id="int-trace-pid">$int = $trace-&gt;pid()</dt>
+<dd>
+
+<p>The process ID in which the event was generated.</p>
+
+</dd>
+<dt id="int-trace--tid">$int = $trace-&gt;{tid}</dt>
+<dd>
+
+</dd>
+<dt id="int-trace-tid">$int = $trace-&gt;tid()</dt>
+<dd>
+
+<p>The thread ID in which the event was generated.</p>
+
+</dd>
+<dt id="id-trace--cid">$id = $trace-&gt;{cid}</dt>
+<dd>
+
+</dd>
+<dt id="id-trace-cid">$id = $trace-&gt;cid()</dt>
+<dd>
+
+<p>The ID of the context that was used to create the event.</p>
+
+</dd>
+<dt id="hid-trace--hid">$hid = $trace-&gt;{hid}</dt>
+<dd>
+
+</dd>
+<dt id="hid-trace-hid">$hid = $trace-&gt;hid()</dt>
+<dd>
+
+<p>The ID of the hub that was current when the event was created.</p>
+
+</dd>
+<dt id="int-trace--nested">$int = $trace-&gt;{nested}</dt>
+<dd>
+
+</dd>
+<dt id="int-trace-nested">$int = $trace-&gt;nested()</dt>
+<dd>
+
+<p>How deeply nested the event is.</p>
+
+</dd>
+<dt id="bool-trace--buffered">$bool = $trace-&gt;{buffered}</dt>
+<dd>
+
+</dd>
+<dt id="bool-trace-buffered">$bool = $trace-&gt;buffered()</dt>
+<dd>
+
+<p>True if the event was buffered and not sent to the formatter independent of a parent (This should never be set when nested is <code>0</code> or <code>undef</code>).</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p><b>Note:</b> All facet frames are also methods.</p>
+
+<dl>
+
+<dt id="trace-set_detail-msg">$trace-&gt;set_detail($msg)</dt>
+<dd>
+
+</dd>
+<dt id="msg-trace-detail">$msg = $trace-&gt;detail</dt>
+<dd>
+
+<p>Used to get/set a custom trace message that will be used INSTEAD of <code>at &lt;FILE&gt; line &lt;LINE&gt;</code> when calling <code>$trace-&gt;debug</code>.</p>
+
+<p><code>detail()</code> is an alias to the <code>details</code> facet field for backwards compatibility.</p>
+
+</dd>
+<dt id="str-trace-debug">$str = $trace-&gt;debug</dt>
+<dd>
+
+<p>Typically returns the string <code>at &lt;FILE&gt; line &lt;LINE&gt;</code>. If <code>detail</code> is set then its value will be returned instead.</p>
+
+</dd>
+<dt id="trace-alert-MESSAGE">$trace-&gt;alert($MESSAGE)</dt>
+<dd>
+
+<p>This issues a warning at the frame (filename and line number where errors should be reported).</p>
+
+</dd>
+<dt id="trace-throw-MESSAGE">$trace-&gt;throw($MESSAGE)</dt>
+<dd>
+
+<p>This throws an exception at the frame (filename and line number where errors should be reported).</p>
+
+</dd>
+<dt id="package-file-line-subname-trace-call">($package, $file, $line, $subname) = $trace-&gt;call()</dt>
+<dd>
+
+<p>Get the caller details for the debug-info. This is where errors should be reported.</p>
+
+</dd>
+<dt id="pkg-trace-package">$pkg = $trace-&gt;package</dt>
+<dd>
+
+<p>Get the debug-info package.</p>
+
+</dd>
+<dt id="file-trace-file">$file = $trace-&gt;file</dt>
+<dd>
+
+<p>Get the debug-info filename.</p>
+
+</dd>
+<dt id="line-trace-line">$line = $trace-&gt;line</dt>
+<dd>
+
+<p>Get the debug-info line number.</p>
+
+</dd>
+<dt id="subname-trace-subname">$subname = $trace-&gt;subname</dt>
+<dd>
+
+<p>Get the debug-info subroutine name.</p>
+
+</dd>
+<dt id="sig-trace-signature">$sig = trace-&gt;signature</dt>
+<dd>
+
+<p>Get a signature string that identifies this trace. This is used to check if multiple events are related. The Trace includes pid, tid, file, line number, and the cid which is <code>&#39;C\d+&#39;</code> for traces created by a context, or <code>&#39;T\d+&#39;</code> for traces created by <code>new()</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2016 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

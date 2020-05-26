@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines - Prevent unused private subroutines.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>By convention Perl authors (like authors in many other languages) indicate private methods and variables by inserting a leading underscore before the identifier. This policy catches such subroutines which are not used in the file which declares them.</p>
+
+<p>This module defines a &#39;use&#39; of a subroutine as a subroutine or method call to it (other than from inside the subroutine itself), a reference to it (i.e. <code>my $foo = \&amp;_foo</code>), a <code>goto</code> to it outside the subroutine itself (i.e. <code>goto &amp;_foo</code>), or the use of the subroutine&#39;s name as an even-numbered argument to <code>use overload</code>.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>You can define what a private subroutine name looks like by specifying a regular expression for the <code>private_name_regex</code> option in your <i>.perlcriticrc</i>:</p>
+
+<pre><code>    [Subroutines::ProhibitUnusedPrivateSubroutines]
+    private_name_regex = _(?!_)\w+</code></pre>
+
+<p>The above example is a way of saying that subroutines that start with a double underscore are not considered to be private. (Perl::Critic, in its implementation, uses leading double underscores to indicate a distribution-private subroutine -- one that is allowed to be invoked by other Perl::Critic modules, but not by anything outside of Perl::Critic.)</p>
+
+<p>You can configure additional subroutines to accept by specifying them in a space-delimited list to the <code>allow</code> option:</p>
+
+<pre><code>    [Subroutines::ProhibitUnusedPrivateSubroutines]
+    allow = _bar _baz</code></pre>
+
+<p>These are added to the default list of exemptions from this policy. So the above allows <code><span class="keyword">sub</span><span class="variable"> _bar </span><span class="operator">{}</span>
+</code> and <code><span class="keyword">sub</span><span class="variable"> _baz </span><span class="operator">{}</span>
+</code>, even if they are not referred to in the module that defines them.</p>
+
+<p>You can configure this policy not to check private subroutines declared in a file that uses one or more particular named modules. This allows you to, for example, exclude unused private subroutine checking in classes that are roles.</p>
+
+<pre><code>    [Subroutines::ProhibitUnusedPrivateSubroutines]
+    skip_when_using = Moose::Role Moo::Role Role::Tiny</code></pre>
+
+<h1 id="HISTORY">HISTORY</h1>
+
+<p>This policy is derived from <a href="../../../../../lib/Perl/Critic/Policy/Subroutines/ProtectPrivateSubs.html">Perl::Critic::Policy::Subroutines::ProtectPrivateSubs</a>, which looks at the other side of the problem.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Does not forbid <code><span class="keyword">sub</span><span class="variable"> Foo::_foo</span><span class="operator">{}</span>
+</code> because it does not know (and can not assume) what is in the <code>Foo</code> package.</p>
+
+<p>Does not respect the scope caused by multiple packages in the same file. For example a file:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    <span class="keyword">sub</span><span class="variable"> _is_private </span><span class="operator">{</span> <span class="keyword">print</span> <span class="string">"A private sub!"</span><span class="operator">;</span> <span class="operator">}</span>
+    
+    <span class="keyword">package</span> <span class="variable">Bar</span><span class="operator">;</span>
+    <span class="variable">_is_private</span><span class="operator">();</span>
+</code></pre>
+
+<p>Will not trigger a violation even though <code>Foo::_is_private</code> is not called. Similarly, <code>skip_when_using</code> currently works on a <i>file</i> level, not on a <i>package scope</i> level.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../../lib/Perl/Critic/Policy/Subroutines/ProtectPrivateSubs.html">Perl::Critic::Policy::Subroutines::ProtectPrivateSubs</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Chris Dolan &lt;cdolan@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2009-2011 Thomas R. Wyant, III.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#WARNING">WARNING</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>locale - Perl pragma to use or avoid POSIX locales for built-in operations</p>
+
+<h1 id="WARNING">WARNING</h1>
+
+<p>DO NOT USE this pragma in scripts that have multiple <a href="../lib/threads.html">threads</a> active. The locale is not local to a single thread. Another thread may change the locale at any time, which could cause at a minimum that a given thread is operating in a locale it isn&#39;t expecting to be in. On some platforms, segfaults can also occur. The locale change need not be explicit; some operations cause perl to change the locale itself. You are vulnerable simply by having done a <code>&quot;use locale&quot;</code>.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="variable">@x</span> <span class="operator">=</span> <span class="keyword">sort</span> <span class="variable">@y</span><span class="operator">;</span>      <span class="comment"># Native-platform/Unicode code point sort order</span>
+    <span class="operator">{</span>
+        <span class="keyword">use</span> <span class="variable">locale</span><span class="operator">;</span>
+        <span class="variable">@x</span> <span class="operator">=</span> <span class="keyword">sort</span> <span class="variable">@y</span><span class="operator">;</span>  <span class="comment"># Locale-defined sort order</span>
+    <span class="operator">}</span>
+    <span class="variable">@x</span> <span class="operator">=</span> <span class="keyword">sort</span> <span class="variable">@y</span><span class="operator">;</span>      <span class="comment"># Native-platform/Unicode code point sort order</span>
+                       <span class="comment"># again</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This pragma tells the compiler to enable (or disable) the use of POSIX locales for built-in operations (for example, LC_CTYPE for regular expressions, LC_COLLATE for string comparison, and LC_NUMERIC for number formatting). Each &quot;use locale&quot; or &quot;no locale&quot; affects statements to the end of the enclosing BLOCK.</p>
+
+<p>See <a href="../lib/pods/perllocale.html">perllocale</a> for more detailed information on how Perl supports locales.</p>
+
+<p>On systems that don&#39;t have locales, this pragma will cause your operations to behave as if in the &quot;C&quot; locale; attempts to change the locale will fail.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,300 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#WHAT-IS-DELEGATION">WHAT IS DELEGATION?</a></li>
+  <li><a href="#DEFINING-A-MAPPING">DEFINING A MAPPING</a></li>
+  <li><a href="#NATIVE-DELEGATION">NATIVE DELEGATION</a></li>
+  <li><a href="#CURRYING">CURRYING</a></li>
+  <li><a href="#MISSING-ATTRIBUTES">MISSING ATTRIBUTES</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::Delegation - Attribute delegation</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="WHAT-IS-DELEGATION">WHAT IS DELEGATION?</h1>
+
+<p>Delegation is a feature that lets you create &quot;proxy&quot; methods that do nothing more than call some other method on an attribute. This lets you simplify a complex set of &quot;has-a&quot; relationships and present a single unified API from one class.</p>
+
+<p>With delegation, consumers of a class don&#39;t need to know about all the objects it contains, reducing the amount of API they need to learn.</p>
+
+<p>Delegations are defined as a mapping between one or more methods provided by the &quot;real&quot; class (the delegatee), and a set of corresponding methods in the delegating class. The delegating class can re-use the method names provided by the delegatee or provide its own names.</p>
+
+<p>Delegation is also a great way to wrap an existing class, especially a non-Moose class or one that is somehow hard (or impossible) to subclass.</p>
+
+<h1 id="DEFINING-A-MAPPING">DEFINING A MAPPING</h1>
+
+<p>Moose offers a number of options for defining a delegation&#39;s mapping, ranging from simple to complex.</p>
+
+<p>The simplest form is to simply specify a list of methods:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Website</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'uri'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'URI'</span><span class="operator">,</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw( host path )</span><span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Using an arrayref tells Moose to create methods in your class that match the method names in the delegated class.</p>
+
+<p>With this definition, we can call <code>$website-&gt;host</code> and it &quot;just works&quot;. Under the hood, Moose will call <code>$website-&gt;uri-&gt;host</code> for you. Note that <code>$website</code> is <i>not</i> automatically passed to the <code>host</code> method; the invocant is <code>$website-&gt;uri</code>.</p>
+
+<p>We can also define a mapping as a hash reference. This allows you to rename methods as part of the mapping:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Website</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'uri'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'URI'</span><span class="operator">,</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">hostname</span> <span class="operator">=&gt;</span> <span class="string">'host'</span><span class="operator">,</span>
+          <span class="string">path</span>     <span class="operator">=&gt;</span> <span class="string">'path'</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Using a hash tells Moose to create method names (specified on the left) which invoke the delegated class methods (specified on the right).</p>
+
+<p>In this example, we&#39;ve created a <code>$website-&gt;hostname</code> method, rather than simply using <code>URI.pm</code>&#39;s name, <code>host</code> in the Website class.</p>
+
+<p>These two mapping forms are the ones you will use most often. The remaining methods are a bit more complex.</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'uri'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'URI'</span><span class="operator">,</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="string">qr/^(?:host|path|query.*)/</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>This is similar to the array version, except it uses the regex to match against all the methods provided by the delegatee. In order for this to work, you must provide an <code>isa</code> parameter for the attribute, and it must be a class. Moose uses this to introspect the delegatee class and determine what methods it provides.</p>
+
+<p>You can use a role name as the value of <code>handles</code>:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'uri'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'URI'</span><span class="operator">,</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="string">'HasURI'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Moose will introspect the role to determine what methods it provides and create a name-for-name mapping for each of those methods.</p>
+
+<p>Finally, you can provide a sub reference to <i>generate</i> a mapping that behaves like the hash example above. You probably won&#39;t need this version often (if ever). See the <a href="../../../lib/Moose.html">Moose</a> docs for more details on exactly how this works.</p>
+
+<h1 id="NATIVE-DELEGATION">NATIVE DELEGATION</h1>
+
+<p>Native delegations allow you to delegate to standard Perl data structures as if they were objects.</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'queue'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">traits</span>  <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Array'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'ArrayRef[Item]'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span> <span class="operator">]</span> <span class="operator">},</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">add_item</span>  <span class="operator">=&gt;</span> <span class="string">'push'</span><span class="operator">,</span>
+          <span class="string">next_item</span> <span class="operator">=&gt;</span> <span class="string">'shift'</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">)</span>
+</code></pre>
+
+<p>The <code>Array</code> trait in the <code>traits</code> parameter tells Moose that you would like to use the set of Array helpers. Moose will then create <code>add_item</code> and <code>next_item</code> methods that &quot;just work&quot;. Behind the scenes <code>add_item</code> is something like</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> add_item </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">@items</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$item</span> <span class="operator">(</span><span class="variable">@items</span><span class="operator">)</span> <span class="operator">{</span>
+          <span class="variable">$Item_TC</span><span class="operator">-&gt;</span><span class="variable">validate</span><span class="operator">(</span><span class="variable">$item</span><span class="operator">);</span>
+      <span class="operator">}</span>
+  
+      <span class="keyword">push</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">queue</span> <span class="operator">}</span><span class="operator">,</span> <span class="variable">@items</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>For example, you might use Array helpers to add <code>add_task</code> and <code>add_appointment</code> methods to a Calendar class:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'tasks'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">traits</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Array'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'ArrayRef[Task]'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span> <span class="operator">]</span> <span class="operator">},</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">add_task</span>  <span class="operator">=&gt;</span> <span class="string">'push'</span><span class="operator">,</span>
+          <span class="string">next_task</span> <span class="operator">=&gt;</span> <span class="string">'shift'</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">has</span> <span class="string">'appointments'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">traits</span>  <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Array'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'ArrayRef[Appointment]'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[</span> <span class="operator">]</span> <span class="operator">},</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">add_appointment</span>  <span class="operator">=&gt;</span> <span class="string">'push'</span><span class="operator">,</span>
+          <span class="string">next_appointment</span> <span class="operator">=&gt;</span> <span class="string">'shift'</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Which you would call as:</p>
+
+<pre><code>  <span class="variable">$calendar</span><span class="operator">-&gt;</span><span class="variable">add_task</span><span class="operator">(</span> <span class="variable">$task_obj</span> <span class="operator">);</span>
+  <span class="variable">$calendar</span><span class="operator">-&gt;</span><span class="variable">add_appointment</span><span class="operator">(</span> <span class="variable">$appointment_obj</span> <span class="operator">);</span>
+</code></pre>
+
+<p>As mentioned above, each trait provides a number of methods which are summarized below. For more information about each of these provided methods see the documentation for that specific trait.</p>
+
+<p>Moose includes the following traits for native delegation.</p>
+
+<ul>
+
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/Array.html">Array</a></p>
+
+<p>The following methods are provided by the native Array trait:</p>
+
+<p>count, is_empty, elements, get, pop, push, shift, unshift, splice, first, first_index, grep, map, reduce, sort, sort_in_place, shuffle, uniq, join, set, delete, insert, clear, accessor, natatime, shallow_clone</p>
+
+</li>
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/Bool.html">Bool</a></p>
+
+<p>The following methods are provided by the native Bool trait:</p>
+
+<p>set, unset, toggle, not</p>
+
+</li>
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/Code.html">Code</a></p>
+
+<p>The following methods are provided by the native Code trait:</p>
+
+<p>execute, execute_method</p>
+
+</li>
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/Counter.html">Counter</a></p>
+
+<p>The following methods are provided by the native Counter trait:</p>
+
+<p>set, inc, dec, reset</p>
+
+</li>
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/Hash.html">Hash</a></p>
+
+<p>The following methods are provided by the native Hash trait:</p>
+
+<p>get, set, delete, keys, exists, defined, values, kv, elements, clear, count, is_empty, accessor, shallow_clone</p>
+
+</li>
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/Number.html">Number</a></p>
+
+<p>The following methods are provided by the native Number trait:</p>
+
+<p>add, sub, mul, div, mod, abs</p>
+
+</li>
+<li><p><a href="../../../lib/Moose/Meta/Attribute/Native/Trait/String.html">String</a></p>
+
+<p>The following methods are provided by the native String trait:</p>
+
+<p>inc, append, prepend, replace, match, chop, chomp, clear, length, substr</p>
+
+</li>
+</ul>
+
+<h1 id="CURRYING">CURRYING</h1>
+
+<p>Currying allows you to create a method with some pre-set parameters. You can create a curried delegation method:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Spider</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    
+    <span class="variable">has</span> <span class="string">request</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+        <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span>
+        <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'HTTP::Request'</span><span class="operator">,</span>
+        <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+            <span class="string">set_user_agent</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">header</span> <span class="operator">=&gt;</span> <span class="string">'UserAgent'</span> <span class="operator">]</span><span class="operator">,</span>
+        <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">)</span>
+</code></pre>
+
+<p>With this definition, calling <code>$spider-&gt;set_user_agent(&#39;MyClient&#39;)</code> will call <code>$spider-&gt;request-&gt;header(&#39;UserAgent&#39;, &#39;MyClient&#39;)</code> behind the scenes.</p>
+
+<p>Note that with currying, the currying always starts with the first parameter to a method (<code>$_[0]</code>). Any arguments you pass to the delegation come after the curried arguments.</p>
+
+<h1 id="MISSING-ATTRIBUTES">MISSING ATTRIBUTES</h1>
+
+<p>It is perfectly valid to delegate methods to an attribute which is not required or can be undefined. When a delegated method is called, Moose will throw a runtime error if the attribute does not contain an object.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

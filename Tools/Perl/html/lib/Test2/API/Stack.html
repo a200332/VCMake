@@ -1,0 +1,161 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#INTERNALS-NOTE">***INTERNALS NOTE***</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::API::Stack - Object to manage a stack of <a href="../../../lib/Test2/Hub.html">Test2::Hub</a> instances.</p>
+
+<h1 id="INTERNALS-NOTE">***INTERNALS NOTE***</h1>
+
+<p><b>The internals of this package are subject to change at any time!</b> The public methods provided will not change in backwards incompatible ways, but the underlying implementation details might. <b>Do not break encapsulation here!</b></p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is used to represent and manage a stack of <a href="../../../lib/Test2/Hub.html">Test2::Hub</a> objects. Hubs are usually in a stack so that you can push a new hub into place that can intercept and handle events differently than the primary hub.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$stack</span> <span class="operator">=</span> <span class="variable">Test2::API::Stack</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$hub</span> <span class="operator">=</span> <span class="variable">$stack</span><span class="operator">-&gt;</span><span class="variable">top</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="stack-Test2::API::Stack-new">$stack = Test2::API::Stack-&gt;new()</dt>
+<dd>
+
+<p>This will create a new empty stack instance. All arguments are ignored.</p>
+
+</dd>
+<dt id="hub-stack-new_hub">$hub = $stack-&gt;new_hub()</dt>
+<dd>
+
+</dd>
+<dt id="hub-stack-new_hub-params">$hub = $stack-&gt;new_hub(%params)</dt>
+<dd>
+
+</dd>
+<dt id="hub-stack-new_hub-params-class-class">$hub = $stack-&gt;new_hub(%params, class =&gt; $class)</dt>
+<dd>
+
+<p>This will generate a new hub and push it to the top of the stack. Optionally you can provide arguments that will be passed into the constructor for the <a href="../../../lib/Test2/Hub.html">Test2::Hub</a> object.</p>
+
+<p>If you specify the <code>&#39;class&#39; =&gt; $class</code> argument, the new hub will be an instance of the specified class.</p>
+
+<p>Unless your parameters specify <code>&#39;formatter&#39;</code> or <code>&#39;ipc&#39;</code> arguments, the formatter and IPC instance will be inherited from the current top hub. You can set the parameters to <code>undef</code> to avoid having a formatter or IPC instance.</p>
+
+<p>If there is no top hub, and you do not ask to leave IPC and formatter undef, then a new formatter will be created, and the IPC instance from <a href="../../../lib/Test2/API.html">Test2::API</a> will be used.</p>
+
+</dd>
+<dt id="hub-stack-top">$hub = $stack-&gt;top()</dt>
+<dd>
+
+<p>This will return the top hub from the stack. If there is no top hub yet this will create it.</p>
+
+</dd>
+<dt id="hub-stack-peek">$hub = $stack-&gt;peek()</dt>
+<dd>
+
+<p>This will return the top hub from the stack. If there is no top hub yet this will return undef.</p>
+
+</dd>
+<dt id="stack-cull">$stack-&gt;cull</dt>
+<dd>
+
+<p>This will call <code>$hub-&gt;cull</code> on all hubs in the stack.</p>
+
+</dd>
+<dt id="hubs-stack-all">@hubs = $stack-&gt;all</dt>
+<dd>
+
+<p>This will return all the hubs in the stack as a list.</p>
+
+</dd>
+<dt id="stack-clear">$stack-&gt;clear</dt>
+<dd>
+
+<p>This will completely remove all hubs from the stack. Normally you do not want to do this, but there are a few valid reasons for it.</p>
+
+</dd>
+<dt id="stack-push-hub">$stack-&gt;push($hub)</dt>
+<dd>
+
+<p>This will push the new hub onto the stack.</p>
+
+</dd>
+<dt id="stack-pop-hub">$stack-&gt;pop($hub)</dt>
+<dd>
+
+<p>This will pop a hub from the stack, if the hub at the top of the stack does not match the hub you expect (passed in as an argument) it will throw an exception.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

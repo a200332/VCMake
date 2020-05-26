@@ -1,0 +1,896 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#New-to-Moose">New to Moose?</a></li>
+      <li><a href="#Moose-Extensions">Moose Extensions</a></li>
+    </ul>
+  </li>
+  <li><a href="#TRANSLATIONS">TRANSLATIONS</a></li>
+  <li><a href="#BUILDING-CLASSES-WITH-MOOSE">BUILDING CLASSES WITH MOOSE</a></li>
+  <li><a href="#PROVIDED-METHODS">PROVIDED METHODS</a></li>
+  <li><a href="#EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</a>
+    <ul>
+      <li><a href="#extends-superclasses">extends (@superclasses)</a></li>
+      <li><a href="#with-roles">with (@roles)</a></li>
+      <li><a href="#has-name-names-options">has $name|@$names =&gt; %options</a></li>
+      <li><a href="#has-name-options">has +$name =&gt; %options</a></li>
+      <li><a href="#before-name-names-names-qr-...-sub">before $name|@names|\@names|qr/.../ =&gt; sub { ... }</a></li>
+      <li><a href="#after-name-names-names-qr-...-sub">after $name|@names|\@names|qr/.../ =&gt; sub { ... }</a></li>
+      <li><a href="#around-name-names-names-qr-...-sub">around $name|@names|\@names|qr/.../ =&gt; sub { ... }</a></li>
+      <li><a href="#override-name-sub">override ($name, &amp;sub)</a></li>
+      <li><a href="#super">super</a></li>
+      <li><a href="#augment-name-sub">augment ($name, &amp;sub)</a></li>
+      <li><a href="#inner">inner</a></li>
+      <li><a href="#blessed">blessed</a></li>
+      <li><a href="#confess">confess</a></li>
+    </ul>
+  </li>
+  <li><a href="#METACLASS">METACLASS</a>
+    <ul>
+      <li><a href="#Metaclass-and-Trait-Name-Resolution">Metaclass and Trait Name Resolution</a></li>
+    </ul>
+  </li>
+  <li><a href="#UNIMPORTING-FUNCTIONS">UNIMPORTING FUNCTIONS</a>
+    <ul>
+      <li><a href="#unimport">unimport</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXTENDING-AND-EMBEDDING-MOOSE">EXTENDING AND EMBEDDING MOOSE</a>
+    <ul>
+      <li><a href="#The-MooseX::-namespace">The MooseX:: namespace</a></li>
+    </ul>
+  </li>
+  <li><a href="#METACLASS-COMPATIBILITY-AND-MOOSE">METACLASS COMPATIBILITY AND MOOSE</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#GETTING-HELP">GETTING HELP</a></li>
+  <li><a href="#WHAT-DOES-MOOSE-STAND-FOR">WHAT DOES MOOSE STAND FOR?</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a>
+    <ul>
+      <li><a href="#Books">Books</a></li>
+      <li><a href="#Papers">Papers</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#FEATURE-REQUESTS">FEATURE REQUESTS</a></li>
+  <li><a href="#CABAL">CABAL</a></li>
+  <li><a href="#CONTRIBUTORS">CONTRIBUTORS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose - A postmodern object system for Perl 5</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Point</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span> <span class="comment"># automatically turns on strict and warnings</span>
+  
+  <span class="variable">has</span> <span class="string">'x'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">);</span>
+  <span class="variable">has</span> <span class="string">'y'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> clear </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span>x<span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span>y<span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">Point3D</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Point'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'z'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">);</span>
+  
+  <span class="variable">after</span> <span class="string">'clear'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span>z<span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Moose is an extension of the Perl 5 object system.</p>
+
+<p>The main goal of Moose is to make Perl 5 Object Oriented programming easier, more consistent, and less tedious. With Moose you can think more about what you want to do and less about the mechanics of OOP.</p>
+
+<p>Additionally, Moose is built on top of <a href="../lib/Class/MOP.html">Class::MOP</a>, which is a metaclass system for Perl 5. This means that Moose not only makes building normal Perl 5 objects better, but it provides the power of metaclass programming as well.</p>
+
+<h2 id="New-to-Moose">New to Moose?</h2>
+
+<p>If you&#39;re new to Moose, the best place to start is the <a href="../lib/Moose/Manual.html">Moose::Manual</a> docs, followed by the <a href="../lib/Moose/Cookbook.html">Moose::Cookbook</a>. The intro will show you what Moose is, and how it makes Perl 5 OO better.</p>
+
+<p>The cookbook recipes on Moose basics will get you up to speed with many of Moose&#39;s features quickly. Once you have an idea of what Moose can do, you can use the API documentation to get more detail on features which interest you.</p>
+
+<h2 id="Moose-Extensions">Moose Extensions</h2>
+
+<p>The <code>MooseX::</code> namespace is the official place to find Moose extensions. These extensions can be found on the CPAN. The easiest way to find them is to search for them (<a href="https://metacpan.org/search?q=MooseX::">https://metacpan.org/search?q=MooseX::</a>), or to examine <a>Task::Moose</a> which aims to keep an up-to-date, easily installable list of Moose extensions.</p>
+
+<h1 id="TRANSLATIONS">TRANSLATIONS</h1>
+
+<p>Much of the Moose documentation has been translated into other languages.</p>
+
+<dl>
+
+<dt id="Japanese">Japanese</dt>
+<dd>
+
+<p>Japanese docs can be found at <a href="http://perldoc.perlassociation.org/pod/Moose-Doc-JA/index.html">http://perldoc.perlassociation.org/pod/Moose-Doc-JA/index.html</a>. The source POD files can be found in GitHub: <a href="http://github.com/jpa/Moose-Doc-JA">http://github.com/jpa/Moose-Doc-JA</a></p>
+
+</dd>
+</dl>
+
+<h1 id="BUILDING-CLASSES-WITH-MOOSE">BUILDING CLASSES WITH MOOSE</h1>
+
+<p>Moose makes every attempt to provide as much convenience as possible during class construction/definition, but still stay out of your way if you want it to. Here are a few items to note when building classes with Moose.</p>
+
+<p>When you <code>use Moose</code>, Moose will set the class&#39;s parent class to <a href="../lib/Moose/Object.html">Moose::Object</a>, <i>unless</i> the class using Moose already has a parent class. In addition, specifying a parent with <code>extends</code> will change the parent class.</p>
+
+<p>Moose will also manage all attributes (including inherited ones) that are defined with <code>has</code>. And (assuming you call <code>new</code>, which is inherited from <a href="../lib/Moose/Object.html">Moose::Object</a>) this includes properly initializing all instance slots, setting defaults where appropriate, and performing any type constraint checking or coercion.</p>
+
+<h1 id="PROVIDED-METHODS">PROVIDED METHODS</h1>
+
+<p>Moose provides a number of methods to all your classes, mostly through the inheritance of <a href="../lib/Moose/Object.html">Moose::Object</a>. There is however, one exception. By default, Moose will install a method named <code>meta</code> in any class which uses <code>Moose</code>. This method returns the current class&#39;s metaclass.</p>
+
+<p>If you&#39;d like to rename this method, you can do so by passing the <code>-meta_name</code> option when using Moose:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Moose</span> <span class="operator">-</span><span class="string">meta_name</span> <span class="operator">=&gt;</span> <span class="string">'my_meta'</span><span class="operator">;</span>
+</code></pre>
+
+<p>However, the <a href="../lib/Moose/Object.html">Moose::Object</a> class <i>also</i> provides a method named <code>meta</code> which does the same thing. If your class inherits from <a href="../lib/Moose/Object.html">Moose::Object</a> (which is the default), then you will still have a <code>meta</code> method. However, if your class inherits from a parent which provides a <code>meta</code> method of its own, your class will inherit that instead.</p>
+
+<p>If you&#39;d like for Moose to not install a meta method at all, you can pass <code>undef</code> as the <code>-meta_name</code> option:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Moose</span> <span class="operator">-</span><span class="string">meta_name</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">;</span>
+</code></pre>
+
+<p>Again, you will still inherit <code>meta</code> from <a href="../lib/Moose/Object.html">Moose::Object</a> in this case.</p>
+
+<h1 id="EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</h1>
+
+<p>Moose will export a number of functions into the class&#39;s namespace which may then be used to set up the class. These functions all work directly on the current class.</p>
+
+<h2 id="extends-superclasses">extends (@superclasses)</h2>
+
+<p>This function will set the superclass(es) for the current class. If the parent classes are not yet loaded, then <code>extends</code> tries to load them.</p>
+
+<p>This approach is recommended instead of <code>use <a href="../lib/base.html">base</a></code>/<code>use <a href="../lib/parent.html">parent</a></code>, because <code>use base</code> actually <code>push</code>es onto the class&#39;s <code>@ISA</code>, whereas <code>extends</code> will replace it. This is important to ensure that classes which do not have superclasses still properly inherit from <a href="../lib/Moose/Object.html">Moose::Object</a>.</p>
+
+<p>Each superclass can be followed by a hash reference with options. Currently, only <a href="../lib/Class/MOP.html#Class-Loading-Options">-version</a> is recognized:</p>
+
+<pre><code>    <span class="variable">extends</span> <span class="string">'My::Parent'</span>      <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-version</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">01</span> <span class="operator">}</span><span class="operator">,</span>
+            <span class="string">'My::OtherParent'</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-version</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">03</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>An exception will be thrown if the version requirements are not satisfied.</p>
+
+<h2 id="with-roles">with (@roles)</h2>
+
+<p>This will apply a given set of <code>@roles</code> to the local class.</p>
+
+<p>Like with <code>extends</code>, each specified role can be followed by a hash reference with a <a href="../lib/Class/MOP.html#Class-Loading-Options">-version</a> option:</p>
+
+<pre><code>    <span class="variable">with</span> <span class="string">'My::Role'</span>      <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-version</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">32</span> <span class="operator">}</span><span class="operator">,</span>
+         <span class="string">'My::Otherrole'</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-version</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">23</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>The specified version requirements must be satisfied, otherwise an exception will be thrown.</p>
+
+<p>If your role takes options or arguments, they can be passed along in the hash reference as well.</p>
+
+<p>You should only use one <code>with</code>, even if you are consuming multiple roles. If you consume roles using multiple <code>with</code> statements Moose cannot detect method conflicts between those roles.</p>
+
+<h2 id="has-name-names-options">has $name|@$names =&gt; %options</h2>
+
+<p>This will install an attribute of a given <code>$name</code> into the current class. If the first parameter is an array reference, it will create an attribute for every <code>$name</code> in the list. The <code>%options</code> will be passed to the constructor for <a href="../lib/Moose/Meta/Attribute.html">Moose::Meta::Attribute</a> (which inherits from <a href="../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a>), so the full documentation for the valid options can be found there. These are the most commonly used options:</p>
+
+<dl>
+
+<dt id="is-rw-ro"><i>is =&gt; &#39;rw&#39;|&#39;ro&#39;</i></dt>
+<dd>
+
+<p>The <i>is</i> option accepts either <i>rw</i> (for read/write) or <i>ro</i> (for read only). These will create either a read/write accessor or a read-only accessor respectively, using the same name as the <code>$name</code> of the attribute.</p>
+
+<p>If you need more control over how your accessors are named, you can use the <a href="../lib/Class/MOP/Attribute.html#reader">reader</a>, <a href="../lib/Class/MOP/Attribute.html#writer">writer</a> and <a href="../lib/Class/MOP/Attribute.html#accessor">accessor</a> options inherited from <a href="../lib/Class/MOP/Attribute.html">Class::MOP::Attribute</a>, however if you use those, you won&#39;t need the <i>is</i> option.</p>
+
+</dd>
+<dt id="isa-type_name"><i>isa =&gt; $type_name</i></dt>
+<dd>
+
+<p>The <i>isa</i> option uses Moose&#39;s type constraint facilities to set up runtime type checking for this attribute. Moose will perform the checks during class construction, and within any accessors. The <code>$type_name</code> argument must be a string. The string may be either a class name or a type defined using Moose&#39;s type definition features. (Refer to <a href="../lib/Moose/Util/TypeConstraints.html">Moose::Util::TypeConstraints</a> for information on how to define a new type, and how to retrieve type meta-data).</p>
+
+</dd>
+<dt id="coerce-1-0"><i>coerce =&gt; (1|0)</i></dt>
+<dd>
+
+<p>This will attempt to use coercion with the supplied type constraint to change the value passed into any accessors or constructors. You <b>must</b> supply a type constraint, and that type constraint <b>must</b> define a coercion. See <a href="../lib/Moose/Cookbook/Basics/HTTP_SubtypesAndCoercion.html">Moose::Cookbook::Basics::HTTP_SubtypesAndCoercion</a> for an example.</p>
+
+</dd>
+<dt id="does-role_name"><i>does =&gt; $role_name</i></dt>
+<dd>
+
+<p>This will accept the name of a role which the value stored in this attribute is expected to have consumed.</p>
+
+</dd>
+<dt id="required-1-0"><i>required =&gt; (1|0)</i></dt>
+<dd>
+
+<p>This marks the attribute as being required. This means a value must be supplied during class construction, <i>or</i> the attribute must be lazy and have either a default or a builder. Note that <code>required</code> does not say anything about the attribute&#39;s value, which can be <code>undef</code>.</p>
+
+</dd>
+<dt id="weak_ref-1-0"><i>weak_ref =&gt; (1|0)</i></dt>
+<dd>
+
+<p>This will tell the class to store the value of this attribute as a weakened reference. If an attribute is a weakened reference, it <b>cannot</b> also be coerced. Note that when a weak ref expires, the attribute&#39;s value becomes undefined, and is still considered to be set for purposes of predicate, default, etc.</p>
+
+</dd>
+<dt id="lazy-1-0"><i>lazy =&gt; (1|0)</i></dt>
+<dd>
+
+<p>This will tell the class to not create this slot until absolutely necessary. If an attribute is marked as lazy it <b>must</b> have a default or builder supplied.</p>
+
+</dd>
+<dt id="trigger-code"><i>trigger =&gt; $code</i></dt>
+<dd>
+
+<p>The <i>trigger</i> option is a CODE reference which will be called after the value of the attribute is set. The CODE ref is passed the instance itself, the updated value, and the original value if the attribute was already set.</p>
+
+<p>You <b>can</b> have a trigger on a read-only attribute.</p>
+
+<p><b>NOTE:</b> Triggers will only fire when you <b>assign</b> to the attribute, either in the constructor, or using the writer. Default and built values will <b>not</b> cause the trigger to be fired.</p>
+
+</dd>
+<dt id="handles-ARRAY-HASH-REGEXP-ROLE-ROLETYPE-DUCKTYPE-CODE"><i>handles =&gt; ARRAY | HASH | REGEXP | ROLE | ROLETYPE | DUCKTYPE | CODE</i></dt>
+<dd>
+
+<p>The <i>handles</i> option provides Moose classes with automated delegation features. This is a pretty complex and powerful option. It accepts many different option formats, each with its own benefits and drawbacks.</p>
+
+<p><b>NOTE:</b> The class being delegated to does not need to be a Moose based class, which is why this feature is especially useful when wrapping non-Moose classes.</p>
+
+<p>All <i>handles</i> option formats share the following traits:</p>
+
+<p>You cannot override a locally defined method with a delegated method; an exception will be thrown if you try. That is to say, if you define <code>foo</code> in your class, you cannot override it with a delegated <code>foo</code>. This is almost never something you would want to do, and if it is, you should do it by hand and not use Moose.</p>
+
+<p>You cannot override any of the methods found in Moose::Object, or the <code>BUILD</code> and <code>DEMOLISH</code> methods. These will not throw an exception, but will silently move on to the next method in the list. My reasoning for this is that you would almost never want to do this, since it usually breaks your class. As with overriding locally defined methods, if you do want to do this, you should do it manually, not with Moose.</p>
+
+<p>You do not <i>need</i> to have a reader (or accessor) for the attribute in order to delegate to it. Moose will create a means of accessing the value for you, however this will be several times <b>less</b> efficient then if you had given the attribute a reader (or accessor) to use.</p>
+
+<p>Below is the documentation for each option format:</p>
+
+<dl>
+
+<dt id="ARRAY"><code>ARRAY</code></dt>
+<dd>
+
+<p>This is the most common usage for <i>handles</i>. You basically pass a list of method names to be delegated, and Moose will install a delegation method for each one.</p>
+
+</dd>
+<dt id="HASH"><code>HASH</code></dt>
+<dd>
+
+<p>This is the second most common usage for <i>handles</i>. Instead of a list of method names, you pass a HASH ref where each key is the method name you want installed locally, and its value is the name of the original method in the class being delegated to.</p>
+
+<p>This can be very useful for recursive classes like trees. Here is a quick example (soon to be expanded into a Moose::Cookbook recipe):</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Tree</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'node'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Any'</span><span class="operator">);</span>
+  
+  <span class="variable">has</span> <span class="string">'children'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'ArrayRef'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">[]</span> <span class="operator">}</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">has</span> <span class="string">'parent'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>          <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span>         <span class="operator">=&gt;</span> <span class="string">'Tree'</span><span class="operator">,</span>
+      <span class="string">weak_ref</span>    <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+      <span class="string">handles</span>     <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">parent_node</span> <span class="operator">=&gt;</span> <span class="string">'node'</span><span class="operator">,</span>
+          <span class="string">siblings</span>    <span class="operator">=&gt;</span> <span class="string">'children'</span><span class="operator">,</span>
+      <span class="operator">}</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>In this example, the Tree package gets <code>parent_node</code> and <code>siblings</code> methods, which delegate to the <code>node</code> and <code>children</code> methods (respectively) of the Tree instance stored in the <code>parent</code> slot.</p>
+
+<p>You may also use an array reference to curry arguments to the original method.</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'thing'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="operator">...</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">set_foo</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">set</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span> <span class="operator">]</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="comment"># $self-&gt;set_foo(...) calls $self-&gt;thing-&gt;set('foo', ...)</span>
+</code></pre>
+
+<p>The first element of the array reference is the original method name, and the rest is a list of curried arguments.</p>
+
+</dd>
+<dt id="REGEXP"><code>REGEXP</code></dt>
+<dd>
+
+<p>The regexp option works very similar to the ARRAY option, except that it builds the list of methods for you. It starts by collecting all possible methods of the class being delegated to, then filters that list using the regexp supplied here.</p>
+
+<p><b>NOTE:</b> An <i>isa</i> option is required when using the regexp option format. This is so that we can determine (at compile time) the method list from the class. Without an <i>isa</i> this is just not possible.</p>
+
+</dd>
+<dt id="ROLE-or-ROLETYPE"><code>ROLE</code> or <code>ROLETYPE</code></dt>
+<dd>
+
+<p>With the role option, you specify the name of a role or a <a href="../lib/Moose/Meta/TypeConstraint/Role.html">role type</a> whose &quot;interface&quot; then becomes the list of methods to handle. The &quot;interface&quot; can be defined as; the methods of the role and any required methods of the role. It should be noted that this does <b>not</b> include any method modifiers or generated attribute methods (which is consistent with role composition).</p>
+
+</dd>
+<dt id="DUCKTYPE"><code>DUCKTYPE</code></dt>
+<dd>
+
+<p>With the duck type option, you pass a duck type object whose &quot;interface&quot; then becomes the list of methods to handle. The &quot;interface&quot; can be defined as the list of methods passed to <code>duck_type</code> to create a duck type object. For more information on <code>duck_type</code> please check <a href="../lib/Moose/Util/TypeConstraints.html">Moose::Util::TypeConstraints</a>.</p>
+
+</dd>
+<dt id="CODE"><code>CODE</code></dt>
+<dd>
+
+<p>This is the option to use when you really want to do something funky. You should only use it if you really know what you are doing, as it involves manual metaclass twiddling.</p>
+
+<p>This takes a code reference, which should expect two arguments. The first is the attribute meta-object this <i>handles</i> is attached to. The second is the metaclass of the class being delegated to. It expects you to return a hash (not a HASH ref) of the methods you want mapped.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="traits-role_names"><i>traits =&gt; [ @role_names ]</i></dt>
+<dd>
+
+<p>This tells Moose to take the list of <code>@role_names</code> and apply them to the attribute meta-object. Custom attribute metaclass traits are useful for extending the capabilities of the <i>has</i> keyword: they are the simplest way to extend the MOP, but they are still a fairly advanced topic and too much to cover here.</p>
+
+<p>See <a href="#Metaclass-and-Trait-Name-Resolution">&quot;Metaclass and Trait Name Resolution&quot;</a> for details on how a trait name is resolved to a role name.</p>
+
+<p>Also see <a href="../lib/Moose/Cookbook/Meta/Labeled_AttributeTrait.html">Moose::Cookbook::Meta::Labeled_AttributeTrait</a> for a metaclass trait example.</p>
+
+</dd>
+<dt id="builder-Str"><i>builder</i> =&gt; Str</dt>
+<dd>
+
+<p>The value of this key is the name of the method that will be called to obtain the value used to initialize the attribute. See the <a href="../lib/Class/MOP/Attribute.html#builder">builder option docs in Class::MOP::Attribute</a> and/or <a href="../lib/Moose/Cookbook/Basics/BinaryTree_BuilderAndLazyBuild.html">Moose::Cookbook::Basics::BinaryTree_BuilderAndLazyBuild</a> for more information.</p>
+
+</dd>
+<dt id="default-SCALAR-CODE"><i>default</i> =&gt; SCALAR | CODE</dt>
+<dd>
+
+<p>The value of this key is the default value which will initialize the attribute.</p>
+
+<p>NOTE: If the value is a simple scalar (string or number), then it can be just passed as is. However, if you wish to initialize it with a HASH or ARRAY ref, then you need to wrap that inside a CODE reference. See the <a href="../lib/Class/MOP/Attribute.html#default">default option docs in Class::MOP::Attribute</a> for more information.</p>
+
+</dd>
+<dt id="clearer-Str"><i>clearer</i> =&gt; Str</dt>
+<dd>
+
+<p>Creates a method allowing you to clear the value. See the <a href="../lib/Class/MOP/Attribute.html#clearer">clearer option docs in Class::MOP::Attribute</a> for more information.</p>
+
+</dd>
+<dt id="predicate-Str"><i>predicate</i> =&gt; Str</dt>
+<dd>
+
+<p>Creates a method to perform a basic test to see if a value has been set in the attribute. See the <a href="../lib/Class/MOP/Attribute.html#predicate">predicate option docs in Class::MOP::Attribute</a> for more information.</p>
+
+<p>Note that the predicate will return true even for a <code>weak_ref</code> attribute whose value has expired.</p>
+
+</dd>
+<dt id="documentation-string"><i>documentation</i> =&gt; $string</dt>
+<dd>
+
+<p>An arbitrary string that can be retrieved later by calling <code>$attr-&gt;documentation</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="has-name-options">has +$name =&gt; %options</h2>
+
+<p>This is variation on the normal attribute creator <code>has</code> which allows you to clone and extend an attribute from a superclass or from a role. Here is an example of the superclass usage:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'message'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="string">'Hello, I am a Foo'</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">package</span> <span class="variable">My::Foo</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">extends</span> <span class="string">'Foo'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'+message'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">default</span> <span class="operator">=&gt;</span> <span class="string">'Hello I am My::Foo'</span><span class="operator">);</span>
+</code></pre>
+
+<p>What is happening here is that <b>My::Foo</b> is cloning the <code>message</code> attribute from its parent class <b>Foo</b>, retaining the <code>is =&gt; &#39;rw&#39;</code> and <code>isa =&gt; &#39;Str&#39;</code> characteristics, but changing the value in <code>default</code>.</p>
+
+<p>Here is another example, but within the context of a role:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo::Role</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'message'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="string">'Hello, I am a Foo'</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">package</span> <span class="variable">My::Foo</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">with</span> <span class="string">'Foo::Role'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'+message'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">default</span> <span class="operator">=&gt;</span> <span class="string">'Hello I am My::Foo'</span><span class="operator">);</span>
+</code></pre>
+
+<p>In this case, we are basically taking the attribute which the role supplied and altering it within the bounds of this feature.</p>
+
+<p>Note that you can only extend an attribute from either a superclass or a role, you cannot extend an attribute in a role that composes over an attribute from another role.</p>
+
+<p>Aside from where the attributes come from (one from superclass, the other from a role), this feature works exactly the same. This feature is restricted somewhat, so as to try and force at least <i>some</i> sanity into it. Most options work the same, but there are some exceptions:</p>
+
+<dl>
+
+<dt id="reader"><i>reader</i></dt>
+<dd>
+
+</dd>
+<dt id="writer"><i>writer</i></dt>
+<dd>
+
+</dd>
+<dt id="accessor"><i>accessor</i></dt>
+<dd>
+
+</dd>
+<dt id="clearer"><i>clearer</i></dt>
+<dd>
+
+</dd>
+<dt id="predicate"><i>predicate</i></dt>
+<dd>
+
+<p>These options can be added, but cannot override a superclass definition.</p>
+
+</dd>
+<dt id="traits"><i>traits</i></dt>
+<dd>
+
+<p>You are allowed to <b>add</b> additional traits to the <code>traits</code> definition. These traits will be composed into the attribute, but preexisting traits <b>are not</b> overridden, or removed.</p>
+
+</dd>
+</dl>
+
+<h2 id="before-name-names-names-qr-...-sub">before $name|@names|\@names|qr/.../ =&gt; sub { ... }</h2>
+
+<h2 id="after-name-names-names-qr-...-sub">after $name|@names|\@names|qr/.../ =&gt; sub { ... }</h2>
+
+<h2 id="around-name-names-names-qr-...-sub">around $name|@names|\@names|qr/.../ =&gt; sub { ... }</h2>
+
+<p>These three items are syntactic sugar for the before, after, and around method modifier features that <a href="../lib/Class/MOP.html">Class::MOP</a> provides. More information on these may be found in <a href="../lib/Moose/Manual/MethodModifiers.html">Moose::Manual::MethodModifiers</a> and the <a href="../lib/Class/MOP/Class.html#Method-Modifiers">Class::MOP::Class documentation</a>.</p>
+
+<h2 id="override-name-sub">override ($name, &amp;sub)</h2>
+
+<p>An <code>override</code> method is a way of explicitly saying &quot;I am overriding this method from my superclass&quot;. You can call <code>super</code> within this method, and it will work as expected. The same thing <i>can</i> be accomplished with a normal method call and the <code>SUPER::</code> pseudo-package; it is really your choice.</p>
+
+<h2 id="super">super</h2>
+
+<p>The keyword <code>super</code> is a no-op when called outside of an <code>override</code> method. In the context of an <code>override</code> method, it will call the next most appropriate superclass method with the same arguments as the original method.</p>
+
+<h2 id="augment-name-sub">augment ($name, &amp;sub)</h2>
+
+<p>An <code>augment</code> method, is a way of explicitly saying &quot;I am augmenting this method from my superclass&quot;. Once again, the details of how <code>inner</code> and <code>augment</code> work is best described in the <a href="../lib/Moose/Cookbook/Basics/Document_AugmentAndInner.html">Moose::Cookbook::Basics::Document_AugmentAndInner</a>.</p>
+
+<h2 id="inner">inner</h2>
+
+<p>The keyword <code>inner</code>, much like <code>super</code>, is a no-op outside of the context of an <code>augment</code> method. You can think of <code>inner</code> as being the inverse of <code>super</code>; the details of how <code>inner</code> and <code>augment</code> work is best described in the <a href="../lib/Moose/Cookbook/Basics/Document_AugmentAndInner.html">Moose::Cookbook::Basics::Document_AugmentAndInner</a>.</p>
+
+<h2 id="blessed">blessed</h2>
+
+<p>This is the <code>Scalar::Util::blessed</code> function. It is highly recommended that this is used instead of <code>ref</code> anywhere you need to test for an object&#39;s class name.</p>
+
+<h2 id="confess">confess</h2>
+
+<p>This is the <code>Carp::confess</code> function, and exported here for historical reasons.</p>
+
+<h1 id="METACLASS">METACLASS</h1>
+
+<p>When you use Moose, you can specify traits which will be applied to your metaclass:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Moose</span> <span class="operator">-</span><span class="string">traits</span> <span class="operator">=&gt;</span> <span class="string">'My::Trait'</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is very similar to the attribute traits feature. When you do this, your class&#39;s <code>meta</code> object will have the specified traits applied to it. See <a href="#Metaclass-and-Trait-Name-Resolution">&quot;Metaclass and Trait Name Resolution&quot;</a> for more details.</p>
+
+<h2 id="Metaclass-and-Trait-Name-Resolution">Metaclass and Trait Name Resolution</h2>
+
+<p>By default, when given a trait name, Moose simply tries to load a class of the same name. If such a class does not exist, it then looks for a class matching <b>Moose::Meta::$type::Custom::Trait::$trait_name</b>. The <code>$type</code> variable here will be one of <b>Attribute</b> or <b>Class</b>, depending on what the trait is being applied to.</p>
+
+<p>If a class with this long name exists, Moose checks to see if it has the method <code>register_implementation</code>. This method is expected to return the <i>real</i> class name of the trait. If there is no <code>register_implementation</code> method, it will fall back to using <b>Moose::Meta::$type::Custom::Trait::$trait</b> as the trait name.</p>
+
+<p>The lookup method for metaclasses is the same, except that it looks for a class matching <b>Moose::Meta::$type::Custom::$metaclass_name</b>.</p>
+
+<p>If all this is confusing, take a look at <a href="../lib/Moose/Cookbook/Meta/Labeled_AttributeTrait.html">Moose::Cookbook::Meta::Labeled_AttributeTrait</a>, which demonstrates how to create an attribute trait.</p>
+
+<h1 id="UNIMPORTING-FUNCTIONS">UNIMPORTING FUNCTIONS</h1>
+
+<h2 id="unimport"><b>unimport</b></h2>
+
+<p>Moose offers a way to remove the keywords it exports, through the <code>unimport</code> method. You simply have to say <code>no Moose</code> at the bottom of your code for this to work. Here is an example:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Person</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+    
+    <span class="variable">has</span> <span class="string">'first_name'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">);</span>
+    <span class="variable">has</span> <span class="string">'last_name'</span>  <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">);</span>
+    
+    <span class="keyword">sub</span><span class="variable"> full_name </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">first_name</span> <span class="operator">.</span> <span class="string">' '</span> <span class="operator">.</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">last_name</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">no</span> <span class="variable">Moose</span><span class="operator">;</span> <span class="comment"># keywords are removed from the Person package</span>
+</code></pre>
+
+<h1 id="EXTENDING-AND-EMBEDDING-MOOSE">EXTENDING AND EMBEDDING MOOSE</h1>
+
+<p>To learn more about extending Moose, we recommend checking out the &quot;Extending&quot; recipes in the <a href="../lib/Moose/Cookbook.html">Moose::Cookbook</a>, starting with <a href="../lib/Moose/Cookbook/Extending/ExtensionOverview.html">Moose::Cookbook::Extending::ExtensionOverview</a>, which provides an overview of all the different ways you might extend Moose. <a href="../lib/Moose/Exporter.html">Moose::Exporter</a> and <a href="../lib/Moose/Util/MetaRole.html">Moose::Util::MetaRole</a> are the modules which provide the majority of the extension functionality, so reading their documentation should also be helpful.</p>
+
+<h2 id="The-MooseX::-namespace">The MooseX:: namespace</h2>
+
+<p>Generally if you&#39;re writing an extension <i>for</i> Moose itself you&#39;ll want to put your extension in the <code>MooseX::</code> namespace. This namespace is specifically for extensions that make Moose better or different in some fundamental way. It is traditionally <b>not</b> for a package that just happens to use Moose. This namespace follows from the examples of the <code>LWPx::</code> and <code>DBIx::</code> namespaces that perform the same function for <code>LWP</code> and <code>DBI</code> respectively.</p>
+
+<h1 id="METACLASS-COMPATIBILITY-AND-MOOSE">METACLASS COMPATIBILITY AND MOOSE</h1>
+
+<p>Metaclass compatibility is a thorny subject. You should start by reading the &quot;About Metaclass compatibility&quot; section in the <a href="../lib/Class/MOP.html">Class::MOP</a> docs.</p>
+
+<p>Moose will attempt to resolve a few cases of metaclass incompatibility when you set the superclasses for a class, in addition to the cases that <a href="../lib/Class/MOP.html">Class::MOP</a> handles.</p>
+
+<p>Moose tries to determine if the metaclasses only &quot;differ by roles&quot;. This means that the parent and child&#39;s metaclass share a common ancestor in their respective hierarchies, and that the subclasses under the common ancestor are only different because of role applications. This case is actually fairly common when you mix and match various <code>MooseX::*</code> modules, many of which apply roles to the metaclass.</p>
+
+<p>If the parent and child do differ by roles, Moose replaces the metaclass in the child with a newly created metaclass. This metaclass is a subclass of the parent&#39;s metaclass which does all of the roles that the child&#39;s metaclass did before being replaced. Effectively, this means the new metaclass does all of the roles done by both the parent&#39;s and child&#39;s original metaclasses.</p>
+
+<p>Ultimately, this is all transparent to you except in the case of an unresolvable conflict.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>It should be noted that <code>super</code> and <code>inner</code> <b>cannot</b> be used in the same method. However, they may be combined within the same class hierarchy; see <i>t/basics/override_augment_inner_super.t</i> for an example.</p>
+
+<p>The reason for this is that <code>super</code> is only valid within a method with the <code>override</code> modifier, and <code>inner</code> will never be valid within an <code>override</code> method. In fact, <code>augment</code> will skip over any <code>override</code> methods when searching for its appropriate <code>inner</code>.</p>
+
+<p>This might seem like a restriction, but I am of the opinion that keeping these two features separate (yet interoperable) actually makes them easy to use, since their behavior is then easier to predict. Time will tell whether I am right or not (UPDATE: so far so good).</p>
+
+<h1 id="GETTING-HELP">GETTING HELP</h1>
+
+<p>We offer both a mailing list and a very active IRC channel.</p>
+
+<p>The mailing list is <a href="mailto:moose@perl.org">mailto:moose@perl.org</a>. You must be subscribed to send a message. To subscribe, send an empty message to <a href="mailto:moose-subscribe@perl.org">mailto:moose-subscribe@perl.org</a></p>
+
+<p>You can also visit us at <code><span class="comment">#moose</span>
+</code> on <a href="irc://irc.perl.org/#moose">irc://irc.perl.org/#moose</a> This channel is quite active, and questions at all levels (on Moose-related topics ;) are welcome.</p>
+
+<h1 id="WHAT-DOES-MOOSE-STAND-FOR">WHAT DOES MOOSE STAND FOR?</h1>
+
+<p>Moose doesn&#39;t stand for one thing in particular, however, if you want, here are a few of our favorites. Feel free to contribute more!</p>
+
+<ul>
+
+<li><p>Make Other Object Systems Envious</p>
+
+</li>
+<li><p>Makes Object Orientation So Easy</p>
+
+</li>
+<li><p>Makes Object Orientation Spiffy- Er (sorry ingy)</p>
+
+</li>
+<li><p>Most Other Object Systems Emasculate</p>
+
+</li>
+<li><p>Moose Often Ovulate Sorta Early</p>
+
+</li>
+<li><p>Moose Offers Often Super Extensions</p>
+
+</li>
+<li><p>Meta Object Obligates Salivary Excitation</p>
+
+</li>
+<li><p>Meta Object Orientation Syntax Extensions</p>
+
+</li>
+<li><p>Moo, Only Overengineered, Slow, and Execrable (blame rjbs!)</p>
+
+</li>
+<li><p>Massive Object-Oriented Stacktrace Emitter</p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<dl>
+
+<dt id="I-blame-Sam-Vilain-for-introducing-me-to-the-insanity-that-is-meta-models">I blame Sam Vilain for introducing me to the insanity that is meta-models.</dt>
+<dd>
+
+</dd>
+<dt id="I-blame-Audrey-Tang-for-then-encouraging-my-meta-model-habit-in-perl6">I blame Audrey Tang for then encouraging my meta-model habit in #perl6.</dt>
+<dd>
+
+</dd>
+<dt id="Without-Yuval-nothingmuch-Kogman-this-module-would-not-be-possible-and-it-certainly-wouldnt-have-this-name-P">Without Yuval &quot;nothingmuch&quot; Kogman this module would not be possible, and it certainly wouldn&#39;t have this name ;P</dt>
+<dd>
+
+</dd>
+<dt id="The-basis-of-the-TypeContraints-module-was-Rob-Kinyons-idea-originally-I-just-ran-with-it">The basis of the TypeContraints module was Rob Kinyon&#39;s idea originally, I just ran with it.</dt>
+<dd>
+
+</dd>
+<dt id="Thanks-to-mst-chansen-and-the-whole-moose-posse-for-all-the-early-ideas-feature-requests-encouragement-bug-finding">Thanks to mst &amp; chansen and the whole #moose posse for all the early ideas/feature-requests/encouragement/bug-finding.</dt>
+<dd>
+
+</dd>
+<dt id="Thanks-to-David-Theory-Wheeler-for-meta-discussions-and-spelling-fixes">Thanks to David &quot;Theory&quot; Wheeler for meta-discussions and spelling fixes.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<dl>
+
+<dt id="http:-moose.perl.org"><a href="http://moose.perl.org/">http://moose.perl.org/</a></dt>
+<dd>
+
+<p>This is the official web home of Moose. It contains links to our public git repository, as well as links to a number of talks and articles on Moose and Moose related technologies.</p>
+
+</dd>
+<dt id="the-Moose-manual">the <a href="../lib/Moose/Manual.html">Moose manual</a></dt>
+<dd>
+
+<p>This is an introduction to Moose which covers most of the basics.</p>
+
+</dd>
+<dt id="Modern-Perl-by-chromatic">Modern Perl, by chromatic</dt>
+<dd>
+
+<p>This is an introduction to modern Perl programming, which includes a section on Moose. It is available in print and as a free download from <a href="http://onyxneon.com/books/modern_perl/">http://onyxneon.com/books/modern_perl/</a>.</p>
+
+</dd>
+<dt id="The-Moose-is-flying-a-tutorial-by-Randal-Schwartz">The Moose is flying, a tutorial by Randal Schwartz</dt>
+<dd>
+
+<p>Part 1 - <a href="http://www.stonehenge.com/merlyn/LinuxMag/col94.html">http://www.stonehenge.com/merlyn/LinuxMag/col94.html</a></p>
+
+<p>Part 2 - <a href="http://www.stonehenge.com/merlyn/LinuxMag/col95.html">http://www.stonehenge.com/merlyn/LinuxMag/col95.html</a></p>
+
+</dd>
+<dt id="Several-Moose-extension-modules-in-the-MooseX::-namespace">Several Moose extension modules in the <code>MooseX::</code> namespace.</dt>
+<dd>
+
+<p>See <a href="https://metacpan.org/search?q=MooseX::">https://metacpan.org/search?q=MooseX::</a> for extensions.</p>
+
+</dd>
+</dl>
+
+<h2 id="Books">Books</h2>
+
+<dl>
+
+<dt id="The-Art-of-the-MetaObject-Protocol">The Art of the MetaObject Protocol</dt>
+<dd>
+
+<p>I mention this in the <a href="../lib/Class/MOP.html">Class::MOP</a> docs too, as this book was critical in the development of both modules and is highly recommended.</p>
+
+</dd>
+</dl>
+
+<h2 id="Papers">Papers</h2>
+
+<dl>
+
+<dt id="http:-www.cs.utah.edu-plt-publications-oopsla04-gff.pdf"><a href="http://www.cs.utah.edu/plt/publications/oopsla04-gff.pdf">http://www.cs.utah.edu/plt/publications/oopsla04-gff.pdf</a></dt>
+<dd>
+
+<p>This paper (suggested by lbr on #moose) was what lead to the implementation of the <code>super</code>/<code>override</code> and <code>inner</code>/<code>augment</code> features. If you really want to understand them, I suggest you read this.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>All complex software has bugs lurking in it, and this module is no exception.</p>
+
+<p>Please report any bugs to <code>bug-moose@rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>. You can also submit a <code>TODO</code> test as a pull request at <a href="https://github.com/moose/Moose">https://github.com/moose/Moose</a>.</p>
+
+<p>You can also discuss feature requests or possible bugs on the Moose mailing list (moose@perl.org) or on IRC at <a href="irc://irc.perl.org/#moose">irc://irc.perl.org/#moose</a>.</p>
+
+<h1 id="FEATURE-REQUESTS">FEATURE REQUESTS</h1>
+
+<p>We are very strict about what features we add to the Moose core, especially the user-visible features. Instead we have made sure that the underlying meta-system of Moose is as extensible as possible so that you can add your own features easily.</p>
+
+<p>That said, occasionally there is a feature needed in the meta-system to support your planned extension, in which case you should either email the mailing list (moose@perl.org) or join us on IRC at <a href="irc://irc.perl.org/#moose">irc://irc.perl.org/#moose</a> to discuss. The <a href="../lib/Moose/Manual/Contributing.html">Moose::Manual::Contributing</a> has more detail about how and when you can contribute.</p>
+
+<h1 id="CABAL">CABAL</h1>
+
+<p>There are only a few people with the rights to release a new version of Moose. The Moose Cabal are the people to go to with questions regarding the wider purview of Moose. They help maintain not just the code but the community as well. See the list below under <code>AUTHORS</code>.</p>
+
+<h1 id="CONTRIBUTORS">CONTRIBUTORS</h1>
+
+<p>Moose is a community project, and as such, involves the work of many, many members of the community beyond just the members in the cabal. In particular:</p>
+
+<p>Dave (autarch) Rolsky wrote most of the documentation in <a href="../lib/Moose/Manual.html">Moose::Manual</a>.</p>
+
+<p>John (jgoulah) Goulah wrote <a href="../lib/Moose/Cookbook/Snack/Keywords.html">Moose::Cookbook::Snack::Keywords</a>.</p>
+
+<p>Jess (castaway) Robinson wrote <a href="../lib/Moose/Cookbook/Snack/Types.html">Moose::Cookbook::Snack::Types</a>.</p>
+
+<p>Aran (bluefeet) Clary Deltac wrote <a href="../lib/Moose/Cookbook/Basics/Genome_OverloadingSubtypesAndCoercion.html">Moose::Cookbook::Basics::Genome_OverloadingSubtypesAndCoercion</a>.</p>
+
+<p>Anders (Debolaz) Nor Berle contributed <a href="../lib/Test/Moose.html">Test::Moose</a> and <a href="../lib/Moose/Util.html">Moose::Util</a>.</p>
+
+<p>Also, the code in <a href="../lib/Moose/Meta/Attribute/Native.html">Moose::Meta::Attribute::Native</a> is based on code from the <a>MooseX::AttributeHelpers</a> distribution, which had contributions from:</p>
+
+<p>Chris (perigrin) Prather</p>
+
+<p>Cory (gphat) Watson</p>
+
+<p>Evan Carroll</p>
+
+<p>Florian (rafl) Ragwitz</p>
+
+<p>Jason May</p>
+
+<p>Jay Hannah</p>
+
+<p>Jesse (doy) Luehrs</p>
+
+<p>Paul (frodwith) Driver</p>
+
+<p>Robert (rlb3) Boone</p>
+
+<p>Robert Buels</p>
+
+<p>Robert (phaylon) Sedlacek</p>
+
+<p>Shawn (Sartak) Moore</p>
+
+<p>Stevan Little</p>
+
+<p>Tom (dec) Lanyon</p>
+
+<p>Yuval Kogman</p>
+
+<p>Finally, these people also contributed various tests, bug fixes, documentation, and features to the Moose codebase:</p>
+
+<p>Aankhen</p>
+
+<p>Adam (Alias) Kennedy</p>
+
+<p>Christian (chansen) Hansen</p>
+
+<p>Cory (gphat) Watson</p>
+
+<p>Dylan Hardison (doc fixes)</p>
+
+<p>Eric (ewilhelm) Wilhelm</p>
+
+<p>Evan Carroll</p>
+
+<p>Guillermo (groditi) Roditi</p>
+
+<p>Jason May</p>
+
+<p>Jay Hannah</p>
+
+<p>Jonathan (jrockway) Rockway</p>
+
+<p>Matt (mst) Trout</p>
+
+<p>Nathan (kolibrie) Gray</p>
+
+<p>Paul (frodwith) Driver</p>
+
+<p>Piotr (dexter) Roszatycki</p>
+
+<p>Robert Buels</p>
+
+<p>Robert (phaylon) Sedlacek</p>
+
+<p>Robert (rlb3) Boone</p>
+
+<p>Sam (mugwump) Vilain</p>
+
+<p>Scott (konobi) McWhirter</p>
+
+<p>Shlomi (rindolf) Fish</p>
+
+<p>Tom (dec) Lanyon</p>
+
+<p>Wallace (wreis) Reis</p>
+
+<p>... and many other #moose folks</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

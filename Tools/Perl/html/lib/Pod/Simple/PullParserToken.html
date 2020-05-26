@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#COPYRIGHT-AND-DISCLAIMERS">COPYRIGHT AND DISCLAIMERS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Pod::Simple::PullParserToken -- tokens from Pod::Simple::PullParser</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Given a $parser that&#39;s an object of class Pod::Simple::PullParser (or a subclass)...</p>
+
+<pre><code>  <span class="keyword">while</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$token</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">get_token</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="variable">$DEBUG</span> <span class="keyword">and</span> <span class="keyword">print</span> <span class="variable">STDERR</span> <span class="string">"Token: "</span><span class="operator">,</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">dump</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="keyword">if</span><span class="operator">(</span><span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">is_start</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="operator">...</span><span class="variable">access</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">tagname</span><span class="operator">,</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">attr</span><span class="operator">,</span> <span class="variable">etc</span><span class="operator">...</span>
+  
+    <span class="operator">}</span> <span class="keyword">elsif</span><span class="operator">(</span><span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">is_text</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="operator">...</span><span class="variable">access</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">text</span><span class="operator">,</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">text_r</span><span class="operator">,</span> <span class="variable">etc</span><span class="operator">...</span>
+  
+    <span class="operator">}</span> <span class="keyword">elsif</span><span class="operator">(</span><span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">is_end</span><span class="operator">)</span> <span class="operator">{</span>
+      <span class="operator">...</span><span class="variable">access</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">tagname</span><span class="operator">...</span>
+  
+    <span class="operator">}</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>(Also see <a href="../../../lib/Pod/Simple/PullParser.html">Pod::Simple::PullParser</a>)</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>When you do $parser-&gt;get_token on a <a href="../../../lib/Pod/Simple/PullParser.html">Pod::Simple::PullParser</a>, you should get an object of a subclass of Pod::Simple::PullParserToken.</p>
+
+<p>Subclasses will add methods, and will also inherit these methods:</p>
+
+<dl>
+
+<dt id="token-type">$token-&gt;type</dt>
+<dd>
+
+<p>This returns the type of the token. This will be either the string &quot;start&quot;, the string &quot;text&quot;, or the string &quot;end&quot;.</p>
+
+<p>Once you know what the type of an object is, you then know what subclass it belongs to, and therefore what methods it supports.</p>
+
+<p>Yes, you could probably do the same thing with code like $token-&gt;isa(&#39;Pod::Simple::PullParserEndToken&#39;), but that&#39;s not so pretty as using just $token-&gt;type, or even the following shortcuts:</p>
+
+</dd>
+<dt id="token-is_start">$token-&gt;is_start</dt>
+<dd>
+
+<p>This is a shortcut for <code>$token-&gt;type() eq &quot;start&quot;</code></p>
+
+</dd>
+<dt id="token-is_text">$token-&gt;is_text</dt>
+<dd>
+
+<p>This is a shortcut for <code>$token-&gt;type() eq &quot;text&quot;</code></p>
+
+</dd>
+<dt id="token-is_end">$token-&gt;is_end</dt>
+<dd>
+
+<p>This is a shortcut for <code>$token-&gt;type() eq &quot;end&quot;</code></p>
+
+</dd>
+<dt id="token-dump">$token-&gt;dump</dt>
+<dd>
+
+<p>This returns a handy stringified value of this object. This is useful for debugging, as in:</p>
+
+<pre><code>  <span class="keyword">while</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$token</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">get_token</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="variable">$DEBUG</span> <span class="keyword">and</span> <span class="keyword">print</span> <span class="variable">STDERR</span> <span class="string">"Token: "</span><span class="operator">,</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">dump</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+    <span class="operator">...</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>My subclasses: <a href="../../../lib/Pod/Simple/PullParserStartToken.html">Pod::Simple::PullParserStartToken</a>, <a href="../../../lib/Pod/Simple/PullParserTextToken.html">Pod::Simple::PullParserTextToken</a>, and <a href="../../../lib/Pod/Simple/PullParserEndToken.html">Pod::Simple::PullParserEndToken</a>.</p>
+
+<p><a href="../../../lib/Pod/Simple/PullParser.html">Pod::Simple::PullParser</a> and <a href="../../../lib/Pod/Simple.html">Pod::Simple</a></p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Questions or discussion about POD and Pod::Simple should be sent to the pod-people@perl.org mail list. Send an empty email to pod-people-subscribe@perl.org to subscribe.</p>
+
+<p>This module is managed in an open GitHub repository, <a href="https://github.com/perl-pod/pod-simple/">https://github.com/perl-pod/pod-simple/</a>. Feel free to fork and contribute, or to clone <a href="git://github.com/perl-pod/pod-simple.git">git://github.com/perl-pod/pod-simple.git</a> and send patches!</p>
+
+<p>Patches against Pod::Simple are welcome. Please send bug reports to &lt;bug-pod-simple@rt.cpan.org&gt;.</p>
+
+<h1 id="COPYRIGHT-AND-DISCLAIMERS">COPYRIGHT AND DISCLAIMERS</h1>
+
+<p>Copyright (c) 2002 Sean M. Burke.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Pod::Simple was created by Sean M. Burke &lt;sburke@cpan.org&gt;. But don&#39;t bother him, he&#39;s retired.</p>
+
+<p>Pod::Simple is maintained by:</p>
+
+<ul>
+
+<li><p>Allison Randal <code>allison@perl.org</code></p>
+
+</li>
+<li><p>Hans Dieter Pearcey <code>hdp@cpan.org</code></p>
+
+</li>
+<li><p>David E. Wheeler <code>dwheeler@cpan.org</code></p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

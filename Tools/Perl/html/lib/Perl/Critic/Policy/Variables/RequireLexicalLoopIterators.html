@@ -1,0 +1,116 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Variables::RequireLexicalLoopIterators - Write <code><span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$element</span> <span class="operator">(</span><span class="variable">@list</span><span class="operator">)</span> <span class="operator">{...}</span>
+</code> instead of <code><span class="keyword">for</span> <span class="variable">$element</span> <span class="operator">(</span><span class="variable">@list</span><span class="operator">)</span> <span class="operator">{...}</span>
+</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This policy asks you to use <code>my</code>-style lexical loop iterator variables:</p>
+
+<pre><code>    <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$zed</span> <span class="operator">(...)</span> <span class="operator">{</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>Unless you use <code>my</code>, <code>for</code>/<code>foreach</code> loops use a global variable with its value <code>local</code> to the block. In other words,</p>
+
+<pre><code>    <span class="keyword">foreach</span> <span class="variable">$zed</span> <span class="operator">(...)</span> <span class="operator">{</span>
+        <span class="operator">...</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>is more-or-less equivalent to</p>
+
+<pre><code>    <span class="operator">{</span>
+        <span class="keyword">local</span> <span class="variable">$zed</span>
+        <span class="keyword">foreach</span> <span class="variable">$zed</span> <span class="operator">(...)</span> <span class="operator">{</span>
+            <span class="operator">...</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>This may not seem like a big deal until you see code like</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$bicycle</span><span class="operator">;</span>
+    <span class="keyword">for</span> <span class="variable">$bicycle</span> <span class="operator">(</span><span class="variable">@things_attached_to_the_bike_rack</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">if</span> <span class="operator">(</span>
+                <span class="variable">$bicycle</span><span class="operator">-&gt;</span><span class="variable">is_red</span><span class="operator">()</span>
+            <span class="keyword">and</span> <span class="variable">$bicycle</span><span class="operator">-&gt;</span><span class="variable">has_baseball_card_in_spokes</span><span class="operator">()</span>
+            <span class="keyword">and</span> <span class="variable">$bicycle</span><span class="operator">-&gt;</span><span class="variable">has_bent_kickstand</span><span class="operator">()</span>
+        <span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">$bicycle</span><span class="operator">-&gt;</span><span class="variable">remove_lock</span><span class="operator">();</span>
+    
+            <span class="keyword">last</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$bicycle</span> <span class="keyword">and</span> <span class="variable">$bicycle</span><span class="operator">-&gt;</span><span class="variable">is_unlocked</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="variable">ride_home</span><span class="operator">(</span><span class="variable">$bicycle</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>which is not going to allow you to arrive in time for dinner with your family because the <code>$bicycle</code> outside the loop is not changed by the loop. You may have unlocked your bicycle, but you can&#39;t remember which one it was.</p>
+
+<p>Lexical loop variables were introduced in Perl 5.004. This policy does not report violations on code which explicitly specifies an earlier version of Perl (e.g. <code><span class="keyword">require</span> <span class="number">5.002</span><span class="operator">;</span>
+</code>).</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../../lib/pods/perlsyn.html#Foreach-Loops">&quot;Foreach Loops&quot; in perlsyn</a></p>
+
+<p><a href="../../../../../lib/pods/perl5004delta.html#my-in-control-structures">&quot;my() in Control Structures&quot; in perl5004delta</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

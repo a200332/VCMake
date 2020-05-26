@@ -1,0 +1,204 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#NOTES-CAVEATS">NOTES &amp;&amp; CAVEATS</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#MAINTAINERS">MAINTAINERS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Test2::Util - Tools used by Test2 and friends.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Collection of tools used by <a href="../../lib/Test2.html">Test2</a> and friends.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>All exports are optional. You must specify subs to import.</p>
+
+<dl>
+
+<dt id="success-error-try">($success, $error) = try { ... }</dt>
+<dd>
+
+<p>Eval the codeblock, return success or failure, and the error message. This code protects $@ and $!, they will be restored by the end of the run. This code also temporarily blocks $SIG{DIE} handlers.</p>
+
+</dd>
+<dt id="protect">protect { ... }</dt>
+<dd>
+
+<p>Similar to try, except that it does not catch exceptions. The idea here is to protect $@ and $! from changes. $@ and $! will be restored to whatever they were before the run so long as it is successful. If the run fails $! will still be restored, but $@ will contain the exception being thrown.</p>
+
+</dd>
+<dt id="CAN_FORK">CAN_FORK</dt>
+<dd>
+
+<p>True if this system is capable of true or pseudo-fork.</p>
+
+</dd>
+<dt id="CAN_REALLY_FORK">CAN_REALLY_FORK</dt>
+<dd>
+
+<p>True if the system can really fork. This will be false for systems where fork is emulated.</p>
+
+</dd>
+<dt id="CAN_THREAD">CAN_THREAD</dt>
+<dd>
+
+<p>True if this system is capable of using threads.</p>
+
+</dd>
+<dt id="USE_THREADS">USE_THREADS</dt>
+<dd>
+
+<p>Returns true if threads are enabled, false if they are not.</p>
+
+</dd>
+<dt id="get_tid">get_tid</dt>
+<dd>
+
+<p>This will return the id of the current thread when threads are enabled, otherwise it returns 0.</p>
+
+</dd>
+<dt id="my-file-pkg_to_file-package">my $file = pkg_to_file($package)</dt>
+<dd>
+
+<p>Convert a package name to a filename.</p>
+
+</dd>
+<dt id="ok-err-do_rename-old_name-new_name">($ok, $err) = do_rename($old_name, $new_name)</dt>
+<dd>
+
+<p>Rename a file, this wraps <code>rename()</code> in a way that makes it more reliable cross-platform when trying to rename files you recently altered.</p>
+
+</dd>
+<dt id="ok-err-do_unlink-filename">($ok, $err) = do_unlink($filename)</dt>
+<dd>
+
+<p>Unlink a file, this wraps <code>unlink()</code> in a way that makes it more reliable cross-platform when trying to unlink files you recently altered.</p>
+
+</dd>
+<dt id="ok-err-try_sig_mask">($ok, $err) = try_sig_mask { ... }</dt>
+<dd>
+
+<p>Complete an action with several signals masked, they will be unmasked at the end allowing any signals that were intercepted to get handled.</p>
+
+<p>This is primarily used when you need to make several actions atomic (against some signals anyway).</p>
+
+<p>Signals that are intercepted:</p>
+
+<dl>
+
+<dt id="SIGINT">SIGINT</dt>
+<dd>
+
+</dd>
+<dt id="SIGALRM">SIGALRM</dt>
+<dd>
+
+</dd>
+<dt id="SIGHUP">SIGHUP</dt>
+<dd>
+
+</dd>
+<dt id="SIGTERM">SIGTERM</dt>
+<dd>
+
+</dd>
+<dt id="SIGUSR1">SIGUSR1</dt>
+<dd>
+
+</dd>
+<dt id="SIGUSR2">SIGUSR2</dt>
+<dd>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h1 id="NOTES-CAVEATS">NOTES &amp;&amp; CAVEATS</h1>
+
+<dl>
+
+<dt id="pod5.10.0">5.10.0</dt>
+<dd>
+
+<p>Perl 5.10.0 has a bug when compiled with newer gcc versions. This bug causes a segfault whenever a new thread is launched. Test2 will attempt to detect this, and note that the system is not capable of forking when it is detected.</p>
+
+</dd>
+<dt id="Devel::Cover">Devel::Cover</dt>
+<dd>
+
+<p>Devel::Cover does not support threads. CAN_THREAD will return false if Devel::Cover is loaded before the check is first run.</p>
+
+</dd>
+</dl>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Test2 can be found at <i>http://github.com/Test-More/test-more/</i>.</p>
+
+<h1 id="MAINTAINERS">MAINTAINERS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt id="Chad-Granum-exodist-cpan.org1">Chad Granum &lt;exodist@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+<dt id="Kent-Fredric-kentnl-cpan.org">Kent Fredric &lt;kentnl@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2017 Chad Granum &lt;exodist@cpan.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+
+</body>
+
+</html>
+
+

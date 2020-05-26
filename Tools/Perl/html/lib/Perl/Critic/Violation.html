@@ -1,0 +1,260 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INTERFACE-SUPPORT">INTERFACE SUPPORT</a></li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#OVERLOADS">OVERLOADS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Violation - A violation of a Policy found in some source code.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">PPI</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Perl::Critic::Violation</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$elem</span> <span class="operator">=</span> <span class="variable">$doc</span><span class="operator">-&gt;</span><span class="variable">child</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>      <span class="comment"># $doc is a PPI::Document object</span>
+  <span class="keyword">my</span> <span class="variable">$desc</span> <span class="operator">=</span> <span class="string">'Offending code'</span><span class="operator">;</span>    <span class="comment"># Describe the violation</span>
+  <span class="keyword">my</span> <span class="variable">$expl</span> <span class="operator">=</span> <span class="operator">[</span><span class="number">1</span><span class="operator">,</span><span class="number">45</span><span class="operator">,</span><span class="number">67</span><span class="operator">]</span><span class="operator">;</span>           <span class="comment"># Page numbers from PBP</span>
+  <span class="keyword">my</span> <span class="variable">$sev</span>  <span class="operator">=</span> <span class="number">5</span><span class="operator">;</span>                   <span class="comment"># Severity level of this violation</span>
+  
+  <span class="keyword">my</span> <span class="variable">$vio</span>  <span class="operator">=</span> <span class="variable">Perl::Critic::Violation</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$desc</span><span class="operator">,</span> <span class="variable">$expl</span><span class="operator">,</span> <span class="variable">$node</span><span class="operator">,</span> <span class="variable">$sev</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl::Critic::Violation is the generic representation of an individual Policy violation. Its primary purpose is to provide an abstraction layer so that clients of <a href="../../../lib/Perl/Critic.html">Perl::Critic</a> don&#39;t have to know anything about <a href="../../../lib/PPI.html">PPI</a>. The <code>violations</code> method of all <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> subclasses must return a list of these Perl::Critic::Violation objects.</p>
+
+<h1 id="INTERFACE-SUPPORT">INTERFACE SUPPORT</h1>
+
+<p>This is considered to be a public class. Any changes to its interface will go through a deprecation cycle.</p>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<dl>
+
+<dt id="new-description-explanation-element-severity"><code>new( $description, $explanation, $element, $severity )</code></dt>
+<dd>
+
+<p>Returns a reference to a new <code>Perl::Critic::Violation</code> object. The arguments are a description of the violation (as string), an explanation for the policy (as string) or a series of page numbers in PBP (as an ARRAY ref), a reference to the <a href="../../../lib/PPI.html">PPI</a> element that caused the violation, and the severity of the violation (as an integer).</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="description"><code>description()</code></dt>
+<dd>
+
+<p>Returns a brief description of the specific violation. In other words, this value may change on a per violation basis.</p>
+
+</dd>
+<dt id="explanation"><code>explanation()</code></dt>
+<dd>
+
+<p>Returns an explanation of the policy as a string or as reference to an array of page numbers in PBP. This value will generally not change based upon the specific code violating the policy.</p>
+
+</dd>
+<dt id="location"><code>location()</code></dt>
+<dd>
+
+<p>Don&#39;t use this method. Use the <code>line_number()</code>, <code>logical_line_number()</code>, <code>column_number()</code>, <code>visual_column_number()</code>, and <code>logical_filename()</code> methods instead.</p>
+
+<p>Returns a five-element array reference containing the line and real &amp; virtual column and logical numbers and logical file name where this Violation occurred, as in <a href="../../../lib/PPI/Element.html">PPI::Element</a>.</p>
+
+</dd>
+<dt id="line_number"><code>line_number()</code></dt>
+<dd>
+
+<p>Returns the physical line number that the violation was found on.</p>
+
+</dd>
+<dt id="logical_line_number"><code>logical_line_number()</code></dt>
+<dd>
+
+<p>Returns the logical line number that the violation was found on. This can differ from the physical line number when there were <code><span class="comment">#line</span>
+</code> directives in the code.</p>
+
+</dd>
+<dt id="column_number"><code>column_number()</code></dt>
+<dd>
+
+<p>Returns the physical column that the violation was found at. This means that hard tab characters count as a single character.</p>
+
+</dd>
+<dt id="visual_column_number"><code>visual_column_number()</code></dt>
+<dd>
+
+<p>Returns the column that the violation was found at, as it would appear if hard tab characters were expanded, based upon the value of <a href="../../../lib/PPI/Document.html#tab_width-width">&quot;tab_width [ $width ]&quot; in PPI::Document</a>.</p>
+
+</dd>
+<dt id="filename"><code>filename()</code></dt>
+<dd>
+
+<p>Returns the path to the file where this Violation occurred. In some cases, the path may be undefined because the source code was not read directly from a file.</p>
+
+</dd>
+<dt id="logical_filename"><code>logical_filename()</code></dt>
+<dd>
+
+<p>Returns the logical path to the file where the Violation occurred. This can differ from <code>filename()</code> when there was a <code><span class="comment">#line</span>
+</code> directive in the code.</p>
+
+</dd>
+<dt id="severity"><code>severity()</code></dt>
+<dd>
+
+<p>Returns the severity of this Violation as an integer ranging from 1 to 5, where 5 is the &quot;most&quot; severe.</p>
+
+</dd>
+<dt id="sort_by_severity-violation_objects"><code>sort_by_severity( @violation_objects )</code></dt>
+<dd>
+
+<p>If you need to sort Violations by severity, use this handy routine:</p>
+
+<pre><code>    <span class="variable">@sorted</span> <span class="operator">=</span> <span class="variable">Perl::Critic::Violation::sort_by_severity</span><span class="operator">(</span><span class="variable">@violations</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="sort_by_location-violation_objects"><code>sort_by_location( @violation_objects )</code></dt>
+<dd>
+
+<p>If you need to sort Violations by location, use this handy routine:</p>
+
+<pre><code>    <span class="variable">@sorted</span> <span class="operator">=</span> <span class="variable">Perl::Critic::Violation::sort_by_location</span><span class="operator">(</span><span class="variable">@violations</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="diagnostics"><code>diagnostics()</code></dt>
+<dd>
+
+<p>Returns a formatted string containing a full discussion of the motivation for and details of the Policy module that created this Violation. This information is automatically extracted from the <code>DESCRIPTION</code> section of the Policy module&#39;s POD.</p>
+
+</dd>
+<dt id="policy"><code>policy()</code></dt>
+<dd>
+
+<p>Returns the name of the <a href="../../../lib/Perl/Critic/Policy.html">Perl::Critic::Policy</a> that created this Violation.</p>
+
+</dd>
+<dt id="source"><code>source()</code></dt>
+<dd>
+
+<p>Returns the string of source code that caused this exception. If the code spans multiple lines (e.g. multi-line statements, subroutines or other blocks), then only the line containing the violation will be returned.</p>
+
+</dd>
+<dt id="element_class"><code>element_class()</code></dt>
+<dd>
+
+<p>Returns the <a href="../../../lib/PPI/Element.html">PPI::Element</a> subclass of the code that caused this exception.</p>
+
+</dd>
+<dt id="set_format-format"><code>set_format( $format )</code></dt>
+<dd>
+
+<p>Class method. Sets the format for all Violation objects when they are evaluated in string context. The default is <code>&#39;%d at line %l, column %c. %e&#39;</code>. See <a href="#OVERLOADS">&quot;OVERLOADS&quot;</a> for formatting options.</p>
+
+</dd>
+<dt id="get_format"><code>get_format()</code></dt>
+<dd>
+
+<p>Class method. Returns the current format for all Violation objects when they are evaluated in string context.</p>
+
+</dd>
+<dt id="to_string"><code>to_string()</code></dt>
+<dd>
+
+<p>Returns a string representation of this violation. The content of the string depends on the current value of the <code>$format</code> package variable. See <a href="#OVERLOADS">&quot;OVERLOADS&quot;</a> for the details.</p>
+
+</dd>
+</dl>
+
+<h1 id="OVERLOADS">OVERLOADS</h1>
+
+<p>Perl::Critic::Violation overloads the <code>&quot;&quot;</code> operator to produce neat little messages when evaluated in string context.</p>
+
+<p>Formats are a combination of literal and escape characters similar to the way <code>sprintf</code> works. If you want to know the specific formatting capabilities, look at <a>String::Format</a>. Valid escape characters are:</p>
+
+<pre><code>    Escape    Meaning
+    -------   ----------------------------------------------------------------
+    %c        Column number where the violation occurred
+    %d        Full diagnostic discussion of the violation (DESCRIPTION in POD)
+    %e        Explanation of violation or page numbers in PBP
+    %F        Just the name of the logical file where the violation occurred.
+    %f        Path to the logical file where the violation occurred.
+    %G        Just the name of the physical file where the violation occurred.
+    %g        Path to the physical file where the violation occurred.
+    %l        Logical line number where the violation occurred
+    %L        Physical line number where the violation occurred
+    %m        Brief description of the violation
+    %P        Full name of the Policy module that created the violation
+    %p        Name of the Policy without the Perl::Critic::Policy:: prefix
+    %r        The string of source code that caused the violation
+    %C        The class of the PPI::Element that caused the violation
+    %s        The severity level of the violation</code></pre>
+
+<p>Explanation of the <code>%F</code>, <code>%f</code>, <code>%G</code>, <code>%G</code>, <code>%l</code>, and <code>%L</code> formats: Using <code><span class="comment">#line</span>
+</code> directives, you can affect what perl thinks the current line number and file name are; see <a href="../../../lib/pods/perlsyn.html#Plain-Old-Comments-Not">&quot;Plain Old Comments (Not!)&quot; in perlsyn</a> for the details. Under normal circumstances, the values of <code>%F</code>, <code>%f</code>, and <code>%l</code> will match the values of <code>%G</code>, <code>%g</code>, and <code>%L</code>, respectively. In the presence of a <code><span class="comment">#line</span>
+</code> directive, the values of <code>%F</code>, <code>%f</code>, and <code>%l</code> will change to take that directive into account. The values of <code>%G</code>, <code>%g</code>, and <code>%L</code> are unaffected by those directives.</p>
+
+<p>Here are some examples:</p>
+
+<pre><code>    Perl::Critic::Violation::set_format(&quot;%m at line %l, column %c.\n&quot;);
+    # looks like &quot;Mixed case variable name at line 6, column 23.&quot;
+
+    Perl::Critic::Violation::set_format(&quot;%m near &#39;%r&#39;\n&quot;);
+    # looks like &quot;Mixed case variable name near &#39;my $theGreatAnswer = 42;&#39;&quot;
+
+    Perl::Critic::Violation::set_format(&quot;%l:%c:%p\n&quot;);
+    # looks like &quot;6:23:NamingConventions::Capitalization&quot;
+
+    Perl::Critic::Violation::set_format(&quot;%m at line %l. %e. \n%d\n&quot;);
+    # looks like &quot;Mixed case variable name at line 6.  See page 44 of PBP.
+      Conway&#39;s recommended naming convention is to use lower-case words
+      separated by underscores.  Well-recognized acronyms can be in ALL
+      CAPS, but must be separated by underscores from other parts of the
+      name.&quot;</code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

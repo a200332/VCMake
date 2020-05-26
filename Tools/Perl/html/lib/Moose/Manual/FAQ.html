@@ -1,0 +1,414 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#FREQUENTLY-ASKED-QUESTIONS">FREQUENTLY ASKED QUESTIONS</a>
+    <ul>
+      <li><a href="#Module-Stability">Module Stability</a>
+        <ul>
+          <li><a href="#Is-Moose-production-ready">Is Moose &quot;production ready&quot;?</a></li>
+          <li><a href="#Is-Mooses-API-stable">Is Moose&#39;s API stable?</a></li>
+          <li><a href="#I-heard-Moose-is-slow-is-this-true">I heard Moose is slow, is this true?</a></li>
+        </ul>
+      </li>
+      <li><a href="#Constructors">Constructors</a>
+        <ul>
+          <li><a href="#How-do-I-write-custom-constructors-with-Moose">How do I write custom constructors with Moose?</a></li>
+          <li><a href="#How-do-I-make-non-Moose-constructors-work-with-Moose">How do I make non-Moose constructors work with Moose?</a></li>
+        </ul>
+      </li>
+      <li><a href="#Accessors">Accessors</a>
+        <ul>
+          <li><a href="#How-do-I-tell-Moose-to-use-get-set-accessors">How do I tell Moose to use get/set accessors?</a></li>
+          <li><a href="#How-can-I-inflate-deflate-values-in-accessors">How can I inflate/deflate values in accessors?</a></li>
+        </ul>
+      </li>
+      <li><a href="#Method-Modifiers">Method Modifiers</a>
+        <ul>
+          <li><a href="#How-can-I-affect-the-values-in-_-using-before">How can I affect the values in @_ using before?</a></li>
+          <li><a href="#Can-I-use-before-to-stop-execution-of-a-method">Can I use before to stop execution of a method?</a></li>
+          <li><a href="#Why-cant-I-see-return-values-in-an-after-modifier">Why can&#39;t I see return values in an after modifier?</a></li>
+        </ul>
+      </li>
+      <li><a href="#Type-Constraints">Type Constraints</a>
+        <ul>
+          <li><a href="#How-can-I-provide-a-custom-error-message-for-a-type-constraint">How can I provide a custom error message for a type constraint?</a></li>
+          <li><a href="#Can-I-turn-off-type-constraint-checking">Can I turn off type constraint checking?</a></li>
+          <li><a href="#My-coercions-stopped-working-with-recent-Moose-why-did-you-break-it">My coercions stopped working with recent Moose, why did you break it?</a></li>
+        </ul>
+      </li>
+      <li><a href="#Roles">Roles</a>
+        <ul>
+          <li><a href="#Why-is-BUILD-not-called-for-my-composed-roles">Why is BUILD not called for my composed roles?</a></li>
+          <li><a href="#What-are-traits-and-how-are-they-different-from-roles">What are traits, and how are they different from roles?</a></li>
+          <li><a href="#Can-an-attribute-generated-method-e.g.-an-accessor-satisfy-requires">Can an attribute-generated method (e.g. an accessor) satisfy requires?</a></li>
+        </ul>
+      </li>
+      <li><a href="#Moose-and-Subroutine-Attributes">Moose and Subroutine Attributes</a>
+        <ul>
+          <li><a href="#Why-dont-subroutine-attributes-I-inherited-from-a-superclass-work">Why don&#39;t subroutine attributes I inherited from a superclass work?</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Manual::FAQ - Frequently asked questions about Moose</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="FREQUENTLY-ASKED-QUESTIONS">FREQUENTLY ASKED QUESTIONS</h1>
+
+<h2 id="Module-Stability">Module Stability</h2>
+
+<h3 id="Is-Moose-production-ready">Is Moose &quot;production ready&quot;?</h3>
+
+<p>Yes! Many sites with household names are using Moose to build high-traffic services. Countless others are using Moose in production. See <a href="http://moose.iinteractive.com/about.html#organizations">http://moose.iinteractive.com/about.html#organizations</a> for a partial list.</p>
+
+<p>As of this writing, Moose is a dependency of several hundred CPAN modules. <a href="https://metacpan.org/requires/module/Moose">https://metacpan.org/requires/module/Moose</a></p>
+
+<h3 id="Is-Mooses-API-stable">Is Moose&#39;s API stable?</h3>
+
+<p>Yes. The sugary API, the one 95% of users will interact with, is <b>very stable</b>. Any changes will be <b>100% backwards compatible</b>.</p>
+
+<p>The meta API is less set in stone. We reserve the right to tweak parts of it to improve efficiency or consistency. This will not be done lightly. We do perform deprecation cycles. We <i>really</i> do not like making ourselves look bad by breaking your code. Submitting test cases is the best way to ensure that your code is not inadvertently broken by refactoring.</p>
+
+<h3 id="I-heard-Moose-is-slow-is-this-true">I heard Moose is slow, is this true?</h3>
+
+<p>Again, this one is tricky, so Yes <i>and</i> No.</p>
+
+<p>Firstly, <i>nothing</i> in life is free, and some Moose features do cost more than others. It is also the policy of Moose to <b>only charge you for the features you use</b>, and to do our absolute best to not place any extra burdens on the execution of your code for features you are not using. Of course using Moose itself does involve some overhead, but it is mostly compile time. At this point we do have some options available for getting the speed you need.</p>
+
+<p>Currently we provide the option of making your classes immutable as a means of boosting speed. This will mean a slightly larger compile time cost, but the runtime speed increase (especially in object construction) is pretty significant. This can be done with the following code:</p>
+
+<pre><code>  <span class="variable">MyClass</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">make_immutable</span><span class="operator">();</span>
+</code></pre>
+
+<h2 id="Constructors">Constructors</h2>
+
+<h3 id="How-do-I-write-custom-constructors-with-Moose">How do I write custom constructors with Moose?</h3>
+
+<p>Ideally, you should never write your own <code>new</code> method, and should use Moose&#39;s other features to handle your specific object construction needs. Here are a few scenarios, and the Moose way to solve them;</p>
+
+<p>If you need to call initialization code post instance construction, then use the <code>BUILD</code> method. This feature is taken directly from Perl 6. Every <code>BUILD</code> method in your inheritance chain is called (in the correct order) immediately after the instance is constructed. This allows you to ensure that all your superclasses are initialized properly as well. This is the best approach to take (when possible) because it makes subclassing your class much easier.</p>
+
+<p>If you need to affect the constructor&#39;s parameters prior to the instance actually being constructed, you have a number of options.</p>
+
+<p>To change the parameter processing as a whole, you can use the <code>BUILDARGS</code> method. The default implementation accepts key/value pairs or a hash reference. You can override it to take positional args, or any other format</p>
+
+<p>To change the handling of individual parameters, there are <i>coercions</i> (See the <a href="../../../lib/Moose/Cookbook/Basics/HTTP_SubtypesAndCoercion.html">Moose::Cookbook::Basics::HTTP_SubtypesAndCoercion</a> for a complete example and explanation of coercions). With coercions it is possible to morph argument values into the correct expected types. This approach is the most flexible and robust, but does have a slightly higher learning curve.</p>
+
+<h3 id="How-do-I-make-non-Moose-constructors-work-with-Moose">How do I make non-Moose constructors work with Moose?</h3>
+
+<p>Usually the correct approach to subclassing a non-Moose class is delegation. Moose makes this easy using the <code>handles</code> keyword, coercions, and <code>lazy_build</code>, so subclassing is often not the ideal route.</p>
+
+<p>That said, if you really need to inherit from a non-Moose class, see <a href="../../../lib/Moose/Cookbook/Basics/DateTime_ExtendingNonMooseParent.html">Moose::Cookbook::Basics::DateTime_ExtendingNonMooseParent</a> for an example of how to do it, or take a look at <a href="../../../lib/Moose/Manual/MooseX.html#MooseX::NonMoose">&quot;MooseX::NonMoose&quot; in Moose::Manual::MooseX</a>.</p>
+
+<h2 id="Accessors">Accessors</h2>
+
+<h3 id="How-do-I-tell-Moose-to-use-get-set-accessors">How do I tell Moose to use get/set accessors?</h3>
+
+<p>The easiest way to accomplish this is to use the <code>reader</code> and <code>writer</code> attribute options:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'bar'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">isa</span>    <span class="operator">=&gt;</span> <span class="string">'Baz'</span><span class="operator">,</span>
+      <span class="string">reader</span> <span class="operator">=&gt;</span> <span class="string">'get_bar'</span><span class="operator">,</span>
+      <span class="string">writer</span> <span class="operator">=&gt;</span> <span class="string">'set_bar'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Moose will still take advantage of type constraints, triggers, etc. when creating these methods.</p>
+
+<p>If you do not like this much typing, and wish it to be a default for your classes, please see <a>MooseX::FollowPBP</a>. This extension will allow you to write:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'bar'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Baz'</span><span class="operator">,</span>
+      <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>Moose will create separate <code>get_bar</code> and <code>set_bar</code> methods instead of a single <code>bar</code> method.</p>
+
+<p>If you like <code>bar</code> and <code>set_bar</code>, see <a>MooseX::SemiAffordanceAccessor</a>.</p>
+
+<p>NOTE: This <b>cannot</b> be set globally in Moose, as that would break other classes which are built with Moose. You can still save on typing by defining a new <code>MyApp::Moose</code> that exports Moose&#39;s sugar and then turns on <a>MooseX::FollowPBP</a>. See <a href="../../../lib/Moose/Cookbook/Extending/Mooseish_MooseSugar.html">Moose::Cookbook::Extending::Mooseish_MooseSugar</a>.</p>
+
+<h3 id="How-can-I-inflate-deflate-values-in-accessors">How can I inflate/deflate values in accessors?</h3>
+
+<p>Well, the first question to ask is if you actually need both inflate and deflate.</p>
+
+<p>If you only need to inflate, then we suggest using coercions. Here is some basic sample code for inflating a <a href="../../../lib/DateTime.html">DateTime</a> object:</p>
+
+<pre><code>  <span class="variable">class_type</span> <span class="string">'DateTime'</span><span class="operator">;</span>
+  
+  <span class="variable">coerce</span> <span class="string">'DateTime'</span>
+      <span class="operator">=&gt;</span> <span class="variable">from</span> <span class="string">'Str'</span>
+      <span class="operator">=&gt;</span> <span class="variable">via</span> <span class="operator">{</span> <span class="variable">DateTime::Format::MySQL</span><span class="operator">-&gt;</span><span class="variable">parse_datetime</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="operator">};</span>
+  
+  <span class="variable">has</span> <span class="string">'timestamp'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'DateTime'</span><span class="operator">,</span> <span class="string">coerce</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+<p>This creates a custom type for <a href="../../../lib/DateTime.html">DateTime</a> objects, then attaches a coercion to that type. The <code>timestamp</code> attribute is then told to expect a <code>DateTime</code> type, and to try to coerce it. When a <code>Str</code> type is given to the <code>timestamp</code> accessor, it will attempt to coerce the value into a <code>DateTime</code> object using the code in found in the <code>via</code> block.</p>
+
+<p>For a more comprehensive example of using coercions, see the <a href="../../../lib/Moose/Cookbook/Basics/HTTP_SubtypesAndCoercion.html">Moose::Cookbook::Basics::HTTP_SubtypesAndCoercion</a>.</p>
+
+<p>If you need to deflate your attribute&#39;s value, the current best practice is to add an <code>around</code> modifier to your accessor:</p>
+
+<pre><code>  <span class="comment"># a timestamp which stores as</span>
+  <span class="comment"># seconds from the epoch</span>
+  <span class="variable">has</span> <span class="string">'timestamp'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">);</span>
+  
+  <span class="variable">around</span> <span class="string">'timestamp'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$next</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+  
+      <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$next</span> <span class="keyword">unless</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+      <span class="comment"># assume we get a DateTime object ...</span>
+      <span class="keyword">my</span> <span class="variable">$timestamp</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">return</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$next</span><span class="operator">(</span> <span class="variable">$timestamp</span><span class="operator">-&gt;</span><span class="variable">epoch</span> <span class="operator">);</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>It is also possible to do deflation using coercion, but this tends to get quite complex and require many subtypes. An example of this is outside the scope of this document, ask on #moose or send a mail to the list.</p>
+
+<p>Still another option is to write a custom attribute metaclass, which is also outside the scope of this document, but we would be happy to explain it on #moose or the mailing list.</p>
+
+<h2 id="Method-Modifiers">Method Modifiers</h2>
+
+<h3 id="How-can-I-affect-the-values-in-_-using-before">How can I affect the values in <code>@_</code> using <code>before</code>?</h3>
+
+<p>You can&#39;t, actually: <code>before</code> only runs before the main method, and it cannot easily affect the method&#39;s execution.</p>
+
+<p>You similarly can&#39;t use <code>after</code> to affect the return value of a method.</p>
+
+<p>We limit <code>before</code> and <code>after</code> because this lets you write more concise code. You do not have to worry about passing <code>@_</code> to the original method, or forwarding its return value (being careful to preserve context).</p>
+
+<p>The <code>around</code> method modifier has neither of these limitations, but is a little more verbose.</p>
+
+<p>Alternatively, the <a>MooseX::Mangle</a> extension provides the <code>mangle_args</code> function, which does allow you to affect <code>@_</code>.</p>
+
+<h3 id="Can-I-use-before-to-stop-execution-of-a-method">Can I use <code>before</code> to stop execution of a method?</h3>
+
+<p>Yes, but only if you throw an exception. If this is too drastic a measure then we suggest using <code>around</code> instead. The <code>around</code> method modifier is the only modifier which can gracefully prevent execution of the main method. Here is an example:</p>
+
+<pre><code>    <span class="variable">around</span> <span class="string">'baz'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$next</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">%options</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+        <span class="keyword">unless</span> <span class="operator">(</span><span class="variable">$options</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">bar</span><span class="operator">}</span> <span class="keyword">eq</span> <span class="string">'foo'</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">return</span> <span class="string">'bar'</span><span class="operator">;</span>
+        <span class="operator">}</span>
+        <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">$next</span><span class="operator">(</span><span class="variable">%options</span><span class="operator">);</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<p>By choosing not to call the <code>$next</code> method, you can stop the execution of the main method.</p>
+
+<p>Alternatively, the <a>MooseX::Mangle</a> extension provides the <code>guard</code> function, which will conditionally prevent execution of the original method.</p>
+
+<h3 id="Why-cant-I-see-return-values-in-an-after-modifier">Why can&#39;t I see return values in an <code>after</code> modifier?</h3>
+
+<p>As with the <code>before</code> modifier, the <code>after</code> modifier is simply called <i>after</i> the main method. It is passed the original contents of <code>@_</code> and <b>not</b> the return values of the main method.</p>
+
+<p>Again, the arguments are too lengthy as to why this has to be. And as with <code>before</code> I recommend using an <code>around</code> modifier instead. Here is some sample code:</p>
+
+<pre><code>  <span class="variable">around</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$next</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">@rv</span> <span class="operator">=</span> <span class="variable">$next</span><span class="operator">-&gt;(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">@args</span><span class="operator">);</span>
+      <span class="comment"># do something silly with the return values</span>
+      <span class="keyword">return</span> <span class="keyword">reverse</span> <span class="variable">@rv</span><span class="operator">;</span>
+  <span class="operator">};</span>
+</code></pre>
+
+<p>Alternatively, the <a>MooseX::Mangle</a> extension provides the <code>mangle_return</code> function, which allows modifying the return values of the original method.</p>
+
+<h2 id="Type-Constraints">Type Constraints</h2>
+
+<h3 id="How-can-I-provide-a-custom-error-message-for-a-type-constraint">How can I provide a custom error message for a type constraint?</h3>
+
+<p>Use the <code>message</code> option when building the subtype:</p>
+
+<pre><code>  <span class="variable">subtype</span> <span class="string">'NaturalLessThanTen'</span>
+      <span class="operator">=&gt;</span> <span class="variable">as</span> <span class="string">'Natural'</span>
+      <span class="operator">=&gt;</span> <span class="variable">where</span> <span class="operator">{</span> <span class="variable">$_</span> <span class="operator">&lt;</span> <span class="number">10</span> <span class="operator">}</span>
+      <span class="operator">=&gt;</span> <span class="variable">message</span> <span class="operator">{</span> <span class="string">"This number (</span><span class="variable">$_</span><span class="string">) is not less than ten!"</span> <span class="operator">};</span>
+</code></pre>
+
+<p>This <code>message</code> block will be called when a value fails to pass the <code>NaturalLessThanTen</code> constraint check.</p>
+
+<h3 id="Can-I-turn-off-type-constraint-checking">Can I turn off type constraint checking?</h3>
+
+<p>There&#39;s no support for it in the core of Moose yet. This option may come in a future release.</p>
+
+<p>Meanwhile there&#39;s a <a>MooseX extension</a> that allows you to do this on a per-attribute basis, and if it doesn&#39;t do what you it&#39;s easy to write one that fits your use case.</p>
+
+<h3 id="My-coercions-stopped-working-with-recent-Moose-why-did-you-break-it">My coercions stopped working with recent Moose, why did you break it?</h3>
+
+<p>Moose 0.76 fixed a case where coercions were being applied even if the original constraint passed. This has caused some edge cases to fail where people were doing something like</p>
+
+<pre><code>    <span class="variable">subtype</span> <span class="string">'Address'</span><span class="operator">,</span> <span class="variable">as</span> <span class="string">'Str'</span><span class="operator">;</span>
+    <span class="variable">coerce</span> <span class="string">'Address'</span><span class="operator">,</span> <span class="variable">from</span> <span class="string">'Str'</span><span class="operator">,</span> <span class="variable">via</span> <span class="operator">{</span> <span class="variable">get_address</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="operator">};</span>
+</code></pre>
+
+<p>This is not what they intended, because the type constraint <code>Address</code> is too loose in this case. It is saying that all strings are Addresses, which is obviously not the case. The solution is to provide a <code>where</code> clause that properly restricts the type constraint:</p>
+
+<pre><code>    <span class="variable">subtype</span> <span class="string">'Address'</span><span class="operator">,</span> <span class="variable">as</span> <span class="string">'Str'</span><span class="operator">,</span> <span class="variable">where</span> <span class="operator">{</span> <span class="variable">looks_like_address</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="operator">};</span>
+</code></pre>
+
+<p>This will allow the coercion to apply only to strings that fail to look like an Address.</p>
+
+<h2 id="Roles">Roles</h2>
+
+<h3 id="Why-is-BUILD-not-called-for-my-composed-roles">Why is BUILD not called for my composed roles?</h3>
+
+<p><code>BUILD</code> is never called in composed roles. The primary reason is that roles are <b>not</b> order sensitive. Roles are composed in such a way that the order of composition does not matter (for information on the deeper theory of this read the original traits papers here <a href="http://www.iam.unibe.ch/~scg/Research/Traits/">http://www.iam.unibe.ch/~scg/Research/Traits/</a>).</p>
+
+<p>Because roles are essentially unordered, it would be impossible to determine the order in which to execute the <code>BUILD</code> methods.</p>
+
+<p>As for alternate solutions, there are a couple.</p>
+
+<ul>
+
+<li><p>Using a combination of lazy and default in your attributes to defer initialization (see the Binary Tree example in the cookbook for a good example of lazy/default usage <a href="../../../lib/Moose/Cookbook/Basics/BinaryTree_AttributeFeatures.html">Moose::Cookbook::Basics::BinaryTree_AttributeFeatures</a>)</p>
+
+</li>
+<li><p>Use attribute triggers, which fire after an attribute is set, to facilitate initialization. These are described in the <a href="../../../lib/Moose.html">Moose</a> docs, and examples can be found in the test suite.</p>
+
+</li>
+</ul>
+
+<p>In general, roles should not <i>require</i> initialization; they should either provide sane defaults or should be documented as needing specific initialization. One such way to &quot;document&quot; this is to have a separate attribute initializer which is required for the role. Here is an example of how to do this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">My::Role</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'height'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span>     <span class="operator">=&gt;</span> <span class="string">'Int'</span><span class="operator">,</span>
+      <span class="string">lazy</span>    <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+      <span class="string">default</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+          <span class="keyword">my</span> <span class="variable">$self</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+          <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">init_height</span><span class="operator">;</span>
+      <span class="operator">}</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">requires</span> <span class="string">'init_height'</span><span class="operator">;</span>
+</code></pre>
+
+<p>In this example, the role will not compose successfully unless the class provides a <code>init_height</code> method.</p>
+
+<p>If none of those solutions work, then it is possible that a role is not the best tool for the job, and you really should be using classes. Or, at the very least, you should reduce the amount of functionality in your role so that it does not require initialization.</p>
+
+<h3 id="What-are-traits-and-how-are-they-different-from-roles">What are traits, and how are they different from roles?</h3>
+
+<p>In Moose, a trait is almost exactly the same thing as a role, except that traits typically register themselves, which allows you to refer to them by a short name (&quot;Big&quot; vs &quot;MyApp::Role::Big&quot;).</p>
+
+<p>In Moose-speak, a <i>Role</i> is usually composed into a <i>class</i> at compile time, whereas a <i>Trait</i> is usually composed into an instance of a class at runtime to add or modify the behavior of <b>just that instance</b>.</p>
+
+<p>Outside the context of Moose, traits and roles generally mean exactly the same thing. The original paper called them traits, but Perl 6 will call them roles.</p>
+
+<h3 id="Can-an-attribute-generated-method-e.g.-an-accessor-satisfy-requires">Can an attribute-generated method (e.g. an accessor) satisfy requires?</h3>
+
+<p>Yes, just be sure to consume the role <i>after</i> declaring your attribute. <a href="../../../lib/Moose/Manual/Roles.html#Required-Attributes">&quot;Required Attributes&quot; in Moose::Manual::Roles</a> provides an example:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Breakable</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span>
+  <span class="variable">requires</span> <span class="string">'stress'</span><span class="operator">;</span>
+  
+  <span class="keyword">package</span> <span class="variable">Car</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="variable">has</span> <span class="string">'stress'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span> <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Int'</span> <span class="operator">);</span>
+  <span class="variable">with</span> <span class="string">'Breakable'</span><span class="operator">;</span>
+</code></pre>
+
+<p>If you mistakenly consume the <code>Breakable</code> role before declaring your <code>stress</code> attribute, you would see an error like this:</p>
+
+<pre><code>  &#39;Breakable&#39; requires the method &#39;stress&#39; to be implemented by &#39;Car&#39; at...</code></pre>
+
+<h2 id="Moose-and-Subroutine-Attributes">Moose and Subroutine Attributes</h2>
+
+<h3 id="Why-dont-subroutine-attributes-I-inherited-from-a-superclass-work">Why don&#39;t subroutine attributes I inherited from a superclass work?</h3>
+
+<p>Currently when subclassing a module is done at runtime with the <code>extends</code> keyword, but attributes are checked at compile time by Perl. To make attributes work, you must place <code>extends</code> in a <code>BEGIN</code> block so that the attribute handlers will be available at compile time, like this:</p>
+
+<pre><code>  <span class="keyword">BEGIN</span> <span class="operator">{</span> <span class="variable">extends</span> <span class="string">qw/Foo/</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Note that we&#39;re talking about Perl&#39;s subroutine attributes here, not Moose attributes:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> foo : Bar</span><span class="operator">(</span>27<span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

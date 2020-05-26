@@ -1,0 +1,434 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#content">content</a></li>
+      <li><a href="#default_modifiers">default_modifiers</a></li>
+      <li><a href="#encoding">encoding</a></li>
+      <li><a href="#errstr">errstr</a></li>
+      <li><a href="#failures">failures</a></li>
+      <li><a href="#modifier">modifier</a></li>
+      <li><a href="#next_token">next_token</a></li>
+      <li><a href="#significant">significant</a></li>
+      <li><a href="#tokens">tokens</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXTERNAL-TOKENIZERS">EXTERNAL TOKENIZERS</a>
+    <ul>
+      <li><a href="#capture">capture</a></li>
+      <li><a href="#cookie">cookie</a></li>
+      <li><a href="#expect">expect</a></li>
+      <li><a href="#find_regexp">find_regexp</a></li>
+      <li><a href="#find_matching_delimiter">find_matching_delimiter</a></li>
+      <li><a href="#get_mode">get_mode</a></li>
+      <li><a href="#get_start_delimiter">get_start_delimiter</a></li>
+      <li><a href="#get_token">get_token</a></li>
+      <li><a href="#interpolates">interpolates</a></li>
+      <li><a href="#make_token">make_token</a></li>
+      <li><a href="#match">match</a></li>
+      <li><a href="#modifier_duplicate">modifier_duplicate</a></li>
+      <li><a href="#modifier_modify">modifier_modify</a></li>
+      <li><a href="#modifier_pop">modifier_pop</a></li>
+      <li><a href="#peek">peek</a></li>
+      <li><a href="#ppi_document">ppi_document</a></li>
+      <li><a href="#prior">prior</a></li>
+      <li><a href="#prior_significant_token">prior_significant_token</a></li>
+      <li><a href="#strict">strict</a></li>
+    </ul>
+  </li>
+  <li><a href="#ENVIRONMENT-VARIABLES">ENVIRONMENT VARIABLES</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Regexp::Tokenizer - Tokenize a regular expression</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">;</span>
+ <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'qr{foo}smx'</span> <span class="operator">)</span>
+     <span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>PPIx::Regexp::Tokenizer</code> is a <a href="../../../lib/PPIx/Regexp/Support.html">PPIx::Regexp::Support</a>.</p>
+
+<p><code>PPIx::Regexp::Tokenizer</code> has no descendants.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class provides tokenization of the regular expression.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provides the following public methods. Methods not documented here (or documented below under <a href="#EXTERNAL-TOKENIZERS">&quot;EXTERNAL TOKENIZERS&quot;</a>) are private, and unsupported in the sense that the author reserves the right to change or remove them without notice.</p>
+
+<h2 id="new">new</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$tokenizer</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp::Tokenizer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'xyzzy'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This static method instantiates the tokenizer. You must pass it the regular expression to be parsed, either as a string or as a <a href="../../../lib/PPI/Element.html">PPI::Element</a> of some sort. You can also pass optional name/value pairs of arguments. The option names are specified <b>without</b> a leading dash. Supported options are:</p>
+
+<dl>
+
+<dt id="default_modifiers-array_reference">default_modifiers array_reference</dt>
+<dd>
+
+<p>This argument specifies default statement modifiers. It is optional, but if specified must be an array reference. See the <a href="../../../lib/PPIx/Regexp.html">PPIx::Regexp</a> <a href="../../../lib/PPIx/Regexp.html#new">new()</a> documentation for the details.</p>
+
+</dd>
+<dt id="encoding-name">encoding name</dt>
+<dd>
+
+<p>This option specifies the encoding of the string to be tokenized. If specified, an <code>Encode::decode</code> is done on the string (or the <code>content</code> of the PPI class) before it is tokenized.</p>
+
+</dd>
+<dt id="postderef-boolean">postderef boolean</dt>
+<dd>
+
+<p>This option specifies whether the tokenizer recognizes postfix dereferencing. See the <a href="../../../lib/PPIx/Regexp.html">PPIx::Regexp</a> <a href="../../../lib/PPIx/Regexp.html#new">new()</a> documentation for the details.</p>
+
+<p><code>$PPIx::Regexp::Tokenizer::DEFAULT_POSTDEREF</code> is not exported.</p>
+
+</dd>
+<dt id="strict-boolean">strict boolean</dt>
+<dd>
+
+<p>This option specifies whether tokenization should assume <code><span class="keyword">use</span> <span class="variable">re</span> <span class="string">'strict'</span><span class="operator">;</span>
+</code> is in effect.</p>
+
+<p>The <code>&#39;strict&#39;</code> pragma was introduced in Perl 5.22, and its documentation says that it is experimental, and that there is no commitment to backward compatibility. The same applies to the tokenization produced when this option is asserted.</p>
+
+</dd>
+<dt id="trace-number">trace number</dt>
+<dd>
+
+<p>Specifying a positive value for this option causes a trace of the tokenization. This option is unsupported in the sense that the author reserves the right to alter it without notice.</p>
+
+<p>If this option is unspecified, the value comes from environment variable <code>PPIX_REGEXP_TOKENIZER_TRACE</code> (see <a href="#ENVIRONMENT-VARIABLES">&quot;ENVIRONMENT VARIABLES&quot;</a>). If this environment variable does not exist, the default is 0.</p>
+
+</dd>
+</dl>
+
+<p>Undocumented options are unsupported.</p>
+
+<p>The returned value is the instantiated tokenizer, or <code>undef</code> if instantiation failed. In the latter case a call to <a href="#errstr">&quot;errstr&quot;</a> will return the reason.</p>
+
+<h2 id="content">content</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method returns the string being tokenized. This will be the result of the <a href="../../../lib/PPI/Element.html#content">PPI::Element-&gt;content()</a> method if the object was instantiated with a <a href="../../../lib/PPI/Element.html">PPI::Element</a>.</p>
+
+<h2 id="default_modifiers">default_modifiers</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="keyword">join</span> <span class="string">', '</span><span class="operator">,</span> <span class="variable">@</span><span class="operator">{</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">default_modifiers</span><span class="operator">()</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns a reference to a copy of the array passed to the <code>default_modifiers</code> argument to <a href="#new">new()</a>. If this argument was not used to instantiate the object, the return is a reference to an empty array.</p>
+
+<h2 id="encoding">encoding</h2>
+
+<p>This method returns the encoding of the data being parsed, if one was set when the class was instantiated; otherwise it simply returns undef.</p>
+
+<h2 id="errstr">errstr</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$tokenizer</span> <span class="operator">=</span> <span class="variable">PPIx::Regexp::Tokenizer</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'xyzzy'</span> <span class="operator">)</span>
+     <span class="keyword">or</span> <span class="keyword">die</span> <span class="variable">PPIx::Regexp::Tokenizer</span><span class="operator">-&gt;</span><span class="variable">errstr</span><span class="operator">();</span>
+</code></pre>
+
+<p>This static method returns an error description if tokenizer instantiation failed.</p>
+
+<h2 id="failures">failures</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">failures</span><span class="operator">(),</span> <span class="string">" tokenization failures\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns the number of tokenization failures encountered. A tokenization failure is represented in the output token stream by a <a href="../../../lib/PPIx/Regexp/Token/Unknown.html">PPIx::Regexp::Token::Unknown</a>.</p>
+
+<h2 id="modifier">modifier</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">modifier</span><span class="operator">(</span> <span class="string">'x'</span> <span class="operator">)</span>
+     <span class="keyword">and</span> <span class="keyword">print</span> <span class="string">"Tokenizing an extended regular expression\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns true if the given modifier character was found on the end of the regular expression, and false otherwise.</p>
+
+<p>Starting with version 0.036_01, if the argument is a single-character modifier followed by an asterisk (intended as a wild card character), the return is the number of times that modifier appears. In this case an exception will be thrown if you specify a multi-character modifier (e.g. <code>&#39;ee*&#39;</code>), or if you specify one of the match semantics modifiers (e.g. <code>&#39;a*&#39;</code>).</p>
+
+<h2 id="next_token">next_token</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$token</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">next_token</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method returns the next token in the token stream, or nothing if there are no more tokens.</p>
+
+<h2 id="significant">significant</h2>
+
+<p>This method exists simply for the convenience of <a href="../../../lib/PPIx/Regexp/Dumper.html">PPIx::Regexp::Dumper</a>. It always returns true.</p>
+
+<h2 id="tokens">tokens</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">@tokens</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">tokens</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method returns all remaining tokens in the token stream.</p>
+
+<h1 id="EXTERNAL-TOKENIZERS">EXTERNAL TOKENIZERS</h1>
+
+<p>This class does very little of its own tokenization. Instead the token classes contain external tokenization routines, whose name is &#39;__PPIX_TOKENIZER__&#39; concatenated with the current mode of the tokenizer (&#39;regexp&#39; for regular expressions, &#39;repl&#39; for the replacement string).</p>
+
+<p>These external tokenizers are called as static methods, and passed the <code>PPIx::Regexp::Tokenizer</code> object and the current character in the character stream.</p>
+
+<p>If the external tokenizer wants to make one or more tokens, it returns an array containing either length in characters for tokens of the tokenizer&#39;s own class, or the results of one or more <a href="#make_token">&quot;make_token&quot;</a> calls for tokens of an arbitrary class.</p>
+
+<p>If the external tokenizer is not interested in the characters starting at the current position it simply returns.</p>
+
+<p>The following methods are for the use of external tokenizers, and <b>are not part of the public interface to this class.</b></p>
+
+<h2 id="capture">capture</h2>
+
+<pre><code> <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">find_regexp</span><span class="operator">(</span> <span class="string">qr{ \A ( foo ) }smx</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">foreach</span> <span class="operator">(</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">capture</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+         <span class="keyword">print</span> <span class="string">"</span><span class="variable">$_</span><span class="string">\n"</span><span class="operator">;</span>
+     <span class="operator">}</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>This method returns all the contents of any capture buffers from the previous call to <a href="#find_regexp">&quot;find_regexp&quot;</a>. The first element of the array (i.e. element 0) corresponds to <code>$1</code>, and so on.</p>
+
+<p>The captures are cleared by <a href="#make_token">&quot;make_token&quot;</a>, as well as by another call to <a href="#find_regexp">&quot;find_regexp&quot;</a>.</p>
+
+<h2 id="cookie">cookie</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">cookie</span><span class="operator">(</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">$cookie</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">cookie</span><span class="operator">(</span> <span class="string">'foo'</span> <span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">$old_hint</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">cookie</span><span class="operator">(</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method either creates, deletes, or accesses a cookie.</p>
+
+<p>A cookie is a code reference which is called whenever the tokenizer makes a token. If it returns a false value, it is deleted. Explicitly setting the cookie to <code>undef</code> also deletes it.</p>
+
+<p>When you call <code>$tokenizer-&gt;cookie( &#39;foo&#39; )</code>, the current cookie is returned. If you pass a new value of <code>undef</code> to delete the token, the deleted cookie (if any) is returned.</p>
+
+<p>When the <a href="#make_token">&quot;make_token&quot;</a> method calls a cookie, it passes it the tokenizer and the token just made. If a token calls a cookie, it is recommended that it merely pass the tokenizer, though of course the token can do whatever it wants.</p>
+
+<p>The cookie mechanism seems to be a bit of a crock, but it appeared to be more work to fix things up in the lexer after the tokenizer got something wrong.</p>
+
+<p>The recommended way to write a cookie is to use a closure to store any necessary data, and have a call to the cookie return the data; otherwise the ultimate consumer of the cookie has no way to access the data. Of course, it may be that the presence of the cookie at a certain point in the parse is all that is required.</p>
+
+<h2 id="expect">expect</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">expect</span><span class="operator">(</span> <span class="string">'PPIx::Regexp::Token::Code'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method inserts a given class at the head of the token scan, for the next iteration only. More than one class can be specified. Class names can be abbreviated by removing the leading &#39;PPIx::Regexp::&#39;.</p>
+
+<p>If no class is specified, this method does nothing.</p>
+
+<p>The expectation lasts from the next time <a href="#get_token">&quot;get_token&quot;</a> is called until the next time <a>make_token</a> makes a significant token, or until the next <code>expect</code> call if that is done sooner.</p>
+
+<h2 id="find_regexp">find_regexp</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$end</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">find_regexp</span><span class="operator">(</span> <span class="string">qr{ \A \w+ }smx</span> <span class="operator">);</span>
+ <span class="keyword">my</span> <span class="operator">(</span> <span class="variable">$begin</span><span class="operator">,</span> <span class="variable">$end</span> <span class="operator">)</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">find_regexp</span><span class="operator">(</span>
+     <span class="string">qr{ \A \w+ }smx</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method finds the given regular expression in the content, starting at the current position. If called in scalar context, the offset from the current position to the end of the matched string is returned. If called in list context, the offsets to both the beginning and the end of the matched string are returned.</p>
+
+<h2 id="find_matching_delimiter">find_matching_delimiter</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$offset</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">find_matching_delimiter</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method is used by tokenizers to find the delimiter matching the character at the current position in the content string. If the delimiter is an opening bracket of some sort, bracket nesting will be taken into account.</p>
+
+<p>When searching for the matching delimiter, the back slash character is considered to escape the following character, so back-slashed delimiters will be ignored. No other quoting mechanisms are recognized, though, so delimiters inside quotes still count. This is actually the way Perl works, as</p>
+
+<pre><code> <span class="operator">$ </span><span class="variable">perl</span> <span class="keyword">-e</span> <span class="string">'qr&lt;(?{ print "}" })&gt;'</span>
+</code></pre>
+
+<p>demonstrates.</p>
+
+<p>This method returns the offset from the current position in the content string to the matching delimiter (which will always be positive), or undef if no match can be found.</p>
+
+<h2 id="get_mode">get_mode</h2>
+
+<p>This method returns the name of the current mode of the tokenizer.</p>
+
+<h2 id="get_start_delimiter">get_start_delimiter</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$start_delimiter</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">get_start_delimiter</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method is used by tokenizers to access the start delimiter for the regular expression.</p>
+
+<h2 id="get_token">get_token</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$token</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">make_token</span><span class="operator">(</span> <span class="number">3</span> <span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">@tokens</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">get_token</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method returns the next token that can be made from the input stream. It is <b>not</b> part of the external interface, but is intended for the use of an external tokenizer which calls it after making and retaining its own token to look at the next token ( if any ) in the input stream.</p>
+
+<p>If any external tokenizer calls get_token without first calling make_token, a fatal error occurs; this is better than the infinite recursion which would occur if the condition were not trapped.</p>
+
+<p>An external tokenizer <b>must</b> return anything returned by get_token; otherwise tokens get lost.</p>
+
+<h2 id="interpolates">interpolates</h2>
+
+<p>This method returns true if the top-level structure being tokenized interpolates; that is, if the delimiter is not a single quote.</p>
+
+<h2 id="make_token">make_token</h2>
+
+<pre><code> <span class="keyword">return</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">make_token</span><span class="operator">(</span> <span class="number">3</span><span class="operator">,</span> <span class="string">'PPIx::Regexp::Token::Unknown'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method is used by this class (and possibly by individual tokenizers) to manufacture a token. Its arguments are the number of characters to include in the token, and optionally the class of the token. If no class name is given, the caller&#39;s class is used. Class names may be shortened by removing the initial &#39;PPIx::Regexp::&#39;, which will be restored by this method.</p>
+
+<p>The token will be manufactured from the given number of characters starting at the current cursor position, which will be adjusted.</p>
+
+<p>If the given length would include characters past the end of the string being tokenized, the length is reduced appropriately. If this means a token with no characters, nothing is returned.</p>
+
+<h2 id="match">match</h2>
+
+<pre><code> <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">find_regexp</span><span class="operator">(</span> <span class="string">qr{ \A \w+ }smx</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">match</span><span class="operator">(),</span> <span class="string">"\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>This method returns the string matched by the previous call to <a href="#find_regexp">&quot;find_regexp&quot;</a>.</p>
+
+<p>The match is set to <code>undef</code> by <a href="#make_token">&quot;make_token&quot;</a>, as well as by another call to <a href="#find_regexp">&quot;find_regexp&quot;</a>.</p>
+
+<h2 id="modifier_duplicate">modifier_duplicate</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">modifier_duplicate</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method duplicates the modifiers on the top of the modifier stack, with the intent of creating a locally-scoped copy of the modifiers. This should only be called by an external tokenizer that is actually creating a modifier scope. In other words, only when creating a <a href="../../../lib/PPIx/Regexp/Token/Structure.html">PPIx::Regexp::Token::Structure</a> token whose content is &#39;(&#39;.</p>
+
+<h2 id="modifier_modify">modifier_modify</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">modifier_modify</span><span class="operator">(</span> <span class="string">name</span> <span class="operator">=&gt;</span> <span class="variable">$value</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method sets new values for the modifiers in the local scope. Only the modifiers whose names are actually passed have their values changed.</p>
+
+<p>This method is intended to be called after manufacturing a <a href="../../../lib/PPIx/Regexp/Token/Modifier.html">PPIx::Regexp::Token::Modifier</a> token, and passed the results of its <code>modifiers</code> method.</p>
+
+<h2 id="modifier_pop">modifier_pop</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">modifier_pop</span><span class="operator">();</span>
+</code></pre>
+
+<p>This method removes the modifiers on the top of the modifier stack. This should only be called by an external tokenizer that is ending a modifier scope. In other words, only when creating a <a href="../../../lib/PPIx/Regexp/Token/Structure.html">PPIx::Regexp::Token::Structure</a> token whose content is &#39;)&#39;.</p>
+
+<p>Note that this method will never pop the last modifier item off the stack, to guard against unmatched right parentheses.</p>
+
+<h2 id="peek">peek</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$character</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">peek</span><span class="operator">();</span>
+ <span class="keyword">my</span> <span class="variable">$next_char</span> <span class="operator">=</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">peek</span><span class="operator">(</span> <span class="number">1</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method returns the character at the given non-negative offset from the current position. If no offset is given, an offset of 0 is used.</p>
+
+<p>If you ask for a negative offset or an offset off the end of the sting, <code>undef</code> is returned.</p>
+
+<h2 id="ppi_document">ppi_document</h2>
+
+<p>This method makes a PPI document out of the remainder of the string, and returns it.</p>
+
+<h2 id="prior">prior</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">prior</span><span class="operator">(</span> <span class="string">'can_be_quantified'</span> <span class="operator">)</span>
+    <span class="keyword">and</span> <span class="keyword">print</span> <span class="string">"The prior token can be quantified.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method is deprecated in favor of <a href="#prior_significant_token">prior_significant_tokrn()</a>. It will warn on the first use. Six months after the release of version 0.050_01 it will start warning on every use. Six months after that a fatal exception will be thrown when it is called. I am not sure I need to put this though a deprecation cycle, given that this method is documented as not being part of the public interface, but I choose to err on the side of caution.</p>
+
+<p>This method calls the named method on the most-recently-instantiated significant token, and returns the result. Any arguments subsequent to the method name will be passed to the method.</p>
+
+<p>Because this method is designed to be used within the tokenizing system, it will die horribly if the named method does not exist.</p>
+
+<p>If called with no arguments at all the most-recently-instantiated significant token is returned.</p>
+
+<h2 id="prior_significant_token">prior_significant_token</h2>
+
+<pre><code> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">prior_significant_token</span><span class="operator">(</span> <span class="string">'can_be_quantified'</span> <span class="operator">)</span>
+    <span class="keyword">and</span> <span class="keyword">print</span> <span class="string">"The prior token can be quantified.\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method calls the named method on the most-recently-instantiated significant token, and returns the result. Any arguments subsequent to the method name will be passed to the method.</p>
+
+<p>Because this method is designed to be used within the tokenizing system, it will die horribly if the named method does not exist.</p>
+
+<p>If called with no arguments at all the most-recently-instantiated significant token is returned.</p>
+
+<h2 id="strict">strict</h2>
+
+<pre><code> <span class="keyword">say</span> <span class="string">'Parse is '</span><span class="operator">,</span> <span class="variable">$tokenizer</span><span class="operator">-&gt;</span><span class="variable">strict</span><span class="operator">()</span> <span class="operator">?</span> <span class="string">'strict'</span> <span class="operator">:</span> <span class="string">'lenient'</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method simply returns true or false, depending on whether the <code>&#39;strict&#39;</code> option to <code>new()</code> was true or false.</p>
+
+<h1 id="ENVIRONMENT-VARIABLES">ENVIRONMENT VARIABLES</h1>
+
+<p>A tokenizer trace can be requested by setting environment variable PPIX_REGEXP_TOKENIZER_TRACE to a numeric value other than 0. Use of this environment variable is unsupported in the same sense that the <code>trace</code> option of <a href="#new">&quot;new&quot;</a> is unsupported. Explicitly specifying the <code>trace</code> option to <a href="#new">&quot;new&quot;</a> overrides the environment variable.</p>
+
+<p>The real reason this is documented is to give the user a way to troubleshoot funny output from the tokenizer.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is by the author. Please file bug reports at <a href="http://rt.cpan.org">http://rt.cpan.org</a>, or in electronic mail to the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2017 by Thomas R. Wyant, III</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the full text of the licenses in the directory LICENSES.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+
+</body>
+
+</html>
+
+

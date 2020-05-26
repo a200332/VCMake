@@ -1,0 +1,892 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Input">Input</a></li>
+      <li><a href="#Output">Output</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Configuration-methods">Configuration methods</a></li>
+      <li><a href="#Constructor-methods">Constructor methods</a></li>
+      <li><a href="#Arithmetic-methods">Arithmetic methods</a></li>
+      <li><a href="#ACCURACY-AND-PRECISION">ACCURACY AND PRECISION</a></li>
+      <li><a href="#Rounding">Rounding</a></li>
+    </ul>
+  </li>
+  <li><a href="#Autocreating-constants">Autocreating constants</a>
+    <ul>
+      <li><a href="#Math-library">Math library</a></li>
+      <li><a href="#Using-Math::BigInt::Lite">Using Math::BigInt::Lite</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Math::BigFloat - Arbitrary size floating point math package</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+  
+  <span class="comment"># Configuration methods (may be used as class methods and instance methods)</span>
+  
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">();</span>     <span class="comment"># get class accuracy</span>
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>   <span class="comment"># set class accuracy</span>
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">();</span>    <span class="comment"># get class precision</span>
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>  <span class="comment"># set class precision</span>
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">round_mode</span><span class="operator">();</span>   <span class="comment"># get class rounding mode</span>
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">round_mode</span><span class="operator">(</span><span class="variable">$m</span><span class="operator">);</span> <span class="comment"># set global round mode, must be one of</span>
+                                  <span class="comment"># 'even', 'odd', '+inf', '-inf', 'zero',</span>
+                                  <span class="comment"># 'trunc', or 'common'</span>
+  <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">config</span><span class="operator">();</span>       <span class="comment"># return hash with configuration</span>
+  
+  <span class="comment"># Constructor methods (when the class methods below are used as instance</span>
+  <span class="comment"># methods, the value is assigned the invocand)</span>
+  
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$str</span><span class="operator">);</span>               <span class="comment"># defaults to 0</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'0x123'</span><span class="operator">);</span>            <span class="comment"># from hexadecimal</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'0b101'</span><span class="operator">);</span>            <span class="comment"># from binary</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">from_hex</span><span class="operator">(</span><span class="string">'0xc.afep+3'</span><span class="operator">);</span>  <span class="comment"># from hex</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">from_hex</span><span class="operator">(</span><span class="string">'cafe'</span><span class="operator">);</span>        <span class="comment"># ditto</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">from_oct</span><span class="operator">(</span><span class="string">'1.3267p-4'</span><span class="operator">);</span>   <span class="comment"># from octal</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">from_oct</span><span class="operator">(</span><span class="string">'0377'</span><span class="operator">);</span>        <span class="comment"># ditto</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">from_bin</span><span class="operator">(</span><span class="string">'0b1.1001p-4'</span><span class="operator">);</span> <span class="comment"># from binary</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">from_bin</span><span class="operator">(</span><span class="string">'0101'</span><span class="operator">);</span>        <span class="comment"># ditto</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bzero</span><span class="operator">();</span>                 <span class="comment"># create a +0</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bone</span><span class="operator">();</span>                  <span class="comment"># create a +1</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bone</span><span class="operator">(</span><span class="string">'-'</span><span class="operator">);</span>               <span class="comment"># create a -1</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">binf</span><span class="operator">();</span>                  <span class="comment"># create a +inf</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">binf</span><span class="operator">(</span><span class="string">'-'</span><span class="operator">);</span>               <span class="comment"># create a -inf</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bnan</span><span class="operator">();</span>                  <span class="comment"># create a Not-A-Number</span>
+  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bpi</span><span class="operator">();</span>                   <span class="comment"># returns pi</span>
+  
+  <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">();</span>        <span class="comment"># make a copy (unlike $y = $x)</span>
+  <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">as_int</span><span class="operator">();</span>      <span class="comment"># return as BigInt</span>
+  
+  <span class="comment"># Boolean methods (these don't modify the invocand)</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_zero</span><span class="operator">();</span>          <span class="comment"># if $x is 0</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_one</span><span class="operator">();</span>           <span class="comment"># if $x is +1</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_one</span><span class="operator">(</span><span class="string">"+"</span><span class="operator">);</span>        <span class="comment"># ditto</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_one</span><span class="operator">(</span><span class="string">"-"</span><span class="operator">);</span>        <span class="comment"># if $x is -1</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_inf</span><span class="operator">();</span>           <span class="comment"># if $x is +inf or -inf</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_inf</span><span class="operator">(</span><span class="string">"+"</span><span class="operator">);</span>        <span class="comment"># if $x is +inf</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_inf</span><span class="operator">(</span><span class="string">"-"</span><span class="operator">);</span>        <span class="comment"># if $x is -inf</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_nan</span><span class="operator">();</span>           <span class="comment"># if $x is NaN</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_positive</span><span class="operator">();</span>      <span class="comment"># if $x &gt; 0</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_pos</span><span class="operator">();</span>           <span class="comment"># ditto</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_negative</span><span class="operator">();</span>      <span class="comment"># if $x &lt; 0</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_neg</span><span class="operator">();</span>           <span class="comment"># ditto</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_odd</span><span class="operator">();</span>           <span class="comment"># if $x is odd</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_even</span><span class="operator">();</span>          <span class="comment"># if $x is even</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">is_int</span><span class="operator">();</span>           <span class="comment"># if $x is an integer</span>
+  
+  <span class="comment"># Comparison methods</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bcmp</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># compare numbers (undef, &lt; 0, == 0, &gt; 0)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bacmp</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>          <span class="comment"># compare absolutely (undef, &lt; 0, == 0, &gt; 0)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">beq</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># true if and only if $x == $y</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bne</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># true if and only if $x != $y</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">blt</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># true if and only if $x &lt; $y</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">ble</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># true if and only if $x &lt;= $y</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bgt</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># true if and only if $x &gt; $y</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bge</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># true if and only if $x &gt;= $y</span>
+  
+  <span class="comment"># Arithmetic methods</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bneg</span><span class="operator">();</span>             <span class="comment"># negation</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">babs</span><span class="operator">();</span>             <span class="comment"># absolute value</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bsgn</span><span class="operator">();</span>             <span class="comment"># sign function (-1, 0, 1, or NaN)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bnorm</span><span class="operator">();</span>            <span class="comment"># normalize (no-op)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">binc</span><span class="operator">();</span>             <span class="comment"># increment $x by 1</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bdec</span><span class="operator">();</span>             <span class="comment"># decrement $x by 1</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">badd</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># addition (add $y to $x)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bsub</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># subtraction (subtract $y from $x)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmul</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># multiplication (multiply $x by $y)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmuladd</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">,</span><span class="variable">$z</span><span class="operator">);</span>     <span class="comment"># $x = $x * $y + $z</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># division (floored), set $x to quotient</span>
+                          <span class="comment"># return (quo,rem) or quo if scalar</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">btdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>          <span class="comment"># division (truncated), set $x to quotient</span>
+                          <span class="comment"># return (quo,rem) or quo if scalar</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmod</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># modulus (x % y)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">btmod</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>          <span class="comment"># modulus (truncated)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmodinv</span><span class="operator">(</span><span class="variable">$mod</span><span class="operator">);</span>      <span class="comment"># modular multiplicative inverse</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmodpow</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">,</span><span class="variable">$mod</span><span class="operator">);</span>   <span class="comment"># modular exponentiation (($x ** $y) % $mod)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bpow</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># power of arguments (x ** y)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">blog</span><span class="operator">();</span>             <span class="comment"># logarithm of $x to base e (Euler's number)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">blog</span><span class="operator">(</span><span class="variable">$base</span><span class="operator">);</span>        <span class="comment"># logarithm of $x to base $base (e.g., base 2)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bexp</span><span class="operator">();</span>             <span class="comment"># calculate e ** $x where e is Euler's number</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bnok</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># x over y (binomial coefficient n over k)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bsin</span><span class="operator">();</span>             <span class="comment"># sine</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bcos</span><span class="operator">();</span>             <span class="comment"># cosine</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">batan</span><span class="operator">();</span>            <span class="comment"># inverse tangent</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">batan2</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>         <span class="comment"># two-argument inverse tangent</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bsqrt</span><span class="operator">();</span>            <span class="comment"># calculate square-root</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">broot</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>          <span class="comment"># $y'th root of $x (e.g. $y == 3 =&gt; cubic root)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bfac</span><span class="operator">();</span>             <span class="comment"># factorial of $x (1*2*3*4*..$x)</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">blsft</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>          <span class="comment"># left shift $n places in base 2</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">blsft</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">,</span><span class="variable">$b</span><span class="operator">);</span>       <span class="comment"># left shift $n places in base $b</span>
+                          <span class="comment"># returns (quo,rem) or quo (scalar context)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">brsft</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>          <span class="comment"># right shift $n places in base 2</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">brsft</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">,</span><span class="variable">$b</span><span class="operator">);</span>       <span class="comment"># right shift $n places in base $b</span>
+                          <span class="comment"># returns (quo,rem) or quo (scalar context)</span>
+  
+  <span class="comment"># Bitwise methods</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">band</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># bitwise and</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bior</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># bitwise inclusive or</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bxor</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>           <span class="comment"># bitwise exclusive or</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bnot</span><span class="operator">();</span>             <span class="comment"># bitwise not (two's complement)</span>
+  
+  <span class="comment"># Rounding methods</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">round</span><span class="operator">(</span><span class="variable">$A</span><span class="operator">,</span><span class="variable">$P</span><span class="operator">,</span><span class="variable">$mode</span><span class="operator">);</span> <span class="comment"># round to accuracy or precision using</span>
+                          <span class="comment"># rounding mode $mode</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bround</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>         <span class="comment"># accuracy: preserve $n digits</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bfround</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>        <span class="comment"># $n &gt; 0: round to $nth digit left of dec. point</span>
+                          <span class="comment"># $n &lt; 0: round to $nth digit right of dec. point</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bfloor</span><span class="operator">();</span>           <span class="comment"># round towards minus infinity</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bceil</span><span class="operator">();</span>            <span class="comment"># round towards plus infinity</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bint</span><span class="operator">();</span>             <span class="comment"># round towards zero</span>
+  
+  <span class="comment"># Other mathematical methods</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bgcd</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># greatest common divisor</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">blcm</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>            <span class="comment"># least common multiple</span>
+  
+  <span class="comment"># Object property methods (do not modify the invocand)</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">sign</span><span class="operator">();</span>              <span class="comment"># the sign, either +, - or NaN</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">digit</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>           <span class="comment"># the nth digit, counting from the right</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">digit</span><span class="operator">(-</span><span class="variable">$n</span><span class="operator">);</span>          <span class="comment"># the nth digit, counting from the left</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">length</span><span class="operator">();</span>            <span class="comment"># return number of digits in number</span>
+  <span class="operator">(</span><span class="variable">$xl</span><span class="operator">,</span><span class="variable">$f</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">length</span><span class="operator">();</span> <span class="comment"># length of number and length of fraction</span>
+                           <span class="comment"># part, latter is always 0 digits long</span>
+                           <span class="comment"># for Math::BigInt objects</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">mantissa</span><span class="operator">();</span>          <span class="comment"># return (signed) mantissa as BigInt</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">exponent</span><span class="operator">();</span>          <span class="comment"># return exponent as BigInt</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">parts</span><span class="operator">();</span>             <span class="comment"># return (mantissa,exponent) as BigInt</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">sparts</span><span class="operator">();</span>            <span class="comment"># mantissa and exponent (as integers)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">nparts</span><span class="operator">();</span>            <span class="comment"># mantissa and exponent (normalised)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">eparts</span><span class="operator">();</span>            <span class="comment"># mantissa and exponent (engineering notation)</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">dparts</span><span class="operator">();</span>            <span class="comment"># integer and fraction part</span>
+  
+  <span class="comment"># Conversion methods (do not modify the invocand)</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bstr</span><span class="operator">();</span>         <span class="comment"># decimal notation, possibly zero padded</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bsstr</span><span class="operator">();</span>        <span class="comment"># string in scientific notation with integers</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bnstr</span><span class="operator">();</span>        <span class="comment"># string in normalized notation</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bestr</span><span class="operator">();</span>        <span class="comment"># string in engineering notation</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bdstr</span><span class="operator">();</span>        <span class="comment"># string in decimal notation</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">as_hex</span><span class="operator">();</span>       <span class="comment"># as signed hexadecimal string with prefixed 0x</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">as_bin</span><span class="operator">();</span>       <span class="comment"># as signed binary string with prefixed 0b</span>
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">as_oct</span><span class="operator">();</span>       <span class="comment"># as signed octal string with prefixed 0</span>
+  
+  <span class="comment"># Other conversion methods</span>
+  
+  <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">numify</span><span class="operator">();</span>           <span class="comment"># return as scalar (might overflow or underflow)</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Math::BigFloat provides support for arbitrary precision floating point. Overloading is also provided for Perl operators.</p>
+
+<p>All operators (including basic math operations) are overloaded if you declare your big floating point numbers as</p>
+
+<pre><code>  <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span> <span class="operator">-&gt;</span> <span class="variable">new</span><span class="operator">(</span><span class="string">'12_3.456_789_123_456_789E-2'</span><span class="operator">);</span>
+</code></pre>
+
+<p>Operations with overloaded operators preserve the arguments, which is exactly what you expect.</p>
+
+<h2 id="Input">Input</h2>
+
+<p>Input values to these routines may be any scalar number or string that looks like a number and represents a floating point number.</p>
+
+<ul>
+
+<li><p>Leading and trailing whitespace is ignored.</p>
+
+</li>
+<li><p>Leading and trailing zeros are ignored.</p>
+
+</li>
+<li><p>If the string has a &quot;0x&quot; prefix, it is interpreted as a hexadecimal number.</p>
+
+</li>
+<li><p>If the string has a &quot;0b&quot; prefix, it is interpreted as a binary number.</p>
+
+</li>
+<li><p>For hexadecimal and binary numbers, the exponent must be separated from the significand (mantissa) by the letter &quot;p&quot; or &quot;P&quot;, not &quot;e&quot; or &quot;E&quot; as with decimal numbers.</p>
+
+</li>
+<li><p>One underline is allowed between any two digits, including hexadecimal and binary digits.</p>
+
+</li>
+<li><p>If the string can not be interpreted, NaN is returned.</p>
+
+</li>
+</ul>
+
+<p>Octal numbers are typically prefixed by &quot;0&quot;, but since leading zeros are stripped, these methods can not automatically recognize octal numbers, so use the constructor from_oct() to interpret octal strings.</p>
+
+<p>Some examples of valid string input</p>
+
+<pre><code>    Input string                Resulting value
+    123                         123
+    1.23e2                      123
+    12300e-2                    123
+    0xcafe                      51966
+    0b1101                      13
+    67_538_754                  67538754
+    -4_5_6.7_8_9e+0_1_0         -4567890000000
+    0x1.921fb5p+1               3.14159262180328369140625e+0
+    0b1.1001p-4                 9.765625e-2</code></pre>
+
+<h2 id="Output">Output</h2>
+
+<p>Output values are usually Math::BigFloat objects.</p>
+
+<p>Boolean operators <code>is_zero()</code>, <code>is_one()</code>, <code>is_inf()</code>, etc. return true or false.</p>
+
+<p>Comparison operators <code>bcmp()</code> and <code>bacmp()</code>) return -1, 0, 1, or undef.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>Math::BigFloat supports all methods that Math::BigInt supports, except it calculates non-integer results when possible. Please see <a href="../../lib/Math/BigInt.html">Math::BigInt</a> for a full description of each method. Below are just the most important differences:</p>
+
+<h2 id="Configuration-methods">Configuration methods</h2>
+
+<dl>
+
+<dt id="accuracy">accuracy()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(</span><span class="number">5</span><span class="operator">);</span>           <span class="comment"># local for $x</span>
+    <span class="variable">CLASS</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(</span><span class="number">5</span><span class="operator">);</span>        <span class="comment"># global for all members of CLASS</span>
+                               <span class="comment"># Note: This also applies to new()!</span>
+    
+    <span class="variable">$A</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">();</span>       <span class="comment"># read out accuracy that affects $x</span>
+    <span class="variable">$A</span> <span class="operator">=</span> <span class="variable">CLASS</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">();</span>    <span class="comment"># read out global accuracy</span>
+</code></pre>
+
+<p>Set or get the global or local accuracy, aka how many significant digits the results have. If you set a global accuracy, then this also applies to new()!</p>
+
+<p>Warning! The accuracy <i>sticks</i>, e.g. once you created a number under the influence of <code>CLASS-&gt;accuracy($A)</code>, all results from math operations with that number will also be rounded.</p>
+
+<p>In most cases, you should probably round the results explicitly using one of <a href="../../lib/Math/BigInt.html#round">&quot;round()&quot; in Math::BigInt</a>, <a href="../../lib/Math/BigInt.html#bround">&quot;bround()&quot; in Math::BigInt</a> or <a href="../../lib/Math/BigInt.html#bfround">&quot;bfround()&quot; in Math::BigInt</a> or by passing the desired accuracy to the math operation as additional parameter:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigInt</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">30000</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">Math::BigInt</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">7</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="keyword">scalar</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">,</span> <span class="number">2</span><span class="operator">);</span>           <span class="comment"># print 4300</span>
+    <span class="keyword">print</span> <span class="keyword">scalar</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">)-&gt;</span><span class="variable">bround</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>   <span class="comment"># print 4300</span>
+</code></pre>
+
+</dd>
+<dt id="precision">precision()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(-</span><span class="number">2</span><span class="operator">);</span>        <span class="comment"># local for $x, round at the second</span>
+                              <span class="comment"># digit right of the dot</span>
+    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>         <span class="comment"># ditto, round at the second digit</span>
+                              <span class="comment"># left of the dot</span>
+    
+    <span class="variable">CLASS</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(</span><span class="number">5</span><span class="operator">);</span>      <span class="comment"># Global for all members of CLASS</span>
+                              <span class="comment"># This also applies to new()!</span>
+    <span class="variable">CLASS</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(-</span><span class="number">5</span><span class="operator">);</span>     <span class="comment"># ditto</span>
+    
+    <span class="variable">$P</span> <span class="operator">=</span> <span class="variable">CLASS</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">();</span>  <span class="comment"># read out global precision</span>
+    <span class="variable">$P</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">();</span>     <span class="comment"># read out precision that affects $x</span>
+</code></pre>
+
+<p>Note: You probably want to use <a href="#accuracy">&quot;accuracy()&quot;</a> instead. With <a href="#accuracy">&quot;accuracy()&quot;</a> you set the number of digits each result should have, with <a href="#precision">&quot;precision()&quot;</a> you set the place where to round!</p>
+
+</dd>
+</dl>
+
+<h2 id="Constructor-methods">Constructor methods</h2>
+
+<dl>
+
+<dt id="from_hex">from_hex()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">-&gt;</span> <span class="variable">from_hex</span><span class="operator">(</span><span class="string">"0x1.921fb54442d18p+1"</span><span class="operator">);</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span> <span class="operator">-&gt;</span> <span class="variable">from_hex</span><span class="operator">(</span><span class="string">"0x1.921fb54442d18p+1"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Interpret input as a hexadecimal string.A prefix (&quot;0x&quot;, &quot;x&quot;, ignoring case) is optional. A single underscore character (&quot;_&quot;) may be placed between any two digits. If the input is invalid, a NaN is returned. The exponent is in base 2 using decimal digits.</p>
+
+<p>If called as an instance method, the value is assigned to the invocand.</p>
+
+</dd>
+<dt id="from_oct">from_oct()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">-&gt;</span> <span class="variable">from_oct</span><span class="operator">(</span><span class="string">"1.3267p-4"</span><span class="operator">);</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span> <span class="operator">-&gt;</span> <span class="variable">from_oct</span><span class="operator">(</span><span class="string">"1.3267p-4"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Interpret input as an octal string. A single underscore character (&quot;_&quot;) may be placed between any two digits. If the input is invalid, a NaN is returned. The exponent is in base 2 using decimal digits.</p>
+
+<p>If called as an instance method, the value is assigned to the invocand.</p>
+
+</dd>
+<dt id="from_bin">from_bin()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">-&gt;</span> <span class="variable">from_bin</span><span class="operator">(</span><span class="string">"0b1.1001p-4"</span><span class="operator">);</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span> <span class="operator">-&gt;</span> <span class="variable">from_bin</span><span class="operator">(</span><span class="string">"0b1.1001p-4"</span><span class="operator">);</span>
+</code></pre>
+
+<p>Interpret input as a hexadecimal string. A prefix (&quot;0b&quot; or &quot;b&quot;, ignoring case) is optional. A single underscore character (&quot;_&quot;) may be placed between any two digits. If the input is invalid, a NaN is returned. The exponent is in base 2 using decimal digits.</p>
+
+<p>If called as an instance method, the value is assigned to the invocand.</p>
+
+</dd>
+<dt id="bpi">bpi()</dt>
+<dd>
+
+<pre><code>    <span class="keyword">print</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bpi</span><span class="operator">(</span><span class="number">100</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Calculate PI to N digits (including the 3 before the dot). The result is rounded according to the current rounding mode, which defaults to &quot;even&quot;.</p>
+
+<p>This method was added in v1.87 of Math::BigInt (June 2007).</p>
+
+</dd>
+</dl>
+
+<h2 id="Arithmetic-methods">Arithmetic methods</h2>
+
+<dl>
+
+<dt id="bmuladd">bmuladd()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmuladd</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">,</span><span class="variable">$z</span><span class="operator">);</span>
+</code></pre>
+
+<p>Multiply $x by $y, and then add $z to the result.</p>
+
+<p>This method was added in v1.87 of Math::BigInt (June 2007).</p>
+
+</dd>
+<dt id="bdiv">bdiv()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$q</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>
+    <span class="operator">(</span><span class="variable">$q</span><span class="operator">,</span> <span class="variable">$r</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>
+</code></pre>
+
+<p>In scalar context, divides $x by $y and returns the result to the given or default accuracy/precision. In list context, does floored division (F-division), returning an integer $q and a remainder $r so that $x = $q * $y + $r. The remainer (modulo) is equal to what is returned by <code>$x-</code>bmod($y)&gt;.</p>
+
+</dd>
+<dt id="bmod">bmod()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bmod</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>
+</code></pre>
+
+<p>Returns $x modulo $y. When $x is finite, and $y is finite and non-zero, the result is identical to the remainder after floored division (F-division). If, in addition, both $x and $y are integers, the result is identical to the result from Perl&#39;s % operator.</p>
+
+</dd>
+<dt id="bexp">bexp()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bexp</span><span class="operator">(</span><span class="variable">$accuracy</span><span class="operator">);</span>            <span class="comment"># calculate e ** X</span>
+</code></pre>
+
+<p>Calculates the expression <code>e ** $x</code> where <code>e</code> is Euler&#39;s number.</p>
+
+<p>This method was added in v1.82 of Math::BigInt (April 2007).</p>
+
+</dd>
+<dt id="bnok">bnok()</dt>
+<dd>
+
+<pre><code>    <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bnok</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>   <span class="comment"># x over y (binomial coefficient n over k)</span>
+</code></pre>
+
+<p>Calculates the binomial coefficient n over k, also called the &quot;choose&quot; function. The result is equivalent to:</p>
+
+<pre><code>    ( n )      n!
+    | - |  = -------
+    ( k )    k!(n-k)!</code></pre>
+
+<p>This method was added in v1.84 of Math::BigInt (April 2007).</p>
+
+</dd>
+<dt id="bsin">bsin()</dt>
+<dd>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bsin</span><span class="operator">(</span><span class="number">100</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Calculate the sinus of $x, modifying $x in place.</p>
+
+<p>This method was added in v1.87 of Math::BigInt (June 2007).</p>
+
+</dd>
+<dt id="bcos">bcos()</dt>
+<dd>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">bcos</span><span class="operator">(</span><span class="number">100</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Calculate the cosinus of $x, modifying $x in place.</p>
+
+<p>This method was added in v1.87 of Math::BigInt (June 2007).</p>
+
+</dd>
+<dt id="batan">batan()</dt>
+<dd>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">batan</span><span class="operator">(</span><span class="number">100</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Calculate the arcus tanges of $x, modifying $x in place. See also <a href="#batan2">&quot;batan2()&quot;</a>.</p>
+
+<p>This method was added in v1.87 of Math::BigInt (June 2007).</p>
+
+</dd>
+<dt id="batan2">batan2()</dt>
+<dd>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">3</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$y</span><span class="operator">-&gt;</span><span class="variable">batan2</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Calculate the arcus tanges of <code>$y</code> divided by <code>$x</code>, modifying $y in place. See also <a href="#batan">&quot;batan()&quot;</a>.</p>
+
+<p>This method was added in v1.87 of Math::BigInt (June 2007).</p>
+
+</dd>
+<dt id="as_float">as_float()</dt>
+<dd>
+
+<p>This method is called when Math::BigFloat encounters an object it doesn&#39;t know how to handle. For instance, assume $x is a Math::BigFloat, or subclass thereof, and $y is defined, but not a Math::BigFloat, or subclass thereof. If you do</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">-&gt;</span> <span class="variable">badd</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">);</span>
+</code></pre>
+
+<p>$y needs to be converted into an object that $x can deal with. This is done by first checking if $y is something that $x might be upgraded to. If that is the case, no further attempts are made. The next is to see if $y supports the method <code>as_float()</code>. The method <code>as_float()</code> is expected to return either an object that has the same class as $x, a subclass thereof, or a string that <code>ref($x)-&gt;new()</code> can parse to create an object.</p>
+
+<p>In Math::BigFloat, <code>as_float()</code> has the same effect as <code>copy()</code>.</p>
+
+</dd>
+</dl>
+
+<h2 id="ACCURACY-AND-PRECISION">ACCURACY AND PRECISION</h2>
+
+<p>See also: <a href="#Rounding">Rounding</a>.</p>
+
+<p>Math::BigFloat supports both precision (rounding to a certain place before or after the dot) and accuracy (rounding to a certain number of digits). For a full documentation, examples and tips on these topics please see the large section about rounding in <a href="../../lib/Math/BigInt.html">Math::BigInt</a>.</p>
+
+<p>Since things like <code>sqrt(2)</code> or <code>1 / 3</code> must presented with a limited accuracy lest a operation consumes all resources, each operation produces no more than the requested number of digits.</p>
+
+<p>If there is no global precision or accuracy set, <b>and</b> the operation in question was not called with a requested precision or accuracy, <b>and</b> the input $x has no accuracy or precision set, then a fallback parameter will be used. For historical reasons, it is called <code>div_scale</code> and can be accessed via:</p>
+
+<pre><code>    <span class="variable">$d</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">div_scale</span><span class="operator">();</span>       <span class="comment"># query</span>
+    <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">div_scale</span><span class="operator">(</span><span class="variable">$n</span><span class="operator">);</span>          <span class="comment"># set to $n digits</span>
+</code></pre>
+
+<p>The default value for <code>div_scale</code> is 40.</p>
+
+<p>In case the result of one operation has more digits than specified, it is rounded. The rounding mode taken is either the default mode, or the one supplied to the operation after the <i>scale</i>:</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+    <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(</span><span class="number">5</span><span class="operator">);</span>              <span class="comment"># 5 digits max</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="number">3</span><span class="operator">);</span>                 <span class="comment"># gives 0.66667</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">6</span><span class="operator">);</span>               <span class="comment"># gives 0.666667</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">6</span><span class="operator">,</span><span class="keyword">undef</span><span class="operator">,</span><span class="string">'odd'</span><span class="operator">);</span>   <span class="comment"># gives 0.666667</span>
+    <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">round_mode</span><span class="operator">(</span><span class="string">'zero'</span><span class="operator">);</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">6</span><span class="operator">);</span>               <span class="comment"># will also give 0.666667</span>
+</code></pre>
+
+<p>Note that <code>Math::BigFloat-&gt;accuracy()</code> and <code>Math::BigFloat-&gt;precision()</code> set the global variables, and thus <b>any</b> newly created number will be subject to the global rounding <b>immediately</b>. This means that in the examples above, the <code>3</code> as argument to <code>bdiv()</code> will also get an accuracy of <b>5</b>.</p>
+
+<p>It is less confusing to either calculate the result fully, and afterwards round it explicitly, or use the additional parameters to the math functions like so:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="number">3</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$y</span><span class="operator">-&gt;</span><span class="variable">bround</span><span class="operator">(</span><span class="number">5</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span>               <span class="comment"># gives 0.66667</span>
+    
+    <span class="keyword">or</span>
+    
+    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">5</span><span class="operator">);</span>             <span class="comment"># gives 0.66667</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$y</span><span class="string">\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Rounding">Rounding</h2>
+
+<dl>
+
+<dt id="bfround-scale">bfround ( +$scale )</dt>
+<dd>
+
+<p>Rounds to the $scale&#39;th place left from the &#39;.&#39;, counting from the dot. The first digit is numbered 1.</p>
+
+</dd>
+<dt id="bfround---scale">bfround ( -$scale )</dt>
+<dd>
+
+<p>Rounds to the $scale&#39;th place right from the &#39;.&#39;, counting from the dot.</p>
+
+</dd>
+<dt id="bfround-0">bfround ( 0 )</dt>
+<dd>
+
+<p>Rounds to an integer.</p>
+
+</dd>
+<dt id="bround-scale">bround ( +$scale )</dt>
+<dd>
+
+<p>Preserves accuracy to $scale digits from the left (aka significant digits) and pads the rest with zeros. If the number is between 1 and -1, the significant digits count from the first non-zero after the &#39;.&#39;</p>
+
+</dd>
+<dt id="bround---scale-and-bround-0">bround ( -$scale ) and bround ( 0 )</dt>
+<dd>
+
+<p>These are effectively no-ops.</p>
+
+</dd>
+</dl>
+
+<p>All rounding functions take as a second parameter a rounding mode from one of the following: &#39;even&#39;, &#39;odd&#39;, &#39;+inf&#39;, &#39;-inf&#39;, &#39;zero&#39;, &#39;trunc&#39; or &#39;common&#39;.</p>
+
+<p>The default rounding mode is &#39;even&#39;. By using <code><span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">round_mode</span><span class="operator">(</span><span class="variable">$round_mode</span><span class="operator">);</span>
+</code> you can get and set the default mode for subsequent rounding. The usage of <code>$Math::BigFloat::$round_mode</code> is no longer supported. The second parameter to the round functions then overrides the default temporarily.</p>
+
+<p>The <code>as_number()</code> function returns a BigInt from a Math::BigFloat. It uses &#39;trunc&#39; as rounding mode to make it equivalent to:</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=</span> <span class="number">2.5</span><span class="operator">;</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="keyword">int</span><span class="operator">(</span><span class="variable">$x</span><span class="operator">)</span> <span class="operator">+</span> <span class="number">2</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can override this by passing the desired rounding mode as parameter to <code>as_number()</code>:</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">2.5</span><span class="operator">);</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">as_number</span><span class="operator">(</span><span class="string">'odd'</span><span class="operator">);</span>      <span class="comment"># $y = 3</span>
+</code></pre>
+
+<h1 id="Autocreating-constants">Autocreating constants</h1>
+
+<p>After <code>use Math::BigFloat &#39;:constant&#39;</code> all the floating point constants in the given scope are converted to <code>Math::BigFloat</code>. This conversion happens at compile time.</p>
+
+<p>In particular</p>
+
+<pre><code>    perl -MMath::BigFloat=:constant -e &#39;print 2E-100,&quot;\n&quot;&#39;</code></pre>
+
+<p>prints the value of <code>2E-100</code>. Note that without conversion of constants the expression 2E-100 will be calculated as normal floating point number.</p>
+
+<p>Please note that &#39;:constant&#39; does not affect integer constants, nor binary nor hexadecimal constants. Use <a href="../../lib/bignum.html">bignum</a> or <a href="../../lib/Math/BigInt.html">Math::BigInt</a> to get this to work.</p>
+
+<h2 id="Math-library">Math library</h2>
+
+<p>Math with the numbers is done (by default) by a module called Math::BigInt::Calc. This is equivalent to saying:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">lib</span> <span class="operator">=&gt;</span> <span class="string">'Calc'</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can change this by using:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">lib</span> <span class="operator">=&gt;</span> <span class="string">'GMP'</span><span class="operator">;</span>
+</code></pre>
+
+<p><b>Note</b>: General purpose packages should not be explicit about the library to use; let the script author decide which is best.</p>
+
+<p>Note: The keyword &#39;lib&#39; will warn when the requested library could not be loaded. To suppress the warning use &#39;try&#39; instead:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">try</span> <span class="operator">=&gt;</span> <span class="string">'GMP'</span><span class="operator">;</span>
+</code></pre>
+
+<p>If your script works with huge numbers and Calc is too slow for them, you can also for the loading of one of these libraries and if none of them can be used, the code will die:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">only</span> <span class="operator">=&gt;</span> <span class="string">'GMP,Pari'</span><span class="operator">;</span>
+</code></pre>
+
+<p>The following would first try to find Math::BigInt::Foo, then Math::BigInt::Bar, and when this also fails, revert to Math::BigInt::Calc:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">lib</span> <span class="operator">=&gt;</span> <span class="string">'Foo,Math::BigInt::Bar'</span><span class="operator">;</span>
+</code></pre>
+
+<p>See the respective low-level library documentation for further details.</p>
+
+<p>Please note that Math::BigFloat does <b>not</b> use the denoted library itself, but it merely passes the lib argument to Math::BigInt. So, instead of the need to do:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigInt</span> <span class="string">lib</span> <span class="operator">=&gt;</span> <span class="string">'GMP'</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+</code></pre>
+
+<p>you can roll it all into one line:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">lib</span> <span class="operator">=&gt;</span> <span class="string">'GMP'</span><span class="operator">;</span>
+</code></pre>
+
+<p>It is also possible to just require Math::BigFloat:</p>
+
+<pre><code>    <span class="keyword">require</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+</code></pre>
+
+<p>This will load the necessary things (like BigInt) when they are needed, and automatically.</p>
+
+<p>See <a href="../../lib/Math/BigInt.html">Math::BigInt</a> for more details than you ever wanted to know about using a different low-level library.</p>
+
+<h2 id="Using-Math::BigInt::Lite">Using Math::BigInt::Lite</h2>
+
+<p>For backwards compatibility reasons it is still possible to request a different storage class for use with Math::BigFloat:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">with</span> <span class="operator">=&gt;</span> <span class="string">'Math::BigInt::Lite'</span><span class="operator">;</span>
+</code></pre>
+
+<p>However, this request is ignored, as the current code now uses the low-level math library for directly storing the number parts.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p><code>Math::BigFloat</code> exports nothing by default, but can export the <code>bpi()</code> method:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span> <span class="string">qw/bpi/</span><span class="operator">;</span>
+    
+    <span class="keyword">print</span> <span class="variable">bpi</span><span class="operator">(</span><span class="number">10</span><span class="operator">),</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>Do not try to be clever to insert some operations in between switching libraries:</p>
+
+<pre><code>    <span class="keyword">require</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$matter</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bone</span><span class="operator">()</span> <span class="operator">+</span> <span class="number">4</span><span class="operator">;</span>    <span class="comment"># load BigInt and Calc</span>
+    <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">import</span><span class="operator">(</span> <span class="string">lib</span> <span class="operator">=&gt;</span> <span class="string">'Pari'</span> <span class="operator">);</span>    <span class="comment"># load Pari, too</span>
+    <span class="keyword">my</span> <span class="variable">$anti_matter</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">bone</span><span class="operator">()+</span><span class="number">4</span><span class="operator">;</span> <span class="comment"># now use Pari</span>
+</code></pre>
+
+<p>This will create objects with numbers stored in two different backend libraries, and <b>VERY BAD THINGS</b> will happen when you use these together:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$flash_and_bang</span> <span class="operator">=</span> <span class="variable">$matter</span> <span class="operator">+</span> <span class="variable">$anti_matter</span><span class="operator">;</span>    <span class="comment"># Don't do this!</span>
+</code></pre>
+
+<dl>
+
+<dt id="stringify-bstr">stringify, bstr()</dt>
+<dd>
+
+<p>Both stringify and bstr() now drop the leading &#39;+&#39;. The old code would return &#39;+1.23&#39;, the new returns &#39;1.23&#39;. See the documentation in <a href="../../lib/Math/BigInt.html">Math::BigInt</a> for reasoning and details.</p>
+
+</dd>
+<dt id="brsft">brsft()</dt>
+<dd>
+
+<p>The following will probably not print what you expect:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$c</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'3.14159'</span><span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$c</span><span class="operator">-&gt;</span><span class="variable">brsft</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">10</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span>     <span class="comment"># prints 0.00314153.1415</span>
+</code></pre>
+
+<p>It prints both quotient and remainder, since print calls <code>brsft()</code> in list context. Also, <code>$c-&gt;brsft()</code> will modify $c, so be careful. You probably want to use</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="keyword">scalar</span> <span class="variable">$c</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">brsft</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">10</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span>
+    <span class="comment"># or if you really want to modify $c</span>
+    <span class="keyword">print</span> <span class="keyword">scalar</span> <span class="variable">$c</span><span class="operator">-&gt;</span><span class="variable">brsft</span><span class="operator">(</span><span class="number">3</span><span class="operator">,</span><span class="number">10</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>instead.</p>
+
+</dd>
+<dt id="Modifying-and">Modifying and =</dt>
+<dd>
+
+<p>Beware of:</p>
+
+<pre><code>    <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">5</span><span class="operator">);</span>
+    <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">;</span>
+</code></pre>
+
+<p>It will not do what you think, e.g. making a copy of $x. Instead it just makes a second reference to the <b>same</b> object and stores it in $y. Thus anything that modifies $x will modify $y (except overloaded math operators), and vice versa. See <a href="../../lib/Math/BigInt.html">Math::BigInt</a> for details and how to avoid that.</p>
+
+</dd>
+<dt id="precision-vs.-accuracy">precision() vs. accuracy()</dt>
+<dd>
+
+<p>A common pitfall is to use <a href="#precision">&quot;precision()&quot;</a> when you want to round a result to a certain number of digits:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+    
+    <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(</span><span class="number">4</span><span class="operator">);</span>           <span class="comment"># does not do what you</span>
+                                            <span class="comment"># think it does</span>
+    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">12345</span><span class="operator">);</span>     <span class="comment"># rounds $x to "12000"!</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$x</span><span class="string">\n"</span><span class="operator">;</span>                           <span class="comment"># print "12000"</span>
+    <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">3</span><span class="operator">);</span>         <span class="comment"># rounds $y to "0"!</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$y</span><span class="string">\n"</span><span class="operator">;</span>                           <span class="comment"># print "0"</span>
+    <span class="variable">$z</span> <span class="operator">=</span> <span class="variable">$x</span> <span class="operator">/</span> <span class="variable">$y</span><span class="operator">;</span>                           <span class="comment"># 12000 / 0 =&gt; NaN!</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$z</span><span class="string">\n"</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$z</span><span class="operator">-&gt;</span><span class="variable">precision</span><span class="operator">(),</span><span class="string">"\n"</span><span class="operator">;</span>             <span class="comment"># 4</span>
+</code></pre>
+
+<p>Replacing <a href="#precision">&quot;precision()&quot;</a> with <a href="#accuracy">&quot;accuracy()&quot;</a> is probably not what you want, either:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+    
+    <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(</span><span class="number">4</span><span class="operator">);</span>          <span class="comment"># enables global rounding:</span>
+    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">123456</span><span class="operator">);</span>  <span class="comment"># rounded immediately</span>
+                                          <span class="comment">#   to "12350"</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$x</span><span class="string">\n"</span><span class="operator">;</span>                         <span class="comment"># print "123500"</span>
+    <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">3</span><span class="operator">);</span>       <span class="comment"># rounded to "3</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$y</span><span class="string">\n"</span><span class="operator">;</span>                         <span class="comment"># print "3"</span>
+    <span class="keyword">print</span> <span class="variable">$z</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span> <span class="comment"># 41170</span>
+    <span class="keyword">print</span> <span class="variable">$z</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(),</span><span class="string">"\n"</span><span class="operator">;</span>            <span class="comment"># 4</span>
+</code></pre>
+
+<p>What you want to use instead is:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Math::BigFloat</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">123456</span><span class="operator">);</span>    <span class="comment"># no rounding</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$x</span><span class="string">\n"</span><span class="operator">;</span>                           <span class="comment"># print "123456"</span>
+    <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="variable">Math::BigFloat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="number">3</span><span class="operator">);</span>         <span class="comment"># no rounding</span>
+    <span class="keyword">print</span> <span class="string">"</span><span class="variable">$y</span><span class="string">\n"</span><span class="operator">;</span>                           <span class="comment"># print "3"</span>
+    <span class="keyword">print</span> <span class="variable">$z</span> <span class="operator">=</span> <span class="variable">$x</span><span class="operator">-&gt;</span><span class="variable">copy</span><span class="operator">()-&gt;</span><span class="variable">bdiv</span><span class="operator">(</span><span class="variable">$y</span><span class="operator">,</span><span class="number">4</span><span class="operator">),</span><span class="string">"\n"</span><span class="operator">;</span> <span class="comment"># 41150</span>
+    <span class="keyword">print</span> <span class="variable">$z</span><span class="operator">-&gt;</span><span class="variable">accuracy</span><span class="operator">(),</span><span class="string">"\n"</span><span class="operator">;</span>              <span class="comment"># undef</span>
+</code></pre>
+
+<p>In addition to computing what you expected, the last example also does <b>not</b> &quot;taint&quot; the result with an accuracy or precision setting, which would influence any further operation.</p>
+
+</dd>
+</dl>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-math-bigint at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt">https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt</a> (requires login). We will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc Math::BigFloat</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker</p>
+
+<p><a href="https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt">https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/Math-BigInt">http://annocpan.org/dist/Math-BigInt</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/dist/Math-BigInt">http://cpanratings.perl.org/dist/Math-BigInt</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="http://search.cpan.org/dist/Math-BigInt/">http://search.cpan.org/dist/Math-BigInt/</a></p>
+
+</li>
+<li><p>CPAN Testers Matrix</p>
+
+<p><a href="http://matrix.cpantesters.org/?dist=Math-BigInt">http://matrix.cpantesters.org/?dist=Math-BigInt</a></p>
+
+</li>
+<li><p>The Bignum mailing list</p>
+
+<ul>
+
+<li><p>Post to mailing list</p>
+
+<p><code>bignum at lists.scsys.co.uk</code></p>
+
+</li>
+<li><p>View mailing list</p>
+
+<p><a href="http://lists.scsys.co.uk/pipermail/bignum/">http://lists.scsys.co.uk/pipermail/bignum/</a></p>
+
+</li>
+<li><p>Subscribe/Unsubscribe</p>
+
+<p><a href="http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum">http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/bignum</a></p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This program is free software; you may redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/Math/BigFloat.html">Math::BigFloat</a> and <a href="../../lib/Math/BigInt.html">Math::BigInt</a> as well as the backends <a href="../../lib/Math/BigInt/FastCalc.html">Math::BigInt::FastCalc</a>, <a href="../../lib/Math/BigInt/GMP.html">Math::BigInt::GMP</a>, and <a>Math::BigInt::Pari</a>.</p>
+
+<p>The pragmas <a href="../../lib/bignum.html">bignum</a>, <a href="../../lib/bigint.html">bigint</a> and <a href="../../lib/bigrat.html">bigrat</a> also might be of interest because they solve the autoupgrading/downgrading issue, at least partly.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Mark Biggar, overloaded interface by Ilya Zakharevich, 1996-2001.</p>
+
+</li>
+<li><p>Completely rewritten by Tels <a href="http://bloodgate.com">http://bloodgate.com</a> in 2001-2008.</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;flora@cpan.org&gt;, 2010.</p>
+
+</li>
+<li><p>Peter John Acklam &lt;pjacklam@online.no&gt;, 2011-.</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

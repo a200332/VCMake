@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Use-traits-instead-of-metaclass">Use &#39;traits&#39; instead of &#39;metaclass&#39;</a></li>
+      <li><a href="#Custom-Metaclass-alias">Custom Metaclass alias</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>MooseX::Getopt::Meta::Attribute::NoGetopt - Optional meta attribute for ignoring parameters</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.71</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">App</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">with</span> <span class="string">'MooseX::Getopt'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'data'</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">metaclass</span> <span class="operator">=&gt;</span> <span class="string">'NoGetopt'</span><span class="operator">,</span>  <span class="comment"># do not attempt to capture this param</span>
+      <span class="string">is</span>        <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">isa</span>       <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+      <span class="string">default</span>   <span class="operator">=&gt;</span> <span class="string">'file.dat'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a custom attribute metaclass which can be used to specify that a specific attribute should <b>not</b> be processed by <code>MooseX::Getopt</code>. All you need to do is specify the <code>NoGetopt</code> metaclass.</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">metaclass</span> <span class="operator">=&gt;</span> <span class="string">'MooseX::Getopt::Meta::Attribute::NoGetopt'</span><span class="operator">,</span> <span class="operator">...</span> <span class="operator">);</span>
+</code></pre>
+
+<h2 id="Use-traits-instead-of-metaclass">Use &#39;traits&#39; instead of &#39;metaclass&#39;</h2>
+
+<p>You should rarely need to explicitly set the attribute metaclass. It is much preferred to simply provide a trait (a role applied to the attribute metaclass), which allows other code to further modify the attribute by applying additional roles.</p>
+
+<p>Therefore, you should first try to do this:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">traits</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'NoGetopt'</span><span class="operator">,</span> <span class="operator">...</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">...);</span>
+</code></pre>
+
+<h2 id="Custom-Metaclass-alias">Custom Metaclass alias</h2>
+
+<p>This now takes advantage of the Moose 0.19 feature to support custom attribute metaclass. This means you can also use this as the <b>NoGetopt</b> alias, like so:</p>
+
+<pre><code>  <span class="variable">has</span> <span class="string">'foo'</span> <span class="operator">=&gt;</span> <span class="operator">(</span><span class="string">metaclass</span> <span class="operator">=&gt;</span> <span class="string">'NoGetopt'</span><span class="operator">,</span> <span class="string">cmd_flag</span> <span class="operator">=&gt;</span> <span class="string">'f'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Getopt">the RT bug tracker</a> (or <a href="mailto:bug-MooseX-Getopt@rt.cpan.org">bug-MooseX-Getopt@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/moose.html">http://lists.perl.org/list/moose.html</a>.</p>
+
+<p>There is also an irc channel available for users of this distribution, at <a href="irc://irc.perl.org/#moose"><code><span class="comment">#moose</span>
+</code> on <code>irc.perl.org</code></a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Stevan Little &lt;stevan@iinteractive.com&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2007 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

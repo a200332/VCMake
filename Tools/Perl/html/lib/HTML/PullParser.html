@@ -1,0 +1,113 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTML::PullParser - Alternative HTML::Parser interface</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">HTML::PullParser</span><span class="operator">;</span>
+ 
+ <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">HTML::PullParser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">file</span> <span class="operator">=&gt;</span> <span class="string">"index.html"</span><span class="operator">,</span>
+                            <span class="string">start</span> <span class="operator">=&gt;</span> <span class="string">'event, tagname, @attr'</span><span class="operator">,</span>
+                            <span class="string">end</span>   <span class="operator">=&gt;</span> <span class="string">'event, tagname'</span><span class="operator">,</span>
+                            <span class="string">ignore_elements</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">qw(script style)</span><span class="operator">]</span><span class="operator">,</span>
+                           <span class="operator">)</span> <span class="operator">||</span> <span class="keyword">die</span> <span class="string">"Can't open: $!"</span><span class="operator">;</span>
+ <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">my</span> <span class="variable">$token</span> <span class="operator">=</span> <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">get_token</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="comment">#...do something with $token</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The HTML::PullParser is an alternative interface to the HTML::Parser class. It basically turns the HTML::Parser inside out. You associate a file (or any IO::Handle object or string) with the parser at construction time and then repeatedly call $parser-&gt;get_token to obtain the tags and text found in the parsed document.</p>
+
+<p>The following methods are provided:</p>
+
+<dl>
+
+<dt id="p-HTML::PullParser-new-file-file-options">$p = HTML::PullParser-&gt;new( file =&gt; $file, %options )</dt>
+<dd>
+
+</dd>
+<dt id="p-HTML::PullParser-new-doc-doc-options">$p = HTML::PullParser-&gt;new( doc =&gt; \$doc, %options )</dt>
+<dd>
+
+<p>A <code>HTML::PullParser</code> can be made to parse from either a file or a literal document based on whether the <code>file</code> or <code>doc</code> option is passed to the parser&#39;s constructor.</p>
+
+<p>The <code>file</code> passed in can either be a file name or a file handle object. If a file name is passed, and it can&#39;t be opened for reading, then the constructor will return an undefined value and $! will tell you why it failed. Otherwise the argument is taken to be some object that the <code>HTML::PullParser</code> can read() from when it needs more data. The stream will be read() until EOF, but not closed.</p>
+
+<p>A <code>doc</code> can be passed plain or as a reference to a scalar. If a reference is passed then the value of this scalar should not be changed before all tokens have been extracted.</p>
+
+<p>Next the information to be returned for the different token types must be set up. This is done by simply associating an argspec (as defined in <a href="../../lib/HTML/Parser.html">HTML::Parser</a>) with the events you have an interest in. For instance, if you want <code>start</code> tokens to be reported as the string <code>&#39;S&#39;</code> followed by the tagname and the attributes you might pass an <code>start</code>-option like this:</p>
+
+<pre><code>   <span class="variable">$p</span> <span class="operator">=</span> <span class="variable">HTML::PullParser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+          <span class="string">doc</span>   <span class="operator">=&gt;</span> <span class="variable">$document_to_parse</span><span class="operator">,</span>
+          <span class="string">start</span> <span class="operator">=&gt;</span> <span class="string">'"S", tagname, @attr'</span><span class="operator">,</span>
+          <span class="string">end</span>   <span class="operator">=&gt;</span> <span class="string">'"E", tagname'</span><span class="operator">,</span>
+        <span class="operator">);</span>
+</code></pre>
+
+<p>At last other <code>HTML::Parser</code> options, like <code>ignore_tags</code>, and <code>unbroken_text</code>, can be passed in. Note that you should not use the <i>event</i>_h options to set up parser handlers. That would confuse the inner logic of <code>HTML::PullParser</code>.</p>
+
+</dd>
+<dt id="token-p-get_token">$token = $p-&gt;get_token</dt>
+<dd>
+
+<p>This method will return the next <i>token</i> found in the HTML document, or <code>undef</code> at the end of the document. The token is returned as an array reference. The content of this array match the argspec set up during <code>HTML::PullParser</code> construction.</p>
+
+</dd>
+<dt id="p-unget_token-tokens">$p-&gt;unget_token( @tokens )</dt>
+<dd>
+
+<p>If you find out you have read too many tokens you can push them back, so that they are returned again the next time $p-&gt;get_token is called.</p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>The &#39;eg/hform&#39; script shows how we might parse the form section of HTML::Documents using HTML::PullParser.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/HTML/Parser.html">HTML::Parser</a>, <a href="../../lib/HTML/TokeParser.html">HTML::TokeParser</a></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 1998-2001 Gisle Aas.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,458 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#REFERENCE">REFERENCE</a>
+    <ul>
+      <li><a href="#General-Usage">General Usage</a></li>
+      <li><a href="#Methods">Methods</a></li>
+      <li><a href="#Properties">Properties</a></li>
+      <li><a href="#Constants">Constants</a></li>
+    </ul>
+  </li>
+  <li><a href="#VERSION-HISTORY">VERSION HISTORY</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CREDITS">CREDITS</a></li>
+  <li><a href="#DISCLAIMER">DISCLAIMER</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::Shortcut - Perl Module to deal with Windows Shortcuts</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>This module implements the Win32 IShellLink Interface to allow management of shortcut files from Perl.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::Shortcut</span><span class="operator">;</span>
+  
+  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Path'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"C:\\Directory\\Target.exe"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Description'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"Target executable"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">(</span><span class="string">"Target.lnk"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="REFERENCE">REFERENCE</h1>
+
+<h2 id="General-Usage">General Usage</h2>
+
+<p>To use this module, first add the following line at the beginning of your script:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::Shortcut</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then, use this command to create a shortcut object:</p>
+
+<pre><code>  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+</code></pre>
+
+<p>This function will create a <code>$LINK</code> object on which you can apply the Methods and Properties explained later.</p>
+
+<p>The object is not yet a shortcut file; it is just the definition of a shortcut. Basically, you can do 2 things:</p>
+
+<dl>
+
+<dt id="Load-a-shortcut-file-into-the-object">1. Load a shortcut file into the object.</dt>
+<dd>
+
+</dd>
+<dt id="Save-the-object-into-a-shortcut-file">2. Save the object into a shortcut file.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>For the rest, the object can be accessed as it were a normal associative array reference. It has the following keys (here referred as properties):</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'File'</span><span class="operator">}</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Path'</span><span class="operator">}</span>               <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Path</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'ShortPath'</span><span class="operator">}</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'WorkingDirectory'</span><span class="operator">}</span>   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">WorkingDirectory</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Arguments'</span><span class="operator">}</span>          <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Arguments</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Description'</span><span class="operator">}</span>        <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Description</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'ShowCmd'</span><span class="operator">}</span>            <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">ShowCmd</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Hotkey'</span><span class="operator">}</span>             <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Hotkey</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'IconLocation'</span><span class="operator">}</span>       <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">IconLocation</span><span class="operator">()</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'IconNumber'</span><span class="operator">}</span>         <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">IconNumber</span><span class="operator">()</span>
+</code></pre>
+
+<p>Thus, assuming you have a shortcut file named <code>test.lnk</code> in your current directory, this simple script will tell you where this shortcut points to:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::Shortcut</span><span class="operator">;</span>
+  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Load</span><span class="operator">(</span><span class="string">"test.lnk"</span><span class="operator">);</span>
+  <span class="keyword">print</span> <span class="string">"Shortcut to: </span><span class="variable">$LINK</span><span class="string">-&gt;{'Path'} </span><span class="variable">$LINK</span><span class="string">-&gt;{'Arguments'} \n"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<p>But you can also modify its values:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::Shortcut</span><span class="operator">;</span>
+  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Load</span><span class="operator">(</span><span class="string">"test.lnk"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Path'</span><span class="operator">}</span> <span class="operator">=~</span> <span class="regex">s/C:/D:/i</span><span class="operator">;</span>   <span class="comment"># move the target from C: to D:</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'ShowCmd'</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">SW_NORMAL</span><span class="operator">;</span> <span class="comment"># runs in a normal window</span>
+</code></pre>
+
+<p>and then you can save your changes to the shortcut file with this command:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">();</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<p>or you can save it with another name, creating a new shortcut file:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">(</span><span class="string">"test2.lnk"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<p>Finally, you can create a completely new shortcut:</p>
+
+<pre><code>  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Path'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"C:\\PERL5\\BIN\\PERL.EXE"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Arguments'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"-v"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'WorkingDirectory'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"C:\PERL5\\BIN"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Description'</span><span class="operator">}</span> <span class="operator">=</span> <span class="string">"Prints out the version of Perl"</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'ShowCmd'</span><span class="operator">}</span> <span class="operator">=</span> <span class="variable">SW_SHOWMAXIMIZED</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">(</span><span class="string">"Perl Version Info.lnk"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+<p>Note also that in the examples above the two lines:</p>
+
+<pre><code>  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Load</span><span class="operator">(</span><span class="string">"test.lnk"</span><span class="operator">);</span>
+</code></pre>
+
+<p>can be collapsed to:</p>
+
+<pre><code>  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"test.lnk"</span><span class="operator">);</span>
+</code></pre>
+
+<h2 id="Methods">Methods</h2>
+
+<dl>
+
+<dt id="Close"><b>Close</b></dt>
+<dd>
+
+<p>Closes a shortcut object. Note that it is not &quot;strictly&quot; required to close the objects you created, since the Win32::Shortcut objects are automatically closed when the program ends (or when you somehow destroy such an object).</p>
+
+<p>Note also that a shortcut is not automatically saved when it is closed, even if you modified it. You have to call Save in order to apply modifications to a shortcut file.</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Close</span><span class="operator">();</span>
+</code></pre>
+
+</dd>
+<dt id="Load-file"><b>Load</b> <i>file</i></dt>
+<dd>
+
+<p>Loads the content of the shortcut file named <i>file</i> in a shortcut object and fill the properties of the object with its values. Will return <b>undef</b> on errors, or a true value if everything was successful.</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Load</span><span class="operator">(</span><span class="string">"test.lnk"</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">print</span> <span class="string">"test.lnk not found!"</span><span class="operator">;</span>
+  
+  <span class="keyword">print</span> <span class="keyword">join</span><span class="operator">(</span><span class="string">"\n"</span><span class="operator">,</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Path</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">ShortPath</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Arguments</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">WorkingDirectory</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Description</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">ShowCmd</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Hotkey</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">IconLocation</span><span class="operator">,</span>
+                   <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">IconNumber</span><span class="operator">);</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="new-Win32::Shortcut-file"><b>new Win32::Shortcut</b> <i>[file]</i></dt>
+<dd>
+
+<p>Creates a new shortcut object. If a filename is passed in <i>file</i>, automatically Loads this file also. Returns the object created or <b>undef</b> on errors.</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="variable">$LINK</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+  
+  <span class="variable">$RegEdit</span> <span class="operator">=</span> <span class="variable">Win32::Shortcut</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"Registry Editor.lnk"</span><span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"File not found"</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">$RegEdit</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="Resolve-flag"><b>Resolve</b> <i>[flag]</i></dt>
+<dd>
+
+<p>Attempts to automatically resolve a shortcut and returns the resolved path, or <b>undef</b> on errors; in case no resolution was made, the path is returned unchanged. Note that the path is automatically updated in the Path property of the shortcut.</p>
+
+<p>By default this method acts quietly, but if you pass a value of 0 (zero) in the <i>flag</i> parameter, it will eventually post a dialog box prompting the user for more information.</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="comment"># if the target doesn't exist...</span>
+  <span class="keyword">if</span><span class="operator">(!</span> <span class="keyword">-f</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Path</span><span class="operator">)</span> <span class="operator">{</span>
+    <span class="comment"># save the actual target for comparison</span>
+    <span class="variable">$oldpath</span> <span class="operator">=</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Path</span><span class="operator">;</span>
+  
+    <span class="comment"># try to resolve it (with dialog box)</span>
+    <span class="variable">$newpath</span> <span class="operator">=</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Resolve</span><span class="operator">(</span><span class="number">0</span><span class="operator">);</span>
+  
+    <span class="keyword">die</span> <span class="string">"Not resolved..."</span> <span class="keyword">if</span> <span class="variable">$newpath</span> <span class="operator">==</span> <span class="variable">$oldpath</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Save-file"><b>Save</b> <i>[file]</i></dt>
+<dd>
+
+<p>Saves the content of the shortcut object into the file named <i>file</i>. If <i>file</i> is omitted, it is taken from the File property of the object (which, if not changed, is the name of the last Loaded file).</p>
+
+<p>If no file was loaded and the File property doesn&#39;t contain a valid filename, the method will return <b>undef</b>, which will also be returned on errors. A true value will be returned if everything was successful.</p>
+
+<p>Example:</p>
+
+<pre><code> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">();</span>
+ <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Save</span><span class="operator">(</span><span class="string">"Copy of "</span> <span class="operator">.</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'File'</span><span class="operator">}</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Set-path-arguments-workingdirectory-description-showcmd-hotkey-iconlocation-iconnumber"><b>Set</b> <i>path, arguments, workingdirectory, description, showcmd, hotkey, iconlocation, iconnumber</i></dt>
+<dd>
+
+<p>Sets all the properties of the shortcut object with a single command. This method is supplied for convenience only, you can also set those values changing the values of the properties.</p>
+
+<p>Example:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Set</span><span class="operator">(</span><span class="string">"C:\\PERL5\\BIN\\PERL.EXE"</span><span class="operator">,</span>
+             <span class="string">"-v"</span><span class="operator">,</span>
+             <span class="string">"C:\\PERL5\\BIN"</span><span class="operator">,</span>
+             <span class="string">"Prints out the version of Perl"</span><span class="operator">,</span>
+             <span class="variable">SW_SHOWMAXIMIZED</span><span class="operator">,</span>
+             <span class="keyword">hex</span><span class="operator">(</span><span class="string">'0x0337'</span><span class="operator">),</span>
+             <span class="string">"C:\\WINDOWS\\SYSTEM\\COOL.DLL"</span><span class="operator">,</span>
+             <span class="number">1</span><span class="operator">);</span>
+  
+  <span class="comment"># it is the same of...</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Path</span><span class="operator">(</span><span class="string">"C:\\PERL5\\BIN\\PERL.EXE"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Arguments</span><span class="operator">(</span><span class="string">"-v"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">WorkingDirectory</span><span class="operator">(</span><span class="string">"C:\\PERL5\\BIN"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Description</span><span class="operator">(</span><span class="string">"Prints out the version of Perl"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">ShowCmd</span><span class="operator">(</span><span class="variable">SW_SHOWMAXIMIZED</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Hotkey</span><span class="operator">(</span><span class="keyword">hex</span><span class="operator">(</span><span class="string">'0x0337'</span><span class="operator">));</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">IconLocation</span><span class="operator">(</span><span class="string">"C:\\WINDOWS\\SYSTEM\\COOL.DLL"</span><span class="operator">);</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">IconNumber</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h2 id="Properties">Properties</h2>
+
+<p>The properties of a shortcut object can be accessed as:</p>
+
+<pre><code>  <span class="variable">$OBJECT</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'property'</span><span class="operator">}</span>
+</code></pre>
+
+<p>Eg., assuming that you have created a shortcut object with:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">=</span><span class="variable">new</span> <span class="variable">Win32::Shortcut</span><span class="operator">();</span>
+</code></pre>
+
+<p>you can for example see its description with:</p>
+
+<pre><code>  <span class="keyword">print</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Description'</span><span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can of course also set it:</p>
+
+<pre><code>  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">'Description'</span><span class="operator">}</span><span class="operator">=</span><span class="string">"This is a description"</span><span class="operator">;</span>
+</code></pre>
+
+<p>From version 0.02, those properties have also a corresponding method (subroutine), so you can write the 2 lines above using this syntax too:</p>
+
+<pre><code>  <span class="keyword">print</span> <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Description</span><span class="operator">;</span>
+  <span class="variable">$LINK</span><span class="operator">-&gt;</span><span class="variable">Description</span><span class="operator">(</span><span class="string">"This is a description"</span><span class="operator">);</span>
+</code></pre>
+
+<p>The properties of a shortcut reflect the content of the Shortcut Properties Dialog Box, which can be obtained by clicking the third mouse button on a shortcut file in the Windows 95 (or NT 4.0) Explorer and choosing &quot;Properties&quot; (well, I hope you already knew :).</p>
+
+<p>The fields corresponding to the single properties are marked in <b>bold</b> in the following list.</p>
+
+<dl>
+
+<dt id="Arguments"><b>Arguments</b></dt>
+<dd>
+
+<p>The arguments associated with the shell link object. They will be passed to the targeted program (see Path) when it gets executed. In fact, joined with Path, this parameter forms the &quot;<b>Target</b>&quot; field of a Shortcut Properties Dialog Box.</p>
+
+</dd>
+<dt id="Description"><b>Description</b></dt>
+<dd>
+
+<p>An optional description given to the shortcut. Seems to be missing in the Shortcut Properties Dialog Box (not yet implemented?).</p>
+
+</dd>
+<dt id="File"><b>File</b></dt>
+<dd>
+
+<p>The filename of the shortcut file opened with Load, and/or the filename under which the shortcut will be saved with Save (if the <i>file</i> argument is not specified).</p>
+
+</dd>
+<dt id="Hotkey"><b>Hotkey</b></dt>
+<dd>
+
+<p>The hotkey associated to the shortcut, in the form of a 2-byte number of which the first byte identifies the modifiers (Ctrl, Alt, Shift... but I didn&#39;t find out how it works) and the second is the ASCII code of the character key. Correspond to the &quot;<b>Shortcut key</b>&quot; field of a Shortcut Properties Dialog Box.</p>
+
+</dd>
+<dt id="IconLocation"><b>IconLocation</b></dt>
+<dd>
+
+<p>The file that contain the icon for the shortcut. Seems actually to always return nothing (YMMV, I hope...).</p>
+
+</dd>
+<dt id="IconNumber"><b>IconNumber</b></dt>
+<dd>
+
+<p>The number of the icon for the shortcut in the file pointed by IconLocation, in case more that one icon is contained in that file (I suppose this, documentation isn&#39;t so clear at this point).</p>
+
+</dd>
+<dt id="Path"><b>Path</b></dt>
+<dd>
+
+<p>The target of the shortcut. This is (joined with Arguments) the content of the &quot;<b>Target</b>&quot; field in a Shortcut Properties Dialog Box.</p>
+
+</dd>
+<dt id="ShortPath"><b>ShortPath</b></dt>
+<dd>
+
+<p>Same as Path, but expressed in a DOS-readable format (8.3 characters filenames). It is available as read-only (well, you can change it, but it has no effect on the shortcut; change Path instead) once you Load a shortcut file.</p>
+
+</dd>
+<dt id="ShowCmd"><b>ShowCmd</b></dt>
+<dd>
+
+<p>The condition of the window in which the program will be executed (can be Normal, Minimized or Maximized). Correspond to the &quot;<b>Run</b>&quot; field of a Shortcut Properties Dialog Box.</p>
+
+<p>Allowed values are:</p>
+
+<p><b>Value</b> <b>Meaning</b> <b>Constant</b></p>
+
+<pre><code>   1     Normal Window SW_SHOWNORMAL
+   3     Maximized     SW_SHOWMAXIMIZED
+   7     Minimized     SW_SHOWMINNOACTIVE</code></pre>
+
+<p>Any other value (theoretically should) result in a Normal Window display.</p>
+
+</dd>
+<dt id="WorkingDirectory"><b>WorkingDirectory</b></dt>
+<dd>
+
+<p>The directory in which the targeted program will be executed. Correspond to the &quot;<b>Start in</b>&quot; field of a Shortcut Properties Dialog Box.</p>
+
+</dd>
+</dl>
+
+<h2 id="Constants">Constants</h2>
+
+<p>The following constants are exported in the main namespace of your script using Win32::Shortcut:</p>
+
+<ul>
+
+<li><p>SW_SHOWNORMAL</p>
+
+</li>
+<li><p>SW_SHOWMAXIMIZED</p>
+
+</li>
+<li><p>SW_SHOWMINNOACTIVE</p>
+
+</li>
+</ul>
+
+<p>Those constants are the allowed values for the ShowCmd property.</p>
+
+<h1 id="VERSION-HISTORY">VERSION HISTORY</h1>
+
+<p><b>0.03 (07 Apr 1997)</b></p>
+
+<ul>
+
+<li><p>The PLL file now comes in 2 versions, one for Perl version 5.001 (build 110) and one for Perl version 5.003 (build 300 and higher, EXCEPT 304).</p>
+
+</li>
+<li><p>Added an installation program which will automatically copy the right files in the right place.</p>
+
+</li>
+</ul>
+
+<p><b>0.02 (21 Jan 1997)</b></p>
+
+<ul>
+
+<li><p>Added methods matching properties to reduce typing overhead (eg. Alt-123 and 125...).</p>
+
+</li>
+</ul>
+
+<p><b>0.01 (15 Jan 1997)</b></p>
+
+<ul>
+
+<li><p>First public release.</p>
+
+</li>
+<li><p>Added &quot;Set&quot; and &quot;Resolve&quot; and the properties &quot;Hotkey&quot;, &quot;IconLocation&quot; and &quot;IconNumber&quot;.</p>
+
+</li>
+</ul>
+
+<p><b>0.01a (10 Jan 1997)</b></p>
+
+<ul>
+
+<li><p>First implementation of the IShellLink interface (wow, it works!); can &quot;Load&quot;, &quot;Save&quot;, and modify properties of shortcut files.</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Aldo Calpini <a>dada@perl.it</a></p>
+
+<p>Distributed under the terms of Larry Wall&#39;s Artistic License.</p>
+
+<h1 id="CREDITS">CREDITS</h1>
+
+<p>Thanks to: Jesse Dougherty, Dave Roth, ActiveWare, and the Perl-Win32-Users community.</p>
+
+<h1 id="DISCLAIMER">DISCLAIMER</h1>
+
+<p><i>This program is FREE; you can redistribute, modify, disassemble, or even reverse engineer this software at your will. Keep in mind, however, that NOTHING IS GUARANTEED to work and everything you do is AT YOUR OWN RISK - I will not take responsibility for any damage, loss of money and/or health that may arise from the use of this program!</i></p>
+
+
+</body>
+
+</html>
+
+

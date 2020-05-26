@@ -1,0 +1,150 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="./displayToc.js"></script>
+<script language="JavaScript" src="./tocParas.js"></script>
+<script language="JavaScript" src="./tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="./scineplex.css">
+<title></title>
+<link rel="stylesheet" href="./Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<h1 id="ActivePerl-2601----Release-Notes">ActivePerl 2601 -- Release Notes</h1>
+
+<p>Welcome, and thank you for downloading ActivePerl. This release corresponds to Perl version 5.26.1.</p>
+
+<p>The following platforms are supported by this release:</p>
+
+<ul>
+
+<li><p>Linux: glibc 2.15 or later (x64), e.g. Ubuntu 12.04 or later</p>
+
+</li>
+<li><p>Mac OS X 10.9 or later (x64)</p>
+
+</li>
+<li><p>Windows Server 2008, 7, Server 2012, 8 (x86 and x64), and 10.</p>
+
+</li>
+</ul>
+
+
+<p>For a chronological list of changes included in this and past releases,
+see the <a href="changes.html">ActivePerl 5.26 Change Log</a>.</p>
+
+<h1 id="Incompatibilities">Incompatibilities</h1>
+
+<p>Perl 5.26 is not binary compatible with Perl 5.24 and earlier releases. In particular, do not attempt to use extensions or PPM packages built for ActivePerl 2400 and older series builds with ActivePerl 2600 series builds and vice versa. Please check <a href="./lib/pods/perl5260delta.html#Incompatible-Changes">&quot;Incompatible Changes&quot; in perl5260delta</a> for known source level incompatibilities between the Perl 5.26 releases and the earlier release series.</p>
+
+<h1 id="Known-Issues">Known Issues</h1>
+
+<h2 id="PPM">PPM</h2>
+
+<p>There are some known outstanding issues with the PPM 4 client:</p>
+
+<ul>
+
+<li><p>The PPM state database (containing configuration information for repositories, view options in the GUI, and repository state) is not imported from previous installations.</p>
+
+<p>If you have added custom PPM 4 repositories in previous ActivePerl releases then you should reconfigure them manually with <code>ppm repo add ...</code> or in the GUI. The repository state will be automatically re-synchronized when PPM is run.</p>
+
+</li>
+<li><p>Post install scripts for packages installed from the GUI will not be able to receive non-default answers for any prompts it might produce. Packages that need non-default answers must be installed with the command line version of ppm.</p>
+
+</li>
+<li><p>List icons will sometimes not repaint properly after scrolling under X11. This does not affect the Windows and Mac OS X builds.</p>
+
+</li>
+</ul>
+
+<h2 id="Mac-OS-X">Mac OS X</h2>
+
+<ul>
+
+<li><p>Perl library paths, and thus PPM Areas, defined in the shell by the PERL5LIB environment variable are not available to PPM when it is launched by clicking the PPM icon in OS X. To to make this variable available in the OS X GUI, add an entry similar to the following to <i>~/.MacOSX/environment.plist</i>:</p>
+
+<pre><code> &lt;key&gt;PERL5LIB&lt;/key&gt;
+ &lt;string&gt;/path/to/perl/lib&lt;/string&gt;</code></pre>
+
+</li>
+<li><p>Running <code>sudo ppm</code> or <code>sudo ppm gui</code> does not start up the GUI with <i>root</i> privileges. Use <code>ppm</code> as a command line tool with <code>sudo</code>.</p>
+
+</li>
+</ul>
+
+<h2 id="Windows">Windows</h2>
+
+<ul>
+
+<li><p>The fork() emulation has known limitations. See <a href="./lib/pods/perlfork.html">perlfork</a> for a detailed summary. In particular, fork() emulation will not work correctly with extensions that are either not thread-safe, or maintain internal state that cannot be cloned in the pseudo-child process. This caveat currently applies to extensions such as Tk and Storable.</p>
+
+</li>
+<li><p>It is possible to install different major versions at the same time as long as you are careful to use different directories. Do not install a newer major version of ActivePerl on top of an older version. It is best to uninstall any older versions and then install this one.</p>
+
+</li>
+<li><p>5.26.x minor version updates can be installed seamlessly on top of an existing 5.26.0 (or later) version. The installer will first remove files from the old version and then install the new version. If you changed the default installation directory, you will need to select a custom install and then choose the directory containing the previous 5.26.x version.</p>
+
+</li>
+<li><p>When upgrading, it can be helpful to save the list of installed PPM modules so they can be quickly reinstalled for 5.26. From a command-line, run:</p>
+
+<pre><code> C:\&gt; ppm profile save my-modules.xml</code></pre>
+
+<p>After installing the newer version, use the my-modules.xml file to reinstall the modules:</p>
+
+<pre><code> C:\&gt; ppm profile restore my-modules.xml</code></pre>
+
+<p>For future minor versions (5.26.1, etc.), the installer will be able to upgrade the current version without requiring an uninstall.</p>
+
+<p>If you have any problems with the new installer, you can install from the zip file version. Remember to run the Installer.bat file included with the zip.</p>
+
+</li>
+</ul>
+
+<h2 id="Further-Information">Further Information</h2>
+
+<p>The Perl distribution comes with extensive documentation. On Unix platforms, all the standard documentation is installed as man pages under the Perl install location. The location of the man pages may need to be added to the MANPATH environment variable in order to access them. For example, in the C shell:</p>
+
+<pre><code>    % setenv MANPATH /opt/ActivePerl-5.26/man:$MANPATH</code></pre>
+
+<p>The documentation is installed in HTML format on all platforms. If ActivePerl was installed in <i>/opt/ActivePerl-5.26</i> then the HTML documentation would be located in <i>/opt/ActivePerl-5.26/html</i>.</p>
+
+<p>On Windows, the standard documentation along with Windows-specific Perl documentation is installed in HTML format, and is accessible from the &quot;Start&quot; menu.</p>
+
+<p>Updated versions of the HTML documentation will always be available at the ActiveState website:</p>
+
+<pre><code>    http://www.activestate.com/ActivePerl</code></pre>
+
+<h1 id="Reporting-Problems">Reporting Problems</h1>
+
+<p>Please report any bugs you encounter with this release in the ActiveState bug database:</p>
+
+<pre><code>    http://bugs.activestate.com</code></pre>
+
+<p>If you do not have web access, reports can be also sent via email to ActivePerl-Bugs@ActiveState.com. Please be sure to include detailed information about the platform in your message.</p>
+
+<p>As far as possible, please ensure that there is enough information in the report to reproduce the bug elsewhere. It also helps to submit a minimal test case that exhibits the bug.</p>
+
+<h1 id="ActivePerl-Community-Edition-Support-Policy">ActivePerl Community Edition Support Policy</h1>
+
+<p>The two most recent stable releases are available for free download. This corresponds to the Perl community&#39;s own version support policy.</p>
+
+<p>Whenever the underlying Perl version becomes &quot;unsupported&quot; by the Perl community itself, support for the corresponding ActivePerl versions will be limited to Business Edition and Enterprise Edition customers.</p>
+
+<p>You can continue to use older ActivePerl releases indefinitely under the terms of the Community Edition license, but won&#39;t be able to download the installers from ActiveState.</p>
+
+<p>The PPM repositories for unsupported ActivePerl releases will remain freely accessible for at least 6 months after support ends, but will no longer be updated with new builds from CPAN.</p>
+
+
+</body>
+
+</html>
+
+

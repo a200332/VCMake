@@ -1,0 +1,209 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#API">API</a>
+    <ul>
+      <li><a href="#Specio::Coercion-new">Specio::Coercion-&gt;new( ... )</a></li>
+      <li><a href="#coercion-from-coercion-to-coercion-declared_at">$coercion-&gt;from(), $coercion-&gt;to(), $coercion-&gt;declared_at()</a></li>
+      <li><a href="#coercion-description">$coercion-&gt;description</a></li>
+      <li><a href="#coercion-coerce-value">$coercion-&gt;coerce($value)</a></li>
+      <li><a href="#coercion-inline_coercion-var">$coercion-&gt;inline_coercion($var)</a></li>
+      <li><a href="#coercion-can_be_inlined">$coercion-&gt;can_be_inlined()</a></li>
+      <li><a href="#coercion-inline_environment">$coercion-&gt;inline_environment()</a></li>
+      <li><a href="#coercion-clone">$coercion-&gt;clone()</a></li>
+      <li><a href="#coercion-clone_with_new_to-new_to_type">$coercion-&gt;clone_with_new_to($new_to_type)</a></li>
+    </ul>
+  </li>
+  <li><a href="#ROLES">ROLES</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#SOURCE">SOURCE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Specio::Coercion - A class representing a coercion from one type to another</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.42</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$coercion</span> <span class="operator">=</span> <span class="variable">$type</span><span class="operator">-&gt;</span><span class="variable">coercion_from_type</span><span class="operator">(</span><span class="string">'Int'</span><span class="operator">);</span>
+    
+    <span class="keyword">my</span> <span class="variable">$new_value</span> <span class="operator">=</span> <span class="variable">$coercion</span><span class="operator">-&gt;</span><span class="variable">coerce_value</span><span class="operator">(</span><span class="number">42</span><span class="operator">);</span>
+    
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$coercion</span><span class="operator">-&gt;</span><span class="variable">can_be_inlined</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="variable">$coercion</span><span class="operator">-&gt;</span><span class="variable">inline_coercion</span><span class="operator">(</span><span class="string">'$_[0]'</span><span class="operator">);</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class represents a coercion from one type to another. Internally, a coercion is a piece of code that takes a value of one type returns a new value of a new type. For example, a coercion from c&lt;Num&gt; to <code>Int</code> might round a number to its nearest integer and return that integer.</p>
+
+<p>Coercions can be implemented either as a simple subroutine reference or as an inline generator subroutine. Using an inline generator is faster but more complicated.</p>
+
+<h1 id="API">API</h1>
+
+<p>This class provides the following methods.</p>
+
+<h2 id="Specio::Coercion-new">Specio::Coercion-&gt;new( ... )</h2>
+
+<p>This method creates a new coercion object. It accepts the following named parameters:</p>
+
+<ul>
+
+<li><p>from =&gt; $type</p>
+
+<p>The type this coercion is from. The type must be an object which does the <a href="../../lib/Specio/Constraint/Role/Interface.html">Specio::Constraint::Role::Interface</a> interface.</p>
+
+<p>This parameter is required.</p>
+
+</li>
+<li><p>to =&gt; $type</p>
+
+<p>The type this coercion is to. The type must be an object which does the <a href="../../lib/Specio/Constraint/Role/Interface.html">Specio::Constraint::Role::Interface</a> interface.</p>
+
+<p>This parameter is required.</p>
+
+</li>
+<li><p>coercion =&gt; sub { ... }</p>
+
+<p>A subroutine reference implementing the coercion. It will be called as a method on the object and passed a single argument, the value to coerce.</p>
+
+<p>It should return the new value.</p>
+
+<p>This parameter is mutually exclusive with <code>inline_generator</code>.</p>
+
+<p>Either this parameter or the <code>inline_generator</code> parameter is required.</p>
+
+<p>You can also pass this option with the key <code>using</code> in the parameter list.</p>
+
+</li>
+<li><p>inline_generator =&gt; sub { ... }</p>
+
+<p>This should be a subroutine reference which returns a string containing a single term. This code should <i>not</i> end in a semicolon. This code should implement the coercion.</p>
+
+<p>The generator will be called as a method on the coercion with a single argument. That argument is the name of the variable being coerced, something like <code>&#39;$_[0]&#39;</code> or <code>&#39;$var&#39;</code>.</p>
+
+<p>This parameter is mutually exclusive with <code>coercion</code>.</p>
+
+<p>Either this parameter or the <code>coercion</code> parameter is required.</p>
+
+<p>You can also pass this option with the key <code>inline</code> in the parameter list.</p>
+
+</li>
+<li><p>inline_environment =&gt; {}</p>
+
+<p>This should be a hash reference of variable names (with sigils) and values for that variable. The values should be <i>references</i> to the values of the variables.</p>
+
+<p>This environment will be used when compiling the coercion as part of a subroutine. The named variables will be captured as closures in the generated subroutine, using <a href="../../lib/Eval/Closure.html">Eval::Closure</a>.</p>
+
+<p>It should be very rare to need to set this in the constructor. It&#39;s more likely that a special coercion subclass would need to provide values that it generates internally.</p>
+
+<p>This parameter defaults to an empty hash reference.</p>
+
+</li>
+<li><p>declared_at =&gt; $declared_at</p>
+
+<p>This parameter must be a <a href="../../lib/Specio/DeclaredAt.html">Specio::DeclaredAt</a> object.</p>
+
+<p>This parameter is required.</p>
+
+</li>
+</ul>
+
+<h2 id="coercion-from-coercion-to-coercion-declared_at">$coercion-&gt;from(), $coercion-&gt;to(), $coercion-&gt;declared_at()</h2>
+
+<p>These methods are all read-only attribute accessors for the corresponding attribute.</p>
+
+<h2 id="coercion-description">$coercion-&gt;description</h2>
+
+<p>This returns a string describing the coercion. This includes the names of the to and from type and where the coercion was declared, so you end up with something like <code>&#39;coercion from Foo to Bar declared in package My::Lib (lib/My/Lib.pm) at line 42&#39;</code>.</p>
+
+<h2 id="coercion-coerce-value">$coercion-&gt;coerce($value)</h2>
+
+<p>Given a value of the right &quot;from&quot; type, returns a new value of the &quot;to&quot; type.</p>
+
+<p>This method does not actually check that the types of given or return values.</p>
+
+<h2 id="coercion-inline_coercion-var">$coercion-&gt;inline_coercion($var)</h2>
+
+<p>Given a variable name like <code>&#39;$_[0]&#39;</code> this returns a string with code for the coercion.</p>
+
+<p>Note that this method will die if the coercion does not have an inline generator.</p>
+
+<h2 id="coercion-can_be_inlined">$coercion-&gt;can_be_inlined()</h2>
+
+<p>This returns true if the coercion has an inline generator <i>and</i> the constraint it is from can be inlined. This exists primarily for the benefit of the <code>inline_coercion_and_check()</code> method for type constraint object.</p>
+
+<h2 id="coercion-inline_environment">$coercion-&gt;inline_environment()</h2>
+
+<p>This returns a hash defining the variables that need to be closed over when inlining the coercion. The keys are full variable names like <code>&#39;$foo&#39;</code> or <code>&#39;@bar&#39;</code>. The values are <i>references</i> to a variable of the matching type.</p>
+
+<h2 id="coercion-clone">$coercion-&gt;clone()</h2>
+
+<p>Returns a clone of this object.</p>
+
+<h2 id="coercion-clone_with_new_to-new_to_type">$coercion-&gt;clone_with_new_to($new_to_type)</h2>
+
+<p>This returns a clone of the coercion, replacing the &quot;to&quot; type with a new one. This is intended for use when the to type itself is being cloned as part of importing that type. We need to make sure the newly cloned coercion has the newly cloned type as well.</p>
+
+<h1 id="ROLES">ROLES</h1>
+
+<p>This class does the <a href="../../lib/Specio/Role/Inlinable.html">Specio::Role::Inlinable</a> role.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted at <a href="https://github.com/houseabsolute/Specio/issues">https://github.com/houseabsolute/Specio/issues</a>.</p>
+
+<p>I am also usually active on IRC as &#39;autarch&#39; on <code>irc://irc.perl.org</code>.</p>
+
+<h1 id="SOURCE">SOURCE</h1>
+
+<p>The source code repository for Specio can be found at <a href="https://github.com/houseabsolute/Specio">https://github.com/houseabsolute/Specio</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is Copyright (c) 2012 - 2017 by Dave Rolsky.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+<p>The full text of the license can be found in the <i>LICENSE</i> file included with this distribution.</p>
+
+
+</body>
+
+</html>
+
+

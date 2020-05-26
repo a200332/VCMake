@@ -1,0 +1,153 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>HTML::Entities - Encode or decode strings with HTML entities</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">HTML::Entities</span><span class="operator">;</span>
+ 
+ <span class="variable">$a</span> <span class="operator">=</span> <span class="string">"V&amp;aring;re norske tegn b&amp;oslash;r &amp;#230res"</span><span class="operator">;</span>
+ <span class="variable">decode_entities</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">);</span>
+ <span class="variable">encode_entities</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">,</span> <span class="string">"\200-\377"</span><span class="operator">);</span>
+</code></pre>
+
+<p>For example, this:</p>
+
+<pre><code> <span class="variable">$input</span> <span class="operator">=</span> <span class="string">"vis-Ã -vis BeyoncÃ©'s naÃ¯ve\npapier-mÃ¢chÃ© rÃ©sumÃ©"</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="variable">encode_entities</span><span class="operator">(</span><span class="variable">$input</span><span class="operator">),</span> <span class="string">"\n"</span>
+</code></pre>
+
+<p>Prints this out:</p>
+
+<pre><code> vis-&amp;agrave;-vis Beyonc&amp;eacute;&#39;s na&amp;iuml;ve
+ papier-m&amp;acirc;ch&amp;eacute; r&amp;eacute;sum&amp;eacute;</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module deals with encoding and decoding of strings with HTML character entities. The module provides the following functions:</p>
+
+<dl>
+
+<dt id="decode_entities-string">decode_entities( $string, ... )</dt>
+<dd>
+
+<p>This routine replaces HTML entities found in the $string with the corresponding Unicode character. Unrecognized entities are left alone.</p>
+
+<p>If multiple strings are provided as argument they are each decoded separately and the same number of strings are returned.</p>
+
+<p>If called in void context the arguments are decoded in-place.</p>
+
+<p>This routine is exported by default.</p>
+
+</dd>
+<dt id="decode_entities-string-entity2char">_decode_entities( $string, \%entity2char )</dt>
+<dd>
+
+</dd>
+<dt id="decode_entities-string-entity2char-expand_prefix">_decode_entities( $string, \%entity2char, $expand_prefix )</dt>
+<dd>
+
+<p>This will in-place replace HTML entities in $string. The %entity2char hash must be provided. Named entities not found in the %entity2char hash are left alone. Numeric entities are expanded unless their value overflow.</p>
+
+<p>The keys in %entity2char are the entity names to be expanded and their values are what they should expand into. The values do not have to be single character strings. If a key has &quot;;&quot; as suffix, then occurrences in $string are only expanded if properly terminated with &quot;;&quot;. Entities without &quot;;&quot; will be expanded regardless of how they are terminated for compatibility with how common browsers treat entities in the Latin-1 range.</p>
+
+<p>If $expand_prefix is TRUE then entities without trailing &quot;;&quot; in %entity2char will even be expanded as a prefix of a longer unrecognized name. The longest matching name in %entity2char will be used. This is mainly present for compatibility with an MSIE misfeature.</p>
+
+<pre><code>   <span class="variable">$string</span> <span class="operator">=</span> <span class="string">"foo&amp;nbspbar"</span><span class="operator">;</span>
+   <span class="variable">_decode_entities</span><span class="operator">(</span><span class="variable">$string</span><span class="operator">,</span> <span class="operator">{</span> <span class="string">nb</span> <span class="operator">=&gt;</span> <span class="string">"@"</span><span class="operator">,</span> <span class="string">nbsp</span> <span class="operator">=&gt;</span> <span class="string">"\xA0"</span> <span class="operator">}</span><span class="operator">,</span> <span class="number">1</span><span class="operator">);</span>
+   <span class="keyword">print</span> <span class="variable">$string</span><span class="operator">;</span>  <span class="comment"># will print "fooÂ bar"</span>
+</code></pre>
+
+<p>This routine is exported by default.</p>
+
+</dd>
+<dt id="encode_entities-string">encode_entities( $string )</dt>
+<dd>
+
+</dd>
+<dt id="encode_entities-string-unsafe_chars">encode_entities( $string, $unsafe_chars )</dt>
+<dd>
+
+<p>This routine replaces unsafe characters in $string with their entity representation. A second argument can be given to specify which characters to consider unsafe. The unsafe characters is specified using the regular expression character class syntax (what you find within brackets in regular expressions).</p>
+
+<p>The default set of characters to encode are control chars, high-bit chars, and the <code>&lt;</code>, <code>&amp;</code>, <code>&gt;</code>, <code>&#39;</code> and <code>&quot;</code> characters. But this, for example, would encode <i>just</i> the <code>&lt;</code>, <code>&amp;</code>, <code>&gt;</code>, and <code>&quot;</code> characters:</p>
+
+<pre><code>  <span class="variable">$encoded</span> <span class="operator">=</span> <span class="variable">encode_entities</span><span class="operator">(</span><span class="variable">$input</span><span class="operator">,</span> <span class="string">'&lt;&gt;&amp;"'</span><span class="operator">);</span>
+</code></pre>
+
+<p>and this would only encode non-plain ascii:</p>
+
+<pre><code>  <span class="variable">$encoded</span> <span class="operator">=</span> <span class="variable">encode_entities</span><span class="operator">(</span><span class="variable">$input</span><span class="operator">,</span> <span class="string">'^\n\x20-\x25\x27-\x7e'</span><span class="operator">);</span>
+</code></pre>
+
+<p>This routine is exported by default.</p>
+
+</dd>
+<dt id="encode_entities_numeric-string">encode_entities_numeric( $string )</dt>
+<dd>
+
+</dd>
+<dt id="encode_entities_numeric-string-unsafe_chars">encode_entities_numeric( $string, $unsafe_chars )</dt>
+<dd>
+
+<p>This routine works just like encode_entities, except that the replacement entities are always <code>&amp;#x<i>hexnum</i><span class="operator">;</span>
+</code> and never <code>&amp;<i>entname</i><span class="operator">;</span>
+</code>. For example, <code>encode_entities(&quot;r\xF4le&quot;)</code> returns &quot;r&amp;ocirc;le&quot;, but <code>encode_entities_numeric(&quot;r\xF4le&quot;)</code> returns &quot;r&amp;#xF4;le&quot;.</p>
+
+<p>This routine is <i>not</i> exported by default. But you can always export it with <code><span class="keyword">use</span> <span class="variable">HTML::Entities</span> <span class="string">qw(encode_entities_numeric)</span><span class="operator">;</span>
+</code> or even <code><span class="keyword">use</span> <span class="variable">HTML::Entities</span> <span class="string">qw(:DEFAULT encode_entities_numeric)</span><span class="operator">;</span>
+</code></p>
+
+</dd>
+</dl>
+
+<p>All these routines modify the string passed as the first argument, if called in a void context. In scalar and array contexts, the encoded or decoded string is returned (without changing the input string).</p>
+
+<p>If you prefer not to import these routines into your namespace, you can call them as:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">HTML::Entities</span> <span class="operator">();</span>
+  <span class="variable">$decoded</span> <span class="operator">=</span> <span class="variable">HTML::Entities::decode</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">);</span>
+  <span class="variable">$encoded</span> <span class="operator">=</span> <span class="variable">HTML::Entities::encode</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">);</span>
+  <span class="variable">$encoded</span> <span class="operator">=</span> <span class="variable">HTML::Entities::encode_numeric</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">);</span>
+</code></pre>
+
+<p>The module can also export the %char2entity and the %entity2char hashes, which contain the mapping from all characters to the corresponding entities (and vice versa, respectively).</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 1995-2006 Gisle Aas. All rights reserved.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

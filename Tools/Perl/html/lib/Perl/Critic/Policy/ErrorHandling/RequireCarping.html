@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ErrorHandling::RequireCarping - Use functions from <a href="../../../../../lib/Carp.html">Carp</a> instead of <code>warn</code> or <code>die</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>die</code> and <code>warn</code> functions both report the file and line number where the exception occurred. But if someone else is using your subroutine, they usually don&#39;t care where <b>your</b> code blew up. Instead, they want to know where <b>their</b> code invoked the subroutine. The <a href="../../../../../lib/Carp.html">Carp</a> module provides alternative methods that report the exception from the caller&#39;s file and line number.</p>
+
+<p>By default, this policy will not complain about <code>die</code> or <code>warn</code>, if it can determine that the message will always result in a terminal newline. Since perl suppresses file names and line numbers in this situation, it is assumed that no stack traces are desired either and none of the <a href="../../../../../lib/Carp.html">Carp</a> functions are necessary.</p>
+
+<pre><code>    <span class="keyword">die</span> <span class="string">"oops"</span> <span class="keyword">if</span> <span class="variable">$explosion</span><span class="operator">;</span>             <span class="comment">#not ok</span>
+    <span class="keyword">warn</span> <span class="string">"Where? Where?!"</span> <span class="keyword">if</span> <span class="variable">$tiger</span><span class="operator">;</span>      <span class="comment">#not ok</span>
+    
+    <span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$mouth</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="string">'food'</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">'of starvation'</span><span class="operator">;</span>           <span class="comment">#not ok</span>
+    
+    <span class="keyword">if</span> <span class="operator">(!</span> <span class="variable">$dentist_appointment</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">warn</span> <span class="string">"You have bad breath!\n"</span><span class="operator">;</span>    <span class="comment">#ok</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">die</span> <span class="string">"</span><span class="variable">$clock</span><span class="string"> not set.\n"</span> <span class="keyword">if</span> <span class="variable">$no_time</span><span class="operator">;</span>  <span class="comment">#ok</span>
+    
+    <span class="keyword">my</span> <span class="variable">$message</span> <span class="operator">=</span> <span class="string">"</span><span class="variable">$clock</span><span class="string"> not set.\n"</span><span class="operator">;</span>
+    <span class="keyword">die</span> <span class="variable">$message</span> <span class="keyword">if</span> <span class="variable">$no_time</span><span class="operator">;</span>             <span class="comment">#not ok, not obvious</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>By default, this policy allows uses of <code>die</code> and <code>warn</code> ending in an explicit newline. If you give this policy an <code>allow_messages_ending_with_newlines</code> option in your <i>.perlcriticrc</i> with a false value, then this policy will prohibit such uses.</p>
+
+<pre><code>    [ErrorHandling::RequireCarping]
+    allow_messages_ending_with_newlines = 0</code></pre>
+
+<p>If you give this policy an <code>allow_in_main_unless_in_subroutine</code> option in your <i>.perlcriticrc</i> with a true value, then this policy will allow <code>die</code> and <code>warn</code> in name space main:: unless they appear in a subroutine, even if they do not end in an explicit newline.</p>
+
+<pre><code>    [ErrorHandling::RequireCarping]
+    allow_in_main_unless_in_subroutine = 1</code></pre>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Should allow <code>die</code> when it is obvious that the &quot;message&quot; is a reference.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Carp::Always</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,368 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new()</a></li>
+      <li><a href="#dialect">dialect()</a></li>
+      <li><a href="#feature">feature()</a></li>
+    </ul>
+  </li>
+  <li><a href="#Supported-SQL-syntax">Supported SQL syntax</a></li>
+  <li><a href="#Subclassing-SQL::Parser">Subclassing SQL::Parser</a></li>
+  <li><a href="#The-parse-structure">The parse structure</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a>
+    <ul>
+      <li><a href="#Where-can-I-go-for-help">Where can I go for help?</a></li>
+      <li><a href="#Where-can-I-go-for-help-with-a-concrete-version">Where can I go for help with a concrete version?</a></li>
+      <li><a href="#Business-support-and-maintenance">Business support and maintenance</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR-COPYRIGHT">AUTHOR &amp; COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<pre><code> SQL::Parser -- validate and parse SQL strings</code></pre>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">SQL::Parser</span><span class="operator">;</span>                                     <span class="comment"># CREATE A PARSER OBJECT</span>
+ <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">SQL::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+ 
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span> <span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="variable">$value</span> <span class="operator">);</span>           <span class="comment"># SET OR FIND STATUS OF</span>
+ <span class="keyword">my</span> <span class="variable">$has_feature</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span> <span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span> <span class="operator">);</span> <span class="comment"># A PARSER FEATURE</span>
+ 
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">dialect</span><span class="operator">(</span> <span class="variable">$dialect_name</span> <span class="operator">);</span>                   <span class="comment"># SET OR FIND STATUS OF</span>
+ <span class="keyword">my</span> <span class="variable">$current_dialect</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">dialect</span><span class="operator">;</span>              <span class="comment"># A PARSER DIALECT</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>SQL::Parser is part of the SQL::Statement distribution and, most interaction with the parser should be done through SQL::Statement. The methods shown above create and modify a parser object. To use the parser object to parse SQL and to examine the resulting structure, you should use SQL::Statement.</p>
+
+<p><b>Important Note</b>: Previously SQL::Parser had its own hash-based interface for parsing, but that is now deprecated and will eventually be phased out in favor of the object-oriented parsing interface of SQL::Statement. If you are unable to transition some features to the new interface or have concerns about the phase out, please contact me. See <a href="#The-Parse-Structure">&quot;The Parse Structure&quot;</a> for details of the now-deprecated hash method if you still need them.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new()</h2>
+
+<p>Create a new parser object</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">SQL::Parser</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">SQL::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+</code></pre>
+
+<p>The new() method creates a SQL::Parser object which can then be used to parse and validate the syntax of SQL strings. It takes two optional parameters - 1) the name of the SQL dialect that will define the syntax rules for the parser and 2) a reference to a hash which can contain additional attributes of the parser. If no dialect is specified, &#39;AnyData&#39; is the default.</p>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">SQL::Parser</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">SQL::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="variable">$dialect_name</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">%attrs</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The dialect_name parameter is a string containing any valid dialect such as &#39;ANSI&#39;, &#39;AnyData&#39;, or &#39;CSV&#39;. See the section on the dialect() method below for details.</p>
+
+<p>The <code>attrs</code> parameter is a reference to a hash that can contain error settings for the PrintError and RaiseError attributes.</p>
+
+<p>An example:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">SQL::Parser</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">SQL::Parser</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">'AnyData'</span><span class="operator">,</span> <span class="operator">{</span><span class="string">RaiseError</span><span class="operator">=&gt;</span><span class="number">1</span><span class="operator">}</span> <span class="operator">);</span>
+  
+  <span class="variable">This</span> <span class="variable">creates</span> <span class="variable">a</span> <span class="variable">new</span> <span class="variable">parser</span> <span class="variable">that</span> <span class="variable">uses</span> <span class="variable">the</span> <span class="variable">grammar</span> <span class="variable">rules</span>
+  <span class="variable">contained</span> <span class="variable">in</span> <span class="variable">the</span> <span class="operator">...</span><span class="regex">/SQL/Dialects</span><span class="operator">/</span><span class="variable">AnyData</span><span class="operator">.</span><span class="variable">pm</span> <span class="variable">file</span> <span class="keyword">and</span> <span class="variable">which</span>
+  <span class="variable">sets</span> <span class="variable">the</span> <span class="variable">RaiseError</span> <span class="variable">attribute</span> <span class="variable">to</span> <span class="variable">true</span><span class="operator">.</span>
+</code></pre>
+
+<h2 id="dialect">dialect()</h2>
+
+<pre><code> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">dialect</span><span class="operator">(</span> <span class="variable">$dialect_name</span> <span class="operator">);</span>     <span class="comment"># load a dialect configuration file</span>
+ <span class="keyword">my</span> <span class="variable">$dialect</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">dialect</span><span class="operator">;</span>        <span class="comment"># get the name of the current dialect</span>
+ 
+ <span class="variable">For</span> <span class="variable">example</span><span class="operator">:</span>
+ 
+   <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">dialect</span><span class="operator">(</span><span class="string">'AnyData'</span><span class="operator">);</span>  <span class="comment"># loads the AnyData config file</span>
+   <span class="keyword">print</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">dialect</span><span class="operator">;</span>       <span class="comment"># prints 'AnyData'</span>
+</code></pre>
+
+<p>The <code>$dialect_name</code> parameter may be the name of any dialect configuration file on your system. Use the $parser-&gt;list(&#39;dialects&#39;) method to see a list of available dialects. At a minimum it will include &quot;ANSI&quot;, &quot;CSV&quot;, and &quot;AnyData&quot;. For backwards compatibility &#39;Ansi&#39; is accepted as a synonym for &#39;ANSI&#39;, otherwise the names are case sensitive.</p>
+
+<p>Loading a new dialect configuration file erases all current parser features and resets them to those defined in the configuration file.</p>
+
+<h2 id="feature">feature()</h2>
+
+<p>Features define the rules to be used by a specific parser instance. They are divided into the following classes:</p>
+
+<pre><code>    * valid_commands
+    * valid_options
+    * valid_comparison_operators
+    * valid_data_types
+    * reserved_words</code></pre>
+
+<p>Within each class a feature name is either enabled or disabled. For example, under &quot;valid_data_types&quot; the name &quot;BLOB&quot; may be either disabled or enabled. If it is not enabled (either by being specifically disabled, or simply by not being specified at all) then any SQL string using &quot;BLOB&quot; as a data type will throw a syntax error &quot;Invalid data type: &#39;BLOB&#39;&quot;.</p>
+
+<p>The feature() method allows you to enable, disable, or check the status of any feature.</p>
+
+<pre><code> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span> <span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="number">1</span> <span class="operator">);</span>             <span class="comment"># enable a feature</span>
+ 
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span> <span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="number">0</span> <span class="operator">);</span>             <span class="comment"># disable a feature</span>
+ 
+ <span class="keyword">my</span> <span class="variable">$feature</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span> <span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span> <span class="operator">);</span>  <span class="comment"># return status of a feature</span>
+ 
+ <span class="variable">For</span> <span class="variable">example</span><span class="operator">:</span>
+ 
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span><span class="string">'reserved_words'</span><span class="operator">,</span><span class="string">'FOO'</span><span class="operator">,</span><span class="number">1</span><span class="operator">);</span>       <span class="comment"># make 'FOO' a reserved word</span>
+ 
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span><span class="string">'valid_data_types'</span><span class="operator">,</span><span class="string">'BLOB'</span><span class="operator">,</span><span class="number">0</span><span class="operator">);</span>    <span class="comment"># disallow 'BLOB' as a</span>
+                                                   <span class="comment"># data type</span>
+ 
+                                                   <span class="comment"># determine if the LIKE</span>
+                                                   <span class="comment"># operator is supported</span>
+ <span class="keyword">my</span> <span class="variable">$LIKE</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">feature</span><span class="operator">(</span><span class="string">'valid_comparison_operators'</span><span class="operator">,</span><span class="string">'LIKE'</span><span class="operator">);</span>
+</code></pre>
+
+<p>See the section below on &quot;Backwards Compatibility&quot; for use of the feature() method with SQL::Statement 0.1x style parameters.</p>
+
+<h1 id="Supported-SQL-syntax">Supported SQL syntax</h1>
+
+<p>The SQL::Statement distribution can be used to either just parse SQL statements or to execute them against actual data. A broader set of syntax is supported in the parser than in the executor. For example the parser allows you to specify column constraints like PRIMARY KEY. Currently, these are ignored by the execution engine. Likewise syntax such as RESTRICT and CASCADE on DROP statements or LOCAL GLOBAL TEMPORARY tables in CREATE are supported by the parser but ignored by the executor.</p>
+
+<p>To see the list of Supported SQL syntax formerly kept in this pod, see <a href="../../lib/SQL/Statement.html">SQL::Statement</a>.</p>
+
+<h1 id="Subclassing-SQL::Parser">Subclassing SQL::Parser</h1>
+
+<p>In the event you need to either extend or modify SQL::Parser&#39;s default behavior, the following methods may be overridden:</p>
+
+<dl>
+
+<dt id="self-get_btwn-string"><code>$self-</code>&gt;<code>get_btwn($string)</code></dt>
+<dd>
+
+<p>Processes the BETWEEN...AND... predicates; default converts to 2 range predicates.</p>
+
+</dd>
+<dt id="self-get_in-string"><code>$self-</code>&gt;<code>get_in($string)</code></dt>
+<dd>
+
+<p>Process the IN (...list...) predicates; default converts to a series of OR&#39;d &#39;=&#39; predicate, or AND&#39;d &#39;&lt;&gt;&#39; predicates for NOT IN.</p>
+
+</dd>
+<dt id="self-transform_syntax-string"><code>$self-</code>&gt;<code>transform_syntax($string)</code></dt>
+<dd>
+
+<p>Abstract method; default simply returns the original string. Called after repl_btwn() and repl_in(), but before any further predicate processing is applied. Possible uses include converting other predicate syntax not recognized by SQL::Parser into user-defined functions.</p>
+
+</dd>
+</dl>
+
+<h1 id="The-parse-structure">The parse structure</h1>
+
+<p>This section outlines the <b>now-deprecated</b> hash interface to the parsed structure. It is included <b>for backwards compatibility only</b>. You should use the SQL::Statement object interface to the structure instead. See <a href="../../lib/SQL/Statement.html">SQL::Statement</a>.</p>
+
+<p><b>Parse Structures</b></p>
+
+<p>Here are some further examples of the data structures returned by the structure() method after a call to parse(). Only specific details are shown for each SQL instance, not the entire structure.</p>
+
+<p><b>parse()</b></p>
+
+<p>Once a SQL::Parser object has been created with the new() method, the parse() method can be used to parse any number of SQL strings. It takes a single required parameter -- a string containing a SQL command. The SQL string may optionally be terminated by a semicolon. The parse() method returns a true value if the parse is successful and a false value if the parse finds SQL syntax errors.</p>
+
+<p>Examples:</p>
+
+<pre><code>  <span class="number">1</span><span class="operator">)</span> <span class="keyword">my</span> <span class="variable">$success</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="string">'SELECT * FROM foo'</span><span class="operator">);</span>
+  
+  <span class="number">2</span><span class="operator">)</span> <span class="keyword">my</span> <span class="variable">$sql</span> <span class="operator">=</span> <span class="string">'SELECT * FROM foo'</span><span class="operator">;</span>
+     <span class="keyword">my</span> <span class="variable">$success</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span> <span class="variable">$sql</span> <span class="operator">);</span>
+  
+  <span class="number">3</span><span class="operator">)</span> <span class="keyword">my</span> <span class="variable">$success</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="string">qq!
+         SELECT id,phrase
+           FROM foo
+          WHERE id &lt; 7
+            AND phrase &lt;&gt; 'bar'
+       ORDER BY phrase;
+   !</span><span class="operator">);</span>
+  
+  <span class="number">4</span><span class="operator">)</span> <span class="keyword">my</span> <span class="variable">$success</span> <span class="operator">=</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="string">'SELECT * FRoOM foo '</span><span class="operator">);</span>
+</code></pre>
+
+<p>In examples #1,#2, and #3, the value of $success will be true because the strings passed to the parse() method are valid SQL strings.</p>
+
+<p>In example #4, however, the value of $success will be false because the string contains a SQL syntax error (&#39;FRoOM&#39; instead of &#39;FROM&#39;).</p>
+
+<p>In addition to checking the return value of parse() with a variable like $success, you may use the PrintError and RaiseError attributes as you would in a DBI script:</p>
+
+<pre><code> * If PrintError is true, then SQL syntax errors will be sent as
+   warnings to STDERR (i.e. to the screen or to a file if STDERR
+   has been redirected).  This is set to true by default which
+   means that unless you specifically turn it off, all errors
+   will be reported.
+
+ * If RaiseError is true, then SQL syntax errors will cause the
+   script to die, (i.e. the script will terminate unless wrapped
+   in an eval).  This is set to false by default which means
+   that unless you specifically turn it on, scripts will
+   continue to operate even if there are SQL syntax errors.</code></pre>
+
+<p>Basically, you should leave PrintError on or else you will not be warned when an error occurs. If you are simply validating a series of strings, you will want to leave RaiseError off so that the script can check all strings regardless of whether some of them contain SQL errors. However, if you are going to try to execute the SQL or need to depend that it is correct, you should set RaiseError on so that the program will only continue to operate if all SQL strings use correct syntax.</p>
+
+<p>IMPORTANT NOTE #1: The parse() method only checks syntax, it does NOT verify if the objects listed actually exist. For example, given the string &quot;SELECT model FROM cars&quot;, the parse() method will report that the string contains valid SQL but that will not tell you whether there actually is a table called &quot;cars&quot; or whether that table contains a column called &#39;model&#39;. Those kinds of verifications are performed by the SQL::Statement module, not by SQL::Parser by itself.</p>
+
+<p>IMPORTANT NOTE #2: The parse() method uses rules as defined by the selected dialect configuration file and the feature() method. This means that a statement that is valid in one dialect may not be valid in another. For example the &#39;CSV&#39; and &#39;AnyData&#39; dialects define &#39;BLOB&#39; as a valid data type but the &#39;ANSI&#39; dialect does not. Therefore the statement &#39;CREATE TABLE foo (picture BLOB)&#39; would be valid in the first two dialects but would produce a syntax error in the &#39;ANSI&#39; dialect.</p>
+
+<p><b>structure()</b></p>
+
+<p>After a SQL::Parser object has been created and the parse() method used to parse a SQL string, the structure() method returns the data structure of that string. This data structure may be passed on to other modules (e.g. SQL::Statement) or it may be printed out using, for example, the Data::Dumper module.</p>
+
+<p>The data structure contains all of the information in the SQL string as parsed into its various components. To take a simple example:</p>
+
+<pre><code> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="string">'SELECT make,model FROM cars'</span><span class="operator">);</span>
+ <span class="keyword">use</span> <span class="variable">Data::Dumper</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="variable">Dumper</span> <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">structure</span><span class="operator">;</span>
+</code></pre>
+
+<p>Would produce:</p>
+
+<pre><code> <span class="variable">$VAR1</span> <span class="operator">=</span> <span class="operator">{</span>
+          <span class="string">'column_defs'</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+                              <span class="operator">{</span> <span class="string">'type'</span>  <span class="operator">=&gt;</span> <span class="string">'column'</span><span class="operator">,</span>
+                                <span class="string">'value'</span> <span class="operator">=&gt;</span> <span class="string">'make'</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                              <span class="operator">{</span> <span class="string">'type'</span>  <span class="operator">=&gt;</span> <span class="string">'column'</span><span class="operator">,</span>
+                                <span class="string">'value'</span> <span class="operator">=&gt;</span> <span class="string">'model'</span><span class="operator">,</span> <span class="operator">}</span><span class="operator">,</span>
+                            <span class="operator">]</span><span class="operator">,</span>
+          <span class="string">'command'</span> <span class="operator">=&gt;</span> <span class="string">'SELECT'</span><span class="operator">,</span>
+          <span class="string">'table_names'</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+                             <span class="string">'cars'</span>
+                           <span class="operator">]</span>
+        <span class="operator">}</span><span class="operator">;</span>
+ 
+ 
+ <span class="string">'SELECT make,model, FROM cars'</span>
+ 
+      <span class="string">command</span> <span class="operator">=&gt;</span> <span class="string">'SELECT'</span><span class="operator">,</span>
+      <span class="string">table_names</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'cars'</span> <span class="operator">]</span><span class="operator">,</span>
+      <span class="string">column_names</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'make'</span><span class="operator">,</span> <span class="string">'model'</span> <span class="operator">]</span><span class="operator">,</span>
+ 
+ <span class="string">'CREATE TABLE cars ( id INTEGER, model VARCHAR(40) )'</span>
+ 
+      <span class="string">column_defs</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">id</span>    <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">data_type</span> <span class="operator">=&gt;</span> <span class="variable">INTEGER</span>     <span class="operator">}</span><span class="operator">,</span>
+          <span class="string">model</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">data_type</span> <span class="operator">=&gt;</span> <span class="variable">VARCHAR</span><span class="operator">(</span><span class="number">40</span><span class="operator">)</span> <span class="operator">}</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+ 
+ <span class="string">'SELECT DISTINCT make FROM cars'</span>
+ 
+      <span class="string">set_quantifier</span> <span class="operator">=&gt;</span> <span class="string">'DISTINCT'</span><span class="operator">,</span>
+ 
+ <span class="string">'SELECT MAX (model) FROM cars'</span>
+ 
+    <span class="string">set_function</span>   <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="string">name</span> <span class="operator">=&gt;</span> <span class="string">'MAX'</span><span class="operator">,</span>
+        <span class="string">arg</span>  <span class="operator">=&gt;</span> <span class="string">'models'</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">,</span>
+ 
+ <span class="string">'SELECT * FROM cars LIMIT 5,10'</span>
+ 
+    <span class="string">limit_clause</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+        <span class="string">offset</span> <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">,</span>
+        <span class="string">limit</span>  <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">,</span>
+ 
+ <span class="string">'SELECT * FROM vars ORDER BY make, model DESC'</span>
+ 
+    <span class="string">sort_spec_list</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+        <span class="operator">{</span> <span class="string">make</span>  <span class="operator">=&gt;</span> <span class="string">'ASC'</span>  <span class="operator">}</span><span class="operator">,</span>
+        <span class="operator">{</span> <span class="string">model</span> <span class="operator">=&gt;</span> <span class="string">'DESC'</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">]</span><span class="operator">,</span>
+ 
+ <span class="string">"INSERT INTO cars VALUES ( 7, 'Chevy', 'Impala' )"</span>
+ 
+    <span class="string">values</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">7</span><span class="operator">,</span> <span class="string">'Chevy'</span><span class="operator">,</span> <span class="string">'Impala'</span> <span class="operator">]</span><span class="operator">,</span>
+</code></pre>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc SQL::Parser
+    perldoc SQL::Statement</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Statement">http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Statement</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/SQL-Statement">http://annocpan.org/dist/SQL-Statement</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="http://cpanratings.perl.org/s/SQL-Statement">http://cpanratings.perl.org/s/SQL-Statement</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="http://search.cpan.org/dist/SQL-Statement/">http://search.cpan.org/dist/SQL-Statement/</a></p>
+
+</li>
+</ul>
+
+<h2 id="Where-can-I-go-for-help">Where can I go for help?</h2>
+
+<p>For questions about installation or usage, please ask on the dbi-users@perl.org mailing list or post a question on PerlMonks (<a href="http://www.perlmonks.org/">http://www.perlmonks.org/</a>, where Jeff is known as jZed). Jens does not visit PerlMonks on a regular basis.</p>
+
+<p>If you have a bug report, a patch or a suggestion, please open a new report ticket at CPAN (but please check previous reports first in case your issue has already been addressed). You can mail any of the module maintainers, but you are more assured of an answer by posting to the dbi-users list or reporting the issue in RT.</p>
+
+<p>Report tickets should contain a detailed description of the bug or enhancement request and at least an easily verifiable way of reproducing the issue or fix. Patches are always welcome, too.</p>
+
+<h2 id="Where-can-I-go-for-help-with-a-concrete-version">Where can I go for help with a concrete version?</h2>
+
+<p>Bugs and feature requests are accepted against the latest version only. To get patches for earlier versions, you need to get an agreement with a developer of your choice - who may or not report the the issue and a suggested fix upstream (depends on the license you have chosen).</p>
+
+<h2 id="Business-support-and-maintenance">Business support and maintenance</h2>
+
+<p>For business support you can contact Jens via his CPAN email address rehsackATcpan.org. Please keep in mind that business support is neither available for free nor are you eligible to receive any support based on the license distributed with this package.</p>
+
+<h1 id="AUTHOR-COPYRIGHT">AUTHOR &amp; COPYRIGHT</h1>
+
+<pre><code> This module is
+
+ copyright (c) 2001,2005 by Jeff Zucker and
+ copyright (c) 2007-2017 by Jens Rehsack.
+
+ All rights reserved.</code></pre>
+
+<p>The module may be freely distributed under the same terms as Perl itself using either the &quot;GPL License&quot; or the &quot;Artistic License&quot; as specified in the Perl README file.</p>
+
+<p>Jeff can be reached at: jzuckerATcpan.org Jens can be reached at: rehsackATcpan.org or via dbi-devATperl.org</p>
+
+
+</body>
+
+</html>
+
+

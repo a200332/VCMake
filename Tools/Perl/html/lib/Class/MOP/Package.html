@@ -1,0 +1,195 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Class::MOP::Package-initialize-package_name-options">Class::MOP::Package-&gt;initialize($package_name, %options)</a></li>
+      <li><a href="#Class::MOP::Package-reinitialize-package-options">Class::MOP::Package-&gt;reinitialize($package, %options)</a></li>
+      <li><a href="#Class::MOP::Package-create-package-options">Class::MOP::Package-&gt;create($package, %options)</a></li>
+      <li><a href="#Class::MOP::Package-create_anon-options">Class::MOP::Package-&gt;create_anon(%options)</a></li>
+      <li><a href="#metapackage-is_anon">$metapackage-&gt;is_anon</a></li>
+      <li><a href="#metapackage-name">$metapackage-&gt;name</a></li>
+      <li><a href="#metapackage-namespace">$metapackage-&gt;namespace</a></li>
+      <li><a href="#metapackage-add_package_symbol-variable_name-initial_value">$metapackage-&gt;add_package_symbol($variable_name, $initial_value)</a></li>
+      <li><a href="#metapackage-get_package_symbol-variable_name">$metapackage-&gt;get_package_symbol($variable_name)</a></li>
+      <li><a href="#metapackage-get_or_add_package_symbol-variable_name">$metapackage-&gt;get_or_add_package_symbol($variable_name)</a></li>
+      <li><a href="#metapackage-has_package_symbol-variable_name">$metapackage-&gt;has_package_symbol($variable_name)</a></li>
+      <li><a href="#metapackage-remove_package_symbol-variable_name">$metapackage-&gt;remove_package_symbol($variable_name)</a></li>
+      <li><a href="#metapackage-remove_package_glob-glob_name">$metapackage-&gt;remove_package_glob($glob_name)</a></li>
+      <li><a href="#metapackage-list_all_package_symbols-type_filter">$metapackage-&gt;list_all_package_symbols($type_filter)</a></li>
+      <li><a href="#metapackage-get_all_package_symbols-type_filter">$metapackage-&gt;get_all_package_symbols($type_filter)</a></li>
+      <li><a href="#Class::MOP::Package-meta">Class::MOP::Package-&gt;meta</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Class::MOP::Package - Package Meta Object</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The Package Protocol provides an abstraction of a Perl 5 package. A package is basically namespace, and this module provides methods for looking at and changing that namespace&#39;s symbol table.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="Class::MOP::Package-initialize-package_name-options">Class::MOP::Package-&gt;initialize($package_name, %options)</h2>
+
+<p>This method creates a new <code>Class::MOP::Package</code> instance which represents specified package. If an existing metaclass object exists for the package, that will be returned instead. No options are valid at the package level.</p>
+
+<h2 id="Class::MOP::Package-reinitialize-package-options">Class::MOP::Package-&gt;reinitialize($package, %options)</h2>
+
+<p>This method forcibly removes any existing metaclass for the package before calling <code>initialize</code>. In contrast to <code>initialize</code>, you may also pass an existing <code>Class::MOP::Package</code> instance instead of just a package name as <code>$package</code>.</p>
+
+<p>Do not call this unless you know what you are doing.</p>
+
+<h2 id="Class::MOP::Package-create-package-options">Class::MOP::Package-&gt;create($package, %options)</h2>
+
+<p>Creates a new <code>Class::MOP::Package</code> instance which represents the specified package, and also does some initialization of that package. Currently, this just does the same thing as <code>initialize</code>, but is overridden in subclasses, such as <code>Class::MOP::Class</code>.</p>
+
+<h2 id="Class::MOP::Package-create_anon-options">Class::MOP::Package-&gt;create_anon(%options)</h2>
+
+<p>Creates a new anonymous package. Valid keys for <code>%options</code> are:</p>
+
+<dl>
+
+<dt id="cache"><code>cache</code></dt>
+<dd>
+
+<p>If this will be <code>true</code> (the default is <code>false</code>), the instance will be cached in <code>Class::MOP</code>&#39;s metaclass cache.</p>
+
+</dd>
+<dt id="weaken"><code>weaken</code></dt>
+<dd>
+
+<p>If this is <code>true</code> (the default <code>true</code> when <a>cache</a> is <code>false</code>), the instance stored in <code>Class::MOP</code>&#39;s metaclass cache will be weakened, so that the anonymous package will be garbage collected when the returned instance goes out of scope.</p>
+
+</dd>
+</dl>
+
+<h2 id="metapackage-is_anon">$metapackage-&gt;is_anon</h2>
+
+<p>Returns true if the package is an anonymous package.</p>
+
+<h2 id="metapackage-name">$metapackage-&gt;name</h2>
+
+<p>This is returns the package&#39;s name, as passed to the constructor.</p>
+
+<h2 id="metapackage-namespace">$metapackage-&gt;namespace</h2>
+
+<p>This returns a hash reference to the package&#39;s symbol table. The keys are symbol names and the values are typeglob references.</p>
+
+<h2 id="metapackage-add_package_symbol-variable_name-initial_value">$metapackage-&gt;add_package_symbol($variable_name, $initial_value)</h2>
+
+<p>This method accepts a variable name and an optional initial value. The <code>$variable_name</code> must contain a leading sigil.</p>
+
+<p>This method creates the variable in the package&#39;s symbol table, and sets it to the initial value if one was provided.</p>
+
+<h2 id="metapackage-get_package_symbol-variable_name">$metapackage-&gt;get_package_symbol($variable_name)</h2>
+
+<p>Given a variable name, this method returns the variable as a reference or undef if it does not exist. The <code>$variable_name</code> must contain a leading sigil.</p>
+
+<h2 id="metapackage-get_or_add_package_symbol-variable_name">$metapackage-&gt;get_or_add_package_symbol($variable_name)</h2>
+
+<p>Given a variable name, this method returns the variable as a reference. If it does not exist, a default value will be generated if possible. The <code>$variable_name</code> must contain a leading sigil.</p>
+
+<h2 id="metapackage-has_package_symbol-variable_name">$metapackage-&gt;has_package_symbol($variable_name)</h2>
+
+<p>Returns true if there is a package variable defined for <code>$variable_name</code>. The <code>$variable_name</code> must contain a leading sigil.</p>
+
+<h2 id="metapackage-remove_package_symbol-variable_name">$metapackage-&gt;remove_package_symbol($variable_name)</h2>
+
+<p>This will remove the package variable specified <code>$variable_name</code>. The <code>$variable_name</code> must contain a leading sigil.</p>
+
+<h2 id="metapackage-remove_package_glob-glob_name">$metapackage-&gt;remove_package_glob($glob_name)</h2>
+
+<p>Given the name of a glob, this will remove that glob from the package&#39;s symbol table. Glob names do not include a sigil. Removing the glob removes all variables and subroutines with the specified name.</p>
+
+<h2 id="metapackage-list_all_package_symbols-type_filter">$metapackage-&gt;list_all_package_symbols($type_filter)</h2>
+
+<p>This will list all the glob names associated with the current package. These names do not have leading sigils.</p>
+
+<p>You can provide an optional type filter, which should be one of &#39;SCALAR&#39;, &#39;ARRAY&#39;, &#39;HASH&#39;, or &#39;CODE&#39;.</p>
+
+<h2 id="metapackage-get_all_package_symbols-type_filter">$metapackage-&gt;get_all_package_symbols($type_filter)</h2>
+
+<p>This works much like <code>list_all_package_symbols</code>, but it returns a hash reference. The keys are glob names and the values are references to the value for that name.</p>
+
+<h2 id="Class::MOP::Package-meta">Class::MOP::Package-&gt;meta</h2>
+
+<p>This will return a <a href="../../../lib/Class/MOP/Class.html">Class::MOP::Class</a> instance for this class.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

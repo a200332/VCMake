@@ -1,0 +1,427 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ADVANCED-USAGE">ADVANCED USAGE</a></li>
+  <li><a href="#PLUGIN-SEARCHING">PLUGIN SEARCHING</a></li>
+  <li><a href="#INNER-PACKAGES">INNER PACKAGES</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a>
+    <ul>
+      <li><a href="#sub_name">sub_name</a></li>
+      <li><a href="#search_path">search_path</a></li>
+      <li><a href="#search_dirs">search_dirs</a></li>
+      <li><a href="#instantiate">instantiate</a></li>
+      <li><a href="#require">require</a></li>
+      <li><a href="#inner">inner</a></li>
+      <li><a href="#only">only</a></li>
+      <li><a href="#except">except</a></li>
+      <li><a href="#package">package</a></li>
+      <li><a href="#file_regex">file_regex</a></li>
+      <li><a href="#include_editor_junk">include_editor_junk</a></li>
+      <li><a href="#follow_symlinks">follow_symlinks</a></li>
+      <li><a href="#min_depth-max_depth">min_depth, max_depth</a></li>
+    </ul>
+  </li>
+  <li><a href="#TRIGGERS">TRIGGERS</a>
+    <ul>
+      <li><a href="#before_require-plugin">before_require &lt;plugin&gt;</a></li>
+      <li><a href="#on_require_error-plugin-err">on_require_error &lt;plugin&gt; &lt;err&gt;</a></li>
+      <li><a href="#on_instantiate_error-plugin-err">on_instantiate_error &lt;plugin&gt; &lt;err&gt;</a></li>
+      <li><a href="#after_require-plugin">after_require &lt;plugin&gt;</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODs">METHODs</a>
+    <ul>
+      <li><a href="#search_path1">search_path</a></li>
+    </ul>
+  </li>
+  <li><a href="#BEHAVIOUR-UNDER-TEST-ENVIRONMENT">BEHAVIOUR UNDER TEST ENVIRONMENT</a></li>
+  <li><a href="#INC-hooks-and-App::FatPacker">@INC hooks and App::FatPacker</a></li>
+  <li><a href="#Module::Require-recommended">Module::Require recommended</a></li>
+  <li><a href="#FUTURE-PLANS">FUTURE PLANS</a></li>
+  <li><a href="#DEVELOPMENT">DEVELOPMENT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYING">COPYING</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Module::Pluggable - automatically give your module the ability to have plugins</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Simple use Module::Pluggable -</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span><span class="operator">;</span>
+</code></pre>
+
+<p>and then later ...</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$mc</span> <span class="operator">=</span> <span class="variable">MyClass</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+    <span class="comment"># returns the names of all plugins installed under MyClass::Plugin::*</span>
+    <span class="keyword">my</span> <span class="variable">@plugins</span> <span class="operator">=</span> <span class="variable">$mc</span><span class="operator">-&gt;</span><span class="variable">plugins</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<p>Why would you want to do this? Say you have something that wants to pass an object to a number of different plugins in turn. For example you may want to extract meta-data from every email you get sent and do something with it. Plugins make sense here because then you can keep adding new meta data parsers and all the logic and docs for each one will be self contained and new handlers are easy to add without changing the core code. For that, you might do something like ...</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Email::Examiner</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Email::Simple</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">require</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+    
+    <span class="keyword">sub</span><span class="variable"> handle_email </span><span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$self</span>  <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+        <span class="keyword">my</span> <span class="variable">$email</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    
+        <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$plugin</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">plugins</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="variable">$plugin</span><span class="operator">-&gt;</span><span class="variable">examine</span><span class="operator">(</span><span class="variable">$email</span><span class="operator">);</span>
+        <span class="operator">}</span>
+    
+        <span class="keyword">return</span> <span class="number">1</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>.. and all the plugins will get a chance in turn to look at it.</p>
+
+<p>This can be trivially extended so that plugins could save the email somewhere and then no other plugin should try and do that. Simply have it so that the <code>examine</code> method returns <code>1</code> if it has saved the email somewhere. You might also want to be paranoid and check to see if the plugin has an <code>examine</code> method.</p>
+
+<pre><code>        <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$plugin</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">plugins</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">next</span> <span class="keyword">unless</span> <span class="variable">$plugin</span><span class="operator">-&gt;</span><span class="variable">can</span><span class="operator">(</span><span class="string">'examine'</span><span class="operator">);</span>
+            <span class="keyword">last</span> <span class="keyword">if</span>     <span class="variable">$plugin</span><span class="operator">-&gt;</span><span class="variable">examine</span><span class="operator">(</span><span class="variable">$email</span><span class="operator">);</span>
+        <span class="operator">}</span>
+</code></pre>
+
+<p>And so on. The sky&#39;s the limit.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Provides a simple but, hopefully, extensible way of having &#39;plugins&#39; for your module. Obviously this isn&#39;t going to be the be all and end all of solutions but it works for me.</p>
+
+<p>Essentially all it does is export a method into your namespace that looks through a search path for .pm files and turn those into class names.</p>
+
+<p>Optionally it instantiates those classes for you.</p>
+
+<h1 id="ADVANCED-USAGE">ADVANCED USAGE</h1>
+
+<p>Alternatively, if you don&#39;t want to use &#39;plugins&#39; as the method ...</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">sub_name</span> <span class="operator">=&gt;</span> <span class="string">'foo'</span><span class="operator">;</span>
+</code></pre>
+
+<p>and then later ...</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@plugins</span> <span class="operator">=</span> <span class="variable">$mc</span><span class="operator">-&gt;</span><span class="variable">foo</span><span class="operator">();</span>
+</code></pre>
+
+<p>Or if you want to look in another namespace</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">search_path</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'Acme::MyClass::Plugin'</span><span class="operator">,</span> <span class="string">'MyClass::Extend'</span><span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>or directory</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">search_dirs</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'mylibs/Foo'</span><span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>Or if you want to instantiate each plugin rather than just return the name</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">instantiate</span> <span class="operator">=&gt;</span> <span class="string">'new'</span><span class="operator">;</span>
+</code></pre>
+
+<p>and then</p>
+
+<pre><code>    <span class="comment"># whatever is passed to 'plugins' will be passed</span>
+    <span class="comment"># to 'new' for each plugin</span>
+    <span class="keyword">my</span> <span class="variable">@plugins</span> <span class="operator">=</span> <span class="variable">$mc</span><span class="operator">-&gt;</span><span class="variable">plugins</span><span class="operator">(</span><span class="variable">@options</span><span class="operator">);</span>
+</code></pre>
+
+<p>alternatively you can just require the module without instantiating it</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">require</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<p>since requiring automatically searches inner packages, which may not be desirable, you can turn this off</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">require</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span> <span class="string">inner</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can limit the plugins loaded using the except option, either as a string, array ref or regex</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">except</span> <span class="operator">=&gt;</span> <span class="string">'MyClass::Plugin::Foo'</span><span class="operator">;</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">except</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'MyClass::Plugin::Foo'</span><span class="operator">,</span> <span class="string">'MyClass::Plugin::Bar'</span><span class="operator">]</span><span class="operator">;</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">except</span> <span class="operator">=&gt;</span> <span class="string">qr/^MyClass::Plugin::(Foo|Bar)$/</span><span class="operator">;</span>
+</code></pre>
+
+<p>and similarly for only which will only load plugins which match.</p>
+
+<p>Remember you can use the module more than once</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">search_path</span> <span class="operator">=&gt;</span> <span class="string">'MyClass::Filters'</span> <span class="string">sub_name</span> <span class="operator">=&gt;</span> <span class="string">'filters'</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">search_path</span> <span class="operator">=&gt;</span> <span class="string">'MyClass::Plugins'</span> <span class="string">sub_name</span> <span class="operator">=&gt;</span> <span class="string">'plugins'</span><span class="operator">;</span>
+</code></pre>
+
+<p>and then later ...</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@filters</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">filters</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">@plugins</span> <span class="operator">=</span> <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">plugins</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="PLUGIN-SEARCHING">PLUGIN SEARCHING</h1>
+
+<p>Every time you call &#39;plugins&#39; the whole search path is walked again. This allows for dynamically loading plugins even at run time. However this can get expensive and so if you don&#39;t expect to want to add new plugins at run time you could do</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">sub_name</span> <span class="operator">=&gt;</span> <span class="string">'_plugins'</span><span class="operator">;</span>
+  
+  <span class="keyword">our</span> <span class="variable">@PLUGINS</span><span class="operator">;</span>
+  <span class="keyword">sub</span><span class="variable"> plugins </span><span class="operator">{</span> <span class="variable">@PLUGINS</span> <span class="operator">||=</span> <span class="keyword">shift</span><span class="operator">-&gt;</span><span class="variable">_plugins</span> <span class="operator">}</span>
+  <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="INNER-PACKAGES">INNER PACKAGES</h1>
+
+<p>If you have, for example, a file <b>lib/Something/Plugin/Foo.pm</b> that contains package definitions for both <code>Something::Plugin::Foo</code> and <code>Something::Plugin::Bar</code> then as long as you either have either the <b>require</b> or <b>instantiate</b> option set then we&#39;ll also find <code>Something::Plugin::Bar</code>. Nifty!</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<p>You can pass a hash of options when importing this module.</p>
+
+<p>The options can be ...</p>
+
+<h2 id="sub_name">sub_name</h2>
+
+<p>The name of the subroutine to create in your namespace.</p>
+
+<p>By default this is &#39;plugins&#39;</p>
+
+<h2 id="search_path">search_path</h2>
+
+<p>An array ref of namespaces to look in.</p>
+
+<h2 id="search_dirs">search_dirs</h2>
+
+<p>An array ref of directories to look in before @INC.</p>
+
+<h2 id="instantiate">instantiate</h2>
+
+<p>Call this method on the class. In general this will probably be &#39;new&#39; but it can be whatever you want. Whatever arguments are passed to &#39;plugins&#39; will be passed to the method.</p>
+
+<p>The default is &#39;undef&#39; i.e just return the class name.</p>
+
+<h2 id="require">require</h2>
+
+<p>Just require the class, don&#39;t instantiate (overrides &#39;instantiate&#39;);</p>
+
+<h2 id="inner">inner</h2>
+
+<p>If set to 0 will <b>not</b> search inner packages. If set to 1 will override <code>require</code>.</p>
+
+<h2 id="only">only</h2>
+
+<p>Takes a string, array ref or regex describing the names of the only plugins to return. Whilst this may seem perverse ... well, it is. But it also makes sense. Trust me.</p>
+
+<h2 id="except">except</h2>
+
+<p>Similar to <code>only</code> it takes a description of plugins to exclude from returning. This is slightly less perverse.</p>
+
+<h2 id="package">package</h2>
+
+<p>This is for use by extension modules which build on <code>Module::Pluggable</code>: passing a <code>package</code> option allows you to place the plugin method in a different package other than your own.</p>
+
+<h2 id="file_regex">file_regex</h2>
+
+<p>By default <code>Module::Pluggable</code> only looks for <i>.pm</i> files.</p>
+
+<p>By supplying a new <code>file_regex</code> then you can change this behaviour e.g</p>
+
+<pre><code>    file_regex =&gt; qr/\.plugin$/</code></pre>
+
+<h2 id="include_editor_junk">include_editor_junk</h2>
+
+<p>By default <code>Module::Pluggable</code> ignores files that look like they were left behind by editors. Currently this means files ending in <i>~</i> (~), the extensions <i>.swp</i> or <i>.swo</i>, or files beginning with <i>.#</i>.</p>
+
+<p>Setting <code>include_editor_junk</code> changes <code>Module::Pluggable</code> so it does not ignore any files it finds.</p>
+
+<h2 id="follow_symlinks">follow_symlinks</h2>
+
+<p>Whether, when searching directories, to follow symlinks.</p>
+
+<p>Defaults to 1 i.e do follow symlinks.</p>
+
+<h2 id="min_depth-max_depth">min_depth, max_depth</h2>
+
+<p>This will allow you to set what &#39;depth&#39; of plugin will be allowed.</p>
+
+<p>So, for example, <code>MyClass::Plugin::Foo</code> will have a depth of 3 and <code>MyClass::Plugin::Foo::Bar</code> will have a depth of 4 so to only get the former (i.e <code>MyClass::Plugin::Foo</code>) do</p>
+
+<pre><code>        <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">max_depth</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">;</span>
+</code></pre>
+
+<p>and to only get the latter (i.e <code>MyClass::Plugin::Foo::Bar</code>)</p>
+
+<pre><code>        <span class="keyword">package</span> <span class="variable">MyClass</span><span class="operator">;</span>
+        <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">min_depth</span> <span class="operator">=&gt;</span> <span class="number">4</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="TRIGGERS">TRIGGERS</h1>
+
+<p>Various triggers can also be passed in to the options.</p>
+
+<p>If any of these triggers return 0 then the plugin will not be returned.</p>
+
+<h2 id="before_require-plugin">before_require &lt;plugin&gt;</h2>
+
+<p>Gets passed the plugin name.</p>
+
+<p>If 0 is returned then this plugin will not be required either.</p>
+
+<h2 id="on_require_error-plugin-err">on_require_error &lt;plugin&gt; &lt;err&gt;</h2>
+
+<p>Gets called when there&#39;s an error on requiring the plugin.</p>
+
+<p>Gets passed the plugin name and the error.</p>
+
+<p>The default on_require_error handler is to <code>carp</code> the error and return 0.</p>
+
+<h2 id="on_instantiate_error-plugin-err">on_instantiate_error &lt;plugin&gt; &lt;err&gt;</h2>
+
+<p>Gets called when there&#39;s an error on instantiating the plugin.</p>
+
+<p>Gets passed the plugin name and the error.</p>
+
+<p>The default on_instantiate_error handler is to <code>carp</code> the error and return 0.</p>
+
+<h2 id="after_require-plugin">after_require &lt;plugin&gt;</h2>
+
+<p>Gets passed the plugin name.</p>
+
+<p>If 0 is returned then this plugin will be required but not returned as a plugin.</p>
+
+<h1 id="METHODs">METHODs</h1>
+
+<h2 id="search_path1">search_path</h2>
+
+<p>The method <code>search_path</code> is exported into you namespace as well. You can call that at any time to change or replace the search_path.</p>
+
+<pre><code>    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">search_path</span><span class="operator">(</span> <span class="string">add</span> <span class="operator">=&gt;</span> <span class="string">"New::Path"</span> <span class="operator">);</span> <span class="comment"># add</span>
+    <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">search_path</span><span class="operator">(</span> <span class="string">new</span> <span class="operator">=&gt;</span> <span class="string">"New::Path"</span> <span class="operator">);</span> <span class="comment"># replace</span>
+</code></pre>
+
+<h1 id="BEHAVIOUR-UNDER-TEST-ENVIRONMENT">BEHAVIOUR UNDER TEST ENVIRONMENT</h1>
+
+<p>In order to make testing reliable we exclude anything not from blib if blib.pm is in %INC.</p>
+
+<p>However if the module being tested used another module that itself used <code>Module::Pluggable</code> then the second module would fail. This was fixed by checking to see if the caller had (^|/)blib/ in their filename.</p>
+
+<p>There&#39;s an argument that this is the wrong behaviour and that modules should explicitly trigger this behaviour but that particular code has been around for 7 years now and I&#39;m reluctant to change the default behaviour.</p>
+
+<p>You can now (as of version 4.1) force Module::Pluggable to look outside blib in a test environment by doing either</p>
+
+<pre><code>        <span class="keyword">require</span> <span class="variable">Module::Pluggable</span><span class="operator">;</span>
+        <span class="variable">$Module::Pluggable::FORCE_SEARCH_ALL_PATHS</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+        <span class="variable">import</span> <span class="variable">Module::Pluggable</span><span class="operator">;</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>        <span class="keyword">use</span> <span class="variable">Module::Pluggable</span> <span class="string">force_search_all_paths</span> <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="INC-hooks-and-App::FatPacker">@INC hooks and App::FatPacker</h1>
+
+<p>If a module&#39;s @INC has a hook and that hook is an object which has a <code>files()</code> method then we will try and require those files too. See <code>t/26inc_hook.t</code> for an example.</p>
+
+<p>This has allowed <a>App::FatPacker</a> (as of version 0.10.0) to provide support for Module::Pluggable.</p>
+
+<p>This should also, theoretically, allow someone to modify PAR to do the same thing.</p>
+
+<h1 id="Module::Require-recommended">Module::Require recommended</h1>
+
+<p>Up until version 5.2 <a href="../../lib/Module/Pluggable.html">Module::Pluggable</a> used a string <code>eval</code> to require plugins.</p>
+
+<p>This has now been changed to optionally use <a href="../../lib/Module/Runtime.html">Module::Runtime</a> and it&#39;s <code>require_module</code> method when available and fall back to using a path based <code>require</code> when not.</p>
+
+<p>It&#39;s recommended, but not required, that you install Module::Runtime.</p>
+
+<h1 id="FUTURE-PLANS">FUTURE PLANS</h1>
+
+<p>This does everything I need and I can&#39;t really think of any other features I want to add. Famous last words of course (not least because we&#39;re up to version 5.0 at the time of writing).</p>
+
+<p>However suggestions (and patches) are always welcome.</p>
+
+<h1 id="DEVELOPMENT">DEVELOPMENT</h1>
+
+<p>The master repo for this module is at</p>
+
+<p>https://github.com/simonwistow/Module-Pluggable</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Simon Wistow &lt;simon@thegestalt.org&gt;</p>
+
+<h1 id="COPYING">COPYING</h1>
+
+<p>Copyright, 2006 Simon Wistow</p>
+
+<p>Distributed under the same terms as Perl itself.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>None known.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../lib/File/Spec.html">File::Spec</a>, <a href="../../lib/File/Find.html">File::Find</a>, <a href="../../lib/File/Basename.html">File::Basename</a>, <a href="../../lib/Class/Factory/Util.html">Class::Factory::Util</a>, <a>Module::Pluggable::Ordered</a></p>
+
+
+</body>
+
+</html>
+
+

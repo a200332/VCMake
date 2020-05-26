@@ -1,0 +1,311 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#significant">significant</a></li>
+      <li><a href="#class">class</a></li>
+      <li><a href="#tokens">tokens</a></li>
+      <li><a href="#content">content</a></li>
+      <li><a href="#parent">parent</a></li>
+      <li><a href="#descendant_of-element">descendant_of $element</a></li>
+      <li><a href="#ancestor_of-element">ancestor_of $element</a></li>
+      <li><a href="#statement">statement</a></li>
+      <li><a href="#top">top</a></li>
+      <li><a href="#document">document</a></li>
+      <li><a href="#next_sibling">next_sibling</a></li>
+      <li><a href="#snext_sibling">snext_sibling</a></li>
+      <li><a href="#previous_sibling">previous_sibling</a></li>
+      <li><a href="#sprevious_sibling">sprevious_sibling</a></li>
+      <li><a href="#first_token">first_token</a></li>
+      <li><a href="#last_token">last_token</a></li>
+      <li><a href="#next_token">next_token</a></li>
+      <li><a href="#previous_token">previous_token</a></li>
+      <li><a href="#clone">clone</a></li>
+      <li><a href="#insert_before-Elements">insert_before @Elements</a></li>
+      <li><a href="#insert_after-Elements">insert_after @Elements</a></li>
+      <li><a href="#remove">remove</a></li>
+      <li><a href="#delete">delete</a></li>
+      <li><a href="#replace-Element">replace $Element</a></li>
+      <li><a href="#location">location</a></li>
+      <li><a href="#line_number">line_number</a></li>
+      <li><a href="#column_number">column_number</a></li>
+      <li><a href="#visual_column_number">visual_column_number</a></li>
+      <li><a href="#logical_line_number">logical_line_number</a></li>
+      <li><a href="#logical_filename">logical_filename</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPI::Element - The abstract Element class, a base for all source objects</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<pre><code>  PPI::Element is the root of the PDOM tree</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The abstract <code>PPI::Element</code> serves as a base class for all source-related objects, from a single whitespace token to an entire document. It provides a basic set of methods to provide a common interface and basic implementations.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="significant">significant</h2>
+
+<p>Because we treat whitespace and other non-code items as Tokens (in order to be able to &quot;round trip&quot; the <a href="../../lib/PPI/Document.html">PPI::Document</a> back to a file) the <code>significant</code> method allows us to distinguish between tokens that form a part of the code, and tokens that aren&#39;t significant, such as whitespace, POD, or the portion of a file after (and including) the <code>__END__</code> token.</p>
+
+<p>Returns true if the Element is significant, or false it not.</p>
+
+<h2 id="class">class</h2>
+
+<p>The <code>class</code> method is provided as a convenience, and really does nothing more than returning <code>ref($self)</code>. However, some people have found that they appreciate the laziness of <code>$Foo-&gt;class eq &#39;whatever&#39;</code>, so I have caved to popular demand and included it.</p>
+
+<p>Returns the class of the Element as a string</p>
+
+<h2 id="tokens">tokens</h2>
+
+<p>The <code>tokens</code> method returns a list of <a href="../../lib/PPI/Token.html">PPI::Token</a> objects for the Element, essentially getting back that part of the document as if it had not been lexed.</p>
+
+<p>This also means there are no Statements and no Structures in the list, just the Token classes.</p>
+
+<h2 id="content">content</h2>
+
+<p>For <b>any</b> <code>PPI::Element</code>, the <code>content</code> method will reconstitute the base code for it as a single string. This method is also the method used for overloading stringification. When an Element is used in a double-quoted string for example, this is the method that is called.</p>
+
+<p><b>WARNING:</b></p>
+
+<p>You should be aware that because of the way that here-docs are handled, any here-doc content is not included in <code>content</code>, and as such you should <b>not</b> eval or execute the result if it contains any <a href="../../lib/PPI/Token/HereDoc.html">PPI::Token::HereDoc</a>.</p>
+
+<p>The <a href="../../lib/PPI/Document.html">PPI::Document</a> method <code>serialize</code> should be used to stringify a PDOM document into something that can be executed as expected.</p>
+
+<p>Returns the basic code as a string (excluding here-doc content).</p>
+
+<h2 id="parent">parent</h2>
+
+<p>Elements themselves are not intended to contain other Elements, that is left to the <a href="../../lib/PPI/Node.html">PPI::Node</a> abstract class, a subclass of <code>PPI::Element</code>. However, all Elements can be contained <b>within</b> a parent Node.</p>
+
+<p>If an Element is within a parent Node, the <code>parent</code> method returns the Node.</p>
+
+<h2 id="descendant_of-element">descendant_of $element</h2>
+
+<p>Answers whether a <code>PPI::Element</code> is contained within another one.</p>
+
+<p><code>PPI::Element</code>s are considered to be descendants of themselves.</p>
+
+<h2 id="ancestor_of-element">ancestor_of $element</h2>
+
+<p>Answers whether a <code>PPI::Element</code> is contains another one.</p>
+
+<p><code>PPI::Element</code>s are considered to be ancestors of themselves.</p>
+
+<h2 id="statement">statement</h2>
+
+<p>For a <code>PPI::Element</code> that is contained (at some depth) within a <a href="../../lib/PPI/Statement.html">PPI::Statement</a>, the <code>statement</code> method will return the first parent Statement object lexically &#39;above&#39; the Element.</p>
+
+<p>Returns a <a href="../../lib/PPI/Statement.html">PPI::Statement</a> object, which may be the same Element if the Element is itself a <a href="../../lib/PPI/Statement.html">PPI::Statement</a> object.</p>
+
+<p>Returns false if the Element is not within a Statement and is not itself a Statement.</p>
+
+<h2 id="top">top</h2>
+
+<p>For a <code>PPI::Element</code> that is contained within a PDOM tree, the <code>top</code> method will return the top-level Node in the tree. Most of the time this should be a <a href="../../lib/PPI/Document.html">PPI::Document</a> object, however this will not always be so. For example, if a subroutine has been removed from its Document, to be moved to another Document.</p>
+
+<p>Returns the top-most PDOM object, which may be the same Element, if it is not within any parent PDOM object.</p>
+
+<h2 id="document">document</h2>
+
+<p>For an Element that is contained within a <a href="../../lib/PPI/Document.html">PPI::Document</a> object, the <code>document</code> method will return the top-level Document for the Element.</p>
+
+<p>Returns the <a href="../../lib/PPI/Document.html">PPI::Document</a> for this Element, or false if the Element is not contained within a Document.</p>
+
+<h2 id="next_sibling">next_sibling</h2>
+
+<p>All <a href="../../lib/PPI/Node.html">PPI::Node</a> objects (specifically, our parent Node) contain a number of <code>PPI::Element</code> objects. The <code>next_sibling</code> method returns the <code>PPI::Element</code> immediately after the current one, or false if there is no next sibling.</p>
+
+<h2 id="snext_sibling">snext_sibling</h2>
+
+<p>As per the other &#39;s&#39; methods, the <code>snext_sibling</code> method returns the next <b>significant</b> sibling of the <code>PPI::Element</code> object.</p>
+
+<p>Returns a <code>PPI::Element</code> object, or false if there is no &#39;next&#39; significant sibling.</p>
+
+<h2 id="previous_sibling">previous_sibling</h2>
+
+<p>All <a href="../../lib/PPI/Node.html">PPI::Node</a> objects (specifically, our parent Node) contain a number of <code>PPI::Element</code> objects. The <code>previous_sibling</code> method returns the Element immediately before the current one, or false if there is no &#39;previous&#39; <code>PPI::Element</code> object.</p>
+
+<h2 id="sprevious_sibling">sprevious_sibling</h2>
+
+<p>As per the other &#39;s&#39; methods, the <code>sprevious_sibling</code> method returns the previous <b>significant</b> sibling of the <code>PPI::Element</code> object.</p>
+
+<p>Returns a <code>PPI::Element</code> object, or false if there is no &#39;previous&#39; significant sibling.</p>
+
+<h2 id="first_token">first_token</h2>
+
+<p>As a support method for higher-order algorithms that deal specifically with tokens and actual Perl content, the <code>first_token</code> method finds the first PPI::Token object within or equal to this one.</p>
+
+<p>That is, if called on a <a href="../../lib/PPI/Node.html">PPI::Node</a> subclass, it will descend until it finds a <a href="../../lib/PPI/Token.html">PPI::Token</a>. If called on a <a href="../../lib/PPI/Token.html">PPI::Token</a> object, it will return the same object.</p>
+
+<p>Returns a <a href="../../lib/PPI/Token.html">PPI::Token</a> object, or dies on error (which should be extremely rare and only occur if an illegal empty <a href="../../lib/PPI/Statement.html">PPI::Statement</a> exists below the current Element somewhere.)</p>
+
+<h2 id="last_token">last_token</h2>
+
+<p>As a support method for higher-order algorithms that deal specifically with tokens and actual Perl content, the <code>last_token</code> method finds the last PPI::Token object within or equal to this one.</p>
+
+<p>That is, if called on a <a href="../../lib/PPI/Node.html">PPI::Node</a> subclass, it will descend until it finds a <a href="../../lib/PPI/Token.html">PPI::Token</a>. If called on a <a href="../../lib/PPI/Token.html">PPI::Token</a> object, it will return the itself.</p>
+
+<p>Returns a <a href="../../lib/PPI/Token.html">PPI::Token</a> object, or dies on error (which should be extremely rare and only occur if an illegal empty <a href="../../lib/PPI/Statement.html">PPI::Statement</a> exists below the current Element somewhere.)</p>
+
+<h2 id="next_token">next_token</h2>
+
+<p>As a support method for higher-order algorithms that deal specifically with tokens and actual Perl content, the <code>next_token</code> method finds the <a href="../../lib/PPI/Token.html">PPI::Token</a> object that is immediately after the current Element, even if it is not within the same parent <a href="../../lib/PPI/Node.html">PPI::Node</a> as the one for which the method is being called.</p>
+
+<p>Note that this is <b>not</b> defined as a <a href="../../lib/PPI/Token.html">PPI::Token</a>-specific method, because it can be useful to find the next token that is after, say, a <a href="../../lib/PPI/Statement.html">PPI::Statement</a>, although obviously it would be useless to want the next token after a <a href="../../lib/PPI/Document.html">PPI::Document</a>.</p>
+
+<p>Returns a <a href="../../lib/PPI/Token.html">PPI::Token</a> object, or false if there are no more tokens after the Element.</p>
+
+<h2 id="previous_token">previous_token</h2>
+
+<p>As a support method for higher-order algorithms that deal specifically with tokens and actual Perl content, the <code>previous_token</code> method finds the <a href="../../lib/PPI/Token.html">PPI::Token</a> object that is immediately before the current Element, even if it is not within the same parent <a href="../../lib/PPI/Node.html">PPI::Node</a> as this one.</p>
+
+<p>Note that this is not defined as a <a href="../../lib/PPI/Token.html">PPI::Token</a>-only method, because it can be useful to find the token is before, say, a <a href="../../lib/PPI/Statement.html">PPI::Statement</a>, although obviously it would be useless to want the next token before a <a href="../../lib/PPI/Document.html">PPI::Document</a>.</p>
+
+<p>Returns a <a href="../../lib/PPI/Token.html">PPI::Token</a> object, or false if there are no more tokens before the <code>Element</code>.</p>
+
+<h2 id="clone">clone</h2>
+
+<p>As per the <a href="../../lib/Clone.html">Clone</a> module, the <code>clone</code> method makes a perfect copy of an Element object. In the generic case, the implementation is done using the <a href="../../lib/Clone.html">Clone</a> module&#39;s mechanism itself. In higher-order cases, such as for Nodes, there is more work involved to keep the parent-child links intact.</p>
+
+<h2 id="insert_before-Elements">insert_before @Elements</h2>
+
+<p>The <code>insert_before</code> method allows you to insert lexical perl content, in the form of <code>PPI::Element</code> objects, before the calling <code>Element</code>. You need to be very careful when modifying perl code, as it&#39;s easy to break things.</p>
+
+<p>In its initial incarnation, this method allows you to insert a single Element, and will perform some basic checking to prevent you inserting something that would be structurally wrong (in PDOM terms).</p>
+
+<p>In future, this method may be enhanced to allow the insertion of multiple Elements, inline-parsed code strings or <a href="../../lib/PPI/Document/Fragment.html">PPI::Document::Fragment</a> objects.</p>
+
+<p>Returns true if the Element was inserted, false if it can not be inserted, or <code>undef</code> if you do not provide a <code>PPI::Element</code> object as a parameter.</p>
+
+<h2 id="insert_after-Elements">insert_after @Elements</h2>
+
+<p>The <code>insert_after</code> method allows you to insert lexical perl content, in the form of <code>PPI::Element</code> objects, after the calling <code>Element</code>. You need to be very careful when modifying perl code, as it&#39;s easy to break things.</p>
+
+<p>In its initial incarnation, this method allows you to insert a single Element, and will perform some basic checking to prevent you inserting something that would be structurally wrong (in PDOM terms).</p>
+
+<p>In future, this method may be enhanced to allow the insertion of multiple Elements, inline-parsed code strings or <a href="../../lib/PPI/Document/Fragment.html">PPI::Document::Fragment</a> objects.</p>
+
+<p>Returns true if the Element was inserted, false if it can not be inserted, or <code>undef</code> if you do not provide a <code>PPI::Element</code> object as a parameter.</p>
+
+<h2 id="remove">remove</h2>
+
+<p>For a given <code>PPI::Element</code>, the <code>remove</code> method will remove it from its parent <b>intact</b>, along with all of its children.</p>
+
+<p>Returns the <code>Element</code> itself as a convenience, or <code>undef</code> if an error occurs while trying to remove the <code>Element</code>.</p>
+
+<h2 id="delete">delete</h2>
+
+<p>For a given <code>PPI::Element</code>, the <code>delete</code> method will remove it from its parent, immediately deleting the <code>Element</code> and all of its children (if it has any).</p>
+
+<p>Returns true if the <code>Element</code> was successfully deleted, or <code>undef</code> if an error occurs while trying to remove the <code>Element</code>.</p>
+
+<h2 id="replace-Element">replace $Element</h2>
+
+<p>Although some higher level class support more exotic forms of replace, at the basic level the <code>replace</code> method takes a single <code>Element</code> as an argument and replaces the current <code>Element</code> with it.</p>
+
+<p>To prevent accidental damage to code, in this initial implementation the replacement element <b>must</b> be of the same class (or a subclass) as the one being replaced.</p>
+
+<h2 id="location">location</h2>
+
+<p>If the Element exists within a <a href="../../lib/PPI/Document.html">PPI::Document</a> that has indexed the Element locations using <code>PPI::Document::index_locations</code>, the <code>location</code> method will return the location of the first character of the Element within the Document.</p>
+
+<p>Returns the location as a reference to a five-element array in the form <code>[ $line, $rowchar, $col, $logical_line, $logical_file_name ]</code>. The values are in a human format, with the first character of the file located at <code>[ 1, 1, 1, ?, &#39;something&#39; ]</code>.</p>
+
+<p>The second and third numbers are similar, except that the second is the literal horizontal character, and the third is the visual column, taking into account tabbing (see <a href="../../lib/PPI/Document.html#tab_width-width">&quot;tab_width [ $width ]&quot; in PPI::Document</a>).</p>
+
+<p>The fourth number is the line number, taking into account any <code><span class="comment">#line</span>
+</code> directives. The fifth element is the name of the file that the element was found in, if available, taking into account any <code><span class="comment">#line</span>
+</code> directives.</p>
+
+<p>Returns <code>undef</code> on error, or if the <a href="../../lib/PPI/Document.html">PPI::Document</a> object has not been indexed.</p>
+
+<h2 id="line_number">line_number</h2>
+
+<p>If the Element exists within a <a href="../../lib/PPI/Document.html">PPI::Document</a> that has indexed the Element locations using <code>PPI::Document::index_locations</code>, the <code>line_number</code> method will return the line number of the first character of the Element within the Document.</p>
+
+<p>Returns <code>undef</code> on error, or if the <a href="../../lib/PPI/Document.html">PPI::Document</a> object has not been indexed.</p>
+
+<h2 id="column_number">column_number</h2>
+
+<p>If the Element exists within a <a href="../../lib/PPI/Document.html">PPI::Document</a> that has indexed the Element locations using <code>PPI::Document::index_locations</code>, the <code>column_number</code> method will return the column number of the first character of the Element within the Document.</p>
+
+<p>Returns <code>undef</code> on error, or if the <a href="../../lib/PPI/Document.html">PPI::Document</a> object has not been indexed.</p>
+
+<h2 id="visual_column_number">visual_column_number</h2>
+
+<p>If the Element exists within a <a href="../../lib/PPI/Document.html">PPI::Document</a> that has indexed the Element locations using <code>PPI::Document::index_locations</code>, the <code>visual_column_number</code> method will return the visual column number of the first character of the Element within the Document, according to the value of <a href="../../lib/PPI/Document.html#tab_width-width">&quot;tab_width [ $width ]&quot; in PPI::Document</a>.</p>
+
+<p>Returns <code>undef</code> on error, or if the <a href="../../lib/PPI/Document.html">PPI::Document</a> object has not been indexed.</p>
+
+<h2 id="logical_line_number">logical_line_number</h2>
+
+<p>If the Element exists within a <a href="../../lib/PPI/Document.html">PPI::Document</a> that has indexed the Element locations using <code>PPI::Document::index_locations</code>, the <code>logical_line_number</code> method will return the line number of the first character of the Element within the Document, taking into account any <code><span class="comment">#line</span>
+</code> directives.</p>
+
+<p>Returns <code>undef</code> on error, or if the <a href="../../lib/PPI/Document.html">PPI::Document</a> object has not been indexed.</p>
+
+<h2 id="logical_filename">logical_filename</h2>
+
+<p>If the Element exists within a <a href="../../lib/PPI/Document.html">PPI::Document</a> that has indexed the Element locations using <code>PPI::Document::index_locations</code>, the <code>logical_filename</code> method will return the logical file name containing the first character of the Element within the Document, taking into account any <code><span class="comment">#line</span>
+</code> directives.</p>
+
+<p>Returns <code>undef</code> on error, or if the <a href="../../lib/PPI/Document.html">PPI::Document</a> object has not been indexed.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>It would be nice if <code>location</code> could be used in an ad-hoc manner. That is, if called on an Element within a Document that has not been indexed, it will do a one-off calculation to find the location. It might be very painful if someone started using it a lot, without remembering to index the document, but it would be handy for things that are only likely to use it once, such as error handlers.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>See the <a href="../../lib/PPI.html#SUPPORT">support section</a> in the main module.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Adam Kennedy &lt;adamk@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

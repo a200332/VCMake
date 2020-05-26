@@ -1,0 +1,106 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Functions-Methods">Functions/Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS-COPYRIGHT">AUTHORS/COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::OLE::Enum - OLE Automation Collection Objects</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$Sheets</span> <span class="operator">=</span> <span class="variable">$Excel</span><span class="operator">-&gt;</span><span class="variable">Workbooks</span><span class="operator">(</span><span class="number">1</span><span class="operator">)-&gt;</span><span class="variable">Worksheets</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$Enum</span> <span class="operator">=</span> <span class="variable">Win32::OLE::Enum</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="variable">$Sheets</span><span class="operator">);</span>
+    <span class="keyword">my</span> <span class="variable">@Sheets</span> <span class="operator">=</span> <span class="variable">$Enum</span><span class="operator">-&gt;</span><span class="variable">All</span><span class="operator">;</span>
+    
+    <span class="keyword">while</span> <span class="operator">(</span><span class="keyword">defined</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$Sheet</span> <span class="operator">=</span> <span class="variable">$Enum</span><span class="operator">-&gt;</span><span class="variable">Next</span><span class="operator">))</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides an interface to OLE collection objects from Perl. It defines an enumerator object closely mirroring the functionality of the IEnumVARIANT interface.</p>
+
+<p>Please note that the Reset() method is not available in all implementations of OLE collections (like Excel 7). In that case the Enum object is good only for a single walk through of the collection.</p>
+
+<h2 id="Functions-Methods">Functions/Methods</h2>
+
+<dl>
+
+<dt id="Win32::OLE::Enum-new-object">Win32::OLE::Enum-&gt;new($object)</dt>
+<dd>
+
+<p>Creates an enumerator for $object, which must be a valid OLE collection object. Note that correctly implemented collection objects must support the <code>Count</code> and <code>Item</code> methods, so creating an enumerator is not always necessary.</p>
+
+</dd>
+<dt id="Enum-All">$Enum-&gt;All()</dt>
+<dd>
+
+<p>Returns a list of all objects in the collection. You have to call $Enum-&gt;Reset() before the enumerator can be used again. The previous position in the collection is lost.</p>
+
+<p>This method can also be called as a class method:</p>
+
+<pre><code>        <span class="keyword">my</span> <span class="variable">@list</span> <span class="operator">=</span> <span class="variable">Win32::OLE::Enum</span><span class="operator">-&gt;</span><span class="variable">All</span><span class="operator">(</span><span class="variable">$Collection</span><span class="operator">);</span>
+</code></pre>
+
+</dd>
+<dt id="Enum-Clone">$Enum-&gt;Clone()</dt>
+<dd>
+
+<p>Returns a clone of the enumerator maintaining the current position within the collection (if possible). Note that the <code>Clone</code> method is often not implemented. Use $Enum-&gt;Clone() in an eval block to avoid dying if you are not sure that Clone is supported.</p>
+
+</dd>
+<dt id="Enum-Next-count">$Enum-&gt;Next( [$count] )</dt>
+<dd>
+
+<p>Returns the next element of the collection. In a list context the optional $count argument specifies the number of objects to be returned. In a scalar context only the last of at most $count retrieved objects is returned. The default for $count is 1.</p>
+
+</dd>
+<dt id="Enum-Reset">$Enum-&gt;Reset()</dt>
+<dd>
+
+<p>Resets the enumeration sequence to the beginning. There is no guarantee that the exact same set of objects will be enumerated again (e.g. when enumerating files in a directory). The methods return value indicates the success of the operation. (Note that the Reset() method seems to be unimplemented in some applications like Excel 7. Use it in an eval block to avoid dying.)</p>
+
+</dd>
+<dt id="Enum-Skip-count">$Enum-&gt;Skip( [$count] )</dt>
+<dd>
+
+<p>Skip the next $count elements of the enumeration. The default for $count is 1. The functions returns TRUE if at least $count elements could be skipped. It returns FALSE if not enough elements were left.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS-COPYRIGHT">AUTHORS/COPYRIGHT</h1>
+
+<p>This module is part of the Win32::OLE distribution.</p>
+
+
+</body>
+
+</html>
+
+

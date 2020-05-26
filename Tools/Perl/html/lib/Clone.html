@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../displayToc.js"></script>
+<script language="JavaScript" src="../tocParas.js"></script>
+<script language="JavaScript" src="../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Clone - recursively copy Perl datatypes</p>
+
+
+<a href="https://travis-ci.org/garu/Clone"><img src="https://travis-ci.org/garu/Clone.png?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/r/garu/Clone?branch=master"><img src="https://coveralls.io/repos/garu/Clone/badge.png?branch=master" alt="Coverage Status"></a>
+<a href="https://metacpan.org/pod/Clone"><img src="https://badge.fury.io/pl/Clone.svg" alt="CPAN version"></a>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Clone</span> <span class="string">'clone'</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$data</span> <span class="operator">=</span> <span class="operator">{</span>
+       <span class="string">set</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="number">1</span> <span class="operator">..</span> <span class="number">50</span> <span class="operator">]</span><span class="operator">,</span>
+       <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+           <span class="string">answer</span> <span class="operator">=&gt;</span> <span class="number">42</span><span class="operator">,</span>
+           <span class="string">object</span> <span class="operator">=&gt;</span> <span class="variable">SomeObject</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">,</span>
+       <span class="operator">}</span><span class="operator">,</span>
+    <span class="operator">}</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$cloned_data</span> <span class="operator">=</span> <span class="variable">clone</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+    
+    <span class="variable">$cloned_data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}{</span><span class="string">answer</span><span class="operator">}</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$cloned_data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}{</span><span class="string">answer</span><span class="operator">}</span><span class="operator">;</span>  <span class="comment"># '1'</span>
+    <span class="keyword">print</span> <span class="variable">$data</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">foo</span><span class="operator">}{</span><span class="string">answer</span><span class="operator">}</span><span class="operator">;</span>         <span class="comment"># '42'</span>
+</code></pre>
+
+<p>You can also add it to your class:</p>
+
+<pre><code>    <span class="keyword">package</span> <span class="variable">Foo</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">parent</span> <span class="string">'Clone'</span><span class="operator">;</span>
+    <span class="keyword">sub</span><span class="variable"> new </span><span class="operator">{</span> <span class="keyword">bless</span> <span class="operator">{}</span><span class="operator">,</span> <span class="keyword">shift</span> <span class="operator">}</span>
+    
+    <span class="keyword">package</span> <span class="variable">main</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$obj</span> <span class="operator">=</span> <span class="variable">Foo</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$copy</span> <span class="operator">=</span> <span class="variable">$obj</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides a <code>clone()</code> method which makes recursive copies of nested hash, array, scalar and reference types, including tied variables and objects.</p>
+
+<p><code>clone()</code> takes a scalar argument and duplicates it. To duplicate lists, arrays or hashes, pass them in by reference, e.g.</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$copy</span> <span class="operator">=</span> <span class="variable">clone</span> <span class="operator">(\</span><span class="variable">@array</span><span class="operator">);</span>
+    
+    <span class="comment"># or</span>
+    
+    <span class="keyword">my</span> <span class="variable">%copy</span> <span class="operator">=</span> <span class="variable">%</span><span class="operator">{</span> <span class="variable">clone</span> <span class="operator">(\</span><span class="variable">%hash</span><span class="operator">)</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../lib/Storable.html">Storable</a>&#39;s <code>dclone()</code> is a flexible solution for cloning variables, albeit slower for average-sized data structures. Simple and naive benchmarks show that Clone is faster for data structures with 3 or fewer levels, while <code>dclone()</code> can be faster for structures 4 or more levels deep.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2001-2017 Ray Finch. All Rights Reserved.</p>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ray Finch <code>&lt;rdf@cpan.org&gt;</code></p>
+
+<p>Breno G. de Oliveira <code>&lt;garu@cpan.org&gt;</code> and Florian Ragwitz <code>&lt;rafl@debian.org&gt;</code> perform routine maintenance releases since 2012.</p>
+
+
+</body>
+
+</html>
+
+

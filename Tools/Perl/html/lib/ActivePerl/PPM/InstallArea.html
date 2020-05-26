@@ -1,0 +1,394 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>ActivePerl::PPM::InstallArea - Perl installation area</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$area</span> <span class="operator">=</span> <span class="variable">ActivePerl::PPM::InstallArea</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">"site"</span><span class="operator">);</span>
+  <span class="comment"># or</span>
+  <span class="keyword">my</span> <span class="variable">$area</span> <span class="operator">=</span> <span class="variable">ActivePerl::PPM::InstallArea</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">prefix</span> <span class="operator">=&gt;</span> <span class="string">"</span><span class="variable">$ENV</span><span class="string">{HOME}/perl"</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>An <code>ActivePerl::PPM::InstallArea</code> object provide an interface to a Perl install area. Different install areas might have different protection policies and each contain a set of installed packages and modules. The concept is the same as <code>INSTALLDIRS</code> provided by <a href="../../../lib/ExtUtils/MakeMaker.html">ExtUtils::MakeMaker</a>.</p>
+
+<p>An install area is divided into the following directories:</p>
+
+<dl>
+
+<dt id="lib">lib</dt>
+<dd>
+
+<p>This is where architecture neutral modules go. Packages that are implemented in pure perl are installed here.</p>
+
+</dd>
+<dt id="archlib">archlib</dt>
+<dd>
+
+<p>This is where architecture specific modules go. Packages that are implemented using XS code are installed here. For ActivePerl this will normally be the same as <code>lib</code>.</p>
+
+</dd>
+<dt id="script">script</dt>
+<dd>
+
+<p>This is where architecture neutral programs go.</p>
+
+</dd>
+<dt id="bin">bin</dt>
+<dd>
+
+<p>This is where architecture specific programs go. For ActivePerl this will normally be the same as <code>script</code>.</p>
+
+</dd>
+<dt id="etc">etc</dt>
+<dd>
+
+<p>This is where configuration files go.</p>
+
+</dd>
+<dt id="man1">man1</dt>
+<dd>
+
+<p>This is where Unix style manual pages describing programs go.</p>
+
+</dd>
+<dt id="man3">man3</dt>
+<dd>
+
+<p>This is where Unix style manual pages describing modules go.</p>
+
+</dd>
+<dt id="html">html</dt>
+<dd>
+
+<p>This is where HTML files go.</p>
+
+</dd>
+<dt id="prefix">prefix</dt>
+<dd>
+
+<p>This just provide a prefix for the install area as a whole. All paths above should be at or below <code>prefix</code>.</p>
+
+</dd>
+</dl>
+
+<p>The following methods are provided:</p>
+
+<dl>
+
+<dt id="area-ActivePerl::PPM::InstallArea-new-name">$area = ActivePerl::PPM::InstallArea-&gt;new( $name )</dt>
+<dd>
+
+</dd>
+<dt id="area-ActivePerl::PPM::InstallArea-new-opts">$area = ActivePerl::PPM::InstallArea-&gt;new( %opts )</dt>
+<dd>
+
+<p>Constructs a new <code>ActivePerl::PPM::InstallArea</code> object. If constructed based on $name, then the constructor might croak if no install area with the given name is known. The &quot;perl&quot; and &quot;site&quot; install areas are always available. Some perls might also have a &quot;vendor&quot; install area.</p>
+
+<p>Alternatively the directories to use can be specified directly by passing them as key/value pair %opts. Only <code>prefix</code> is mandatory. All other directories are derived from this, except for the <code>man*</code> directories will only set up if specified explicitly.</p>
+
+<p>The option <code>autoinit</code> will if TRUE make the install area call $self-&gt;initialize automatically when some method need access to the database.</p>
+
+</dd>
+<dt id="area-name">$area-&gt;name</dt>
+<dd>
+
+<p>Returns the name. This returns the empty string for nameless <i>InstallArea</i>.</p>
+
+</dd>
+<dt id="area-prefix">$area-&gt;prefix</dt>
+<dd>
+
+</dd>
+<dt id="area-archlib">$area-&gt;archlib</dt>
+<dd>
+
+</dd>
+<dt id="area-lib">$area-&gt;lib</dt>
+<dd>
+
+</dd>
+<dt id="area-bin">$area-&gt;bin</dt>
+<dd>
+
+</dd>
+<dt id="area-script">$area-&gt;script</dt>
+<dd>
+
+</dd>
+<dt id="area-man1">$area-&gt;man1</dt>
+<dd>
+
+</dd>
+<dt id="area-man3">$area-&gt;man3</dt>
+<dd>
+
+</dd>
+<dt id="area-html">$area-&gt;html</dt>
+<dd>
+
+</dd>
+<dt id="area-etc">$area-&gt;etc</dt>
+<dd>
+
+<p>Returns the corresponding path.</p>
+
+</dd>
+<dt id="area-inc">$area-&gt;inc</dt>
+<dd>
+
+<p>Returns the list of directories to be pushed onto perl&#39;s @INC for the current install area.</p>
+
+</dd>
+<dt id="area-initialized">$area-&gt;initialized</dt>
+<dd>
+
+<p>Returns TRUE if this area has been initialized. If <code>autoinit</code> was specified for the constructor, then this method might have the side effect of actually initializing the database, in which case this returns TRUE.</p>
+
+</dd>
+<dt id="area-initialize">$area-&gt;initialize</dt>
+<dd>
+
+<p>Set up the database used to track packages for the install area if not already set up. This invokes sync_db() if the database was created.</p>
+
+<p>Most methods will croak unless the install area has been initialized. Exceptions are name(), readonly(), initialized(), packages() and the directory accessors (like lib(), script(),...).</p>
+
+<p>The <code>autoinit</code> option can be specified for the constructor to make the database be automatically set up during the first method call that needs it.</p>
+
+</dd>
+<dt id="area-readonly">$area-&gt;readonly</dt>
+<dd>
+
+<p>Returns TRUE if it is not possible to install or remove packages from the area. This is usually caused by the user not having permission to modify the files of the area.</p>
+
+<p>This also returns TRUE for unintialized install areas.</p>
+
+</dd>
+<dt id="area-install-packages-pkg1-pkg2">$area-&gt;install( packages =&gt; [\%pkg1, \%pkg2, ...] )</dt>
+<dd>
+
+<p>Install the given list of packages as one atomic operation. The function returns TRUE if all packages installed or FALSE if installation failed.</p>
+
+<p>Each package to be installed is described by a hash reference (or an <a href="../../../lib/ActivePerl/PPM/Package.html">ActivePerl::PPM::Package</a> object) with the following elements:</p>
+
+<dl>
+
+<dt id="name-name">name =&gt; $name</dt>
+<dd>
+
+<p>The name of the package. If a package with the given name is already installed, then it will replaced with the new package. This is the only mandatory attribute.</p>
+
+</dd>
+<dt id="version-version">version =&gt; $version</dt>
+<dd>
+
+<p>The version identifier for the given package.</p>
+
+</dd>
+<dt id="author-string">author =&gt; $string</dt>
+<dd>
+
+<p>Who the current maintainer of the package is. Should normally be on the form &quot;Givenname Lastname &lt;user@example.com&gt;&quot;.</p>
+
+</dd>
+<dt id="abstract-string">abstract =&gt; $string</dt>
+<dd>
+
+<p>A short sentence describing the purpose of the package.</p>
+
+</dd>
+<dt id="blib-path">blib =&gt; $path</dt>
+<dd>
+
+<p>Pick up files to install from the given <i>blib</i> style directory. The codebase directory of PPD packages is usually a tarball of this stuff.</p>
+
+</dd>
+<dt id="files-hash">files =&gt; \%hash</dt>
+<dd>
+
+<p>A hash describing files and directories to install. The keys are where to copy files from and the values are install locations. The install locations selects what type of directory to install into by prefixing them with an dir identifier followed by a colon. Example:</p>
+
+<pre><code>   <span class="string">files</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+      <span class="string">Foo</span> <span class="operator">=&gt;</span> <span class="string">"archlib:Foo"</span><span class="operator">,</span>
+      <span class="string">"Bar.pm"</span> <span class="operator">=&gt;</span> <span class="string">"lib:Bar.pm"</span>
+   <span class="operator">}</span>
+</code></pre>
+
+<p>This will install the &quot;Foo&quot; directory into the archlib area and the &quot;Bar.pm&quot; module into the lib area.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="area-uninstall-name">$area-&gt;uninstall( $name )</dt>
+<dd>
+
+<p>Removes the given package and its installed files. Croaks if no such package was installed in the first place. Uninstalling a package might break other packages that depended on features this package provided.</p>
+
+</dd>
+<dt id="area-verify-opts">$area-&gt;verify( %opts )</dt>
+<dd>
+
+<p>Verify that the files of the installed packages are still present and unmodified.</p>
+
+<p>In scalar context returns TRUE if all files where still found good. In array context return key/value pairs suitable for assignment to a hash. The <code>verified</code> value is the number of files checked. The <code>missing</code>, <code>modified</code>, <code>wrong_mode</code> tally the files found to be missing, modified or chmoded.</p>
+
+<p>The following options are recognized:</p>
+
+<dl>
+
+<dt id="package-name">package =&gt; $name</dt>
+<dd>
+
+<p>Only verify the given package.</p>
+
+</dd>
+<dt id="file_cb-sub">file_cb =&gt; \&amp;sub</dt>
+<dd>
+
+<p>Function called back for each file visited. The function is called with 3 arguments; the file name, expected md5 checksum and expected file mode.</p>
+
+</dd>
+<dt id="badfile_cb-sub">badfile_cb =&gt; \&amp;sub</dt>
+<dd>
+
+<p>Function called back each time a bad file is found. The first argument is what kind of badness (same as the status keys in the return value), the second is the file name and the addtional info varies depending on kind.</p>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="area-packages-fields">$area-&gt;packages( @fields )</dt>
+<dd>
+
+<p>Without arguments returns the sorted list of names of packages currently installed. In scalar context returns the number of packages installed, or <code>undef</code> if database has not been initialized.</p>
+
+<p>With arguments return a list of array references each one representing an installed package. The elements of each array are the fields requested. The list will be sorted by package name. See <a href="../../../lib/ActivePerl/PPM/Package.html">ActivePerl::PPM::Package</a> for what field names are available.</p>
+
+</dd>
+<dt id="area-package-id">$area-&gt;package( $id )</dt>
+<dd>
+
+</dd>
+<dt id="area-package-name">$area-&gt;package( $name )</dt>
+<dd>
+
+</dd>
+<dt id="area-package-name-sloppy-1">$area-&gt;package( $name, sloppy =&gt; 1 )</dt>
+<dd>
+
+<p>Return an package object (see <a href="../../../lib/ActivePerl/PPM/Package.html">ActivePerl::PPM::Package</a>) for the given package. Returns <code>undef</code> if no such package is installed.</p>
+
+<p>If no package match the specified name exactly and <code>sloppy</code> is specified then search again ignoring case and even search for features provided that match name. The method will croak if this extended search end up matching multiple packages.</p>
+
+</dd>
+<dt id="area-package_id-name">$area-&gt;package_id( $name )</dt>
+<dd>
+
+<p>Returns the internal identifier for the given package. The package name much match exactly; case matters. Returns <code>undef</code> if no such package is installed. This is the cheapest way to check if a package is installed.</p>
+
+</dd>
+<dt id="area-package_id-name-sloppy-1">$area-&gt;package_id( $name, sloppy =&gt; 1 )</dt>
+<dd>
+
+<p>Find package even if the name does not match exactly. The package will be found if the name match without regard to case or if it provide the given name as a feature. Will croak if multiple packages match.</p>
+
+</dd>
+<dt id="area-package_have-name-version">$area-&gt;package_have( $name, $version )</dt>
+<dd>
+
+<p>Returns TRUE if the package with the given name and version number is installed.</p>
+
+</dd>
+<dt id="area-feature_have-feature">$area-&gt;feature_have( $feature )</dt>
+<dd>
+
+<p>If one of the installed packages provide the given feature, then the feature version number is returned. The method returns <code>undef</code> if no package provide the given feature.</p>
+
+</dd>
+<dt id="area-package_files-id">$area-&gt;package_files( $id )</dt>
+<dd>
+
+<p>Returns the list of names for the files that belong to the given package. In scalar context return the number of files.</p>
+
+</dd>
+<dt id="area-file_owner-path">$area-&gt;file_owner( $path )</dt>
+<dd>
+
+<p>Return the $id if the package that owns the given file, or <code>undef</code> if the file is not tracked by this install area.</p>
+
+</dd>
+<dt id="area-package_packlist-id">$area-&gt;package_packlist( $id )</dt>
+<dd>
+
+<p>Returns the <i>.packlist</i> file for the given package. See <a href="../../../lib/ExtUtils/Packlist.html">ExtUtils::Packlist</a>.</p>
+
+</dd>
+<dt id="area-packlists">$area-&gt;packlists</dt>
+<dd>
+
+<p>Returns the list of packages that have <i>.packlist</i> files installed. In scalar context return a hash reference; the keys are package names and the values are full paths to the corresponding <i>.packlist</i> file. This will also pick up packages installed by other means that by PPM. See <a href="../../../lib/ExtUtils/Packlist.html">ExtUtils::Packlist</a> for more information about these files. PPM does not use <i>.packlist</i> files to track the files installed by the packages it manage, but it keeps them in sync for other tools that manage modules.</p>
+
+</dd>
+<dt id="area-sync_db-opt">$area-&gt;sync_db( %opt )</dt>
+<dd>
+
+<p>Synchronize the state of the PPM database with what modules seems to be installed in the directories of the current install area. Packages where all files are gone will also be deleted from the PPM database.</p>
+
+<p>The following options are recognized:</p>
+
+<dl>
+
+<dt id="keep_package_version-bool"><code>keep_package_version</code> =&gt; $bool</dt>
+<dd>
+
+<p>If TRUE don&#39;t try to update the package version from the version number of the module with the same name as the pacakge.</p>
+
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/ActivePerl/PPM/Package.html">ActivePerl::PPM::Package</a>, <a href="../../../lib/ExtUtils/Packlist.html">ExtUtils::Packlist</a>.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>none.</p>
+
+
+</body>
+
+</html>
+
+

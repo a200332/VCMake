@@ -1,0 +1,145 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USING-MyApp::Mooseish">USING MyApp::Mooseish</a></li>
+  <li><a href="#CONCLUSION">CONCLUSION</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Cookbook::Extending::Mooseish_MooseSugar - Acting like Moose.pm and providing sugar Moose-style</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::Mooseish</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose::Exporter</span><span class="operator">;</span>
+  
+  <span class="variable">Moose::Exporter</span><span class="operator">-&gt;</span><span class="variable">setup_import_methods</span><span class="operator">(</span>
+      <span class="string">with_meta</span>       <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'has_table'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="string">class_metaroles</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+          <span class="string">class</span> <span class="operator">=&gt;</span> <span class="operator">[</span><span class="string">'MyApp::Meta::Class::Trait::HasTable'</span><span class="operator">]</span><span class="operator">,</span>
+      <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> has_table </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$meta</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="variable">$meta</span><span class="operator">-&gt;</span><span class="variable">table</span><span class="operator">(</span><span class="keyword">shift</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="keyword">package</span> <span class="variable">MyApp::Meta::Class::Trait::HasTable</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">table</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>  <span class="operator">=&gt;</span> <span class="string">'rw'</span><span class="operator">,</span>
+      <span class="string">isa</span> <span class="operator">=&gt;</span> <span class="string">'Str'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This recipe expands on the use of <a href="../../../../lib/Moose/Exporter.html">Moose::Exporter</a> we saw in <a href="../../../../lib/Moose/Cookbook/Extending/ExtensionOverview.html">Moose::Cookbook::Extending::ExtensionOverview</a> and the class metaclass trait we saw in <a href="../../../../lib/Moose/Cookbook/Meta/Table_MetaclassTrait.html">Moose::Cookbook::Meta::Table_MetaclassTrait</a>. In this example we provide our own metaclass trait, and we also export a <code>has_table</code> sugar function.</p>
+
+<p>The <code>with_meta</code> parameter specifies a list of functions that should be wrapped before exporting. The wrapper simply ensures that the importing package&#39;s appropriate metaclass object is the first argument to the function, so we can do <code><span style="white-space: nowrap;"><span class="keyword">my</span> <span class="variable">$meta</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+</span></code>.</p>
+
+<p>See the <a href="../../../../lib/Moose/Exporter.html">Moose::Exporter</a> docs for more details on its API.</p>
+
+<h1 id="USING-MyApp::Mooseish">USING MyApp::Mooseish</h1>
+
+<p>The purpose of all this code is to provide a Moose-like interface. Here&#39;s what it would look like in actual use:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">MyApp::User</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">namespace::autoclean</span><span class="operator">;</span>
+  
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">MyApp::Mooseish</span><span class="operator">;</span>
+  
+  <span class="variable">has_table</span> <span class="string">'User'</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">'username'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'ro'</span> <span class="operator">);</span>
+  <span class="variable">has</span> <span class="string">'password'</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">is</span> <span class="operator">=&gt;</span> <span class="string">'ro'</span> <span class="operator">);</span>
+  
+  <span class="keyword">sub</span><span class="variable"> login </span><span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<h1 id="CONCLUSION">CONCLUSION</h1>
+
+<p>Providing sugar functions can make your extension look much more Moose-ish. See <a>Fey::ORM</a> for a more extensive example.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

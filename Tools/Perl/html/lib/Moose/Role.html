@@ -1,0 +1,203 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</a>
+    <ul>
+      <li><a href="#requires-method_names">requires (@method_names)</a></li>
+      <li><a href="#excludes-role_names">excludes (@role_names)</a></li>
+      <li><a href="#no-Moose::Role">no Moose::Role</a></li>
+    </ul>
+  </li>
+  <li><a href="#METACLASS">METACLASS</a></li>
+  <li><a href="#APPLYING-ROLES">APPLYING ROLES</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Moose::Role - The Moose Role</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 2.2009</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Eq</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose::Role</span><span class="operator">;</span> <span class="comment"># automatically turns on strict and warnings</span>
+  
+  <span class="variable">requires</span> <span class="string">'equal'</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> no_equal </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$other</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="operator">!</span><span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">equal</span><span class="operator">(</span><span class="variable">$other</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># ... then in your classes</span>
+  
+  <span class="keyword">package</span> <span class="variable">Currency</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span> <span class="comment"># automatically turns on strict and warnings</span>
+  
+  <span class="variable">with</span> <span class="string">'Eq'</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> equal </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$self</span><span class="operator">,</span> <span class="variable">$other</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+      <span class="variable">$self</span><span class="operator">-&gt;</span><span class="variable">as_float</span> <span class="operator">==</span> <span class="variable">$other</span><span class="operator">-&gt;</span><span class="variable">as_float</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  
+  <span class="comment"># ... and also</span>
+  
+  <span class="keyword">package</span> <span class="variable">Comparator</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Moose</span><span class="operator">;</span>
+  
+  <span class="variable">has</span> <span class="string">compare_to</span> <span class="operator">=&gt;</span> <span class="operator">(</span>
+      <span class="string">is</span>      <span class="operator">=&gt;</span> <span class="string">'ro'</span><span class="operator">,</span>
+      <span class="string">does</span>    <span class="operator">=&gt;</span> <span class="string">'Eq'</span><span class="operator">,</span>
+      <span class="string">handles</span> <span class="operator">=&gt;</span> <span class="string">'Eq'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="comment"># ... which allows</span>
+  
+  <span class="keyword">my</span> <span class="variable">$currency1</span> <span class="operator">=</span> <span class="variable">Currency</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(...);</span>
+  <span class="keyword">my</span> <span class="variable">$currency2</span> <span class="operator">=</span> <span class="variable">Currency</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(...);</span>
+  <span class="variable">Comparator</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span><span class="string">compare_to</span> <span class="operator">=&gt;</span> <span class="variable">$currency1</span><span class="operator">)-&gt;</span><span class="variable">equal</span><span class="operator">(</span><span class="variable">$currency2</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The concept of roles is documented in <a href="../../lib/Moose/Manual/Roles.html">Moose::Manual::Roles</a>. This document serves as API documentation.</p>
+
+<h1 id="EXPORTED-FUNCTIONS">EXPORTED FUNCTIONS</h1>
+
+<p>Moose::Role currently supports all of the functions that <a href="../../lib/Moose.html">Moose</a> exports, but differs slightly in how some items are handled (see <a href="#CAVEATS">&quot;CAVEATS&quot;</a> below for details).</p>
+
+<p>Moose::Role also offers two role-specific keyword exports:</p>
+
+<h2 id="requires-method_names">requires (@method_names)</h2>
+
+<p>Roles can require that certain methods are implemented by any class which <code>does</code> the role.</p>
+
+<p>Note that attribute accessors also count as methods for the purposes of satisfying the requirements of a role.</p>
+
+<h2 id="excludes-role_names">excludes (@role_names)</h2>
+
+<p>Roles can <code>exclude</code> other roles, in effect saying &quot;I can never be combined with these <code>@role_names</code>&quot;. This is a feature which should not be used lightly.</p>
+
+<h2 id="no-Moose::Role">no Moose::Role</h2>
+
+<p>Moose::Role offers a way to remove the keywords it exports, through the <code>unimport</code> method. You simply have to say <code>no Moose::Role</code> at the bottom of your code for this to work.</p>
+
+<h1 id="METACLASS">METACLASS</h1>
+
+<p>When you use Moose::Role, you can specify traits which will be applied to your role metaclass:</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Moose::Role</span> <span class="operator">-</span><span class="string">traits</span> <span class="operator">=&gt;</span> <span class="string">'My::Trait'</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is very similar to the attribute traits feature. When you do this, your class&#39;s <code>meta</code> object will have the specified traits applied to it. See <a href="../../lib/Moose.html#Metaclass-and-Trait-Name-Resolution">&quot;Metaclass and Trait Name Resolution&quot; in Moose</a> for more details.</p>
+
+<p>All role metaclasses (note, not the role itself) extend <a href="../../lib/Moose/Meta/Role.html">Moose::Meta::Role</a>. You can test if a package is a role or not using <a href="../../lib/Moose/Util.html#is_role">&quot;is_role&quot; in Moose::Util</a>.</p>
+
+<h1 id="APPLYING-ROLES">APPLYING ROLES</h1>
+
+<p>In addition to being applied to a class using the &#39;with&#39; syntax (see <a href="../../lib/Moose/Manual/Roles.html">Moose::Manual::Roles</a>) and using the <a href="../../lib/Moose/Util.html">Moose::Util</a> &#39;apply_all_roles&#39; method, roles may also be applied to an instance of a class using <a href="../../lib/Moose/Util.html">Moose::Util</a> &#39;apply_all_roles&#39; or the role&#39;s metaclass:</p>
+
+<pre><code>   <span class="variable">MyApp::Test::SomeRole</span><span class="operator">-&gt;</span><span class="variable">meta</span><span class="operator">-&gt;</span><span class="variable">apply</span><span class="operator">(</span> <span class="variable">$instance</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Doing this creates a new, mutable, anonymous subclass, applies the role to that, and reblesses. In a debugger, for example, you will see class names of the form <code> Moose::Meta::Class::__ANON__::SERIAL::6 </code>, which means that doing a &#39;ref&#39; on your instance may not return what you expect. See <a href="../../lib/Moose/Object.html">Moose::Object</a> for &#39;DOES&#39;.</p>
+
+<p>Additional params may be added to the new instance by providing &#39;rebless_params&#39;. See <a href="../../lib/Moose/Meta/Role/Application/ToInstance.html">Moose::Meta::Role::Application::ToInstance</a>.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>Role support has only a few caveats:</p>
+
+<ul>
+
+<li><p>Roles cannot use the <code>extends</code> keyword; it will throw an exception for now. The same is true of the <code>augment</code> and <code>inner</code> keywords (not sure those really make sense for roles). All other Moose keywords will be <i>deferred</i> so that they can be applied to the consuming class.</p>
+
+</li>
+<li><p>Role composition does its best to <b>not</b> be order-sensitive when it comes to conflict resolution and requirements detection. However, it is order-sensitive when it comes to method modifiers. All before/around/after modifiers are included whenever a role is composed into a class, and then applied in the order in which the roles are used. This also means that there is no conflict for before/around/after modifiers.</p>
+
+<p>In most cases, this will be a non-issue; however, it is something to keep in mind when using method modifiers in a role. You should never assume any ordering.</p>
+
+</li>
+</ul>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>See <a href="../../lib/Moose.html#BUGS">&quot;BUGS&quot; in Moose</a> for details on reporting bugs.</p>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<ul>
+
+<li><p>Stevan Little &lt;stevan.little@iinteractive.com&gt;</p>
+
+</li>
+<li><p>Dave Rolsky &lt;autarch@urth.org&gt;</p>
+
+</li>
+<li><p>Jesse Luehrs &lt;doy@tozt.net&gt;</p>
+
+</li>
+<li><p>Shawn M Moore &lt;code@sartak.org&gt;</p>
+
+</li>
+<li><p>&#x5D9;&#x5D5;&#x5D1;&#x5DC; &#x5E7;&#x5D5;&#x5D2;&#39;&#x5DE;&#x5DF; (Yuval Kogman) &lt;nothingmuch@woobling.org&gt;</p>
+
+</li>
+<li><p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+</li>
+<li><p>Florian Ragwitz &lt;rafl@debian.org&gt;</p>
+
+</li>
+<li><p>Hans Dieter Pearcey &lt;hdp@weftsoar.net&gt;</p>
+
+</li>
+<li><p>Chris Prather &lt;chris@prather.org&gt;</p>
+
+</li>
+<li><p>Matt S Trout &lt;mst@shadowcat.co.uk&gt;</p>
+
+</li>
+</ul>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2006 by Infinity Interactive, Inc.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

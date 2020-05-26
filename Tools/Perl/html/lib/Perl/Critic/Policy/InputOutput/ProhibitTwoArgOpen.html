@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen - Write <code><span class="keyword">open</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">q{&lt;}</span><span class="operator">,</span> <span class="variable">$filename</span><span class="operator">;</span>
+</code> instead of <code><span class="keyword">open</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">"&lt;</span><span class="variable">$filename</span><span class="string">"</span><span class="operator">;</span>
+</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The three-argument form of <code>open</code> (introduced in Perl 5.6) prevents subtle bugs that occur when the filename starts with funny characters like &#39;&gt;&#39; or &#39;&lt;&#39;. The <a href="../../../../../lib/IO/File.html">IO::File</a> module provides a nice object-oriented interface to filehandles, which I think is more elegant anyway.</p>
+
+<pre><code>  <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'&gt;output.txt'</span> <span class="operator">);</span>          <span class="comment"># not ok</span>
+  <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">q{&gt;}</span><span class="operator">,</span> <span class="string">'output.txt'</span> <span class="operator">);</span>     <span class="comment"># ok</span>
+  
+  <span class="keyword">use</span> <span class="variable">IO::File</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$fh</span> <span class="operator">=</span> <span class="variable">IO::File</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'output.txt'</span><span class="operator">,</span> <span class="string">q{&gt;}</span> <span class="operator">);</span> <span class="comment"># even better!</span>
+</code></pre>
+
+<p>It&#39;s also more explicitly clear to define the input mode of the file, as in the difference between these two:</p>
+
+<pre><code>  <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'foo.txt'</span> <span class="operator">);</span>       <span class="comment"># BAD: Reader must think what default mode is</span>
+  <span class="keyword">open</span><span class="operator">(</span> <span class="variable">$fh</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="string">'foo.txt'</span> <span class="operator">);</span>  <span class="comment"># GOOD: Reader can see open mode</span>
+</code></pre>
+
+<p>This policy will not complain if the file explicitly states that it is compatible with a version of perl prior to 5.6 via an include statement, e.g. by having <code>require 5.005</code> in it.</p>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>This Policy is not configurable except for the standard options.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>There are two cases in which you are forced to use the two-argument form of open. When re-opening STDIN, STDOUT, or STDERR, and when doing a safe pipe open, as described in <a href="../../../../../lib/pods/perlipc.html">perlipc</a>.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../../../lib/IO/Handle.html">IO::Handle</a></p>
+
+<p><a href="../../../../../lib/IO/File.html">IO::File</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

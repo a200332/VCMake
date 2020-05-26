@@ -1,0 +1,536 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#XML::Parser::ContentModel-Methods">XML::Parser::ContentModel Methods</a></li>
+      <li><a href="#XML::Parser::ExpatNB-Methods">XML::Parser::ExpatNB Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>XML::Parser::Expat - Lowlevel access to James Clark&#39;s expat XML parser</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">XML::Parser::Expat</span><span class="operator">;</span>
+ 
+ <span class="variable">$parser</span> <span class="operator">=</span> <span class="variable">XML::Parser::Expat</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">setHandlers</span><span class="operator">(</span><span class="string">'Start'</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">sh</span><span class="operator">,</span>
+                      <span class="string">'End'</span>   <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">eh</span><span class="operator">,</span>
+                      <span class="string">'Char'</span>  <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">ch</span><span class="operator">);</span>
+ <span class="keyword">open</span><span class="operator">(</span><span class="variable">FOO</span><span class="operator">,</span> <span class="string">'&lt;'</span><span class="operator">,</span> <span class="string">'info.xml'</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Couldn't open"</span><span class="operator">;</span>
+ <span class="variable">$parser</span><span class="operator">-&gt;</span><span class="variable">parse</span><span class="operator">(</span><span class="variable">*FOO</span><span class="operator">);</span>
+ <span class="keyword">close</span><span class="operator">(</span><span class="variable">FOO</span><span class="operator">);</span>
+ <span class="comment"># $parser-&gt;parse('&lt;foo id="me"&gt; here &lt;em&gt;we&lt;/em&gt; go &lt;/foo&gt;');</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> sh
+ </span><span class="operator">{</span>
+   <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$p</span><span class="operator">,</span> <span class="variable">$el</span><span class="operator">,</span> <span class="variable">%atts</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+   <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">setHandlers</span><span class="operator">(</span><span class="string">'Char'</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">spec</span><span class="operator">)</span>
+     <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$el</span> <span class="keyword">eq</span> <span class="string">'special'</span><span class="operator">);</span>
+   <span class="operator">...</span>
+ <span class="operator">}</span>
+ 
+ <span class="keyword">sub</span><span class="variable"> eh
+ </span><span class="operator">{</span>
+   <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$p</span><span class="operator">,</span> <span class="variable">$el</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+   <span class="variable">$p</span><span class="operator">-&gt;</span><span class="variable">setHandlers</span><span class="operator">(</span><span class="string">'Char'</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">ch</span><span class="operator">)</span>  <span class="comment"># Special elements won't contain</span>
+     <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$el</span> <span class="keyword">eq</span> <span class="string">'special'</span><span class="operator">);</span>         <span class="comment"># other special elements</span>
+   <span class="operator">...</span>
+ <span class="operator">}</span> 
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides an interface to James Clark&#39;s XML parser, expat. As in expat, a single instance of the parser can only parse one document. Calls to parsestring after the first for a given instance will die.</p>
+
+<p>Expat (and XML::Parser::Expat) are event based. As the parser recognizes parts of the document (say the start or end of an XML element), then any handlers registered for that type of an event are called with suitable parameters.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<dl>
+
+<dt id="new">new</dt>
+<dd>
+
+<p>This is a class method, the constructor for XML::Parser::Expat. Options are passed as keyword value pairs. The recognized options are:</p>
+
+<ul>
+
+<li><p>ProtocolEncoding</p>
+
+<p>The protocol encoding name. The default is none. The expat built-in encodings are: <code>UTF-8</code>, <code>ISO-8859-1</code>, <code>UTF-16</code>, and <code>US-ASCII</code>. Other encodings may be used if they have encoding maps in one of the directories in the @Encoding_Path list. Setting the protocol encoding overrides any encoding in the XML declaration.</p>
+
+</li>
+<li><p>Namespaces</p>
+
+<p>When this option is given with a true value, then the parser does namespace processing. By default, namespace processing is turned off. When it is turned on, the parser consumes <i>xmlns</i> attributes and strips off prefixes from element and attributes names where those prefixes have a defined namespace. A name&#39;s namespace can be found using the <a href="#namespace">&quot;namespace&quot;</a> method and two names can be checked for absolute equality with the <a href="#eq_name">&quot;eq_name&quot;</a> method.</p>
+
+</li>
+<li><p>NoExpand</p>
+
+<p>Normally, the parser will try to expand references to entities defined in the internal subset. If this option is set to a true value, and a default handler is also set, then the default handler will be called when an entity reference is seen in text. This has no effect if a default handler has not been registered, and it has no effect on the expansion of entity references inside attribute values.</p>
+
+</li>
+<li><p>Stream_Delimiter</p>
+
+<p>This option takes a string value. When this string is found alone on a line while parsing from a stream, then the parse is ended as if it saw an end of file. The intended use is with a stream of xml documents in a MIME multipart format. The string should not contain a trailing newline.</p>
+
+</li>
+<li><p>ErrorContext</p>
+
+<p>When this option is defined, errors are reported in context. The value of ErrorContext should be the number of lines to show on either side of the line in which the error occurred.</p>
+
+</li>
+<li><p>ParseParamEnt</p>
+
+<p>Unless standalone is set to &quot;yes&quot; in the XML declaration, setting this to a true value allows the external DTD to be read, and parameter entities to be parsed and expanded.</p>
+
+</li>
+<li><p>Base</p>
+
+<p>The base to use for relative pathnames or URLs. This can also be done by using the base method.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="setHandlers-TYPE-HANDLER-TYPE-HANDLER">setHandlers(TYPE, HANDLER [, TYPE, HANDLER [...]])</dt>
+<dd>
+
+<p>This method registers handlers for the various events. If no handlers are registered, then a call to parsestring or parsefile will only determine if the corresponding XML document is well formed (by returning without error.) This may be called from within a handler, after the parse has started.</p>
+
+<p>Setting a handler to something that evaluates to false unsets that handler.</p>
+
+<p>This method returns a list of type, handler pairs corresponding to the input. The handlers returned are the ones that were in effect before the call to setHandlers.</p>
+
+<p>The recognized events and the parameters passed to the corresponding handlers are:</p>
+
+<ul>
+
+<li><p>Start (Parser, Element [, Attr, Val [,...]])</p>
+
+<p>This event is generated when an XML start tag is recognized. Parser is an XML::Parser::Expat instance. Element is the name of the XML element that is opened with the start tag. The Attr &amp; Val pairs are generated for each attribute in the start tag.</p>
+
+</li>
+<li><p>End (Parser, Element)</p>
+
+<p>This event is generated when an XML end tag is recognized. Note that an XML empty tag (&lt;foo/&gt;) generates both a start and an end event.</p>
+
+<p>There is always a lower level start and end handler installed that wrap the corresponding callbacks. This is to handle the context mechanism. A consequence of this is that the default handler (see below) will not see a start tag or end tag unless the default_current method is called.</p>
+
+</li>
+<li><p>Char (Parser, String)</p>
+
+<p>This event is generated when non-markup is recognized. The non-markup sequence of characters is in String. A single non-markup sequence of characters may generate multiple calls to this handler. Whatever the encoding of the string in the original document, this is given to the handler in UTF-8.</p>
+
+</li>
+<li><p>Proc (Parser, Target, Data)</p>
+
+<p>This event is generated when a processing instruction is recognized.</p>
+
+</li>
+<li><p>Comment (Parser, String)</p>
+
+<p>This event is generated when a comment is recognized.</p>
+
+</li>
+<li><p>CdataStart (Parser)</p>
+
+<p>This is called at the start of a CDATA section.</p>
+
+</li>
+<li><p>CdataEnd (Parser)</p>
+
+<p>This is called at the end of a CDATA section.</p>
+
+</li>
+<li><p>Default (Parser, String)</p>
+
+<p>This is called for any characters that don&#39;t have a registered handler. This includes both characters that are part of markup for which no events are generated (markup declarations) and characters that could generate events, but for which no handler has been registered.</p>
+
+<p>Whatever the encoding in the original document, the string is returned to the handler in UTF-8.</p>
+
+</li>
+<li><p>Unparsed (Parser, Entity, Base, Sysid, Pubid, Notation)</p>
+
+<p>This is called for a declaration of an unparsed entity. Entity is the name of the entity. Base is the base to be used for resolving a relative URI. Sysid is the system id. Pubid is the public id. Notation is the notation name. Base and Pubid may be undefined.</p>
+
+</li>
+<li><p>Notation (Parser, Notation, Base, Sysid, Pubid)</p>
+
+<p>This is called for a declaration of notation. Notation is the notation name. Base is the base to be used for resolving a relative URI. Sysid is the system id. Pubid is the public id. Base, Sysid, and Pubid may all be undefined.</p>
+
+</li>
+<li><p>ExternEnt (Parser, Base, Sysid, Pubid)</p>
+
+<p>This is called when an external entity is referenced. Base is the base to be used for resolving a relative URI. Sysid is the system id. Pubid is the public id. Base, and Pubid may be undefined.</p>
+
+<p>This handler should either return a string, which represents the contents of the external entity, or return an open filehandle that can be read to obtain the contents of the external entity, or return undef, which indicates the external entity couldn&#39;t be found and will generate a parse error.</p>
+
+<p>If an open filehandle is returned, it must be returned as either a glob (*FOO) or as a reference to a glob (e.g. an instance of IO::Handle).</p>
+
+</li>
+<li><p>ExternEntFin (Parser)</p>
+
+<p>This is called after an external entity has been parsed. It allows applications to perform cleanup on actions performed in the above ExternEnt handler.</p>
+
+</li>
+<li><p>Entity (Parser, Name, Val, Sysid, Pubid, Ndata, IsParam)</p>
+
+<p>This is called when an entity is declared. For internal entities, the Val parameter will contain the value and the remaining three parameters will be undefined. For external entities, the Val parameter will be undefined, the Sysid parameter will have the system id, the Pubid parameter will have the public id if it was provided (it will be undefined otherwise), the Ndata parameter will contain the notation for unparsed entities. If this is a parameter entity declaration, then the IsParam parameter is true.</p>
+
+<p>Note that this handler and the Unparsed handler above overlap. If both are set, then this handler will not be called for unparsed entities.</p>
+
+</li>
+<li><p>Element (Parser, Name, Model)</p>
+
+<p>The element handler is called when an element declaration is found. Name is the element name, and Model is the content model as an XML::Parser::ContentModel object. See <a href="#XML::Parser::ContentModel-Methods">&quot;XML::Parser::ContentModel Methods&quot;</a> for methods available for this class.</p>
+
+</li>
+<li><p>Attlist (Parser, Elname, Attname, Type, Default, Fixed)</p>
+
+<p>This handler is called for each attribute in an ATTLIST declaration. So an ATTLIST declaration that has multiple attributes will generate multiple calls to this handler. The Elname parameter is the name of the element with which the attribute is being associated. The Attname parameter is the name of the attribute. Type is the attribute type, given as a string. Default is the default value, which will either be &quot;#REQUIRED&quot;, &quot;#IMPLIED&quot; or a quoted string (i.e. the returned string will begin and end with a quote character). If Fixed is true, then this is a fixed attribute.</p>
+
+</li>
+<li><p>Doctype (Parser, Name, Sysid, Pubid, Internal)</p>
+
+<p>This handler is called for DOCTYPE declarations. Name is the document type name. Sysid is the system id of the document type, if it was provided, otherwise it&#39;s undefined. Pubid is the public id of the document type, which will be undefined if no public id was given. Internal will be true or false, indicating whether or not the doctype declaration contains an internal subset.</p>
+
+</li>
+<li><p>DoctypeFin (Parser)</p>
+
+<p>This handler is called after parsing of the DOCTYPE declaration has finished, including any internal or external DTD declarations.</p>
+
+</li>
+<li><p>XMLDecl (Parser, Version, Encoding, Standalone)</p>
+
+<p>This handler is called for XML declarations. Version is a string containing the version. Encoding is either undefined or contains an encoding string. Standalone is either undefined, or true or false. Undefined indicates that no standalone parameter was given in the XML declaration. True or false indicates &quot;yes&quot; or &quot;no&quot; respectively.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="namespace-name">namespace(name)</dt>
+<dd>
+
+<p>Return the URI of the namespace that the name belongs to. If the name doesn&#39;t belong to any namespace, an undef is returned. This is only valid on names received through the Start or End handlers from a single document, or through a call to the generate_ns_name method. In other words, don&#39;t use names generated from one instance of XML::Parser::Expat with other instances.</p>
+
+</dd>
+<dt id="eq_name-name1-name2">eq_name(name1, name2)</dt>
+<dd>
+
+<p>Return true if name1 and name2 are identical (i.e. same name and from the same namespace.) This is only meaningful if both names were obtained through the Start or End handlers from a single document, or through a call to the generate_ns_name method.</p>
+
+</dd>
+<dt id="generate_ns_name-name-namespace">generate_ns_name(name, namespace)</dt>
+<dd>
+
+<p>Return a name, associated with a given namespace, good for using with the above 2 methods. The namespace argument should be the namespace URI, not a prefix.</p>
+
+</dd>
+<dt id="new_ns_prefixes">new_ns_prefixes</dt>
+<dd>
+
+<p>When called from a start tag handler, returns namespace prefixes declared with this start tag. If called elsewhere (or if there were no namespace prefixes declared), it returns an empty list. Setting of the default namespace is indicated with &#39;#default&#39; as a prefix.</p>
+
+</dd>
+<dt id="expand_ns_prefix-prefix">expand_ns_prefix(prefix)</dt>
+<dd>
+
+<p>Return the uri to which the given prefix is currently bound. Returns undef if the prefix isn&#39;t currently bound. Use &#39;#default&#39; to find the current binding of the default namespace (if any).</p>
+
+</dd>
+<dt id="current_ns_prefixes">current_ns_prefixes</dt>
+<dd>
+
+<p>Return a list of currently bound namespace prefixes. The order of the the prefixes in the list has no meaning. If the default namespace is currently bound, &#39;#default&#39; appears in the list.</p>
+
+</dd>
+<dt id="recognized_string">recognized_string</dt>
+<dd>
+
+<p>Returns the string from the document that was recognized in order to call the current handler. For instance, when called from a start handler, it will give us the start-tag string. The string is encoded in UTF-8. This method doesn&#39;t return a meaningful string inside declaration handlers.</p>
+
+</dd>
+<dt id="original_string">original_string</dt>
+<dd>
+
+<p>Returns the verbatim string from the document that was recognized in order to call the current handler. The string is in the original document encoding. This method doesn&#39;t return a meaningful string inside declaration handlers.</p>
+
+</dd>
+<dt id="default_current">default_current</dt>
+<dd>
+
+<p>When called from a handler, causes the sequence of characters that generated the corresponding event to be sent to the default handler (if one is registered). Use of this method is deprecated in favor the recognized_string method, which you can use without installing a default handler. This method doesn&#39;t deliver a meaningful string to the default handler when called from inside declaration handlers.</p>
+
+</dd>
+<dt id="xpcroak-message">xpcroak(message)</dt>
+<dd>
+
+<p>Concatenate onto the given message the current line number within the XML document plus the message implied by ErrorContext. Then croak with the formed message.</p>
+
+</dd>
+<dt id="xpcarp-message">xpcarp(message)</dt>
+<dd>
+
+<p>Concatenate onto the given message the current line number within the XML document plus the message implied by ErrorContext. Then carp with the formed message.</p>
+
+</dd>
+<dt id="current_line">current_line</dt>
+<dd>
+
+<p>Returns the line number of the current position of the parse.</p>
+
+</dd>
+<dt id="current_column">current_column</dt>
+<dd>
+
+<p>Returns the column number of the current position of the parse.</p>
+
+</dd>
+<dt id="current_byte">current_byte</dt>
+<dd>
+
+<p>Returns the current position of the parse.</p>
+
+</dd>
+<dt id="base-NEWBASE">base([NEWBASE]);</dt>
+<dd>
+
+<p>Returns the current value of the base for resolving relative URIs. If NEWBASE is supplied, changes the base to that value.</p>
+
+</dd>
+<dt id="context">context</dt>
+<dd>
+
+<p>Returns a list of element names that represent open elements, with the last one being the innermost. Inside start and end tag handlers, this will be the tag of the parent element.</p>
+
+</dd>
+<dt id="current_element">current_element</dt>
+<dd>
+
+<p>Returns the name of the innermost currently opened element. Inside start or end handlers, returns the parent of the element associated with those tags.</p>
+
+</dd>
+<dt id="in_element-NAME">in_element(NAME)</dt>
+<dd>
+
+<p>Returns true if NAME is equal to the name of the innermost currently opened element. If namespace processing is being used and you want to check against a name that may be in a namespace, then use the generate_ns_name method to create the NAME argument.</p>
+
+</dd>
+<dt id="within_element-NAME">within_element(NAME)</dt>
+<dd>
+
+<p>Returns the number of times the given name appears in the context list. If namespace processing is being used and you want to check against a name that may be in a namespace, then use the generate_ns_name method to create the NAME argument.</p>
+
+</dd>
+<dt id="depth">depth</dt>
+<dd>
+
+<p>Returns the size of the context list.</p>
+
+</dd>
+<dt id="element_index">element_index</dt>
+<dd>
+
+<p>Returns an integer that is the depth-first visit order of the current element. This will be zero outside of the root element. For example, this will return 1 when called from the start handler for the root element start tag.</p>
+
+</dd>
+<dt id="skip_until-INDEX">skip_until(INDEX)</dt>
+<dd>
+
+<p>INDEX is an integer that represents an element index. When this method is called, all handlers are suspended until the start tag for an element that has an index number equal to INDEX is seen. If a start handler has been set, then this is the first tag that the start handler will see after skip_until has been called.</p>
+
+</dd>
+<dt id="position_in_context-LINES">position_in_context(LINES)</dt>
+<dd>
+
+<p>Returns a string that shows the current parse position. LINES should be an integer &gt;= 0 that represents the number of lines on either side of the current parse line to place into the returned string.</p>
+
+</dd>
+<dt id="xml_escape-TEXT-CHAR-CHAR">xml_escape(TEXT [, CHAR [, CHAR ...]])</dt>
+<dd>
+
+<p>Returns TEXT with markup characters turned into character entities. Any additional characters provided as arguments are also turned into character references where found in TEXT.</p>
+
+</dd>
+<dt id="parse-SOURCE">parse (SOURCE)</dt>
+<dd>
+
+<p>The SOURCE parameter should either be a string containing the whole XML document, or it should be an open IO::Handle. Only a single document may be parsed for a given instance of XML::Parser::Expat, so this will croak if it&#39;s been called previously for this instance.</p>
+
+</dd>
+<dt id="parsestring-XML_DOC_STRING">parsestring(XML_DOC_STRING)</dt>
+<dd>
+
+<p>Parses the given string as an XML document. Only a single document may be parsed for a given instance of XML::Parser::Expat, so this will die if either parsestring or parsefile has been called for this instance previously.</p>
+
+<p>This method is deprecated in favor of the parse method.</p>
+
+</dd>
+<dt id="parsefile-FILENAME">parsefile(FILENAME)</dt>
+<dd>
+
+<p>Parses the XML document in the given file. Will die if parsestring or parsefile has been called previously for this instance.</p>
+
+</dd>
+<dt id="is_defaulted-ATTNAME">is_defaulted(ATTNAME)</dt>
+<dd>
+
+<p>NO LONGER WORKS. To find out if an attribute is defaulted please use the specified_attr method.</p>
+
+</dd>
+<dt id="specified_attr">specified_attr</dt>
+<dd>
+
+<p>When the start handler receives lists of attributes and values, the non-defaulted (i.e. explicitly specified) attributes occur in the list first. This method returns the number of specified items in the list. So if this number is equal to the length of the list, there were no defaulted values. Otherwise the number points to the index of the first defaulted attribute name.</p>
+
+</dd>
+<dt id="finish">finish</dt>
+<dd>
+
+<p>Unsets all handlers (including internal ones that set context), but expat continues parsing to the end of the document or until it finds an error. It should finish up a lot faster than with the handlers set.</p>
+
+</dd>
+<dt id="release">release</dt>
+<dd>
+
+<p>There are data structures used by XML::Parser::Expat that have circular references. This means that these structures will never be garbage collected unless these references are explicitly broken. Calling this method breaks those references (and makes the instance unusable.)</p>
+
+<p>Normally, higher level calls handle this for you, but if you are using XML::Parser::Expat directly, then it&#39;s your responsibility to call it.</p>
+
+</dd>
+</dl>
+
+<h2 id="XML::Parser::ContentModel-Methods">XML::Parser::ContentModel Methods</h2>
+
+<p>The element declaration handlers are passed objects of this class as the content model of the element declaration. They also represent content particles, components of a content model.</p>
+
+<p>When referred to as a string, these objects are automagicly converted to a string representation of the model (or content particle).</p>
+
+<dl>
+
+<dt id="isempty">isempty</dt>
+<dd>
+
+<p>This method returns true if the object is &quot;EMPTY&quot;, false otherwise.</p>
+
+</dd>
+<dt id="isany">isany</dt>
+<dd>
+
+<p>This method returns true if the object is &quot;ANY&quot;, false otherwise.</p>
+
+</dd>
+<dt id="ismixed">ismixed</dt>
+<dd>
+
+<p>This method returns true if the object is &quot;(#PCDATA)&quot; or &quot;(#PCDATA|...)*&quot;, false otherwise.</p>
+
+</dd>
+<dt id="isname">isname</dt>
+<dd>
+
+<p>This method returns if the object is an element name.</p>
+
+</dd>
+<dt id="ischoice">ischoice</dt>
+<dd>
+
+<p>This method returns true if the object is a choice of content particles.</p>
+
+</dd>
+<dt id="isseq">isseq</dt>
+<dd>
+
+<p>This method returns true if the object is a sequence of content particles.</p>
+
+</dd>
+<dt id="quant">quant</dt>
+<dd>
+
+<p>This method returns undef or a string representing the quantifier (&#39;?&#39;, &#39;*&#39;, &#39;+&#39;) associated with the model or particle.</p>
+
+</dd>
+<dt id="children">children</dt>
+<dd>
+
+<p>This method returns undef or (for mixed, choice, and sequence types) an array of component content particles. There will always be at least one component for choices and sequences, but for a mixed content model of pure PCDATA, &quot;(#PCDATA)&quot;, then an undef is returned.</p>
+
+</dd>
+</dl>
+
+<h2 id="XML::Parser::ExpatNB-Methods">XML::Parser::ExpatNB Methods</h2>
+
+<p>The class XML::Parser::ExpatNB is a subclass of XML::Parser::Expat used for non-blocking access to the expat library. It does not support the parse, parsestring, or parsefile methods, but it does have these additional methods:</p>
+
+<dl>
+
+<dt id="parse_more-DATA">parse_more(DATA)</dt>
+<dd>
+
+<p>Feed expat more text to munch on.</p>
+
+</dd>
+<dt id="parse_done">parse_done</dt>
+<dd>
+
+<p>Tell expat that it&#39;s gotten the whole document.</p>
+
+</dd>
+</dl>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<dl>
+
+<dt id="XML::Parser::Expat::load_encoding-ENCODING">XML::Parser::Expat::load_encoding(ENCODING)</dt>
+<dd>
+
+<p>Load an external encoding. ENCODING is either the name of an encoding or the name of a file. The basename is converted to lowercase and a &#39;.enc&#39; extension is appended unless there&#39;s one already there. Then, unless it&#39;s an absolute pathname (i.e. begins with &#39;/&#39;), the first file by that name discovered in the @Encoding_Path path list is used.</p>
+
+<p>The encoding in the file is loaded and kept in the %Encoding_Table table. Earlier encodings of the same name are replaced.</p>
+
+<p>This function is automatically called by expat when it encounters an encoding it doesn&#39;t know about. Expat shouldn&#39;t call this twice for the same encoding name. The only reason users should use this function is to explicitly load an encoding not contained in the @Encoding_Path list.</p>
+
+</dd>
+</dl>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<p>Larry Wall &lt;<i>larry@wall.org</i>&gt; wrote version 1.0.</p>
+
+<p>Clark Cooper &lt;<i>coopercc@netheaven.com</i>&gt; picked up support, changed the API for this version (2.x), provided documentation, and added some standard package features.</p>
+
+
+</body>
+
+</html>
+
+

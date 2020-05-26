@@ -1,0 +1,691 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#What-is-Perl">What is Perl?</a></li>
+      <li><a href="#Running-Perl-programs">Running Perl programs</a></li>
+      <li><a href="#Safety-net">Safety net</a></li>
+      <li><a href="#Basic-syntax-overview">Basic syntax overview</a></li>
+      <li><a href="#Perl-variable-types">Perl variable types</a></li>
+      <li><a href="#Variable-scoping">Variable scoping</a></li>
+      <li><a href="#Conditional-and-looping-constructs">Conditional and looping constructs</a></li>
+      <li><a href="#Builtin-operators-and-functions">Builtin operators and functions</a></li>
+      <li><a href="#Files-and-I-O">Files and I/O</a></li>
+      <li><a href="#Regular-expressions">Regular expressions</a></li>
+      <li><a href="#Writing-subroutines">Writing subroutines</a></li>
+      <li><a href="#OO-Perl">OO Perl</a></li>
+      <li><a href="#Using-Perl-modules">Using Perl modules</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>perlintro -- a brief introduction and overview of Perl</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This document is intended to give you a quick overview of the Perl programming language, along with pointers to further documentation. It is intended as a &quot;bootstrap&quot; guide for those who are new to the language, and provides just enough information for you to be able to read other peoples&#39; Perl and understand roughly what it&#39;s doing, or write your own simple scripts.</p>
+
+<p>This introductory document does not aim to be complete. It does not even aim to be entirely accurate. In some cases perfection has been sacrificed in the goal of getting the general idea across. You are <i>strongly</i> advised to follow this introduction with more information from the full Perl manual, the table of contents to which can be found in <a href="../../lib/pods/perltoc.html">perltoc</a>.</p>
+
+<p>Throughout this document you&#39;ll see references to other parts of the Perl documentation. You can read that documentation using the <code>perldoc</code> command or whatever method you&#39;re using to read this document.</p>
+
+<p>Throughout Perl&#39;s documentation, you&#39;ll find numerous examples intended to help explain the discussed features. Please keep in mind that many of them are code fragments rather than complete programs.</p>
+
+<p>These examples often reflect the style and preference of the author of that piece of the documentation, and may be briefer than a corresponding line of code in a real program. Except where otherwise noted, you should assume that <code>use strict</code> and <code>use warnings</code> statements appear earlier in the &quot;program&quot;, and that any variables used have already been declared, even if those declarations have been omitted to make the example easier to read.</p>
+
+<p>Do note that the examples have been written by many different authors over a period of several decades. Styles and techniques will therefore differ, although some effort has been made to not vary styles too widely in the same sections. Do not consider one style to be better than others - &quot;There&#39;s More Than One Way To Do It&quot; is one of Perl&#39;s mottos. After all, in your journey as a programmer, you are likely to encounter different styles.</p>
+
+<h2 id="What-is-Perl">What is Perl?</h2>
+
+<p>Perl is a general-purpose programming language originally developed for text manipulation and now used for a wide range of tasks including system administration, web development, network programming, GUI development, and more.</p>
+
+<p>The language is intended to be practical (easy to use, efficient, complete) rather than beautiful (tiny, elegant, minimal). Its major features are that it&#39;s easy to use, supports both procedural and object-oriented (OO) programming, has powerful built-in support for text processing, and has one of the world&#39;s most impressive collections of third-party modules.</p>
+
+<p>Different definitions of Perl are given in <a href="../../lib/pods/perl.html">perl</a>, <a href="../../lib/pods/perlfaq1.html">perlfaq1</a> and no doubt other places. From this we can determine that Perl is different things to different people, but that lots of people think it&#39;s at least worth writing about.</p>
+
+<h2 id="Running-Perl-programs">Running Perl programs</h2>
+
+<p>To run a Perl program from the Unix command line:</p>
+
+<pre><code> perl progname.pl</code></pre>
+
+<p>Alternatively, put this as the first line of your script:</p>
+
+<pre><code> <span class="comment">#!/usr/bin/env perl</span>
+</code></pre>
+
+<p>... and run the script as <i>/path/to/script.pl</i>. Of course, it&#39;ll need to be executable first, so <code>chmod 755 script.pl</code> (under Unix).</p>
+
+<p>(This start line assumes you have the <b>env</b> program. You can also put directly the path to your perl executable, like in <code><span class="comment">#!/usr/bin/perl</span>
+</code>).</p>
+
+<p>For more information, including instructions for other platforms such as Windows and Mac OS, read <a href="../../lib/pods/perlrun.html">perlrun</a>.</p>
+
+<h2 id="Safety-net">Safety net</h2>
+
+<p>Perl by default is very forgiving. In order to make it more robust it is recommended to start every program with the following lines:</p>
+
+<pre><code> <span class="comment">#!/usr/bin/perl</span>
+ <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+ <span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+</code></pre>
+
+<p>The two additional lines request from perl to catch various common problems in your code. They check different things so you need both. A potential problem caught by <code><span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+</code> will cause your code to stop immediately when it is encountered, while <code><span class="keyword">use</span> <span class="variable">warnings</span><span class="operator">;</span>
+</code> will merely give a warning (like the command-line switch <b>-w</b>) and let your code run. To read more about them check their respective manual pages at <a href="../../lib/strict.html">strict</a> and <a href="../../lib/warnings.html">warnings</a>.</p>
+
+<h2 id="Basic-syntax-overview">Basic syntax overview</h2>
+
+<p>A Perl script or program consists of one or more statements. These statements are simply written in the script in a straightforward fashion. There is no need to have a <code>main()</code> function or anything of that kind.</p>
+
+<p>Perl statements end in a semi-colon:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="string">"Hello, world"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Comments start with a hash symbol and run to the end of the line</p>
+
+<pre><code> <span class="comment"># This is a comment</span>
+</code></pre>
+
+<p>Whitespace is irrelevant:</p>
+
+<pre><code> <span class="keyword">print</span>
+     <span class="string">"Hello, world"</span>
+     <span class="operator">;</span>
+</code></pre>
+
+<p>... except inside quoted strings:</p>
+
+<pre><code> <span class="comment"># this would print with a linebreak in the middle</span>
+ <span class="keyword">print</span> <span class="string">"Hello
+ world"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Double quotes or single quotes may be used around literal strings:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="string">"Hello, world"</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="string">'Hello, world'</span><span class="operator">;</span>
+</code></pre>
+
+<p>However, only double quotes &quot;interpolate&quot; variables and special characters such as newlines (<code>\n</code>):</p>
+
+<pre><code> <span class="keyword">print</span> <span class="string">"Hello, </span><span class="variable">$name</span><span class="string">\n"</span><span class="operator">;</span>     <span class="comment"># works fine</span>
+ <span class="keyword">print</span> <span class="string">'Hello, $name\n'</span><span class="operator">;</span>     <span class="comment"># prints $name\n literally</span>
+</code></pre>
+
+<p>Numbers don&#39;t need quotes around them:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="number">42</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can use parentheses for functions&#39; arguments or omit them according to your personal taste. They are only required occasionally to clarify issues of precedence.</p>
+
+<pre><code> <span class="keyword">print</span><span class="operator">(</span><span class="string">"Hello, world\n"</span><span class="operator">);</span>
+ <span class="keyword">print</span> <span class="string">"Hello, world\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>More detailed information about Perl syntax can be found in <a href="../../lib/pods/perlsyn.html">perlsyn</a>.</p>
+
+<h2 id="Perl-variable-types">Perl variable types</h2>
+
+<p>Perl has three main variable types: scalars, arrays, and hashes.</p>
+
+<dl>
+
+<dt id="Scalars">Scalars</dt>
+<dd>
+
+<p>A scalar represents a single value:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$animal</span> <span class="operator">=</span> <span class="string">"camel"</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$answer</span> <span class="operator">=</span> <span class="number">42</span><span class="operator">;</span>
+</code></pre>
+
+<p>Scalar values can be strings, integers or floating point numbers, and Perl will automatically convert between them as required. There is no need to pre-declare your variable types, but you have to declare them using the <code>my</code> keyword the first time you use them. (This is one of the requirements of <code><span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+</code>.)</p>
+
+<p>Scalar values can be used in various ways:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">$animal</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="string">"The animal is </span><span class="variable">$animal</span><span class="string">\n"</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="string">"The square of </span><span class="variable">$answer</span><span class="string"> is "</span><span class="operator">,</span> <span class="variable">$answer</span> <span class="operator">*</span> <span class="variable">$answer</span><span class="operator">,</span> <span class="string">"\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>There are a number of &quot;magic&quot; scalars with names that look like punctuation or line noise. These special variables are used for all kinds of purposes, and are documented in <a href="../../lib/pods/perlvar.html">perlvar</a>. The only one you need to know about for now is <code>$_</code> which is the &quot;default variable&quot;. It&#39;s used as the default argument to a number of functions in Perl, and it&#39;s set implicitly by certain looping constructs.</p>
+
+<pre><code> <span class="keyword">print</span><span class="operator">;</span>          <span class="comment"># prints contents of $_ by default</span>
+</code></pre>
+
+</dd>
+<dt id="Arrays">Arrays</dt>
+<dd>
+
+<p>An array represents a list of values:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">@animals</span> <span class="operator">=</span> <span class="operator">(</span><span class="string">"camel"</span><span class="operator">,</span> <span class="string">"llama"</span><span class="operator">,</span> <span class="string">"owl"</span><span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">@numbers</span> <span class="operator">=</span> <span class="operator">(</span><span class="number">23</span><span class="operator">,</span> <span class="number">42</span><span class="operator">,</span> <span class="number">69</span><span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">@mixed</span>   <span class="operator">=</span> <span class="operator">(</span><span class="string">"camel"</span><span class="operator">,</span> <span class="number">42</span><span class="operator">,</span> <span class="number">1.23</span><span class="operator">);</span>
+</code></pre>
+
+<p>Arrays are zero-indexed. Here&#39;s how you get at elements in an array:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">$animals</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>              <span class="comment"># prints "camel"</span>
+ <span class="keyword">print</span> <span class="variable">$animals</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>              <span class="comment"># prints "llama"</span>
+</code></pre>
+
+<p>The special variable <code>$#array</code> tells you the index of the last element of an array:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">$mixed</span><span class="operator">[</span><span class="variable">$#mixed</span><span class="operator">]</span><span class="operator">;</span>       <span class="comment"># last element, prints 1.23</span>
+</code></pre>
+
+<p>You might be tempted to use <code>$#array + 1</code> to tell you how many items there are in an array. Don&#39;t bother. As it happens, using <code>@array</code> where Perl expects to find a scalar value (&quot;in scalar context&quot;) will give you the number of elements in the array:</p>
+
+<pre><code> <span class="keyword">if</span> <span class="operator">(</span><span class="variable">@animals</span> <span class="operator">&lt;</span> <span class="number">5</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>
+</code></pre>
+
+<p>The elements we&#39;re getting from the array start with a <code>$</code> because we&#39;re getting just a single value out of the array; you ask for a scalar, you get a scalar.</p>
+
+<p>To get multiple values from an array:</p>
+
+<pre><code> <span class="variable">@animals</span><span class="operator">[</span><span class="number">0</span><span class="operator">,</span><span class="number">1</span><span class="operator">]</span><span class="operator">;</span>                 <span class="comment"># gives ("camel", "llama");</span>
+ <span class="variable">@animals</span><span class="operator">[</span><span class="number">0</span><span class="operator">..</span><span class="number">2</span><span class="operator">]</span><span class="operator">;</span>                <span class="comment"># gives ("camel", "llama", "owl");</span>
+ <span class="variable">@animals</span><span class="operator">[</span><span class="number">1</span><span class="operator">..</span><span class="variable">$#animals</span><span class="operator">]</span><span class="operator">;</span>        <span class="comment"># gives all except the first element</span>
+</code></pre>
+
+<p>This is called an &quot;array slice&quot;.</p>
+
+<p>You can do various useful things to lists:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">@sorted</span>    <span class="operator">=</span> <span class="keyword">sort</span> <span class="variable">@animals</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">@backwards</span> <span class="operator">=</span> <span class="keyword">reverse</span> <span class="variable">@numbers</span><span class="operator">;</span>
+</code></pre>
+
+<p>There are a couple of special arrays too, such as <code>@ARGV</code> (the command line arguments to your script) and <code>@_</code> (the arguments passed to a subroutine). These are documented in <a href="../../lib/pods/perlvar.html">perlvar</a>.</p>
+
+</dd>
+<dt id="Hashes">Hashes</dt>
+<dd>
+
+<p>A hash represents a set of key/value pairs:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">%fruit_color</span> <span class="operator">=</span> <span class="operator">(</span><span class="string">"apple"</span><span class="operator">,</span> <span class="string">"red"</span><span class="operator">,</span> <span class="string">"banana"</span><span class="operator">,</span> <span class="string">"yellow"</span><span class="operator">);</span>
+</code></pre>
+
+<p>You can use whitespace and the <code>=&gt;</code> operator to lay them out more nicely:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">%fruit_color</span> <span class="operator">=</span> <span class="operator">(</span>
+     <span class="string">apple</span>  <span class="operator">=&gt;</span> <span class="string">"red"</span><span class="operator">,</span>
+     <span class="string">banana</span> <span class="operator">=&gt;</span> <span class="string">"yellow"</span><span class="operator">,</span>
+ <span class="operator">);</span>
+</code></pre>
+
+<p>To get at hash elements:</p>
+
+<pre><code> <span class="variable">$fruit_color</span><span class="operator">{</span><span class="string">"apple"</span><span class="operator">}</span><span class="operator">;</span>           <span class="comment"># gives "red"</span>
+</code></pre>
+
+<p>You can get at lists of keys and values with <code>keys()</code> and <code>values()</code>.</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">@fruits</span> <span class="operator">=</span> <span class="keyword">keys</span> <span class="variable">%fruit_colors</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">@colors</span> <span class="operator">=</span> <span class="keyword">values</span> <span class="variable">%fruit_colors</span><span class="operator">;</span>
+</code></pre>
+
+<p>Hashes have no particular internal order, though you can sort the keys and loop through them.</p>
+
+<p>Just like special scalars and arrays, there are also special hashes. The most well known of these is <code>%ENV</code> which contains environment variables. Read all about it (and other special variables) in <a href="../../lib/pods/perlvar.html">perlvar</a>.</p>
+
+</dd>
+</dl>
+
+<p>Scalars, arrays and hashes are documented more fully in <a href="../../lib/pods/perldata.html">perldata</a>.</p>
+
+<p>More complex data types can be constructed using references, which allow you to build lists and hashes within lists and hashes.</p>
+
+<p>A reference is a scalar value and can refer to any other Perl data type. So by storing a reference as the value of an array or hash element, you can easily create lists and hashes within lists and hashes. The following example shows a 2 level hash of hash structure using anonymous hash references.</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$variables</span> <span class="operator">=</span> <span class="operator">{</span>
+     <span class="string">scalar</span>  <span class="operator">=&gt;</span>  <span class="operator">{</span>
+                  <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">"single item"</span><span class="operator">,</span>
+                  <span class="string">sigil</span> <span class="operator">=&gt;</span> <span class="string">'$'</span><span class="operator">,</span>
+                 <span class="operator">}</span><span class="operator">,</span>
+     <span class="string">array</span>   <span class="operator">=&gt;</span>  <span class="operator">{</span>
+                  <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">"ordered list of items"</span><span class="operator">,</span>
+                  <span class="string">sigil</span> <span class="operator">=&gt;</span> <span class="string">'@'</span><span class="operator">,</span>
+                 <span class="operator">}</span><span class="operator">,</span>
+     <span class="string">hash</span>    <span class="operator">=&gt;</span>  <span class="operator">{</span>
+                  <span class="string">description</span> <span class="operator">=&gt;</span> <span class="string">"key/value pairs"</span><span class="operator">,</span>
+                  <span class="string">sigil</span> <span class="operator">=&gt;</span> <span class="string">'%'</span><span class="operator">,</span>
+                 <span class="operator">}</span><span class="operator">,</span>
+ <span class="operator">}</span><span class="operator">;</span>
+ 
+ <span class="keyword">print</span> <span class="string">"Scalars begin with a </span><span class="variable">$variables</span><span class="string">-&gt;{'scalar'}-&gt;{'sigil'}\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>Exhaustive information on the topic of references can be found in <a href="../../lib/pods/perlreftut.html">perlreftut</a>, <a href="../../lib/pods/perllol.html">perllol</a>, <a href="../../lib/pods/perlref.html">perlref</a> and <a href="../../lib/pods/perldsc.html">perldsc</a>.</p>
+
+<h2 id="Variable-scoping">Variable scoping</h2>
+
+<p>Throughout the previous section all the examples have used the syntax:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$var</span> <span class="operator">=</span> <span class="string">"value"</span><span class="operator">;</span>
+</code></pre>
+
+<p>The <code>my</code> is actually not required; you could just use:</p>
+
+<pre><code> <span class="variable">$var</span> <span class="operator">=</span> <span class="string">"value"</span><span class="operator">;</span>
+</code></pre>
+
+<p>However, the above usage will create global variables throughout your program, which is bad programming practice. <code>my</code> creates lexically scoped variables instead. The variables are scoped to the block (i.e. a bunch of statements surrounded by curly-braces) in which they are defined.</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$x</span> <span class="operator">=</span> <span class="string">"foo"</span><span class="operator">;</span>
+ <span class="keyword">my</span> <span class="variable">$some_condition</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$some_condition</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">my</span> <span class="variable">$y</span> <span class="operator">=</span> <span class="string">"bar"</span><span class="operator">;</span>
+     <span class="keyword">print</span> <span class="variable">$x</span><span class="operator">;</span>           <span class="comment"># prints "foo"</span>
+     <span class="keyword">print</span> <span class="variable">$y</span><span class="operator">;</span>           <span class="comment"># prints "bar"</span>
+ <span class="operator">}</span>
+ <span class="keyword">print</span> <span class="variable">$x</span><span class="operator">;</span>               <span class="comment"># prints "foo"</span>
+ <span class="keyword">print</span> <span class="variable">$y</span><span class="operator">;</span>               <span class="comment"># prints nothing; $y has fallen out of scope</span>
+</code></pre>
+
+<p>Using <code>my</code> in combination with a <code><span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+</code> at the top of your Perl scripts means that the interpreter will pick up certain common programming errors. For instance, in the example above, the final <code>print $y</code> would cause a compile-time error and prevent you from running the program. Using <code>strict</code> is highly recommended.</p>
+
+<h2 id="Conditional-and-looping-constructs">Conditional and looping constructs</h2>
+
+<p>Perl has most of the usual conditional and looping constructs. As of Perl 5.10, it even has a case/switch statement (spelled <code>given</code>/<code>when</code>). See <a href="../../lib/pods/perlsyn.html#Switch-Statements">&quot;Switch Statements&quot; in perlsyn</a> for more details.</p>
+
+<p>The conditions can be any Perl expression. See the list of operators in the next section for information on comparison and boolean logic operators, which are commonly used in conditional statements.</p>
+
+<dl>
+
+<dt id="if">if</dt>
+<dd>
+
+<pre><code> <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">condition</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span> <span class="keyword">elsif</span> <span class="operator">(</span> <span class="variable">other</span> <span class="variable">condition</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>There&#39;s also a negated version of it:</p>
+
+<pre><code> <span class="keyword">unless</span> <span class="operator">(</span> <span class="variable">condition</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>This is provided as a more readable version of <code>if (!<i>condition</i>)</code>.</p>
+
+<p>Note that the braces are required in Perl, even if you&#39;ve only got one line in the block. However, there is a clever way of making your one-line conditional blocks more English like:</p>
+
+<pre><code> <span class="comment"># the traditional way</span>
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$zippy</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"Yow!"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="comment"># the Perlish post-condition way</span>
+ <span class="keyword">print</span> <span class="string">"Yow!"</span> <span class="keyword">if</span> <span class="variable">$zippy</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="string">"We have no bananas"</span> <span class="keyword">unless</span> <span class="variable">$bananas</span><span class="operator">;</span>
+</code></pre>
+
+</dd>
+<dt id="while">while</dt>
+<dd>
+
+<pre><code> <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">condition</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>There&#39;s also a negated version, for the same reason we have <code>unless</code>:</p>
+
+<pre><code> <span class="keyword">until</span> <span class="operator">(</span> <span class="variable">condition</span> <span class="operator">)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>You can also use <code>while</code> in a post-condition:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="string">"LA LA LA\n"</span> <span class="keyword">while</span> <span class="number">1</span><span class="operator">;</span>          <span class="comment"># loops forever</span>
+</code></pre>
+
+</dd>
+<dt id="for">for</dt>
+<dd>
+
+<p>Exactly like C:</p>
+
+<pre><code> <span class="keyword">for</span> <span class="operator">(</span><span class="variable">$i</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span> <span class="variable">$i</span> <span class="operator">&lt;=</span> <span class="variable">$max</span><span class="operator">;</span> <span class="variable">$i</span><span class="operator">++)</span> <span class="operator">{</span>
+     <span class="operator">...</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>The C style for loop is rarely needed in Perl since Perl provides the more friendly list scanning <code>foreach</code> loop.</p>
+
+</dd>
+<dt id="foreach">foreach</dt>
+<dd>
+
+<pre><code> <span class="keyword">foreach</span> <span class="operator">(</span><span class="variable">@array</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"This element is </span><span class="variable">$_</span><span class="string">\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+ 
+ <span class="keyword">print</span> <span class="variable">$list</span><span class="operator">[</span><span class="variable">$_</span><span class="operator">]</span> <span class="keyword">foreach</span> <span class="number">0</span> <span class="operator">..</span> <span class="variable">$max</span><span class="operator">;</span>
+ 
+ <span class="comment"># you don't have to use the default $_ either...</span>
+ <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$key</span> <span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%hash</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"The value of </span><span class="variable">$key</span><span class="string"> is </span><span class="variable">$hash</span><span class="string">{</span><span class="variable">$key</span><span class="string">}\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>foreach</code> keyword is actually a synonym for the <code>for</code> keyword. See <code><a href="../../lib/pods/perlsyn.html#Foreach-Loops">&quot;Foreach Loops&quot; in perlsyn</a></code>.</p>
+
+</dd>
+</dl>
+
+<p>For more detail on looping constructs (and some that weren&#39;t mentioned in this overview) see <a href="../../lib/pods/perlsyn.html">perlsyn</a>.</p>
+
+<h2 id="Builtin-operators-and-functions">Builtin operators and functions</h2>
+
+<p>Perl comes with a wide selection of builtin functions. Some of the ones we&#39;ve already seen include <code>print</code>, <code>sort</code> and <code>reverse</code>. A list of them is given at the start of <a href="../../lib/pods/perlfunc.html">perlfunc</a> and you can easily read about any given function by using <code>perldoc -f <i>functionname</i></code>.</p>
+
+<p>Perl operators are documented in full in <a href="../../lib/pods/perlop.html">perlop</a>, but here are a few of the most common ones:</p>
+
+<dl>
+
+<dt id="Arithmetic">Arithmetic</dt>
+<dd>
+
+<pre><code> +   addition
+ -   subtraction
+ *   multiplication
+ /   division</code></pre>
+
+</dd>
+<dt id="Numeric-comparison">Numeric comparison</dt>
+<dd>
+
+<pre><code> ==  equality
+ !=  inequality
+ &lt;   less than
+ &gt;   greater than
+ &lt;=  less than or equal
+ &gt;=  greater than or equal</code></pre>
+
+</dd>
+<dt id="String-comparison">String comparison</dt>
+<dd>
+
+<pre><code> eq  equality
+ ne  inequality
+ lt  less than
+ gt  greater than
+ le  less than or equal
+ ge  greater than or equal</code></pre>
+
+<p>(Why do we have separate numeric and string comparisons? Because we don&#39;t have special variable types, and Perl needs to know whether to sort numerically (where 99 is less than 100) or alphabetically (where 100 comes before 99).</p>
+
+</dd>
+<dt id="Boolean-logic">Boolean logic</dt>
+<dd>
+
+<pre><code> &amp;&amp;  and
+ ||  or
+ !   not</code></pre>
+
+<p>(<code>and</code>, <code>or</code> and <code>not</code> aren&#39;t just in the above table as descriptions of the operators. They&#39;re also supported as operators in their own right. They&#39;re more readable than the C-style operators, but have different precedence to <code>&amp;&amp;</code> and friends. Check <a href="../../lib/pods/perlop.html">perlop</a> for more detail.)</p>
+
+</dd>
+<dt id="Miscellaneous">Miscellaneous</dt>
+<dd>
+
+<pre><code> =   assignment
+ .   string concatenation
+ x   string multiplication
+ ..  range operator (creates a list of numbers or strings)</code></pre>
+
+</dd>
+</dl>
+
+<p>Many operators can be combined with a <code>=</code> as follows:</p>
+
+<pre><code> <span class="variable">$a</span> <span class="operator">+=</span> <span class="number">1</span><span class="operator">;</span>        <span class="comment"># same as $a = $a + 1</span>
+ <span class="variable">$a</span> <span class="operator">-=</span> <span class="number">1</span><span class="operator">;</span>        <span class="comment"># same as $a = $a - 1</span>
+ <span class="variable">$a</span> <span class="operator">.=</span> <span class="string">"\n"</span><span class="operator">;</span>     <span class="comment"># same as $a = $a . "\n";</span>
+</code></pre>
+
+<h2 id="Files-and-I-O">Files and I/O</h2>
+
+<p>You can open a file for input or output using the <code>open()</code> function. It&#39;s documented in extravagant detail in <a href="../../lib/pods/perlfunc.html">perlfunc</a> and <a href="../../lib/pods/perlopentut.html">perlopentut</a>, but in short:</p>
+
+<pre><code> <span class="keyword">open</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$in</span><span class="operator">,</span>  <span class="string">"&lt;"</span><span class="operator">,</span>  <span class="string">"input.txt"</span><span class="operator">)</span>  <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't open input.txt: $!"</span><span class="operator">;</span>
+ <span class="keyword">open</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$out</span><span class="operator">,</span> <span class="string">"&gt;"</span><span class="operator">,</span>  <span class="string">"output.txt"</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't open output.txt: $!"</span><span class="operator">;</span>
+ <span class="keyword">open</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$log</span><span class="operator">,</span> <span class="string">"&gt;&gt;"</span><span class="operator">,</span> <span class="string">"my.log"</span><span class="operator">)</span>     <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Can't open my.log: $!"</span><span class="operator">;</span>
+</code></pre>
+
+<p>You can read from an open filehandle using the <code>&lt;&gt;</code> operator. In scalar context it reads a single line from the filehandle, and in list context it reads the whole file in, assigning each line to an element of the list:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$line</span>  <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">$in</span><span class="operator">&gt;;</span>
+ <span class="keyword">my</span> <span class="variable">@lines</span> <span class="operator">=</span> <span class="operator">&lt;</span><span class="variable">$in</span><span class="operator">&gt;;</span>
+</code></pre>
+
+<p>Reading in the whole file at one time is called slurping. It can be useful but it may be a memory hog. Most text file processing can be done a line at a time with Perl&#39;s looping constructs.</p>
+
+<p>The <code>&lt;&gt;</code> operator is most often seen in a <code>while</code> loop:</p>
+
+<pre><code> <span class="keyword">while</span> <span class="operator">(&lt;</span><span class="variable">$in</span><span class="operator">&gt;)</span> <span class="operator">{</span>     <span class="comment"># assigns each line in turn to $_</span>
+     <span class="keyword">print</span> <span class="string">"Just read in this line: </span><span class="variable">$_</span><span class="string">"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>We&#39;ve already seen how to print to standard output using <code>print()</code>. However, <code>print()</code> can also take an optional first argument specifying which filehandle to print to:</p>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">STDERR</span> <span class="string">"This is your final warning.\n"</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="variable">$out</span> <span class="variable">$record</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="variable">$log</span> <span class="variable">$logmessage</span><span class="operator">;</span>
+</code></pre>
+
+<p>When you&#39;re done with your filehandles, you should <code>close()</code> them (though to be honest, Perl will clean up after you if you forget):</p>
+
+<pre><code> <span class="keyword">close</span> <span class="variable">$in</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"</span><span class="variable">$in</span><span class="string">: $!"</span><span class="operator">;</span>
+</code></pre>
+
+<h2 id="Regular-expressions">Regular expressions</h2>
+
+<p>Perl&#39;s regular expression support is both broad and deep, and is the subject of lengthy documentation in <a href="../../lib/pods/perlrequick.html">perlrequick</a>, <a href="../../lib/pods/perlretut.html">perlretut</a>, and elsewhere. However, in short:</p>
+
+<dl>
+
+<dt id="Simple-matching">Simple matching</dt>
+<dd>
+
+<pre><code> <span class="keyword">if</span> <span class="operator">(</span><span class="regex">/foo/</span><span class="operator">)</span>       <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>  <span class="comment"># true if $_ contains "foo"</span>
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$a</span> <span class="operator">=~</span> <span class="regex">/foo/</span><span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span> <span class="operator">}</span>  <span class="comment"># true if $a contains "foo"</span>
+</code></pre>
+
+<p>The <code>//</code> matching operator is documented in <a href="../../lib/pods/perlop.html">perlop</a>. It operates on <code>$_</code> by default, or can be bound to another variable using the <code>=~</code> binding operator (also documented in <a href="../../lib/pods/perlop.html">perlop</a>).</p>
+
+</dd>
+<dt id="Simple-substitution">Simple substitution</dt>
+<dd>
+
+<pre><code> <span class="regex">s/foo/bar/</span><span class="operator">;</span>               <span class="comment"># replaces foo with bar in $_</span>
+ <span class="variable">$a</span> <span class="operator">=~</span> <span class="regex">s/foo/bar/</span><span class="operator">;</span>         <span class="comment"># replaces foo with bar in $a</span>
+ <span class="variable">$a</span> <span class="operator">=~</span> <span class="regex">s/foo/bar/g</span><span class="operator">;</span>        <span class="comment"># replaces ALL INSTANCES of foo with bar</span>
+                           <span class="comment"># in $a</span>
+</code></pre>
+
+<p>The <code>s///</code> substitution operator is documented in <a href="../../lib/pods/perlop.html">perlop</a>.</p>
+
+</dd>
+<dt id="More-complex-regular-expressions">More complex regular expressions</dt>
+<dd>
+
+<p>You don&#39;t just have to match on fixed strings. In fact, you can match on just about anything you could dream of by using more complex regular expressions. These are documented at great length in <a href="../../lib/pods/perlre.html">perlre</a>, but for the meantime, here&#39;s a quick cheat sheet:</p>
+
+<pre><code> .                   a single character
+ \s                  a whitespace character (space, tab, newline,
+                     ...)
+ \S                  non-whitespace character
+ \d                  a digit (0-9)
+ \D                  a non-digit
+ \w                  a word character (a-z, A-Z, 0-9, _)
+ \W                  a non-word character
+ [aeiou]             matches a single character in the given set
+ [^aeiou]            matches a single character outside the given
+                     set
+ (foo|bar|baz)       matches any of the alternatives specified
+
+ ^                   start of string
+ $                   end of string</code></pre>
+
+<p>Quantifiers can be used to specify how many of the previous thing you want to match on, where &quot;thing&quot; means either a literal character, one of the metacharacters listed above, or a group of characters or metacharacters in parentheses.</p>
+
+<pre><code> <span class="operator">*</span>                   <span class="variable">zero</span> <span class="keyword">or</span> <span class="variable">more</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">thing</span>
+ <span class="operator">+</span>                   <span class="variable">one</span> <span class="keyword">or</span> <span class="variable">more</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">thing</span>
+ <span class="operator">?</span>                   <span class="variable">zero</span> <span class="keyword">or</span> <span class="variable">one</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">thing</span>
+ <span class="operator">{</span><span class="number">3</span><span class="operator">}</span>                 <span class="variable">matches</span> <span class="variable">exactly</span> <span class="number">3</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">thing</span>
+ <span class="operator">{</span><span class="number">3</span><span class="operator">,</span><span class="number">6</span><span class="operator">}</span>               <span class="variable">matches</span> <span class="variable">between</span> <span class="number">3</span> <span class="keyword">and</span> <span class="number">6</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">thing</span>
+ <span class="operator">{</span><span class="number">3</span><span class="operator">,}</span>                <span class="variable">matches</span> <span class="number">3</span> <span class="keyword">or</span> <span class="variable">more</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">previous</span> <span class="variable">thing</span>
+</code></pre>
+
+<p>Some brief examples:</p>
+
+<pre><code> <span class="regex">/^\d+/</span>              <span class="variable">string</span> <span class="variable">starts</span> <span class="variable">with</span> <span class="variable">one</span> <span class="keyword">or</span> <span class="variable">more</span> <span class="variable">digits</span>
+ <span class="operator">/^</span><span class="variable">$/</span>                <span class="variable">nothing</span> <span class="variable">in</span> <span class="variable">the</span> <span class="variable">string</span> <span class="operator">(</span><span class="variable">start</span> <span class="keyword">and</span> <span class="variable">end</span> <span class="variable">are</span>
+                     <span class="variable">adjacent</span><span class="operator">)</span>
+ <span class="operator">/(\</span><span class="variable">d</span><span class="operator">\</span><span class="regex">s){3}/         three digits, each followed by a whitespace
+                     character (eg "3 4 5 ")
+ /(a.)</span><span class="operator">+</span><span class="regex">/             matches a string in which every odd-numbered
+                     letter is a (eg "abacadaf")
+ 
+ # This loop reads from STDIN, and prints non-blank lines:
+ while (&lt;&gt;) {
+     next if /</span><span class="operator">^</span><span class="variable">$/</span><span class="operator">;</span>
+     <span class="keyword">print</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Parentheses-for-capturing">Parentheses for capturing</dt>
+<dd>
+
+<p>As well as grouping, parentheses serve a second purpose. They can be used to capture the results of parts of the regexp match for later use. The results end up in <code>$1</code>, <code>$2</code> and so on.</p>
+
+<pre><code> <span class="comment"># a cheap and nasty way to break an email address up into parts</span>
+ 
+ <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$email</span> <span class="operator">=~</span> <span class="regex">/([^@]+)@(.+)/</span><span class="operator">)</span> <span class="operator">{</span>
+     <span class="keyword">print</span> <span class="string">"Username is </span><span class="variable">$1</span><span class="string">\n"</span><span class="operator">;</span>
+     <span class="keyword">print</span> <span class="string">"Hostname is </span><span class="variable">$2</span><span class="string">\n"</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Other-regexp-features">Other regexp features</dt>
+<dd>
+
+<p>Perl regexps also support backreferences, lookaheads, and all kinds of other complex details. Read all about them in <a href="../../lib/pods/perlrequick.html">perlrequick</a>, <a href="../../lib/pods/perlretut.html">perlretut</a>, and <a href="../../lib/pods/perlre.html">perlre</a>.</p>
+
+</dd>
+</dl>
+
+<h2 id="Writing-subroutines">Writing subroutines</h2>
+
+<p>Writing subroutines is easy:</p>
+
+<pre><code> <span class="keyword">sub</span><span class="variable"> logger </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$logmessage</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+    <span class="keyword">open</span> <span class="keyword">my</span> <span class="variable">$logfile</span><span class="operator">,</span> <span class="string">"&gt;&gt;"</span><span class="operator">,</span> <span class="string">"my.log"</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"Could not open my.log: $!"</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="variable">$logfile</span> <span class="variable">$logmessage</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>Now we can use the subroutine just as any other built-in function:</p>
+
+<pre><code> <span class="variable">logger</span><span class="operator">(</span><span class="string">"We have a logger subroutine!"</span><span class="operator">);</span>
+</code></pre>
+
+<p>What&#39;s that <code>shift</code>? Well, the arguments to a subroutine are available to us as a special array called <code>@_</code> (see <a href="../../lib/pods/perlvar.html">perlvar</a> for more on that). The default argument to the <code>shift</code> function just happens to be <code>@_</code>. So <code><span class="keyword">my</span> <span class="variable">$logmessage</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+</code> shifts the first item off the list of arguments and assigns it to <code>$logmessage</code>.</p>
+
+<p>We can manipulate <code>@_</code> in other ways too:</p>
+
+<pre><code> <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$logmessage</span><span class="operator">,</span> <span class="variable">$priority</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>       <span class="comment"># common</span>
+ <span class="keyword">my</span> <span class="variable">$logmessage</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>                 <span class="comment"># uncommon, and ugly</span>
+</code></pre>
+
+<p>Subroutines can also return values:</p>
+
+<pre><code> <span class="keyword">sub</span><span class="variable"> square </span><span class="operator">{</span>
+     <span class="keyword">my</span> <span class="variable">$num</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+     <span class="keyword">my</span> <span class="variable">$result</span> <span class="operator">=</span> <span class="variable">$num</span> <span class="operator">*</span> <span class="variable">$num</span><span class="operator">;</span>
+     <span class="keyword">return</span> <span class="variable">$result</span><span class="operator">;</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>Then use it like:</p>
+
+<pre><code> <span class="variable">$sq</span> <span class="operator">=</span> <span class="variable">square</span><span class="operator">(</span><span class="number">8</span><span class="operator">);</span>
+</code></pre>
+
+<p>For more information on writing subroutines, see <a href="../../lib/pods/perlsub.html">perlsub</a>.</p>
+
+<h2 id="OO-Perl">OO Perl</h2>
+
+<p>OO Perl is relatively simple and is implemented using references which know what sort of object they are based on Perl&#39;s concept of packages. However, OO Perl is largely beyond the scope of this document. Read <a href="../../lib/pods/perlootut.html">perlootut</a> and <a href="../../lib/pods/perlobj.html">perlobj</a>.</p>
+
+<p>As a beginning Perl programmer, your most common use of OO Perl will be in using third-party modules, which are documented below.</p>
+
+<h2 id="Using-Perl-modules">Using Perl modules</h2>
+
+<p>Perl modules provide a range of features to help you avoid reinventing the wheel, and can be downloaded from CPAN ( <a href="http://www.cpan.org/">http://www.cpan.org/</a> ). A number of popular modules are included with the Perl distribution itself.</p>
+
+<p>Categories of modules range from text manipulation to network protocols to database integration to graphics. A categorized list of modules is also available from CPAN.</p>
+
+<p>To learn how to install modules you download from CPAN, read <a href="../../lib/pods/perlmodinstall.html">perlmodinstall</a>.</p>
+
+<p>To learn how to use a particular module, use <code>perldoc <i>Module::Name</i></code>. Typically you will want to <code>use <i>Module::Name</i></code>, which will then give you access to exported functions or an OO interface to the module.</p>
+
+<p><a href="../../lib/pods/perlfaq.html">perlfaq</a> contains questions and answers related to many common tasks, and often provides suggestions for good CPAN modules to use.</p>
+
+<p><a href="../../lib/pods/perlmod.html">perlmod</a> describes Perl modules in general. <a href="../../lib/pods/perlmodlib.html">perlmodlib</a> lists the modules which came with your Perl installation.</p>
+
+<p>If you feel the urge to write Perl modules, <a href="../../lib/pods/perlnewmod.html">perlnewmod</a> will give you good advice.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Kirrily &quot;Skud&quot; Robert &lt;skud@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

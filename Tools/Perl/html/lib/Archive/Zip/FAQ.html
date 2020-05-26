@@ -1,0 +1,382 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#Install-problems-on-RedHat-8-or-9-with-Perl-5.8.0">Install problems on RedHat 8 or 9 with Perl 5.8.0</a></li>
+  <li><a href="#Why-is-my-zip-file-so-big">Why is my zip file so big?</a></li>
+  <li><a href="#Sample-code">Sample code?</a></li>
+  <li><a href="#Cant-Read-modify-write-same-Zip-file">Can&#39;t Read/modify/write same Zip file</a></li>
+  <li><a href="#File-creation-time-not-set">File creation time not set</a></li>
+  <li><a href="#Cant-use-Archive::Zip-on-gzip-files">Can&#39;t use Archive::Zip on gzip files</a></li>
+  <li><a href="#Add-a-directory-tree-to-a-Zip">Add a directory/tree to a Zip</a></li>
+  <li><a href="#Extract-a-directory-tree">Extract a directory/tree</a></li>
+  <li><a href="#Update-a-directory-tree">Update a directory/tree</a></li>
+  <li><a href="#Zip-times-might-be-off-by-1-second">Zip times might be off by 1 second</a></li>
+  <li><a href="#Zip-times-dont-include-time-zone-information">Zip times don&#39;t include time zone information</a></li>
+  <li><a href="#How-do-I-make-a-self-extracting-Zip">How do I make a self-extracting Zip</a></li>
+  <li><a href="#How-can-I-deal-with-Zips-with-prepended-garbage-i.e.-from-Sircam">How can I deal with Zips with prepended garbage (i.e. from Sircam)</a></li>
+  <li><a href="#Cant-extract-Shrunk-files">Can&#39;t extract Shrunk files</a></li>
+  <li><a href="#Cant-do-decryption">Can&#39;t do decryption</a></li>
+  <li><a href="#How-to-test-file-integrity">How to test file integrity?</a></li>
+  <li><a href="#Duplicate-files-in-Zip">Duplicate files in Zip?</a></li>
+  <li><a href="#File-ownership-permissions-ACLS-etc">File ownership/permissions/ACLS/etc</a></li>
+  <li><a href="#I-cant-compile-but-ActiveState-only-has-an-old-version-of-Archive::Zip">I can&#39;t compile but ActiveState only has an old version of Archive::Zip</a></li>
+  <li><a href="#My-JPEGs-or-MP3s-dont-compress-when-I-put-them-into-Zips">My JPEGs (or MP3&#39;s) don&#39;t compress when I put them into Zips!</a></li>
+  <li><a href="#Under-Windows-things-lock-up-get-damaged">Under Windows, things lock up/get damaged</a></li>
+  <li><a href="#Zip-contents-in-a-scalar">Zip contents in a scalar</a></li>
+  <li><a href="#Reading-from-streams">Reading from streams</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Archive::Zip::FAQ - Answers to a few frequently asked questions about Archive::Zip</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>It seems that I keep answering the same questions over and over again. I assume that this is because my documentation is deficient, rather than that people don&#39;t read the documentation.</p>
+
+<p>So this FAQ is an attempt to cut down on the number of personal answers I have to give. At least I can now say &quot;You <i>did</i> read the FAQ, right?&quot;.</p>
+
+<p>The questions are not in any particular order. The answers assume the current version of Archive::Zip; some of the answers depend on newly added/fixed functionality.</p>
+
+<h1 id="Install-problems-on-RedHat-8-or-9-with-Perl-5.8.0">Install problems on RedHat 8 or 9 with Perl 5.8.0</h1>
+
+<p><b>Q:</b> Archive::Zip won&#39;t install on my RedHat 9 system! It&#39;s broke!</p>
+
+<p><b>A:</b> This has become something of a FAQ. Basically, RedHat broke some versions of Perl by setting LANG to UTF8. They apparently have a fixed version out as an update.</p>
+
+<p>You might try running CPAN or creating your Makefile after exporting the LANG environment variable as</p>
+
+<p><code>LANG=C</code></p>
+
+<p><a href="https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=87682">https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=87682</a></p>
+
+<h1 id="Why-is-my-zip-file-so-big">Why is my zip file so big?</h1>
+
+<p><b>Q:</b> My zip file is actually bigger than what I stored in it! Why?</p>
+
+<p><b>A:</b> Some things to make sure of:</p>
+
+<dl>
+
+<dt id="Make-sure-that-you-are-requesting-COMPRESSION_DEFLATED-if-you-are-storing-strings">Make sure that you are requesting COMPRESSION_DEFLATED if you are storing strings.</dt>
+<dd>
+
+<p>$member-&gt;desiredCompressionMethod( COMPRESSION_DEFLATED );</p>
+
+</dd>
+<dt id="Dont-make-lots-of-little-files-if-you-can-help-it">Don&#39;t make lots of little files if you can help it.</dt>
+<dd>
+
+<p>Since zip computes the compression tables for each member, small members without much entropy won&#39;t compress well. Instead, if you&#39;ve got lots of repeated strings in your data, try to combine them into one big member.</p>
+
+</dd>
+<dt id="Make-sure-that-you-are-requesting-COMPRESSION_STORED-if-you-are-storing-things-that-are-already-compressed">Make sure that you are requesting COMPRESSION_STORED if you are storing things that are already compressed.</dt>
+<dd>
+
+<p>If you&#39;re storing a .zip, .jpg, .mp3, or other compressed file in a zip, then don&#39;t compress them again. They&#39;ll get bigger.</p>
+
+</dd>
+</dl>
+
+<h1 id="Sample-code">Sample code?</h1>
+
+<p><b>Q:</b> Can you send me code to do (whatever)?</p>
+
+<p><b>A:</b> Have you looked in the <code>examples/</code> directory yet? It contains:</p>
+
+<dl>
+
+<dt id="examples-calcSizes.pl----How-to-find-out-how-big-a-Zip-file-will-be-before-writing-it">examples/calcSizes.pl -- How to find out how big a Zip file will be before writing it</dt>
+<dd>
+
+</dd>
+<dt id="examples-copy.pl----Copies-one-Zip-file-to-another">examples/copy.pl -- Copies one Zip file to another</dt>
+<dd>
+
+</dd>
+<dt id="examples-extract.pl----extract-file-s-from-a-Zip">examples/extract.pl -- extract file(s) from a Zip</dt>
+<dd>
+
+</dd>
+<dt id="examples-mailZip.pl----make-and-mail-a-zip-file">examples/mailZip.pl -- make and mail a zip file</dt>
+<dd>
+
+</dd>
+<dt id="examples-mfh.pl----demo-for-use-of-MockFileHandle">examples/mfh.pl -- demo for use of MockFileHandle</dt>
+<dd>
+
+</dd>
+<dt id="examples-readScalar.pl----shows-how-to-use-IO::Scalar-as-the-source-of-a-Zip-read">examples/readScalar.pl -- shows how to use IO::Scalar as the source of a Zip read</dt>
+<dd>
+
+</dd>
+<dt id="examples-selfex.pl----a-brief-example-of-a-self-extracting-Zip">examples/selfex.pl -- a brief example of a self-extracting Zip</dt>
+<dd>
+
+</dd>
+<dt id="examples-unzipAll.pl----uses-Archive::Zip::Tree-to-unzip-an-entire-Zip">examples/unzipAll.pl -- uses Archive::Zip::Tree to unzip an entire Zip</dt>
+<dd>
+
+</dd>
+<dt id="examples-updateZip.pl----shows-how-to-read-modify-write-a-Zip">examples/updateZip.pl -- shows how to read/modify/write a Zip</dt>
+<dd>
+
+</dd>
+<dt id="examples-updateTree.pl----shows-how-to-update-a-Zip-in-place">examples/updateTree.pl -- shows how to update a Zip in place</dt>
+<dd>
+
+</dd>
+<dt id="examples-writeScalar.pl----shows-how-to-use-IO::Scalar-as-the-destination-of-a-Zip-write">examples/writeScalar.pl -- shows how to use IO::Scalar as the destination of a Zip write</dt>
+<dd>
+
+</dd>
+<dt id="examples-writeScalar2.pl----shows-how-to-use-IO::String-as-the-destination-of-a-Zip-write">examples/writeScalar2.pl -- shows how to use IO::String as the destination of a Zip write</dt>
+<dd>
+
+</dd>
+<dt id="examples-zip.pl----Constructs-a-Zip-file">examples/zip.pl -- Constructs a Zip file</dt>
+<dd>
+
+</dd>
+<dt id="examples-zipcheck.pl----One-way-to-check-a-Zip-file-for-validity">examples/zipcheck.pl -- One way to check a Zip file for validity</dt>
+<dd>
+
+</dd>
+<dt id="examples-zipinfo.pl----Prints-out-information-about-a-Zip-archive-file">examples/zipinfo.pl -- Prints out information about a Zip archive file</dt>
+<dd>
+
+</dd>
+<dt id="examples-zipGrep.pl----Searches-for-text-in-Zip-files">examples/zipGrep.pl -- Searches for text in Zip files</dt>
+<dd>
+
+</dd>
+<dt id="examples-ziptest.pl----Lists-a-Zip-file-and-checks-member-CRCs">examples/ziptest.pl -- Lists a Zip file and checks member CRCs</dt>
+<dd>
+
+</dd>
+<dt id="examples-ziprecent.pl----Puts-recent-files-into-a-zipfile">examples/ziprecent.pl -- Puts recent files into a zipfile</dt>
+<dd>
+
+</dd>
+<dt id="examples-ziptest.pl----Another-way-to-check-a-Zip-file-for-validity">examples/ziptest.pl -- Another way to check a Zip file for validity</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="Cant-Read-modify-write-same-Zip-file">Can&#39;t Read/modify/write same Zip file</h1>
+
+<p><b>Q:</b> Why can&#39;t I open a Zip file, add a member, and write it back? I get an error message when I try.</p>
+
+<p><b>A:</b> Because Archive::Zip doesn&#39;t (and can&#39;t, generally) read file contents into memory, the original Zip file is required to stay around until the writing of the new file is completed.</p>
+
+<p>The best way to do this is to write the Zip to a temporary file and then rename the temporary file to have the old name (possibly after deleting the old one).</p>
+
+<p>Archive::Zip v1.02 added the archive methods <code>overwrite()</code> and <code>overwriteAs()</code> to do this simply and carefully.</p>
+
+<p>See <code>examples/updateZip.pl</code> for an example of this technique.</p>
+
+<h1 id="File-creation-time-not-set">File creation time not set</h1>
+
+<p><b>Q:</b> Upon extracting files, I see that their modification (and access) times are set to the time in the Zip archive. However, their creation time is not set to the same time. Why?</p>
+
+<p><b>A:</b> Mostly because Perl doesn&#39;t give cross-platform access to <i>creation time</i>. Indeed, many systems (like Unix) don&#39;t support such a concept. However, if yours does, you can easily set it. Get the modification time from the member using <code>lastModTime()</code>.</p>
+
+<h1 id="Cant-use-Archive::Zip-on-gzip-files">Can&#39;t use Archive::Zip on gzip files</h1>
+
+<p><b>Q:</b> Can I use Archive::Zip to extract Unix gzip files?</p>
+
+<p><b>A:</b> No.</p>
+
+<p>There is a distinction between Unix gzip files, and Zip archives that also can use the gzip compression.</p>
+
+<p>Depending on the format of the gzip file, you can use <a href="../../../lib/Compress/Raw/Zlib.html">Compress::Raw::Zlib</a>, or <a href="../../../lib/Archive/Tar.html">Archive::Tar</a> to decompress it (and de-archive it in the case of Tar files).</p>
+
+<p>You can unzip PKZIP/WinZip/etc/ archives using Archive::Zip (that&#39;s what it&#39;s for) as long as any compressed members are compressed using Deflate compression.</p>
+
+<h1 id="Add-a-directory-tree-to-a-Zip">Add a directory/tree to a Zip</h1>
+
+<p><b>Q:</b> How can I add a directory (or tree) full of files to a Zip?</p>
+
+<p><b>A:</b> You can use the Archive::Zip::addTree*() methods:</p>
+
+<pre><code>   <span class="keyword">use</span> <span class="variable">Archive::Zip</span><span class="operator">;</span>
+   <span class="keyword">my</span> <span class="variable">$zip</span> <span class="operator">=</span> <span class="variable">Archive::Zip</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">();</span>
+   <span class="comment"># add all readable files and directories below . as xyz/*</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">addTree</span><span class="operator">(</span> <span class="string">'.'</span><span class="operator">,</span> <span class="string">'xyz'</span> <span class="operator">);</span> 
+   <span class="comment"># add all readable plain files below /abc as def/*</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">addTree</span><span class="operator">(</span> <span class="string">'/abc'</span><span class="operator">,</span> <span class="string">'def'</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">-f</span> <span class="operator">&amp;&amp;</span> <span class="keyword">-r</span> <span class="operator">}</span> <span class="operator">);</span>    
+   <span class="comment"># add all .c files below /tmp as stuff/*</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">addTreeMatching</span><span class="operator">(</span> <span class="string">'/tmp'</span><span class="operator">,</span> <span class="string">'stuff'</span><span class="operator">,</span> <span class="string">'\.c$'</span> <span class="operator">);</span>
+   <span class="comment"># add all .o files below /tmp as stuff/* if they aren't writable</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">addTreeMatching</span><span class="operator">(</span> <span class="string">'/tmp'</span><span class="operator">,</span> <span class="string">'stuff'</span><span class="operator">,</span> <span class="string">'\.o$'</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="operator">!</span> <span class="keyword">-w</span> <span class="operator">}</span> <span class="operator">);</span>
+   <span class="comment"># add all .so files below /tmp that are smaller than 200 bytes as stuff/*</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">addTreeMatching</span><span class="operator">(</span> <span class="string">'/tmp'</span><span class="operator">,</span> <span class="string">'stuff'</span><span class="operator">,</span> <span class="string">'\.o$'</span><span class="operator">,</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">-s</span> <span class="operator">&lt;</span> <span class="number">200</span> <span class="operator">}</span> <span class="operator">);</span>
+   <span class="comment"># and write them into a file</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">writeToFileNamed</span><span class="operator">(</span><span class="string">'xxx.zip'</span><span class="operator">);</span>
+</code></pre>
+
+<h1 id="Extract-a-directory-tree">Extract a directory/tree</h1>
+
+<p><b>Q:</b> How can I extract some (or all) files from a Zip into a different directory?</p>
+
+<p><b>A:</b> You can use the Archive::Zip::extractTree() method: ??? ||</p>
+
+<pre><code>   <span class="comment"># now extract the same files into /tmpx</span>
+   <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">extractTree</span><span class="operator">(</span> <span class="string">'stuff'</span><span class="operator">,</span> <span class="string">'/tmpx'</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="Update-a-directory-tree">Update a directory/tree</h1>
+
+<p><b>Q:</b> How can I update a Zip from a directory tree, adding or replacing only the newer files?</p>
+
+<p><b>A:</b> You can use the Archive::Zip::updateTree() method that was added in version 1.09.</p>
+
+<h1 id="Zip-times-might-be-off-by-1-second">Zip times might be off by 1 second</h1>
+
+<p><b>Q:</b> It bothers me greatly that my file times are wrong by one second about half the time. Why don&#39;t you do something about it?</p>
+
+<p><b>A:</b> Get over it. This is a result of the Zip format storing times in DOS format, which has a resolution of only two seconds.</p>
+
+<h1 id="Zip-times-dont-include-time-zone-information">Zip times don&#39;t include time zone information</h1>
+
+<p><b>Q:</b> My file times don&#39;t respect time zones. What gives?</p>
+
+<p><b>A:</b> If this is important to you, please submit patches to read the various Extra Fields that encode times with time zones. I&#39;m just using the DOS Date/Time, which doesn&#39;t have a time zone.</p>
+
+<h1 id="How-do-I-make-a-self-extracting-Zip">How do I make a self-extracting Zip</h1>
+
+<p><b>Q:</b> I want to make a self-extracting Zip file. Can I do this?</p>
+
+<p><b>A:</b> Yes. You can write a self-extracting archive stub (that is, a version of unzip) to the output filehandle that you pass to writeToFileHandle(). See examples/selfex.pl for how to write a self-extracting archive.</p>
+
+<p>However, you should understand that this will only work on one kind of platform (the one for which the stub was compiled).</p>
+
+<h1 id="How-can-I-deal-with-Zips-with-prepended-garbage-i.e.-from-Sircam">How can I deal with Zips with prepended garbage (i.e. from Sircam)</h1>
+
+<p><b>Q:</b> How can I tell if a Zip has been damaged by adding garbage to the beginning or inside the file?</p>
+
+<p><b>A:</b> I added code for this for the Amavis virus scanner. You can query archives for their &#39;eocdOffset&#39; property, which should be 0:</p>
+
+<pre><code>  <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">eocdOffset</span> <span class="operator">&gt;</span> <span class="number">0</span><span class="operator">)</span>
+    <span class="operator">{</span> <span class="keyword">warn</span><span class="operator">(</span><span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">eocdOffset</span> <span class="operator">.</span> <span class="string">" bytes of garbage at beginning or within Zip"</span><span class="operator">)</span> <span class="operator">}</span>
+</code></pre>
+
+<p>When members are extracted, this offset will be used to adjust the start of the member if necessary.</p>
+
+<h1 id="Cant-extract-Shrunk-files">Can&#39;t extract Shrunk files</h1>
+
+<p><b>Q:</b> I&#39;m trying to extract a file out of a Zip produced by PKZIP, and keep getting this error message:</p>
+
+<pre><code>  error: Unsupported compression combination: read 6, write 0</code></pre>
+
+<p><b>A:</b> You can&#39;t uncompress this archive member. Archive::Zip only supports uncompressed members, and compressed members that are compressed using the compression supported by Compress::Raw::Zlib. That means only Deflated and Stored members.</p>
+
+<p>Your file is compressed using the Shrink format, which is not supported by Compress::Raw::Zlib.</p>
+
+<p>You could, perhaps, use a command-line UnZip program (like the Info-Zip one) to extract this.</p>
+
+<h1 id="Cant-do-decryption">Can&#39;t do decryption</h1>
+
+<p><b>Q:</b> How do I decrypt encrypted Zip members?</p>
+
+<p><b>A:</b> With some other program or library. Archive::Zip doesn&#39;t support decryption, and probably never will (unless <i>you</i> write it).</p>
+
+<h1 id="How-to-test-file-integrity">How to test file integrity?</h1>
+
+<p><b>Q:</b> How can Archive::Zip can test the validity of a Zip file?</p>
+
+<p><b>A:</b> If you try to decompress the file, the gzip streams will report errors if you have garbage. Most of the time.</p>
+
+<p>If you try to open the file and a central directory structure can&#39;t be found, an error will be reported.</p>
+
+<p>When a file is being read, if we can&#39;t find a proper PK.. signature in the right places we report a format error.</p>
+
+<p>If there is added garbage at the beginning of a Zip file (as inserted by some viruses), you can find out about it, but Archive::Zip will ignore it, and you can still use the archive. When it gets written back out the added stuff will be gone.</p>
+
+<p>There are two ready-to-use utilities in the examples directory that can be used to test file integrity, or that you can use as examples for your own code:</p>
+
+<dl>
+
+<dt id="examples-zipcheck.pl-shows-how-to-use-an-attempted-extraction-to-test-a-file">examples/zipcheck.pl shows how to use an attempted extraction to test a file.</dt>
+<dd>
+
+</dd>
+<dt id="examples-ziptest.pl-shows-how-to-test-CRCs-in-a-file">examples/ziptest.pl shows how to test CRCs in a file.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="Duplicate-files-in-Zip">Duplicate files in Zip?</h1>
+
+<p><b>Q:</b> Archive::Zip let me put the same file in my Zip twice! Why don&#39;t you prevent this?</p>
+
+<p><b>A:</b> As far as I can tell, this is not disallowed by the Zip spec. If you think it&#39;s a bad idea, check for it yourself:</p>
+
+<pre><code>  <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">addFile</span><span class="operator">(</span><span class="variable">$someFile</span><span class="operator">,</span> <span class="variable">$someName</span><span class="operator">)</span> <span class="keyword">unless</span> <span class="variable">$zip</span><span class="operator">-&gt;</span><span class="variable">memberNamed</span><span class="operator">(</span><span class="variable">$someName</span><span class="operator">);</span>
+</code></pre>
+
+<p>I can even imagine cases where this might be useful (for instance, multiple versions of files).</p>
+
+<h1 id="File-ownership-permissions-ACLS-etc">File ownership/permissions/ACLS/etc</h1>
+
+<p><b>Q:</b> Why doesn&#39;t Archive::Zip deal with file ownership, ACLs, etc.?</p>
+
+<p><b>A:</b> There is no standard way to represent these in the Zip file format. If you want to send me code to properly handle the various extra fields that have been used to represent these through the years, I&#39;ll look at it.</p>
+
+<h1 id="I-cant-compile-but-ActiveState-only-has-an-old-version-of-Archive::Zip">I can&#39;t compile but ActiveState only has an old version of Archive::Zip</h1>
+
+<p><b>Q:</b> I&#39;ve only installed modules using ActiveState&#39;s PPM program and repository. But they have a much older version of Archive::Zip than is in CPAN. Will you send me a newer PPM?</p>
+
+<p><b>A:</b> Probably not, unless I get lots of extra time. But there&#39;s no reason you can&#39;t install the version from CPAN. Archive::Zip is pure Perl, so all you need is NMAKE, which you can get for free from Microsoft (see the FAQ in the ActiveState documentation for details on how to install CPAN modules).</p>
+
+<h1 id="My-JPEGs-or-MP3s-dont-compress-when-I-put-them-into-Zips">My JPEGs (or MP3&#39;s) don&#39;t compress when I put them into Zips!</h1>
+
+<p><b>Q:</b> How come my JPEGs and MP3&#39;s don&#39;t compress much when I put them into Zips?</p>
+
+<p><b>A:</b> Because they&#39;re already compressed.</p>
+
+<h1 id="Under-Windows-things-lock-up-get-damaged">Under Windows, things lock up/get damaged</h1>
+
+<p><b>Q:</b> I&#39;m using Windows. When I try to use Archive::Zip, my machine locks up/makes funny sounds/displays a BSOD/corrupts data. How can I fix this?</p>
+
+<p><b>A:</b> First, try the newest version of Compress::Raw::Zlib. I know of Windows-related problems prior to v1.14 of that library.</p>
+
+<h1 id="Zip-contents-in-a-scalar">Zip contents in a scalar</h1>
+
+<p><b>Q:</b> I want to read a Zip file from (or write one to) a scalar variable instead of a file. How can I do this?</p>
+
+<p><b>A:</b> Use <code>IO::String</code> and the <code>readFromFileHandle()</code> and <code>writeToFileHandle()</code> methods. See <code>examples/readScalar.pl</code> and <code>examples/writeScalar.pl</code>.</p>
+
+<h1 id="Reading-from-streams">Reading from streams</h1>
+
+<p><b>Q:</b> How do I read from a stream (like for the Info-Zip <code>funzip</code> program)?</p>
+
+<p><b>A:</b> This is not currently supported, though writing to a stream is.</p>
+
+
+</body>
+
+</html>
+
+

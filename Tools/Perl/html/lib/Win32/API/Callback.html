@@ -1,0 +1,173 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#FOREWORDS">FOREWORDS</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#FUNCTIONS">FUNCTIONS</a>
+        <ul>
+          <li><a href="#new">new</a></li>
+        </ul>
+      </li>
+      <li><a href="#METHODS">METHODS</a>
+        <ul>
+          <li><a href="#UseMI64">UseMI64</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#MAINTAINER">MAINTAINER</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::API::Callback - Callback support for Win32::API</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Win32::API</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Win32::API::Callback</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$callback</span> <span class="operator">=</span> <span class="variable">Win32::API::Callback</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+    <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">my</span><span class="operator">(</span><span class="variable">$a</span><span class="operator">,</span> <span class="variable">$b</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span> <span class="keyword">return</span> <span class="variable">$a</span><span class="operator">+</span><span class="variable">$b</span><span class="operator">;</span> <span class="operator">},</span>
+    <span class="string">"NN"</span><span class="operator">,</span> <span class="string">"N"</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">Win32::API</span><span class="operator">-&gt;</span><span class="variable">Import</span><span class="operator">(</span>
+      <span class="string">'mydll'</span><span class="operator">,</span> <span class="string">'two_integers_cb'</span><span class="operator">,</span> <span class="string">'KNN'</span><span class="operator">,</span> <span class="string">'N'</span><span class="operator">,</span>
+  <span class="operator">);</span>
+  
+  <span class="variable">$sum</span> <span class="operator">=</span> <span class="variable">two_integers_cb</span><span class="operator">(</span> <span class="variable">$callback</span><span class="operator">,</span> <span class="number">3</span><span class="operator">,</span> <span class="number">2</span> <span class="operator">);</span>
+</code></pre>
+
+<h1 id="FOREWORDS">FOREWORDS</h1>
+
+<ul>
+
+<li><p>Support for this module is <b>highly experimental</b> at this point.</p>
+
+</li>
+<li><p>I won&#39;t be surprised if it doesn&#39;t work for you.</p>
+
+</li>
+<li><p>Feedback is very appreciated.</p>
+
+</li>
+<li><p>Documentation is in the work. Either see the SYNOPSIS above or the samples in the <i>samples</i> or the tests in the <i>t</i> directory.</p>
+
+</li>
+</ul>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>Win32::API::Callback uses a subset of the type letters of Win32::API. C Prototype interface isn&#39;t supported. Not all the type letters of Win32::API are supported in Win32::API::Callback.</p>
+
+<dl>
+
+<dt id="I:-value-is-an-unsigned-integer-unsigned-int"><code>I</code>: value is an unsigned integer (unsigned int)</dt>
+<dd>
+
+</dd>
+<dt id="i:-value-is-an-signed-integer-signed-int-or-int"><code>i</code>: value is an signed integer (signed int or int)</dt>
+<dd>
+
+</dd>
+<dt id="N:-value-is-a-unsigned-pointer-sized-number-unsigned-long"><code>N</code>: value is a unsigned pointer sized number (unsigned long)</dt>
+<dd>
+
+</dd>
+<dt id="n:-value-is-a-signed-pointer-sized-number-signed-long-or-long"><code>n</code>: value is a signed pointer sized number (signed long or long)</dt>
+<dd>
+
+</dd>
+<dt id="Q:-value-is-a-unsigned-64-bit-integer-number-unsigned-long-long-unsigned-__int64-See-next-item-for-details"><code>Q</code>: value is a unsigned 64 bit integer number (unsigned long long, unsigned __int64) See next item for details.</dt>
+<dd>
+
+</dd>
+<dt id="q:-value-is-a-signed-64-bit-integer-number-long-long-__int64-If-your-perl-has-Q-q-quads-support-for-pack-then-Win32::APIs-q-is-a-normal-perl-numeric-scalar.-All-64-bit-Perls-have-quad-support.-Almost-no-32-bit-Perls-have-quad-support.-On-32-bit-Perls-without-quad-support-Win32::API::Callbacks-q-Q-letter-is-a-packed-8-byte-string.-So-0x8000000050000000-from-a-perl-with-native-Quad-support-would-be-written-as-x00-x00-x00-x50-x00-x00-x00-x80-on-a-32-bit-Perl-without-Quad-support.-To-improve-the-use-of-64-bit-integers-with-Win32::API::Callback-on-a-32-bit-Perl-without-Quad-support-there-is-a-per-Win32::API::Callback-object-setting-called-UseMI64-in-Win32::API-that-causes-all-quads-to-be-accepted-as-and-returned-as-Math::Int64-objects.-4-to-8-byte-long-pass-by-copy-return-type-C-aggregate-types-are-very-rare-in-Windows-but-they-are-supported-as-in-and-return-types-by-using-q-Q-on-32-and-64-bits.-Converting-between-the-C-aggregate-and-its-representation-as-a-quad-is-up-to-the-reader.-For-out-in-Win32::API::Callback-not-in-if-the-argument-is-a-reference-it-will-automatically-be-treated-as-a-Math::Int64-object-without-having-to-previously-call-this-function"><code>q</code>: value is a signed 64 bit integer number (long long, __int64) If your perl has &#39;Q&#39;/&#39;q&#39; quads support for <a>pack</a> then Win32::API&#39;s &#39;q&#39; is a normal perl numeric scalar. All 64 bit Perls have quad support. Almost no 32 bit Perls have quad support. On 32 bit Perls, without quad support, Win32::API::Callback&#39;s &#39;q&#39;/&#39;Q&#39; letter is a packed 8 byte string. So <code>0x8000000050000000</code> from a perl with native Quad support would be written as <code>&quot;\x00\x00\x00\x50\x00\x00\x00\x80&quot;</code> on a 32 bit Perl without Quad support. To improve the use of 64 bit integers with Win32::API::Callback on a 32 bit Perl without Quad support, there is a per Win32::API::Callback object setting called <a href="../../../lib/Win32/API.html#UseMI64">&quot;UseMI64&quot; in Win32::API</a> that causes all quads to be accepted as, and returned as <a>Math::Int64</a> objects. 4 to 8 byte long pass by copy/return type C aggregate types are very rare in Windows, but they are supported as &quot;in&quot; and return types by using &#39;q&#39;/&#39;Q&#39; on 32 and 64 bits. Converting between the C aggregate and its representation as a quad is up to the reader. For &quot;out&quot; in Win32::API::Callback (not &quot;in&quot;), if the argument is a reference, it will automatically be treated as a Math::Int64 object without having to previously call this function.</dt>
+<dd>
+
+</dd>
+<dt id="F:-value-is-a-floating-point-number-float"><code>F</code>: value is a floating point number (float)</dt>
+<dd>
+
+</dd>
+<dt id="D:-value-is-a-double-precision-number-double"><code>D</code>: value is a double precision number (double)</dt>
+<dd>
+
+</dd>
+<dt id="Unimplemented-types:-Unimplemented-in-Win32::API::Callback-types-such-as-shorts-chars-and-smaller-than-machine-word-size-32-64bit-numbers-can-be-processed-by-specifying-N-then-masking-off-the-high-bytes.-For-example-to-get-a-char-specify-N-then-do-numeric_char-_-2-0xFF-in-your-Perl-callback-sub.-To-get-a-short-specify-N-then-do-numeric_char-_-2-0xFFFF-in-your-Perl-callback-sub"><code>Unimplemented types</code>: Unimplemented in Win32::API::Callback types such as shorts, chars, and smaller than &quot;machine word size&quot; (32/64bit) numbers can be processed by specifying N, then masking off the high bytes. For example, to get a char, specify N, then do <code><span class="variable">$numeric_char</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">2</span><span class="operator">]</span> <span class="operator">&amp;</span> <span class="number">0xFF</span><span class="operator">;</span>
+</code> in your Perl callback sub. To get a short, specify N, then do <code><span class="variable">$numeric_char</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">2</span><span class="operator">]</span> <span class="operator">&amp;</span> <span class="number">0xFFFF</span><span class="operator">;</span>
+</code> in your Perl callback sub.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="FUNCTIONS">FUNCTIONS</h2>
+
+<h3 id="new">new</h3>
+
+<pre><code>    <span class="variable">$CallbackObj</span> <span class="operator">=</span> <span class="variable">Win32::API::Callback</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">print</span> <span class="string">"hello world"</span><span class="operator">;},</span>
+                                            <span class="string">'NDF'</span><span class="operator">,</span> <span class="string">'Q'</span><span class="operator">,</span> <span class="string">'__cdecl'</span><span class="operator">);</span>
+    <span class="variable">$CallbackObj</span> <span class="operator">=</span> <span class="variable">Win32::API::Callback</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">print</span> <span class="string">"hello world"</span><span class="operator">;},</span>
+                                            <span class="variable">$in</span><span class="operator">,</span> <span class="variable">$out</span><span class="operator">);</span>
+</code></pre>
+
+<p>Creates and returns a new Win32::API::Callback object. Calling convention parameter is optional. Calling convention parameter has same behaviour as Win32::API&#39;s calling convention parameter. C prototype parsing of Win32::API is not available with Win32::API::Callback. If the C caller assumes the callback has vararg parameters, and the platform is 64 bits/x64, in the first 4 parameters, if they are floats or doubles they will be garbage. Note there is no way to create a Win32::API::Callback callback with a vararg prototype. A workaround is to put &quot;enough&quot; Ns as the in types, and stop looking at the @_ slices in your Perl sub callback after a certain count. Usually the first parameter will somehow indicate how many additional stack parameters you are receiving. The Ns in @_ will eventually become garbage, technically they are the return address, saved registers, and C stack allocated variables of the caller. They are effectivly garbage for your vararg callback. All vararg callbacks on 32 bits must supply a calling convention, and it must be &#39;__cdecl&#39; or &#39;WINAPIV&#39;.</p>
+
+<h2 id="METHODS">METHODS</h2>
+
+<h3 id="UseMI64">UseMI64</h3>
+
+<p>See <a href="../../../lib/Win32/API.html#UseMI64">&quot;UseMI64&quot; in Win32::API</a>.</p>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<ul>
+
+<li><p>Callback is safe across a Win32 psuedo-fork. Callback is not safe across a Cygwin fork. On Cygwin, in the child process of the fork, a Segmentation Fault will happen if the Win32::API::Callback callback is is called.</p>
+
+</li>
+</ul>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="../../../lib/Win32/API/Callback/IATPatch.html">Win32::API::Callback::IATPatch</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Aldo Calpini ( <i>dada@perl.it</i> ). Daniel Dragan ( <i>bulkdd@cpan.org</i> ).</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<p>Cosimo Streppone ( <i>cosimo@cpan.org</i> ).</p>
+
+
+</body>
+
+</html>
+
+

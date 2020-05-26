@@ -1,0 +1,316 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#DATA-TYPES">DATA TYPES</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a>
+    <ul>
+      <li><a href="#NOTE">NOTE</a></li>
+      <li><a href="#NOTE1">NOTE</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLE">EXAMPLE</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Win32::NetResource - Manage network resources in Perl</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">Win32::NetResource</span><span class="operator">;</span>
+    
+    <span class="variable">$ShareInfo</span> <span class="operator">=</span> <span class="operator">{</span>
+                    <span class="string">'path'</span> <span class="operator">=&gt;</span> <span class="string">"C:\\MyShareDir"</span><span class="operator">,</span>
+                    <span class="string">'netname'</span> <span class="operator">=&gt;</span> <span class="string">"MyShare"</span><span class="operator">,</span>
+                    <span class="string">'remark'</span> <span class="operator">=&gt;</span> <span class="string">"It is good to share"</span><span class="operator">,</span>
+                    <span class="string">'passwd'</span> <span class="operator">=&gt;</span> <span class="string">""</span><span class="operator">,</span>
+                    <span class="string">'current-users'</span> <span class="operator">=&gt;</span><span class="number">0</span><span class="operator">,</span>
+                    <span class="string">'permissions'</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+                    <span class="string">'maxusers'</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">1</span><span class="operator">,</span>
+                    <span class="string">'type'</span>  <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">,</span>
+                    <span class="operator">}</span><span class="operator">;</span>
+    
+    <span class="variable">Win32::NetResource::NetShareAdd</span><span class="operator">(</span> <span class="variable">$ShareInfo</span><span class="operator">,</span><span class="variable">$parm</span> <span class="operator">)</span>
+        <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"unable to add share"</span><span class="operator">;</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module offers control over the network resources of Win32.Disks, printers etc can be shared over a network.</p>
+
+<h1 id="DATA-TYPES">DATA TYPES</h1>
+
+<p>There are two main data types required to control network resources. In Perl these are represented by hash types.</p>
+
+<dl>
+
+<dt id="NETRESOURCE">%NETRESOURCE</dt>
+<dd>
+
+<pre><code>    KEY                    VALUE
+    
+    &#39;Scope&#39;         =&gt;  Scope of an Enumeration
+                        RESOURCE_CONNECTED,
+                        RESOURCE_GLOBALNET,
+                        RESOURCE_REMEMBERED.
+    
+    &#39;Type&#39;          =&gt;  The type of resource to Enum
+                        RESOURCETYPE_ANY    All resources
+                        RESOURCETYPE_DISK    Disk resources
+                        RESOURCETYPE_PRINT    Print resources
+    
+    &#39;DisplayType&#39;   =&gt;  The way the resource should be displayed.
+                        RESOURCEDISPLAYTYPE_DOMAIN    
+                        The object should be displayed as a domain.
+                        RESOURCEDISPLAYTYPE_GENERIC    
+                        The method used to display the object does not matter.
+                        RESOURCEDISPLAYTYPE_SERVER    
+                        The object should be displayed as a server.
+                        RESOURCEDISPLAYTYPE_SHARE    
+                        The object should be displayed as a sharepoint.
+    
+    &#39;Usage&#39;         =&gt;  Specifies the Resources usage:
+                        RESOURCEUSAGE_CONNECTABLE
+                        RESOURCEUSAGE_CONTAINER.
+    
+    &#39;LocalName&#39;     =&gt;  Name of the local device the resource is 
+                        connected to.
+    
+    &#39;RemoteName&#39;    =&gt;  The network name of the resource.
+    
+    &#39;Comment&#39;       =&gt;  A string comment.
+    
+    &#39;Provider&#39;      =&gt;  Name of the provider of the resource.</code></pre>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="SHARE_INFO">%SHARE_INFO</dt>
+<dd>
+
+<p>This hash represents the SHARE_INFO_502 struct.</p>
+
+<ul>
+
+<pre><code>    KEY                    VALUE
+    &#39;netname&#39;        =&gt;    Name of the share.
+    &#39;type&#39;           =&gt;    type of share.
+    &#39;remark&#39;         =&gt;    A string comment.
+    &#39;permissions&#39;    =&gt;    Permissions value
+    &#39;maxusers&#39;       =&gt;    the max # of users.
+    &#39;current-users&#39;  =&gt;    the current # of users.
+    &#39;path&#39;           =&gt;    The path of the share.
+    &#39;passwd&#39;         =&gt;    A password if one is req&#39;d</code></pre>
+
+</ul>
+
+</dd>
+</dl>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<h2 id="NOTE">NOTE</h2>
+
+<p>All of the functions return false if they fail.</p>
+
+<dl>
+
+<dt id="GetSharedResources-Resources-dwType-NetResource-NULL">GetSharedResources(\@Resources,dwType,\%NetResource = NULL)</dt>
+<dd>
+
+<p>Creates a list in @Resources of %NETRESOURCE hash references.</p>
+
+<p>The return value indicates whether there was an error in accessing any of the shared resources. All the shared resources that were encountered (until the point of an error, if any) are pushed into @Resources as references to %NETRESOURCE hashes. See example below. The \%NetResource argument is optional. If it is not supplied, the root (that is, the topmost container) of the network is assumed, and all network resources available from the toplevel container will be enumerated.</p>
+
+</dd>
+<dt id="AddConnection-NETRESOURCE-Password-UserName-Connection">AddConnection(\%NETRESOURCE,$Password,$UserName,$Connection)</dt>
+<dd>
+
+<p>Makes a connection to a network resource specified by %NETRESOURCE</p>
+
+</dd>
+<dt id="CancelConnection-Name-Connection-Force">CancelConnection($Name,$Connection,$Force)</dt>
+<dd>
+
+<p>Cancels a connection to a network resource connected to local device $name.$Connection is either 1 - persistent connection or 0, non-persistent.</p>
+
+</dd>
+<dt id="WNetGetLastError-ErrorCode-Description-Name">WNetGetLastError($ErrorCode,$Description,$Name)</dt>
+<dd>
+
+<p>Gets the Extended Network Error.</p>
+
+</dd>
+<dt id="GetError-ErrorCode">GetError( $ErrorCode )</dt>
+<dd>
+
+<p>Gets the last Error for a Win32::NetResource call.</p>
+
+</dd>
+<dt id="GetUNCName-UNCName-LocalPath">GetUNCName( $UNCName, $LocalPath );</dt>
+<dd>
+
+<p>Returns the UNC name of the disk share connected to $LocalPath in $UNCName. $LocalPath should be a drive based path. e.g. &quot;C:\\share\\subdir&quot;</p>
+
+</dd>
+</dl>
+
+<h2 id="NOTE1">NOTE</h2>
+
+<p>$servername is optional for all the calls below. (if not given the local machine is assumed.)</p>
+
+<dl>
+
+<dt id="NetShareAdd-SHARE-parm_err-servername-NULL">NetShareAdd(\%SHARE,$parm_err,$servername = NULL )</dt>
+<dd>
+
+<p>Add a share for sharing.</p>
+
+</dd>
+<dt id="NetShareCheck-device-type-servername-NULL">NetShareCheck($device,$type,$servername = NULL )</dt>
+<dd>
+
+<p>Check if a directory or a device is available for connection from the network through a share. This includes all directories that are reachable through a shared directory or device, meaning that if C:\foo is shared, C:\foo\bar is also available for sharing. This means that this function is pretty useless, given that by default every disk volume has an administrative share such as &quot;C$&quot; associated with its root directory.</p>
+
+<p>$device must be a drive name, directory, or a device. For example, &quot;C:&quot;, &quot;C:\dir&quot;, &quot;LPT1&quot;, &quot;D$&quot;, &quot;IPC$&quot; are all valid as the $device argument. $type is an output argument that will be set to one of the following constants that describe the type of share:</p>
+
+<pre><code>    STYPE_DISKTREE     Disk drive 
+    STYPE_PRINTQ       Print queue 
+    STYPE_DEVICE       Communication device 
+    STYPE_IPC          Interprocess communication (IPC) 
+    STYPE_SPECIAL      Special share reserved for interprocess
+                         communication (IPC$) or remote administration
+                         of the server (ADMIN$). Can also refer to
+                         administrative shares such as C$, D$, etc.</code></pre>
+
+</dd>
+<dt id="NetShareDel-netname-servername-NULL">NetShareDel( $netname, $servername = NULL )</dt>
+<dd>
+
+<p>Remove a share from a machines list of shares.</p>
+
+</dd>
+<dt id="NetShareGetInfo-netname-SHARE-servername-NULL">NetShareGetInfo( $netname, \%SHARE,$servername=NULL )</dt>
+<dd>
+
+<p>Get the %SHARE_INFO information about the share $netname on the server $servername.</p>
+
+</dd>
+<dt id="NetShareSetInfo-netname-SHARE-parm_err-servername-NULL">NetShareSetInfo( $netname,\%SHARE,$parm_err,$servername=NULL)</dt>
+<dd>
+
+<p>Set the information for share $netname.</p>
+
+</dd>
+</dl>
+
+<h1 id="EXAMPLE">EXAMPLE</h1>
+
+<dl>
+
+<dt id="Enumerating-all-resources-on-the-network">Enumerating all resources on the network</dt>
+<dd>
+
+<pre><code>    <span class="comment">#</span>
+    <span class="comment"># This example displays all the share points in the entire</span>
+    <span class="comment"># visible part of the network.</span>
+    <span class="comment">#</span>
+    
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Win32::NetResource</span> <span class="string">qw(:DEFAULT GetSharedResources GetError)</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="variable">$resources</span> <span class="operator">=</span> <span class="operator">[]</span><span class="operator">;</span>
+    <span class="keyword">unless</span><span class="operator">(</span><span class="variable">GetSharedResources</span><span class="operator">(</span><span class="variable">$resources</span><span class="operator">,</span> <span class="variable">RESOURCETYPE_ANY</span><span class="operator">))</span> <span class="operator">{</span>
+        <span class="keyword">my</span> <span class="variable">$err</span><span class="operator">;</span>
+        <span class="variable">GetError</span><span class="operator">(</span><span class="variable">$err</span><span class="operator">);</span>
+        <span class="keyword">warn</span> <span class="variable">Win32::FormatMessage</span><span class="operator">(</span><span class="variable">$err</span><span class="operator">);</span>
+    <span class="operator">}</span>
+    
+    <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$href</span> <span class="operator">(</span><span class="variable">@$resources</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">next</span> <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$$href</span><span class="operator">{</span><span class="string">DisplayType</span><span class="operator">}</span> <span class="operator">!=</span> <span class="variable">RESOURCEDISPLAYTYPE_SHARE</span><span class="operator">);</span>
+        <span class="keyword">print</span> <span class="string">"-----\n"</span><span class="operator">;</span>
+        <span class="keyword">foreach</span><span class="operator">(</span> <span class="keyword">keys</span> <span class="variable">%$href</span><span class="operator">){</span>
+            <span class="keyword">print</span> <span class="string">"</span><span class="variable">$_</span><span class="string">: </span><span class="variable">$href</span><span class="string">-&gt;{</span><span class="variable">$_</span><span class="string">}\n"</span><span class="operator">;</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+<dt id="Enumerating-all-resources-on-a-particular-host">Enumerating all resources on a particular host</dt>
+<dd>
+
+<pre><code>    <span class="comment">#</span>
+    <span class="comment"># This example displays all the share points exported by the local</span>
+    <span class="comment"># host.</span>
+    <span class="comment">#</span>
+    
+    <span class="keyword">use</span> <span class="variable">strict</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">Win32::NetResource</span> <span class="string">qw(:DEFAULT GetSharedResources GetError)</span><span class="operator">;</span>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">GetSharedResources</span><span class="operator">(</span><span class="keyword">my</span> <span class="variable">$resources</span><span class="operator">,</span> <span class="variable">RESOURCETYPE_ANY</span><span class="operator">,</span>
+                           <span class="operator">{</span> <span class="string">RemoteName</span> <span class="operator">=&gt;</span> <span class="string">"\\\\"</span> <span class="operator">.</span> <span class="variable">Win32::NodeName</span><span class="operator">()</span> <span class="operator">}</span><span class="operator">))</span>
+    <span class="operator">{</span>
+        <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$href</span> <span class="operator">(</span><span class="variable">@$resources</span><span class="operator">)</span> <span class="operator">{</span>
+            <span class="keyword">print</span> <span class="string">"-----\n"</span><span class="operator">;</span>
+            <span class="keyword">foreach</span><span class="operator">(</span><span class="keyword">keys</span> <span class="variable">%$href</span><span class="operator">)</span> <span class="operator">{</span> <span class="keyword">print</span> <span class="string">"</span><span class="variable">$_</span><span class="string">: </span><span class="variable">$href</span><span class="string">-&gt;{</span><span class="variable">$_</span><span class="string">}\n"</span><span class="operator">;</span> <span class="operator">}</span>
+        <span class="operator">}</span>
+    <span class="operator">}</span>
+</code></pre>
+
+</dd>
+</dl>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jesse Dougherty for Hip Communications.</p>
+
+<p>Additional general cleanups and bug fixes by Gurusamy Sarathy &lt;gsar@cpan.org&gt;.</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-135">Around line 135:</dt>
+<dd>
+
+<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
+
+</dd>
+<dt id="Around-line-153">Around line 153:</dt>
+<dd>
+
+<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

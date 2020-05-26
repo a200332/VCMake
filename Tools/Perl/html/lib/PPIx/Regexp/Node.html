@@ -1,0 +1,172 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#child">child</a></li>
+      <li><a href="#children">children</a></li>
+      <li><a href="#contains">contains</a></li>
+      <li><a href="#elements">elements</a></li>
+      <li><a href="#find">find</a></li>
+      <li><a href="#find_parents">find_parents</a></li>
+      <li><a href="#find_first">find_first</a></li>
+      <li><a href="#first_element">first_element</a></li>
+      <li><a href="#last_element">last_element</a></li>
+      <li><a href="#perl_version_introduced">perl_version_introduced</a></li>
+      <li><a href="#perl_version_removed">perl_version_removed</a></li>
+      <li><a href="#schild">schild</a></li>
+      <li><a href="#schildren">schildren</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Regexp::Node - Represent a container</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">;</span>
+ <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'qr{(foo)}'</span> <span class="operator">)-&gt;</span><span class="variable">print</span><span class="operator">();</span>
+</code></pre>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>PPIx::Regexp::Node</code> is a <a href="../../../lib/PPIx/Regexp/Element.html">PPIx::Regexp::Element</a>.</p>
+
+<p><code>PPIx::Regexp::Node</code> is the parent of <a href="../../../lib/PPIx/Regexp.html">PPIx::Regexp</a>, <a href="../../../lib/PPIx/Regexp/Node/Range.html">PPIx::Regexp::Node::Range</a> and <a href="../../../lib/PPIx/Regexp/Structure.html">PPIx::Regexp::Structure</a>.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class represents a structural element that contains other classes. It is an abstract class, not instantiated by the lexer.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provides the following public methods. Methods not documented here are private, and unsupported in the sense that the author reserves the right to change or remove them without notice.</p>
+
+<h2 id="child">child</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$kid</span> <span class="operator">=</span> <span class="variable">$node</span><span class="operator">-&gt;</span><span class="variable">child</span><span class="operator">(</span> <span class="number">0</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method returns the child at the given index. The indices start from zero, and negative indices are from the end of the list, so that <code>$node-&gt;child( -1 )</code> returns the last child of the node.</p>
+
+<h2 id="children">children</h2>
+
+<p>This method returns the children of the Node. If called in scalar context it returns the number of children.</p>
+
+<h2 id="contains">contains</h2>
+
+<pre><code> <span class="keyword">print</span> <span class="variable">$node</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$elem</span> <span class="operator">)</span> <span class="operator">?</span> <span class="string">"yes\n"</span> <span class="operator">:</span> <span class="string">"no\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns true if the given element is contained in the node, or false otherwise.</p>
+
+<h2 id="elements">elements</h2>
+
+<p>This method returns the elements in the Node. For a <code>PPIx::Regexp::Node</code> proper, it is the same as <code>children()</code>.</p>
+
+<h2 id="find">find</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$rslt</span> <span class="operator">=</span> <span class="variable">$node</span><span class="operator">-&gt;</span><span class="variable">find</span><span class="operator">(</span> <span class="string">'PPIx::Regexp::Token::Literal'</span> <span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">$rslt</span> <span class="operator">=</span> <span class="variable">$node</span><span class="operator">-&gt;</span><span class="variable">find</span><span class="operator">(</span> <span class="string">'Token::Literal'</span> <span class="operator">);</span>
+ <span class="keyword">my</span> <span class="variable">$rslt</span> <span class="operator">=</span> <span class="variable">$node</span><span class="operator">-&gt;</span><span class="variable">find</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+     <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span> <span class="string">'PPIx::Regexp::Token::Literal'</span> <span class="operator">)</span>
+         <span class="operator">&amp;&amp;</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">ordinal</span> <span class="operator">&lt;</span> <span class="keyword">ord</span><span class="operator">(</span><span class="string">' '</span><span class="operator">);</span>
+     <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This method finds things.</p>
+
+<p>If given a string as argument, it is assumed to be a class name (possibly without the leading &#39;PPIx::Regexp::&#39;), and all elements of the given class are found.</p>
+
+<p>If given a code reference, that code reference is called once for each element, and passed <code>$self</code> and the element. The code should return true to accept the element, false to reject it, and ( for subclasses of <code>PPIx::Regexp::Node</code>) <code>undef</code> to prevent recursion into the node. If the code throws an exception, you get nothing back from this method.</p>
+
+<p>Either way, the return is a reference to the list of things found, a false (but defined) value if nothing was found, or <code>undef</code> if an error occurred.</p>
+
+<h2 id="find_parents">find_parents</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$rslt</span> <span class="operator">=</span> <span class="variable">$node</span><span class="operator">-&gt;</span><span class="variable">find_parents</span><span class="operator">(</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+     <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">isa</span><span class="operator">(</span> <span class="string">'PPIx::Regexp::Token::Operator'</span> <span class="operator">)</span>
+         <span class="operator">&amp;&amp;</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">1</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">content</span><span class="operator">()</span> <span class="keyword">eq</span> <span class="string">'|'</span><span class="operator">;</span>
+     <span class="operator">}</span> <span class="operator">);</span>
+</code></pre>
+
+<p>This convenience method takes the same arguments as <code>find</code>, but instead of the found objects themselves returns their parents. No parent will appear more than once in the output.</p>
+
+<p>This method returns a reference to the array of parents if any were found. If no parents were found the return is false but defined. If an error occurred the return is <code>undef</code>.</p>
+
+<h2 id="find_first">find_first</h2>
+
+<p>This method has the same arguments as <a href="#find">&quot;find&quot;</a>, but returns either a reference to the first element found, a false (but defined) value if no elements were found, or <code>undef</code> if an error occurred.</p>
+
+<h2 id="first_element">first_element</h2>
+
+<p>This method returns the first element in the node.</p>
+
+<h2 id="last_element">last_element</h2>
+
+<p>This method returns the last element in the node.</p>
+
+<h2 id="perl_version_introduced">perl_version_introduced</h2>
+
+<p>This method returns the maximum value of <code>perl_version_introduced</code> returned by any of its elements. In other words, it returns the minimum version of Perl under which this node is valid. If there are no elements, 5.000 is returned, since that is the minimum value of Perl supported by this package.</p>
+
+<h2 id="perl_version_removed">perl_version_removed</h2>
+
+<p>This method returns the minimum defined value of <code>perl_version_removed</code> returned by any of the node&#39;s elements. In other words, it returns the lowest version of Perl in which this node is <code>not</code> valid. If there are no elements, or if no element has a defined <code>perl_version_removed</code>, <code>undef</code> is returned.</p>
+
+<h2 id="schild">schild</h2>
+
+<p>This method returns the significant child at the given index; that is, <code>$node-&gt;schild(0)</code> returns the first significant child, <code>$node-&gt;schild(1)</code> returns the second significant child, and so on. Negative indices count from the end.</p>
+
+<h2 id="schildren">schildren</h2>
+
+<p>This method returns the significant children of the node.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is by the author. Please file bug reports at <a href="http://rt.cpan.org">http://rt.cpan.org</a>, or in electronic mail to the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2017 by Thomas R. Wyant, III</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the full text of the licenses in the directory LICENSES.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+
+</body>
+
+</html>
+
+

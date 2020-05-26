@@ -1,0 +1,576 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Why-Generators">Why Generators?</a></li>
+      <li><a href="#Other-Customizations">Other Customizations</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTER-CONFIGURATION">EXPORTER CONFIGURATION</a>
+    <ul>
+      <li><a href="#Export-Configuration">Export Configuration</a></li>
+      <li><a href="#Group-Configuration">Group Configuration</a>
+        <ul>
+          <li><a href="#Default-Groups">Default Groups</a></li>
+        </ul>
+      </li>
+      <li><a href="#Collector-Configuration">Collector Configuration</a></li>
+    </ul>
+  </li>
+  <li><a href="#CALLING-THE-EXPORTER">CALLING THE EXPORTER</a>
+    <ul>
+      <li><a href="#Special-Exporter-Arguments">Special Exporter Arguments</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUBROUTINES">SUBROUTINES</a>
+    <ul>
+      <li><a href="#setup_exporter">setup_exporter</a></li>
+      <li><a href="#build_exporter">build_exporter</a></li>
+      <li><a href="#default_generator">default_generator</a></li>
+      <li><a href="#default_installer">default_installer</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXPORTS">EXPORTS</a></li>
+  <li><a href="#COMPARISONS">COMPARISONS</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#THANKS">THANKS</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Sub::Exporter - a sophisticated exporter for custom-built routines</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 0.987</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>Sub::Exporter must be used in two places. First, in an exporting module:</p>
+
+<pre><code>  <span class="comment"># in the exporting module:</span>
+  <span class="keyword">package</span> <span class="variable">Text::Tweaker</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+      <span class="string">qw(squish titlecase)</span><span class="operator">,</span> <span class="comment"># always works the same way</span>
+      <span class="string">reformat</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">build_reformatter</span><span class="operator">,</span> <span class="comment"># generator to build exported function</span>
+      <span class="string">trim</span>     <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">build_trimmer</span><span class="operator">,</span>
+      <span class="string">indent</span>   <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">build_indenter</span><span class="operator">,</span>
+    <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">collectors</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">'defaults'</span> <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Then, in an importing module:</p>
+
+<pre><code>  <span class="comment"># in the importing module:</span>
+  <span class="keyword">use</span> <span class="variable">Text::Tweaker</span>
+    <span class="string">'squish'</span><span class="operator">,</span>
+    <span class="string">indent</span>   <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">margin</span> <span class="operator">=&gt;</span> <span class="number">5</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">reformat</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">width</span> <span class="operator">=&gt;</span> <span class="number">79</span><span class="operator">,</span> <span class="string">justify</span> <span class="operator">=&gt;</span> <span class="string">'full'</span><span class="operator">,</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'prettify_text'</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">defaults</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">eol</span> <span class="operator">=&gt;</span> <span class="string">'CRLF'</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>With this setup, the importing module ends up with three routines: <code>squish</code>, <code>indent</code>, and <code>prettify_text</code>. The latter two have been built to the specifications of the importer -- they are not just copies of the code in the exporting package.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p><b>ACHTUNG!</b> If you&#39;re not familiar with Exporter or exporting, read <a href="../../lib/Sub/Exporter/Tutorial.html">Sub::Exporter::Tutorial</a> first!</p>
+
+<h2 id="Why-Generators">Why Generators?</h2>
+
+<p>The biggest benefit of Sub::Exporter over existing exporters (including the ubiquitous Exporter.pm) is its ability to build new coderefs for export, rather than to simply export code identical to that found in the exporting package.</p>
+
+<p>If your module&#39;s consumers get a routine that works like this:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Data::Analyze</span> <span class="string">qw(analyze)</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">=</span> <span class="variable">analyze</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="variable">$tolerance</span><span class="operator">,</span> <span class="variable">$passes</span><span class="operator">);</span>
+</code></pre>
+
+<p>and they constantly pass only one or two different set of values for the non-<code>$data</code> arguments, your code can benefit from Sub::Exporter. By writing a simple generator, you can let them do this, instead:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Data::Analyze</span>
+    <span class="string">analyze</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">tolerance</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">10</span><span class="operator">,</span> <span class="string">passes</span> <span class="operator">=&gt;</span> <span class="number">10</span><span class="operator">,</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="variable">analyze10</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">analyze</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">tolerance</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">15</span><span class="operator">,</span> <span class="string">passes</span> <span class="operator">=&gt;</span> <span class="number">50</span><span class="operator">,</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="variable">analyze50</span> <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$value</span> <span class="operator">=</span> <span class="variable">analyze10</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>
+</code></pre>
+
+<p>The package with the generator for that would look something like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Data::Analyze</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+      <span class="string">analyze</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">build_analyzer</span><span class="operator">,</span>
+    <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> build_analyzer </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="variable">$arg</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+  
+    <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$data</span>      <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">my</span> <span class="variable">$tolerance</span> <span class="operator">=</span> <span class="keyword">shift</span> <span class="operator">||</span> <span class="variable">$arg</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">tolerance</span><span class="operator">}</span><span class="operator">;</span> 
+      <span class="keyword">my</span> <span class="variable">$passes</span>    <span class="operator">=</span> <span class="keyword">shift</span> <span class="operator">||</span> <span class="variable">$arg</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">passes</span><span class="operator">}</span><span class="operator">;</span> 
+  
+      <span class="variable">analyze</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="variable">$tolerance</span><span class="operator">,</span> <span class="variable">$passes</span><span class="operator">);</span>
+    <span class="operator">}</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Your module&#39;s user now has to do less work to benefit from it -- and remember, you&#39;re often your own user! Investing in customized subroutines is an investment in future laziness.</p>
+
+<p>This also avoids a common form of ugliness seen in many modules: package-level configuration. That is, you might have seen something like the above implemented like so:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Data::Analyze</span> <span class="string">qw(analyze)</span><span class="operator">;</span>
+  <span class="variable">$Data::Analyze::default_tolerance</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">.</span><span class="number">10</span><span class="operator">;</span>
+  <span class="variable">$Data::Analyze::default_passes</span>    <span class="operator">=</span> <span class="number">10</span><span class="operator">;</span>
+</code></pre>
+
+<p>This might save time, until you have multiple modules using Data::Analyze. Because there is only one global configuration, they step on each other&#39;s toes and your code begins to have mysterious errors.</p>
+
+<p>Generators can also allow you to export class methods to be called as subroutines:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Data::Methodical</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">some_method</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">_curry_class</span> <span class="operator">}</span> <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> _curry_class </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="variable">$class</span><span class="operator">-&gt;</span><span class="variable">$name</span><span class="operator">(</span><span class="variable">@_</span><span class="operator">);</span> <span class="operator">};</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Because of the way that exporters and Sub::Exporter work, any package that inherits from Data::Methodical can inherit its exporter and override its <code>some_method</code>. If a user imports <code>some_method</code> from that package, he&#39;ll receive a subroutine that calls the method on the subclass, rather than on Data::Methodical itself.</p>
+
+<h2 id="Other-Customizations">Other Customizations</h2>
+
+<p>Building custom routines with generators isn&#39;t the only way that Sub::Exporters allows the importing code to refine its use of the exported routines. They may also be renamed to avoid naming collisions.</p>
+
+<p>Consider the following code:</p>
+
+<pre><code>  <span class="comment"># this program determines to which circle of Hell you will be condemned</span>
+  <span class="keyword">use</span> <span class="variable">Morality</span> <span class="string">qw(sin virtue)</span><span class="operator">;</span> <span class="comment"># for calculating viciousness</span>
+  <span class="keyword">use</span> <span class="variable">Math::Trig</span> <span class="string">qw(:all)</span><span class="operator">;</span>     <span class="comment"># for dealing with circles</span>
+</code></pre>
+
+<p>The programmer has inadvertently imported two <code>sin</code> routines. The solution, in Exporter.pm-based modules, would be to import only one and then call the other by its fully-qualified name. Alternately, the importer could write a routine that did so, or could mess about with typeglobs.</p>
+
+<p>How much easier to write:</p>
+
+<pre><code>  <span class="comment"># this program determines to which circle of Hell you will be condemned</span>
+  <span class="keyword">use</span> <span class="variable">Morality</span> <span class="string">qw(virtue)</span><span class="operator">,</span> <span class="string">sin</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'offense'</span> <span class="operator">}</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Math::Trig</span> <span class="operator">-</span><span class="string">all</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-prefix</span> <span class="operator">=&gt;</span> <span class="string">'trig_'</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>and to have at one&#39;s disposal <code>offense</code> and <code>trig_sin</code> -- not to mention <code>trig_cos</code> and <code>trig_tan</code>.</p>
+
+<h1 id="EXPORTER-CONFIGURATION">EXPORTER CONFIGURATION</h1>
+
+<p>You can configure an exporter for your package by using Sub::Exporter like so:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Tools</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span>
+    <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(function1 function2 function3)</span> <span class="operator">]</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>This is the simplest way to use the exporter, and is basically equivalent to this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Tools</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">qw(Exporter)</span><span class="operator">;</span>
+  <span class="keyword">our</span> <span class="variable">@EXPORT_OK</span> <span class="operator">=</span> <span class="string">qw(function1 function2 function3)</span><span class="operator">;</span>
+</code></pre>
+
+<p>Any basic use of Sub::Exporter will look like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Tools</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">\</span><span class="variable">%config</span><span class="operator">;</span>
+</code></pre>
+
+<p>The following keys are valid in <code>%config</code>:</p>
+
+<pre><code>  <span class="variable">exports</span> <span class="operator">-</span> <span class="variable">a</span> <span class="variable">list</span> <span class="variable">of</span> <span class="variable">routines</span> <span class="variable">to</span> <span class="variable">provide</span> <span class="keyword">for</span> <span class="variable">exporting</span><span class="operator">;</span> <span class="keyword">each</span> <span class="variable">routine</span> <span class="variable">may</span> <span class="variable">be</span>
+            <span class="variable">followed</span> <span class="variable">by</span> <span class="variable">generator</span>
+  <span class="variable">groups</span>  <span class="operator">-</span> <span class="variable">a</span> <span class="variable">list</span> <span class="variable">of</span> <span class="variable">groups</span> <span class="variable">to</span> <span class="variable">provide</span> <span class="keyword">for</span> <span class="variable">exporting</span><span class="operator">;</span> <span class="keyword">each</span> <span class="variable">must</span> <span class="variable">be</span> <span class="variable">followed</span> <span class="variable">by</span>
+            <span class="variable">either</span> <span class="operator">(</span><span class="variable">a</span><span class="operator">)</span> <span class="variable">a</span> <span class="variable">list</span> <span class="variable">of</span> <span class="variable">exports</span><span class="operator">,</span> <span class="variable">possibly</span> <span class="variable">with</span> <span class="variable">arguments</span> <span class="keyword">for</span> <span class="keyword">each</span>
+            <span class="variable">export</span><span class="operator">,</span> <span class="keyword">or</span> <span class="operator">(</span><span class="variable">b</span><span class="operator">)</span> <span class="variable">a</span> <span class="variable">generator</span>
+  
+  <span class="variable">collectors</span> <span class="operator">-</span> <span class="variable">a</span> <span class="variable">list</span> <span class="variable">of</span> <span class="variable">names</span> <span class="variable">into</span> <span class="variable">which</span> <span class="keyword">values</span> <span class="variable">are</span> <span class="variable">collected</span> <span class="keyword">for</span> <span class="keyword">use</span> <span class="variable">in</span>
+               <span class="variable">routine</span> <span class="variable">generation</span><span class="operator">;</span> <span class="keyword">each</span> <span class="variable">name</span> <span class="variable">may</span> <span class="variable">be</span> <span class="variable">followed</span> <span class="variable">by</span> <span class="variable">a</span> <span class="variable">validator</span>
+</code></pre>
+
+<p>In addition to the basic options above, a few more advanced options may be passed:</p>
+
+<pre><code>  into_level - how far up the caller stack to look for a target (default 0)
+  into       - an explicit target (package) into which to export routines</code></pre>
+
+<p>In other words: Sub::Exporter installs a <code>import</code> routine which, when called, exports routines to the calling namespace. The <code>into</code> and <code>into_level</code> options change where those exported routines are installed.</p>
+
+<pre><code>  generator  - a callback used to produce the code that will be installed
+               default: Sub::Exporter::default_generator
+
+  installer  - a callback used to install the code produced by the generator
+               default: Sub::Exporter::default_installer</code></pre>
+
+<p>For information on how these callbacks are used, see the documentation for <code><a href="#default_generator">&quot;default_generator&quot;</a></code> and <code><a href="#default_installer">&quot;default_installer&quot;</a></code>.</p>
+
+<h2 id="Export-Configuration">Export Configuration</h2>
+
+<p>The <code>exports</code> list may be provided as an array reference or a hash reference. The list is processed in such a way that the following are equivalent:</p>
+
+<pre><code>  <span class="operator">{</span> <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(foo bar baz)</span><span class="operator">,</span> <span class="string">quux</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">quux_generator</span> <span class="operator">]</span> <span class="operator">}</span>
+  
+  <span class="operator">{</span> <span class="string">exports</span> <span class="operator">=&gt;</span>
+    <span class="operator">{</span> <span class="string">foo</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="string">baz</span> <span class="operator">=&gt;</span> <span class="keyword">undef</span><span class="operator">,</span> <span class="string">quux</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">quux_generator</span> <span class="operator">}</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Generators are code that return coderefs. They are called with four parameters:</p>
+
+<pre><code>  $class - the class whose exporter has been called (the exporting class)
+  $name  - the name of the export for which the routine is being build
+ \%arg   - the arguments passed for this export
+ \%col   - the collections for this import</code></pre>
+
+<p>Given the configuration in the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a>, the following <code>use</code> statement:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Text::Tweaker</span>
+    <span class="string">reformat</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'make_narrow'</span><span class="operator">,</span> <span class="string">width</span> <span class="operator">=&gt;</span> <span class="number">33</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">defaults</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">eol</span> <span class="operator">=&gt;</span> <span class="string">'CR'</span> <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>would result in the following call to <code>&amp;build_reformatter</code>:</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="variable">build_reformatter</span><span class="operator">(</span>
+    <span class="string">'Text::Tweaker'</span><span class="operator">,</span>
+    <span class="string">'reformat'</span><span class="operator">,</span>
+    <span class="operator">{</span> <span class="string">width</span> <span class="operator">=&gt;</span> <span class="number">33</span> <span class="operator">}</span><span class="operator">,</span> <span class="comment"># note that -as is not passed in</span>
+    <span class="operator">{</span> <span class="string">defaults</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">eol</span> <span class="operator">=&gt;</span> <span class="string">'CR'</span> <span class="operator">}</span> <span class="operator">}</span><span class="operator">,</span>
+  <span class="operator">);</span>
+</code></pre>
+
+<p>The returned coderef (<code>$code</code>) would then be installed as <code>make_narrow</code> in the calling package.</p>
+
+<p>Instead of providing a coderef in the configuration, a reference to a method name may be provided. This method will then be called on the invocant of the <code>import</code> method. (In this case, we do not pass the <code>$class</code> parameter, as it would be redundant.)</p>
+
+<h2 id="Group-Configuration">Group Configuration</h2>
+
+<p>The <code>groups</code> list can be passed in the same forms as <code>exports</code>. Groups must have values to be meaningful, which may either list exports that make up the group (optionally with arguments) or may provide a way to build the group.</p>
+
+<p>The simpler case is the first: a group definition is a list of exports. Here&#39;s the example that could go in exporter in the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a>.</p>
+
+<pre><code>  <span class="string">groups</span>  <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">default</span>    <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(reformat)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">shorteners</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(squish trim)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">email_safe</span> <span class="operator">=&gt;</span> <span class="operator">[</span>
+      <span class="string">'indent'</span><span class="operator">,</span>
+      <span class="string">reformat</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="string">'email_format'</span><span class="operator">,</span> <span class="string">width</span> <span class="operator">=&gt;</span> <span class="number">72</span> <span class="operator">}</span>
+    <span class="operator">]</span><span class="operator">,</span>
+  <span class="operator">}</span><span class="operator">,</span>
+</code></pre>
+
+<p>Groups are imported by specifying their name prefixed be either a dash or a colon. This line of code would import the <code>shorteners</code> group:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Text::Tweaker</span> <span class="string">qw(-shorteners)</span><span class="operator">;</span>
+</code></pre>
+
+<p>Arguments passed to a group when importing are merged into the groups options and passed to any relevant generators. Groups can contain other groups, but looping group structures are ignored.</p>
+
+<p>The other possible value for a group definition, a coderef, allows one generator to build several exportable routines simultaneously. This is useful when many routines must share enclosed lexical variables. The coderef must return a hash reference. The keys will be used as export names and the values are the subs that will be exported.</p>
+
+<p>This example shows a simple use of the group generator.</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Data::Crypto</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">groups</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">cipher</span> <span class="operator">=&gt;</span> <span class="operator">\&amp;</span><span class="variable">build_cipher_group</span> <span class="operator">}</span> <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> build_cipher_group </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$group</span><span class="operator">,</span> <span class="variable">$arg</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$encode</span><span class="operator">,</span> <span class="variable">$decode</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">build_codec</span><span class="operator">(</span><span class="variable">$arg</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">secret</span><span class="operator">}</span><span class="operator">);</span>
+    <span class="keyword">return</span> <span class="operator">{</span> <span class="string">cipher</span> <span class="operator">=&gt;</span> <span class="variable">$encode</span><span class="operator">,</span> <span class="string">decipher</span> <span class="operator">=&gt;</span> <span class="variable">$decode</span> <span class="operator">}</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>The <code>cipher</code> and <code>decipher</code> routines are built in a group because they are built together by code which encloses their secret in their environment.</p>
+
+<h3 id="Default-Groups">Default Groups</h3>
+
+<p>If a module that uses Sub::Exporter is <code>use</code>d with no arguments, it will try to export the group named <code>default</code>. If that group has not been specifically configured, it will be empty, and nothing will happen.</p>
+
+<p>Another group is also created if not defined: <code>all</code>. The <code>all</code> group contains all the exports from the exports list.</p>
+
+<h2 id="Collector-Configuration">Collector Configuration</h2>
+
+<p>The <code>collectors</code> entry in the exporter configuration gives names which, when found in the import call, have their values collected and passed to every generator.</p>
+
+<p>For example, the <code>build_analyzer</code> generator that we saw above could be rewritten as:</p>
+
+<pre><code> <span class="keyword">sub</span><span class="variable"> build_analyzer </span><span class="operator">{</span>
+   <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$class</span><span class="operator">,</span> <span class="variable">$name</span><span class="operator">,</span> <span class="variable">$arg</span><span class="operator">,</span> <span class="variable">$col</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">@_</span><span class="operator">;</span>
+ 
+   <span class="keyword">return</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+     <span class="keyword">my</span> <span class="variable">$data</span>      <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+     <span class="keyword">my</span> <span class="variable">$tolerance</span> <span class="operator">=</span> <span class="keyword">shift</span> <span class="operator">||</span> <span class="variable">$arg</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">tolerance</span><span class="operator">}</span> <span class="operator">||</span> <span class="variable">$col</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">defaults</span><span class="operator">}{</span><span class="string">tolerance</span><span class="operator">}</span><span class="operator">;</span> 
+     <span class="keyword">my</span> <span class="variable">$passes</span>    <span class="operator">=</span> <span class="keyword">shift</span> <span class="operator">||</span> <span class="variable">$arg</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">passes</span><span class="operator">}</span>    <span class="operator">||</span> <span class="variable">$col</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">defaults</span><span class="operator">}{</span><span class="string">passes</span><span class="operator">}</span><span class="operator">;</span> 
+ 
+     <span class="variable">analyze</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="variable">$tolerance</span><span class="operator">,</span> <span class="variable">$passes</span><span class="operator">);</span>
+   <span class="operator">}</span>
+ <span class="operator">}</span>
+</code></pre>
+
+<p>That would allow the importer to specify global defaults for his imports:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Data::Analyze</span>
+    <span class="string">'analyze'</span><span class="operator">,</span>
+    <span class="string">analyze</span>  <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">tolerance</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">10</span><span class="operator">,</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="variable">analyze10</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">analyze</span>  <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">tolerance</span> <span class="operator">=&gt;</span> <span class="number">0</span><span class="operator">.</span><span class="number">15</span><span class="operator">,</span> <span class="string">passes</span> <span class="operator">=&gt;</span> <span class="number">50</span><span class="operator">,</span> <span class="string">-as</span> <span class="operator">=&gt;</span> <span class="variable">analyze50</span> <span class="operator">}</span><span class="operator">,</span>
+    <span class="string">defaults</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">passes</span> <span class="operator">=&gt;</span> <span class="number">10</span> <span class="operator">}</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$A</span> <span class="operator">=</span> <span class="variable">analyze10</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>     <span class="comment"># equivalent to analyze($data, 0.10, 10);</span>
+  <span class="keyword">my</span> <span class="variable">$C</span> <span class="operator">=</span> <span class="variable">analyze50</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">);</span>     <span class="comment"># equivalent to analyze($data, 0.15, 50);</span>
+  <span class="keyword">my</span> <span class="variable">$B</span> <span class="operator">=</span> <span class="variable">analyze</span><span class="operator">(</span><span class="variable">$data</span><span class="operator">,</span> <span class="number">0</span><span class="operator">.</span><span class="number">20</span><span class="operator">);</span> <span class="comment"># equivalent to analyze($data, 0.20, 10);</span>
+</code></pre>
+
+<p>If values are provided in the <code>collectors</code> list during exporter setup, they must be code references, and are used to validate the importer&#39;s values. The validator is called when the collection is found, and if it returns false, an exception is thrown. We could ensure that no one tries to set a global data default easily:</p>
+
+<pre><code>  <span class="string">collectors</span> <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">defaults</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> <span class="keyword">return</span> <span class="operator">(</span><span class="keyword">exists</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="operator">{</span><span class="string">data</span><span class="operator">}</span><span class="operator">)</span> <span class="operator">?</span> <span class="number">0</span> <span class="operator">:</span> <span class="number">1</span> <span class="operator">}</span> <span class="operator">}</span>
+</code></pre>
+
+<p>Collector coderefs can also be used as hooks to perform arbitrary actions before anything is exported.</p>
+
+<p>When the coderef is called, it is passed the value of the collection and a hashref containing the following entries:</p>
+
+<pre><code>  name        - the name of the collector
+  config      - the exporter configuration (hashref)
+  import_args - the arguments passed to the exporter, sans collections (aref)
+  class       - the package on which the importer was called
+  into        - the package into which exports will be exported</code></pre>
+
+<p>Collectors with all-caps names (that is, made up of underscore or capital A through Z) are reserved for special use. The only currently implemented special collector is <code>INIT</code>, whose hook (if present in the exporter configuration) is always run before any other hook.</p>
+
+<h1 id="CALLING-THE-EXPORTER">CALLING THE EXPORTER</h1>
+
+<p>Arguments to the exporter (that is, the arguments after the module name in a <code>use</code> statement) are parsed as follows:</p>
+
+<p>First, the collectors gather any collections found in the arguments. Any reference type may be given as the value for a collector. For each collection given in the arguments, its validator (if any) is called.</p>
+
+<p>Next, groups are expanded. If the group is implemented by a group generator, the generator is called. There are two special arguments which, if given to a group, have special meaning:</p>
+
+<pre><code>  -prefix - a string to prepend to any export imported from this group
+  -suffix - a string to append to any export imported from this group</code></pre>
+
+<p>Finally, individual export generators are called and all subs, generated or otherwise, are installed in the calling package. There is only one special argument for export generators:</p>
+
+<pre><code>  -as     - where to install the exported sub</code></pre>
+
+<p>Normally, <code>-as</code> will contain an alternate name for the routine. It may, however, contain a reference to a scalar. If that is the case, a reference the generated routine will be placed in the scalar referenced by <code>-as</code>. It will not be installed into the calling package.</p>
+
+<h2 id="Special-Exporter-Arguments">Special Exporter Arguments</h2>
+
+<p>The generated exporter accept some special options, which may be passed as the first argument, in a hashref.</p>
+
+<p>These options are:</p>
+
+<pre><code>  into_level
+  into
+  generator
+  installer</code></pre>
+
+<p>These override the same-named configuration options described in <a href="#EXPORTER-CONFIGURATION">&quot;EXPORTER CONFIGURATION&quot;</a>.</p>
+
+<h1 id="SUBROUTINES">SUBROUTINES</h1>
+
+<h2 id="setup_exporter">setup_exporter</h2>
+
+<p>This routine builds and installs an <code>import</code> routine. It is called with one argument, a hashref containing the exporter configuration. Using this, it builds an exporter and installs it into the calling package with the name &quot;import.&quot; In addition to the normal exporter configuration, a few named arguments may be passed in the hashref:</p>
+
+<pre><code>  into       - into what package should the exporter be installed
+  into_level - into what level up the stack should the exporter be installed
+  as         - what name should the installed exporter be given</code></pre>
+
+<p>By default the exporter is installed with the name <code>import</code> into the immediate caller of <code>setup_exporter</code>. In other words, if your package calls <code>setup_exporter</code> without providing any of the three above arguments, it will have an <code>import</code> routine installed.</p>
+
+<p>Providing both <code>into</code> and <code>into_level</code> will cause an exception to be thrown.</p>
+
+<p>The exporter is built by <code><a href="#build_exporter">&quot;build_exporter&quot;</a></code>.</p>
+
+<h2 id="build_exporter">build_exporter</h2>
+
+<p>Given a standard exporter configuration, this routine builds and returns an exporter -- that is, a subroutine that can be installed as a class method to perform exporting on request.</p>
+
+<p>Usually, this method is called by <code><a href="#setup_exporter">&quot;setup_exporter&quot;</a></code>, which then installs the exporter as a package&#39;s import routine.</p>
+
+<h2 id="default_generator">default_generator</h2>
+
+<p>This is Sub::Exporter&#39;s default generator. It takes bits of configuration that have been gathered during the import and turns them into a coderef that can be installed.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$code</span> <span class="operator">=</span> <span class="variable">default_generator</span><span class="operator">(\</span><span class="variable">%arg</span><span class="operator">);</span>
+</code></pre>
+
+<p>Passed arguments are:</p>
+
+<pre><code>  class - the class on which the import method was called
+  name  - the name of the export being generated
+  arg   - the arguments to the generator
+  col   - the collections
+
+  generator - the generator to be used to build the export (code or scalar ref)</code></pre>
+
+<h2 id="default_installer">default_installer</h2>
+
+<p>This is Sub::Exporter&#39;s default installer. It does what Sub::Exporter promises: it installs code into the target package.</p>
+
+<pre><code>  <span class="variable">default_installer</span><span class="operator">(\</span><span class="variable">%arg</span><span class="operator">,</span> <span class="operator">\</span><span class="variable">@to_export</span><span class="operator">);</span>
+</code></pre>
+
+<p>Passed arguments are:</p>
+
+<pre><code>  into - the package into which exports should be delivered</code></pre>
+
+<p><code>@to_export</code> is a list of name/value pairs. The default exporter assigns code (the values) to named slots (the names) in the given package. If the name is a scalar reference, the scalar reference is made to point to the code reference instead.</p>
+
+<h1 id="EXPORTS">EXPORTS</h1>
+
+<p>Sub::Exporter also offers its own exports: the <code>setup_exporter</code> and <code>build_exporter</code> routines described above. It also provides a special &quot;setup&quot; collector, which will set up an exporter using the parameters passed to it.</p>
+
+<p>Note that the &quot;setup&quot; collector (seen in examples like the <a href="#SYNOPSIS">&quot;SYNOPSIS&quot;</a> above) uses <code>build_exporter</code>, not <code>setup_exporter</code>. This means that the special arguments like &quot;into&quot; and &quot;as&quot; for <code>setup_exporter</code> are not accepted here. Instead, you may write something like:</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span>
+    <span class="operator">{</span> <span class="string">into</span> <span class="operator">=&gt;</span> <span class="string">'Target::Package'</span> <span class="operator">},</span>
+    <span class="string">-setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+      <span class="string">-as</span>     <span class="operator">=&gt;</span> <span class="string">'do_import'</span><span class="operator">,</span>
+      <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="operator">...</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="operator">}</span>
+  <span class="operator">;</span>
+</code></pre>
+
+<p>Finding a good reason for wanting to do this is left as an exercise for the reader.</p>
+
+<h1 id="COMPARISONS">COMPARISONS</h1>
+
+<p>There are a whole mess of exporters on the CPAN. The features included in Sub::Exporter set it apart from any existing Exporter. Here&#39;s a summary of some other exporters and how they compare.</p>
+
+<ul>
+
+<li><p><a href="../../lib/Exporter.html">Exporter</a> and co.</p>
+
+<p>This is the standard Perl exporter. Its interface is a little clunky, but it&#39;s fast and ubiquitous. It can do some things that Sub::Exporter can&#39;t: it can export things other than routines, it can import &quot;everything in this group except this symbol,&quot; and some other more esoteric things. These features seem to go nearly entirely unused.</p>
+
+<p>It always exports things exactly as they appear in the exporting module; it can&#39;t rename or customize routines. Its groups (&quot;tags&quot;) can&#39;t be nested.</p>
+
+<p><a>Exporter::Lite</a> is a whole lot like Exporter, but it does significantly less: it supports exporting symbols, but not groups, pattern matching, or negation.</p>
+
+<p>The fact that Sub::Exporter can&#39;t export symbols other than subroutines is a good idea, not a missing feature.</p>
+
+<p>For simple uses, setting up Sub::Exporter is about as easy as Exporter. For complex uses, Sub::Exporter makes hard things possible, which would not be possible with Exporter.</p>
+
+<p>When using a module that uses Sub::Exporter, users familiar with Exporter will probably see no difference in the basics. These two lines do about the same thing in whether the exporting module uses Exporter or Sub::Exporter.</p>
+
+<pre><code>  <span class="keyword">use</span> <span class="variable">Some::Module</span> <span class="string">qw(foo bar baz)</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Some::Module</span> <span class="string">qw(foo :bar baz)</span><span class="operator">;</span>
+</code></pre>
+
+<p>The definition for exporting in Exporter.pm might look like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Some::Module</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">base</span> <span class="string">qw(Exporter)</span><span class="operator">;</span>
+  <span class="keyword">our</span> <span class="variable">@EXPORT_OK</span>   <span class="operator">=</span> <span class="string">qw(foo bar baz quux)</span><span class="operator">;</span>
+  <span class="keyword">our</span> <span class="variable">%EXPORT_TAGS</span> <span class="operator">=</span> <span class="operator">(</span><span class="string">bar</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(bar baz)</span> <span class="operator">]</span><span class="operator">);</span>
+</code></pre>
+
+<p>Using Sub::Exporter, it would look like this:</p>
+
+<pre><code>  <span class="keyword">package</span> <span class="variable">Some::Module</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">Sub::Exporter</span> <span class="operator">-</span><span class="string">setup</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+    <span class="string">exports</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(foo bar baz quux)</span> <span class="operator">]</span><span class="operator">,</span>
+    <span class="string">groups</span>  <span class="operator">=&gt;</span> <span class="operator">{</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="string">qw(bar baz)</span> <span class="operator">]}</span>
+  <span class="operator">}</span><span class="operator">;</span>
+</code></pre>
+
+<p>Sub::Exporter respects inheritance, so that a package may export inherited routines, and will export the most inherited version. Exporting methods without currying away the invocant is a bad idea, but Sub::Exporter allows you to do just that -- and anyway, there are other uses for this feature, like packages of exported subroutines which use inheritance specifically to allow more specialized, but similar, packages.</p>
+
+<p><a>Exporter::Easy</a> provides a wrapper around the standard Exporter. It makes it simpler to build groups, but doesn&#39;t provide any more functionality. Because it is a front-end to Exporter, it will store your exporter&#39;s configuration in global package variables.</p>
+
+</li>
+<li><p>Attribute-Based Exporters</p>
+
+<p>Some exporters use attributes to mark variables to export. <a>Exporter::Simple</a> supports exporting any kind of symbol, and supports groups. Using a module like Exporter or Sub::Exporter, it&#39;s easy to look at one place and see what is exported, but it&#39;s impossible to look at a variable definition and see whether it is exported by that alone. Exporter::Simple makes this trade in reverse: each variable&#39;s declaration includes its export definition, but there is no one place to look to find a manifest of exports.</p>
+
+<p>More importantly, Exporter::Simple does not add any new features to those of Exporter. In fact, like Exporter::Easy, it is just a front-end to Exporter, so it ends up storing its configuration in global package variables. (This means that there is one place to look for your exporter&#39;s manifest, actually. You can inspect the <code>@EXPORT</code> package variables, and other related package variables, at runtime.)</p>
+
+<p><a>Perl6::Export</a> isn&#39;t actually attribute based, but looks similar. Its syntax is borrowed from Perl 6, and implemented by a source filter. It is a prototype of an interface that is still being designed. It should probably be avoided for production work. On the other hand, <a>Perl6::Export::Attrs</a> implements Perl 6-like exporting, but translates it into Perl 5 by providing attributes.</p>
+
+</li>
+<li><p>Other Exporters</p>
+
+<p><a>Exporter::Renaming</a> wraps the standard Exporter to allow it to export symbols with changed names.</p>
+
+<p><a>Class::Exporter</a> performs a special kind of routine generation, giving each importing package an instance of your class, and then exporting the instance&#39;s methods as normal routines. (Sub::Exporter, of course, can easily emulate this behavior, as shown above.)</p>
+
+<p><a>Exporter::Tidy</a> implements a form of renaming (using its <code>_map</code> argument) and of prefixing, and implements groups. It also avoids using package variables for its configuration.</p>
+
+</li>
+</ul>
+
+<h1 id="TODO">TODO</h1>
+
+<ul>
+
+<li><p>write a set of longer, more demonstrative examples</p>
+
+</li>
+<li><p>solidify the &quot;custom exporter&quot; interface (see <code>&amp;default_exporter</code>)</p>
+
+</li>
+<li><p>add an &quot;always&quot; group</p>
+
+</li>
+</ul>
+
+<h1 id="THANKS">THANKS</h1>
+
+<p>Hans Dieter Pearcey provided helpful advice while I was writing Sub::Exporter. Ian Langworth and Shawn Sorichetti asked some good questions and helped me improve my documentation quite a bit. Yuval Kogman helped me find a bunch of little problems.</p>
+
+<p>Thanks, guys!</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Ricardo Signes &lt;rjbs@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>This software is copyright (c) 2007 by Ricardo Signes.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+

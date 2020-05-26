@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#NOTES">NOTES</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::ControlStructures::ProhibitPostfixControls - Write <code><span class="keyword">if</span><span class="operator">(</span><span class="variable">$condition</span><span class="operator">){</span> <span class="variable">do_something</span><span class="operator">()</span> <span class="operator">}</span>
+</code> instead of <code>do_something() if $condition</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Conway discourages using postfix control structures (<code>if</code>, <code>for</code>, <code>unless</code>, <code>until</code>, <code>when</code>, <code>while</code>) because they hide control flow. The <code>unless</code> and <code>until</code> controls are particularly evil because they lead to double-negatives that are hard to comprehend. The only tolerable usage of a postfix <code>if</code>/<code>when</code> is when it follows a loop break such as <code>last</code>, <code>next</code>, <code>redo</code>, or <code>continue</code>.</p>
+
+<pre><code>    <span class="variable">do_something</span><span class="operator">()</span> <span class="keyword">if</span> <span class="variable">$condition</span><span class="operator">;</span>           <span class="comment"># not ok</span>
+    <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$condition</span><span class="operator">)</span> <span class="operator">{</span> <span class="variable">do_something</span><span class="operator">()</span> <span class="operator">}</span>      <span class="comment"># ok</span>
+    
+    <span class="variable">do_something</span><span class="operator">()</span> <span class="keyword">while</span> <span class="variable">$condition</span><span class="operator">;</span>        <span class="comment"># not ok</span>
+    <span class="keyword">while</span> <span class="operator">(</span><span class="variable">$condition</span><span class="operator">)</span> <span class="operator">{</span> <span class="variable">do_something</span><span class="operator">()</span> <span class="operator">}</span>   <span class="comment"># ok</span>
+    
+    <span class="variable">do_something</span><span class="operator">()</span> <span class="keyword">unless</span> <span class="variable">$condition</span><span class="operator">;</span>       <span class="comment"># not ok</span>
+    <span class="variable">do_something</span><span class="operator">()</span> <span class="keyword">unless</span> <span class="operator">!</span> <span class="variable">$condition</span><span class="operator">;</span>     <span class="comment"># really bad</span>
+    <span class="keyword">if</span> <span class="operator">(!</span> <span class="variable">$condition</span><span class="operator">)</span> <span class="operator">{</span> <span class="variable">do_something</span><span class="operator">()</span> <span class="operator">}</span>    <span class="comment"># ok</span>
+    
+    <span class="variable">do_something</span><span class="operator">()</span> <span class="keyword">until</span> <span class="variable">$condition</span><span class="operator">;</span>        <span class="comment"># not ok</span>
+    <span class="variable">do_something</span><span class="operator">()</span> <span class="keyword">until</span> <span class="operator">!</span> <span class="variable">$condition</span><span class="operator">;</span>      <span class="comment"># really bad</span>
+    <span class="keyword">while</span> <span class="operator">(!</span> <span class="variable">$condition</span><span class="operator">)</span> <span class="operator">{</span> <span class="variable">do_something</span><span class="operator">()</span> <span class="operator">}</span> <span class="comment"># ok</span>
+    
+    <span class="variable">do_something</span><span class="operator">(</span><span class="variable">$_</span><span class="operator">)</span> <span class="keyword">for</span> <span class="variable">@list</span><span class="operator">;</span>             <span class="comment"># not ok</span>
+    
+    <span class="variable">LOOP</span><span class="operator">:</span>
+    <span class="keyword">for</span> <span class="keyword">my</span> <span class="variable">$n</span> <span class="operator">(</span><span class="number">0</span><span class="operator">..</span><span class="number">100</span><span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">next</span> <span class="keyword">if</span> <span class="variable">$condition</span><span class="operator">;</span>                 <span class="comment"># ok</span>
+        <span class="keyword">last</span> <span class="variable">LOOP</span> <span class="keyword">if</span> <span class="variable">$other_condition</span><span class="operator">;</span>      <span class="comment"># also ok</span>
+    
+        <span class="keyword">next</span> <span class="keyword">when</span> <span class="regex">m&lt; 0 \z &gt;xms</span><span class="operator">;</span>             <span class="comment"># fine too</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>A set of constructs to be ignored by this policy can specified by giving a value for &#39;allow&#39; of a string of space-delimited keywords: <code>if</code>, <code>for</code>, <code>unless</code>, <code>until</code>, <code>when</code>, and/or <code>while</code>. An example of specifying allowed flow-control structures in a <i>.perlcriticrc</i> file:</p>
+
+<pre><code>    [ControlStructures::ProhibitPostfixControls]
+    allow = for if until</code></pre>
+
+<p>By default, all postfix control keywords are prohibited.</p>
+
+<p>The set of flow-control functions that are exempt from the restriction can also be configured with the &#39;flowcontrol&#39; directive in your <i>.perlcriticrc</i> file:</p>
+
+<pre><code>    [ControlStructures::ProhibitPostfixControls]
+    flowcontrol = warn die carp croak cluck confess goto exit</code></pre>
+
+<p>This is useful if you&#39;re using additional modules that add things like <code>assert</code> or <code>throw</code>.</p>
+
+<h1 id="NOTES">NOTES</h1>
+
+<p>The <code>die</code>, <code>croak</code>, and <code>confess</code> functions are frequently used as flow-controls just like <code>next</code> or <code>last</code>. So this Policy does permit you to use a postfix <code>if</code> when the statement begins with one of those functions. It is also pretty common to use <code>warn</code>, <code>carp</code>, and <code>cluck</code> with a postfix <code>if</code>, so those are allowed too.</p>
+
+<p>The <code>when</code> keyword was added to the language after Perl Best Practices was written. This policy treats <code>when</code> the same way it does <code>if</code>, i.e. it&#39;s allowed after flow-control constructs. Thanks to brian d foy for the <a href="http://www.effectiveperlprogramming.com/blog/543">inspiration</a>.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Look for the <code><span class="keyword">do</span> <span class="operator">{}</span> <span class="keyword">while</span>
+</code> case and change the explanation to point to page 123 when it is found. RT #37905.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

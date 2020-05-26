@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#AFFILIATION">AFFILIATION</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#CAVEATS">CAVEATS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Perl::Critic::Policy::Variables::ProhibitPunctuationVars - Write <code>$EVAL_ERROR</code> instead of <code>$@</code>.</p>
+
+<h1 id="AFFILIATION">AFFILIATION</h1>
+
+<p>This Policy is part of the core <a href="../../../../../lib/Perl/Critic.html">Perl::Critic</a> distribution.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Perl&#39;s vocabulary of punctuation variables such as <code>$!</code>, <code>$.</code>, and <code>$^</code> are perhaps the leading cause of its reputation as inscrutable line noise. The simple alternative is to use the <a href="../../../../../lib/English.html">English</a> module to give them clear names.</p>
+
+<pre><code>  <span class="variable">$|</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span>                      <span class="comment">#not ok</span>
+  
+  <span class="keyword">use</span> <span class="variable">English</span> <span class="string">qw(-no_match_vars)</span><span class="operator">;</span>
+  <span class="keyword">local</span> <span class="variable">$OUTPUT_AUTOFLUSH</span> <span class="operator">=</span> <span class="keyword">undef</span><span class="operator">;</span> <span class="comment">#ok</span>
+</code></pre>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>The scratch variables <code>$_</code> and <code>@_</code> are very common and are pretty well understood, so they are exempt from this policy. The same goes for the less-frequently-used default filehandle <code>_</code> used by stat(). All the regexp capture variables (<code>$1</code>, <code>$2</code>, ...) are exempt too. <code>$]</code> is exempt because there is no <a href="../../../../../lib/English.html">English</a> equivalent and <a href="../../../../../lib/Module/CoreList.html">Module::CoreList</a> is based upon it.</p>
+
+<p>You can add more exceptions to your configuration. In your perlcriticrc file, add a block like this:</p>
+
+<pre><code>  [Variables::ProhibitPunctuationVars]
+  allow = $@ $!</code></pre>
+
+<p>The <code>allow</code> property should be a whitespace-delimited list of punctuation variables.</p>
+
+<p>Other configuration options control the parsing of interpolated strings in the search for forbidden variables. They have no effect on detecting punctuation variables outside of interpolated strings.</p>
+
+<pre><code>  [Variables::ProhibitPunctuationVars]
+  string_mode = thorough</code></pre>
+
+<p>The option <code>string_mode</code> controls whether and how interpolated strings are searched for punctuation variables. Setting <code>string_mode = thorough</code>, the default, checks for special cases that may look like punctuation variables but aren&#39;t, for example <code>$#foo</code>, an array index count; <code>$$bar</code>, a scalar dereference; or <code>$::baz</code>, a global symbol.</p>
+
+<p>Setting <code>string_mode = disable</code> causes all interpolated strings to be ignored entirely.</p>
+
+<p>Setting <code>string_mode = simple</code> uses a simple regular expression to find matches. In this mode, the magic variables <code>$$</code>, <code>$&#39;</code>, <code>$#</code> and <code>$:</code> are ignored within interpolated strings due to the high risk of false positives. Simple mode is retained from an earlier draft of the interpolated- strings code. Its use is only recommended as a workaround if bugs appear in thorough mode.</p>
+
+<p>The <code>string_mode</code> option will go away when the parsing of interpolated strings is implemented in PPI. See <a href="#CAVEATS">&quot;CAVEATS&quot;</a> below.</p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Punctuation variables that confuse PPI&#39;s document parsing may not be detected correctly or at all, and may prevent detection of subsequent ones. In particular, <code>$&quot;</code> is known to cause difficulties in interpolated strings.</p>
+
+<h1 id="CAVEATS">CAVEATS</h1>
+
+<p>ProhibitPunctuationVars relies exclusively on PPI to find punctuation variables in code, but does all the parsing itself for interpolated strings. When, at some point, this functionality is transferred to PPI, ProhibitPunctuationVars will cease doing the interpolating and the <code>string_mode</code> option will go away.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jeffrey Ryan Thalhammer &lt;jeff@imaginative-software.com&gt;</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2005-2011 Imaginative Software Systems. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

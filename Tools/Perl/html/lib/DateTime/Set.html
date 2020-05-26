@@ -1,0 +1,485 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../displayToc.js"></script>
+<script language="JavaScript" src="../../tocParas.js"></script>
+<script language="JavaScript" src="../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Set - Datetime sets and set math</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">DateTime</span><span class="operator">;</span>
+    <span class="keyword">use</span> <span class="variable">DateTime::Set</span><span class="operator">;</span>
+    
+    <span class="variable">$date1</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">2002</span><span class="operator">,</span> <span class="string">month</span> <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">,</span> <span class="string">day</span> <span class="operator">=&gt;</span> <span class="number">11</span> <span class="operator">);</span>
+    <span class="variable">$set1</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_datetimes</span><span class="operator">(</span> <span class="string">dates</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">$date1</span> <span class="operator">]</span> <span class="operator">);</span>
+    <span class="comment">#  set1 = 2002-03-11</span>
+    
+    <span class="variable">$date2</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">2003</span><span class="operator">,</span> <span class="string">month</span> <span class="operator">=&gt;</span> <span class="number">4</span><span class="operator">,</span> <span class="string">day</span> <span class="operator">=&gt;</span> <span class="number">12</span> <span class="operator">);</span>
+    <span class="variable">$set2</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_datetimes</span><span class="operator">(</span> <span class="string">dates</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">$date1</span><span class="operator">,</span> <span class="variable">$date2</span> <span class="operator">]</span> <span class="operator">);</span>
+    <span class="comment">#  set2 = 2002-03-11, and 2003-04-12</span>
+    
+    <span class="variable">$date3</span> <span class="operator">=</span> <span class="variable">DateTime</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">2003</span><span class="operator">,</span> <span class="string">month</span> <span class="operator">=&gt;</span> <span class="number">4</span><span class="operator">,</span> <span class="string">day</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+    <span class="keyword">print</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">(</span> <span class="variable">$date3</span> <span class="operator">)-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>      <span class="comment"># 2003-04-12</span>
+    <span class="keyword">print</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">previous</span><span class="operator">(</span> <span class="variable">$date3</span> <span class="operator">)-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>  <span class="comment"># 2002-03-11</span>
+    <span class="keyword">print</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">current</span><span class="operator">(</span> <span class="variable">$date3</span> <span class="operator">)-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>   <span class="comment"># 2002-03-11</span>
+    <span class="keyword">print</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">closest</span><span class="operator">(</span> <span class="variable">$date3</span> <span class="operator">)-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>   <span class="comment"># 2003-04-12</span>
+    
+    <span class="comment"># a 'monthly' recurrence:</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_recurrence</span><span class="operator">(</span> 
+        <span class="string">recurrence</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="keyword">if</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">is_infinite</span><span class="operator">;</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'month'</span> <span class="operator">)-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">months</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">)</span>
+        <span class="operator">},</span>
+        <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$date_span1</span><span class="operator">,</span>    <span class="comment"># optional span</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">union</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>         <span class="comment"># like "OR", "insert", "both"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>    <span class="comment"># like "delete", "remove"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">intersection</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>  <span class="comment"># like "AND", "while"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">;</span>             <span class="comment"># like "NOT", "negate", "invert"</span>
+    
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">intersects</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>  <span class="comment"># like "touches", "interferes"</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>    <span class="comment"># like "is-fully-inside"</span>
+    
+    <span class="comment"># data extraction </span>
+    <span class="variable">$date</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">min</span><span class="operator">;</span>           <span class="comment"># first date of the set</span>
+    <span class="variable">$date</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">max</span><span class="operator">;</span>           <span class="comment"># last date of the set</span>
+    
+    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">next</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>
+    <span class="operator">};</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DateTime::Set is a module for datetime sets. It can be used to handle two different types of sets.</p>
+
+<p>The first is a fixed set of predefined datetime objects. For example, if we wanted to create a set of datetimes containing the birthdays of people in our family for the current year.</p>
+
+<p>The second type of set that it can handle is one based on a recurrence, such as &quot;every Wednesday&quot;, or &quot;noon on the 15th day of every month&quot;. This type of set can have fixed starting and ending datetimes, but neither is required. So our &quot;every Wednesday set&quot; could be &quot;every Wednesday from the beginning of time until the end of time&quot;, or &quot;every Wednesday after 2003-03-05 until the end of time&quot;, or &quot;every Wednesday between 2003-03-05 and 2004-01-07&quot;.</p>
+
+<p>This module also supports set math operations, so you do things like create a new set from the union or difference of two sets, check whether a datetime is a member of a given set, etc.</p>
+
+<p>This is different from a <code>DateTime::Span</code>, which handles a continuous range as opposed to individual datetime points. There is also a module <code>DateTime::SpanSet</code> to handle sets of spans.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<ul>
+
+<li><p>from_datetimes</p>
+
+<p>Creates a new set from a list of datetimes.</p>
+
+<pre><code>   <span class="variable">$dates</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_datetimes</span><span class="operator">(</span> <span class="string">dates</span> <span class="operator">=&gt;</span> <span class="operator">[</span> <span class="variable">$dt1</span><span class="operator">,</span> <span class="variable">$dt2</span><span class="operator">,</span> <span class="variable">$dt3</span> <span class="operator">]</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The datetimes can be objects from class <code>DateTime</code>, or from a <code>DateTime::Calendar::*</code> class.</p>
+
+<p><code>DateTime::Infinite::*</code> objects are not valid set members.</p>
+
+</li>
+<li><p>from_recurrence</p>
+
+<p>Creates a new set specified via a &quot;recurrence&quot; callback.</p>
+
+<pre><code>    <span class="variable">$months</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_recurrence</span><span class="operator">(</span> 
+        <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$dt_span_this_year</span><span class="operator">,</span>    <span class="comment"># optional span</span>
+        <span class="string">recurrence</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span> 
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'month'</span> <span class="operator">)-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">months</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">)</span> 
+        <span class="operator">},</span> 
+    <span class="operator">);</span>
+</code></pre>
+
+<p>The <code>span</code> parameter is optional. It must be a <code>DateTime::Span</code> object.</p>
+
+<p>The span can also be specified using <code>start</code> / <code>after</code> and <code>end</code> / <code>before</code> parameters, as in the <code>DateTime::Span</code> constructor. In this case, if there is a <code>span</code> parameter it will be ignored.</p>
+
+<pre><code>    <span class="variable">$months</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_recurrence</span><span class="operator">(</span>
+        <span class="string">after</span> <span class="operator">=&gt;</span> <span class="variable">$dt_now</span><span class="operator">,</span>
+        <span class="string">recurrence</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'month'</span> <span class="operator">)-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">months</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+        <span class="operator">},</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>The recurrence function will be passed a single parameter, a datetime object. The parameter can be an object from class <code>DateTime</code>, or from one of the <code>DateTime::Calendar::*</code> classes. The parameter can also be a <code>DateTime::Infinite::Future</code> or a <code>DateTime::Infinite::Past</code> object.</p>
+
+<p>The recurrence must return the <i>next</i> event after that object. There is no guarantee as to what the returned object will be set to, only that it will be greater than the object passed to the recurrence.</p>
+
+<p>If there are no more datetimes after the given parameter, then the recurrence function should return <code>DateTime::Infinite::Future</code>.</p>
+
+<p>It is ok to modify the parameter <code>$_[0]</code> inside the recurrence function. There are no side-effects.</p>
+
+<p>For example, if you wanted a recurrence that generated datetimes in increments of 30 seconds, it would look like this:</p>
+
+<pre><code>  <span class="keyword">sub</span><span class="variable"> every_30_seconds </span><span class="operator">{</span>
+      <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="keyword">shift</span><span class="operator">;</span>
+      <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">second</span> <span class="operator">&lt;</span> <span class="number">30</span> <span class="operator">)</span> <span class="operator">{</span>
+          <span class="keyword">return</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'minute'</span> <span class="operator">)-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">seconds</span> <span class="operator">=&gt;</span> <span class="number">30</span> <span class="operator">);</span>
+      <span class="operator">}</span> <span class="keyword">else</span> <span class="operator">{</span>
+          <span class="keyword">return</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'minute'</span> <span class="operator">)-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">minutes</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+      <span class="operator">}</span>
+  <span class="operator">}</span>
+</code></pre>
+
+<p>Note that this recurrence takes leap seconds into account. Consider using <code>truncate()</code> in this manner to avoid complicated arithmetic problems!</p>
+
+<p>It is also possible to create a recurrence by specifying either or both of &#39;next&#39; and &#39;previous&#39; callbacks.</p>
+
+<p>The callbacks can return <code>DateTime::Infinite::Future</code> and <code>DateTime::Infinite::Past</code> objects, in order to define <i>bounded recurrences</i>. In this case, both &#39;next&#39; and &#39;previous&#39; callbacks must be defined:</p>
+
+<pre><code>    <span class="comment"># "monthly from $dt until forever"</span>
+    
+    <span class="keyword">my</span> <span class="variable">$months</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">from_recurrence</span><span class="operator">(</span>
+        <span class="string">next</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="variable">$dt</span> <span class="keyword">if</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">&lt;</span> <span class="variable">$dt</span><span class="operator">;</span>
+            <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'month'</span> <span class="operator">);</span>
+            <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">months</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">;</span>
+        <span class="operator">},</span>
+        <span class="string">previous</span> <span class="operator">=&gt;</span> <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">my</span> <span class="variable">$param</span> <span class="operator">=</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">;</span>
+            <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="string">'month'</span> <span class="operator">);</span>
+            <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span><span class="operator">-&gt;</span><span class="variable">subtract</span><span class="operator">(</span> <span class="string">months</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">)</span> <span class="keyword">if</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">==</span> <span class="variable">$param</span><span class="operator">;</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="keyword">if</span> <span class="variable">$_</span><span class="operator">[</span><span class="number">0</span><span class="operator">]</span> <span class="operator">&gt;=</span> <span class="variable">$dt</span><span class="operator">;</span>
+            <span class="keyword">return</span> <span class="variable">DateTime::Infinite::Past</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">;</span>
+        <span class="operator">},</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>Bounded recurrences are easier to write using <code>span</code> parameters. See above.</p>
+
+<p>See also <code>DateTime::Event::Recurrence</code> and the other <code>DateTime::Event::*</code> factory modules for generating specialized recurrences, such as sunrise and sunset times, and holidays.</p>
+
+</li>
+<li><p>empty_set</p>
+
+<p>Creates a new empty set.</p>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">DateTime::Set</span><span class="operator">-&gt;</span><span class="variable">empty_set</span><span class="operator">;</span>
+    <span class="keyword">print</span> <span class="string">"empty set"</span> <span class="keyword">unless</span> <span class="keyword">defined</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">max</span><span class="operator">;</span>
+</code></pre>
+
+</li>
+<li><p>is_empty_set</p>
+
+<p>Returns true is the set is empty; false otherwise.</p>
+
+<pre><code>    <span class="keyword">print</span> <span class="string">"nothing"</span> <span class="keyword">if</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">is_empty_set</span><span class="operator">;</span>
+</code></pre>
+
+</li>
+<li><p>clone</p>
+
+<p>This object method returns a replica of the given object.</p>
+
+<p><code>clone</code> is useful if you want to apply a transformation to a set, but you want to keep the previous value:</p>
+
+<pre><code>    <span class="variable">$set2</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">;</span>
+    <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">add_duration</span><span class="operator">(</span> <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>  <span class="comment"># $set1 is unaltered</span>
+</code></pre>
+
+</li>
+<li><p>add_duration( $duration )</p>
+
+<p>This method adds the specified duration to every element of the set.</p>
+
+<pre><code>    <span class="variable">$dt_dur</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">DateTime::Duration</span><span class="operator">(</span> <span class="string">year</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+    <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">add_duration</span><span class="operator">(</span> <span class="variable">$dt_dur</span> <span class="operator">);</span>
+</code></pre>
+
+<p>The original set is modified. If you want to keep the old values use:</p>
+
+<pre><code>    <span class="variable">$new_set</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">-&gt;</span><span class="variable">add_duration</span><span class="operator">(</span> <span class="variable">$dt_dur</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>add</p>
+
+<p>This method is syntactic sugar around the <code>add_duration()</code> method.</p>
+
+<pre><code>    <span class="variable">$meetings_2004</span> <span class="operator">=</span> <span class="variable">$meetings_2003</span><span class="operator">-&gt;</span><span class="variable">clone</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">years</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">);</span>
+</code></pre>
+
+</li>
+<li><p>subtract_duration( $duration_object )</p>
+
+<p>When given a <code>DateTime::Duration</code> object, this method simply calls <code>invert()</code> on that object and passes that new duration to the <code>add_duration</code> method.</p>
+
+</li>
+<li><p>subtract( DateTime::Duration-&gt;new parameters )</p>
+
+<p>Like <code>add()</code>, this is syntactic sugar for the <code>subtract_duration()</code> method.</p>
+
+</li>
+<li><p>set_time_zone( $tz )</p>
+
+<p>This method will attempt to apply the <code>set_time_zone</code> method to every datetime in the set.</p>
+
+</li>
+<li><p>set( locale =&gt; .. )</p>
+
+<p>This method can be used to change the <code>locale</code> of a datetime set.</p>
+
+</li>
+<li><p>start, min</p>
+
+</li>
+<li><p>end, max</p>
+
+<p>The first and last <code>DateTime</code> in the set.</p>
+
+<p>These methods may return <code>undef</code> if the set is empty.</p>
+
+<p>It is also possible that these methods may return a <code>DateTime::Infinite::Past</code> or <code>DateTime::Infinite::Future</code> object.</p>
+
+<p>These methods return just a <i>copy</i> of the actual value. If you modify the result, the set will not be modified.</p>
+
+</li>
+<li><p>span</p>
+
+<p>Returns the total span of the set, as a <code>DateTime::Span</code> object.</p>
+
+</li>
+<li><p>iterator / next / previous</p>
+
+<p>These methods can be used to iterate over the datetimes in a set.</p>
+
+<pre><code>    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">next</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>
+    <span class="operator">}</span>
+    
+    <span class="comment"># iterate backwards</span>
+    <span class="variable">$iter</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">iterator</span><span class="operator">;</span>
+    <span class="keyword">while</span> <span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$iter</span><span class="operator">-&gt;</span><span class="variable">previous</span> <span class="operator">)</span> <span class="operator">{</span>
+        <span class="keyword">print</span> <span class="variable">$dt</span><span class="operator">-&gt;</span><span class="variable">ymd</span><span class="operator">;</span>
+    <span class="operator">}</span>
+</code></pre>
+
+<p>The boundaries of the iterator can be limited by passing it a <code>span</code> parameter. This should be a <code>DateTime::Span</code> object which delimits the iterator&#39;s boundaries. Optionally, instead of passing an object, you can pass any parameters that would work for one of the <code>DateTime::Span</code> class&#39;s constructors, and an object will be created for you.</p>
+
+<p>Obviously, if the span you specify is not restricted both at the start and end, then your iterator may iterate forever, depending on the nature of your set. User beware!</p>
+
+<p>The <code>next()</code> or <code>previous()</code> method will return <code>undef</code> when there are no more datetimes in the iterator.</p>
+
+</li>
+<li><p>as_list</p>
+
+<p>Returns the set elements as a list of <code>DateTime</code> objects. Just as with the <code>iterator()</code> method, the <code>as_list()</code> method can be limited by a span.</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">@dt</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">as_list</span><span class="operator">(</span> <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$span</span> <span class="operator">);</span>
+</code></pre>
+
+<p>Applying <code>as_list()</code> to a large recurrence set is a very expensive operation, both in CPU time and in the memory used. If you <i>really</i> need to extract elements from a large set, you can limit the set with a shorter span:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">@short_list</span> <span class="operator">=</span> <span class="variable">$large_set</span><span class="operator">-&gt;</span><span class="variable">as_list</span><span class="operator">(</span> <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$short_span</span> <span class="operator">);</span>
+</code></pre>
+
+<p>For <i>infinite</i> sets, <code>as_list()</code> will return <code>undef</code>. Please note that this is explicitly not an empty list, since an empty list is a valid return value for empty sets!</p>
+
+</li>
+<li><p>count</p>
+
+<p>Returns a count of <code>DateTime</code> objects in the set. Just as with the <code>iterator()</code> method, the <code>count()</code> method can be limited by a span.</p>
+
+<pre><code>  <span class="keyword">defined</span><span class="operator">(</span> <span class="keyword">my</span> <span class="variable">$n</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">count</span><span class="operator">)</span> <span class="keyword">or</span> <span class="keyword">die</span> <span class="string">"can't count"</span><span class="operator">;</span>
+  
+  <span class="keyword">my</span> <span class="variable">$n</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">count</span><span class="operator">(</span> <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$span</span> <span class="operator">);</span>
+  <span class="keyword">die</span> <span class="string">"can't count"</span> <span class="keyword">unless</span> <span class="keyword">defined</span> <span class="variable">$n</span><span class="operator">;</span>
+</code></pre>
+
+<p>Applying <code>count()</code> to a large recurrence set is a very expensive operation, both in CPU time and in the memory used. If you <i>really</i> need to count elements from a large set, you can limit the set with a shorter span:</p>
+
+<pre><code>    <span class="keyword">my</span> <span class="variable">$count</span> <span class="operator">=</span> <span class="variable">$large_set</span><span class="operator">-&gt;</span><span class="variable">count</span><span class="operator">(</span> <span class="string">span</span> <span class="operator">=&gt;</span> <span class="variable">$short_span</span> <span class="operator">);</span>
+</code></pre>
+
+<p>For <i>infinite</i> sets, <code>count()</code> will return <code>undef</code>. Please note that this is explicitly not a scalar zero, since a zero count is a valid return value for empty sets!</p>
+
+</li>
+<li><p>union</p>
+
+</li>
+<li><p>intersection</p>
+
+</li>
+<li><p>complement</p>
+
+<p>These set operation methods can accept a <code>DateTime</code> list, a <code>DateTime::Set</code>, a <code>DateTime::Span</code>, or a <code>DateTime::SpanSet</code> object as an argument.</p>
+
+<pre><code>    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">union</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>         <span class="comment"># like "OR", "insert", "both"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>    <span class="comment"># like "delete", "remove"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">intersection</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">);</span>  <span class="comment"># like "AND", "while"</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">complement</span><span class="operator">;</span>             <span class="comment"># like "NOT", "negate", "invert"</span>
+</code></pre>
+
+<p>The <code>union</code> of a <code>DateTime::Set</code> with a <code>DateTime::Span</code> or a <code>DateTime::SpanSet</code> object returns a <code>DateTime::SpanSet</code> object.</p>
+
+<p>If <code>complement</code> is called without any arguments, then the result is a <code>DateTime::SpanSet</code> object representing the spans between each of the set&#39;s elements. If complement is given an argument, then the return value is a <code>DateTime::Set</code> object representing the <i>set difference</i> between the sets.</p>
+
+<p>All other operations will always return a <code>DateTime::Set</code>.</p>
+
+</li>
+<li><p>intersects</p>
+
+</li>
+<li><p>contains</p>
+
+<p>These set operations result in a boolean value.</p>
+
+<pre><code>    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">intersects</span><span class="operator">(</span> <span class="variable">$set2</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>  <span class="comment"># like "touches", "interferes"</span>
+    <span class="keyword">if</span> <span class="operator">(</span> <span class="variable">$set1</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">)</span> <span class="operator">)</span> <span class="operator">{</span> <span class="operator">...</span>    <span class="comment"># like "is-fully-inside"</span>
+</code></pre>
+
+<p>These methods can accept a <code>DateTime</code> list, a <code>DateTime::Set</code>, a <code>DateTime::Span</code>, or a <code>DateTime::SpanSet</code> object as an argument.</p>
+
+<p>intersects() returns 1 for true, and 0 for false. In a few cases the algorithm can&#39;t decide if the sets intersect at all, and intersects() will return <code>undef</code>.</p>
+
+</li>
+<li><p>previous</p>
+
+</li>
+<li><p>next</p>
+
+</li>
+<li><p>current</p>
+
+</li>
+<li><p>closest</p>
+
+<pre><code>  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">next</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">previous</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">current</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$dt</span> <span class="operator">=</span> <span class="variable">$set</span><span class="operator">-&gt;</span><span class="variable">closest</span><span class="operator">(</span> <span class="variable">$dt</span> <span class="operator">);</span>
+</code></pre>
+
+<p>These methods are used to find a set member relative to a given datetime.</p>
+
+<p>The <code>current()</code> method returns <code>$dt</code> if $dt is an event, otherwise it returns the previous event.</p>
+
+<p>The <code>closest()</code> method returns <code>$dt</code> if $dt is an event, otherwise it returns the closest event (previous or next).</p>
+
+<p>All of these methods may return <code>undef</code> if there is no matching datetime in the set.</p>
+
+<p>These methods will try to set the returned value to the same time zone as the argument, unless the argument has a &#39;floating&#39; time zone.</p>
+
+</li>
+<li><p>map ( sub { ... } )</p>
+
+<pre><code>    <span class="comment"># example: remove the hour:minute:second information</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">map</span><span class="operator">(</span> 
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">truncate</span><span class="operator">(</span> <span class="string">to</span> <span class="operator">=&gt;</span> <span class="variable">day</span> <span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+    
+    <span class="comment"># example: postpone or antecipate events which </span>
+    <span class="comment">#          match datetimes within another set</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">map</span><span class="operator">(</span>
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">add</span><span class="operator">(</span> <span class="string">days</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="operator">)</span> <span class="keyword">while</span> <span class="variable">$holidays</span><span class="operator">-&gt;</span><span class="variable">contains</span><span class="operator">(</span> <span class="variable">$_</span> <span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This method is the &quot;set&quot; version of Perl &quot;map&quot;.</p>
+
+<p>It evaluates a subroutine for each element of the set (locally setting &quot;$_&quot; to each datetime) and returns the set composed of the results of each such evaluation.</p>
+
+<p>Like Perl &quot;map&quot;, each element of the set may produce zero, one, or more elements in the returned value.</p>
+
+<p>Unlike Perl &quot;map&quot;, changing &quot;$_&quot; does not change the original set. This means that calling map in void context has no effect.</p>
+
+<p>The callback subroutine may be called later in the program, due to lazy evaluation. So don&#39;t count on subroutine side-effects. For example, a <code>print</code> inside the subroutine may happen later than you expect.</p>
+
+<p>The callback return value is expected to be within the span of the <code>previous</code> and the <code>next</code> element in the original set. This is a limitation of the backtracking algorithm used in the <code>Set::Infinite</code> library.</p>
+
+<p>For example: given the set <code>[ 2001, 2010, 2015 ]</code>, the callback result for the value <code>2010</code> is expected to be within the span <code>[ 2001 .. 2015 ]</code>.</p>
+
+</li>
+<li><p>grep ( sub { ... } )</p>
+
+<pre><code>    <span class="comment"># example: filter out any sundays</span>
+    <span class="variable">$set</span> <span class="operator">=</span> <span class="variable">$set2</span><span class="operator">-&gt;</span><span class="variable">grep</span><span class="operator">(</span> 
+        <span class="keyword">sub</span><span class="variable"> </span><span class="operator">{</span>
+            <span class="keyword">return</span> <span class="operator">(</span> <span class="variable">$_</span><span class="operator">-&gt;</span><span class="variable">day_of_week</span> <span class="operator">!=</span> <span class="number">7</span> <span class="operator">);</span>
+        <span class="operator">}</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>This method is the &quot;set&quot; version of Perl &quot;grep&quot;.</p>
+
+<p>It evaluates a subroutine for each element of the set (locally setting &quot;$_&quot; to each datetime) and returns the set consisting of those elements for which the expression evaluated to true.</p>
+
+<p>Unlike Perl &quot;grep&quot;, changing &quot;$_&quot; does not change the original set. This means that calling grep in void context has no effect.</p>
+
+<p>Changing &quot;$_&quot; does change the resulting set.</p>
+
+<p>The callback subroutine may be called later in the program, due to lazy evaluation. So don&#39;t count on subroutine side-effects. For example, a <code>print</code> inside the subroutine may happen later than you expect.</p>
+
+</li>
+<li><p>iterate ( sub { ... } )</p>
+
+<p><i>deprecated method - please use &quot;map&quot; or &quot;grep&quot; instead.</i></p>
+
+</li>
+</ul>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is offered through the <code>datetime@perl.org</code> mailing list.</p>
+
+<p>Please report bugs using rt.cpan.org</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Flavio Soibelmann Glock &lt;fglock@gmail.com&gt;</p>
+
+<p>The API was developed together with Dave Rolsky and the DateTime Community.</p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2003-2006 Flavio Soibelmann Glock. All rights reserved. This program is free software; you can distribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>Set::Infinite</p>
+
+<p>For details on the Perl DateTime Suite project please see <a href="http://datetime.perl.org">http://datetime.perl.org</a>.</p>
+
+
+</body>
+
+</html>
+
+

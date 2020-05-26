@@ -1,0 +1,112 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#INTERFACE">INTERFACE</a>
+    <ul>
+      <li><a href="#get_constant_name_elements_from_declaring_statement-statement">get_constant_name_elements_from_declaring_statement($statement)</a></li>
+    </ul>
+  </li>
+  <li><a href="#BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Utilities::Statement - Extensions to <a href="../../../lib/PPI/Statement.html">PPI::Statement</a>.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes PPIx::Utilities::Statement version 1.1.0.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">PPI::Document</span> <span class="string">qw&lt; &gt;</span><span class="operator">;</span>
+    
+    <span class="keyword">use</span> <span class="variable">PPIx::Utilities::Statement</span> <span class="string">qw&lt;
+        get_constant_name_elements_from_declaring_statement
+    &gt;</span><span class="operator">;</span>
+    
+    <span class="keyword">my</span> <span class="variable">$document</span> <span class="operator">=</span> <span class="variable">PPI::Document</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(\</span><span class="string">'Readonly::Scalar my $THINGY =&gt; 47.2;'</span><span class="operator">);</span>
+    
+    <span class="comment"># Returns the PPI::Token::Symbol for "$THINGY".</span>
+    <span class="keyword">my</span> <span class="operator">(</span><span class="variable">$constant</span><span class="operator">)</span> <span class="operator">=</span> <span class="variable">get_constant_name_elements_from_declaring_statement</span><span class="operator">(</span>
+        <span class="variable">$document</span><span class="operator">-&gt;</span><span class="variable">schild</span><span class="operator">(</span><span class="number">0</span><span class="operator">)</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This is a collection of functions for dealing with <a href="../../../lib/PPI/Statement.html">PPI::Statement</a>s.</p>
+
+<h1 id="INTERFACE">INTERFACE</h1>
+
+<p>Nothing is exported by default.</p>
+
+<h2 id="get_constant_name_elements_from_declaring_statement-statement"><code>get_constant_name_elements_from_declaring_statement($statement)</code></h2>
+
+<p>Given a <a href="../../../lib/PPI/Statement.html">PPI::Statement</a>, if the statement is a <a href="../../../lib/Readonly.html">Readonly</a> or <a>Const::Fast</a> declaration statement or a <code>use constant</code>, returns the names of the things being defined.</p>
+
+<p>Given</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">constant</span> <span class="number">1.16</span> <span class="string">FOO</span> <span class="operator">=&gt;</span> <span class="string">'bar'</span><span class="operator">;</span>
+</code></pre>
+
+<p>this will return the <a href="../../../lib/PPI/Token/Word.html">PPI::Token::Word</a> containing <code>&#39;FOO&#39;</code>. Given</p>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">constant</span> <span class="number">1.16</span> <span class="operator">{</span> <span class="string">FOO</span> <span class="operator">=&gt;</span> <span class="string">'bar'</span><span class="operator">,</span> <span class="string">'BAZ'</span> <span class="operator">=&gt;</span> <span class="string">'burfle'</span> <span class="operator">};</span>
+</code></pre>
+
+<p>this will return a list of the <a href="../../../lib/PPI/Token.html">PPI::Token</a>s containing <code>&#39;FOO&#39;</code> and <code>&#39;BAZ&#39;</code>. Similarly, given</p>
+
+<pre><code>    <span class="variable">Readonly::Hash</span> <span class="keyword">my</span> <span class="variable">%FOO</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="string">'baz'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>or</p>
+
+<pre><code>    <span class="variable">const</span> <span class="keyword">my</span> <span class="variable">%FOO</span> <span class="operator">=&gt;</span> <span class="operator">(</span> <span class="string">bar</span> <span class="operator">=&gt;</span> <span class="string">'baz'</span> <span class="operator">);</span>
+</code></pre>
+
+<p>this will return the <a href="../../../lib/PPI/Token/Symbol.html">PPI::Token::Symbol</a> containing <code>&#39;%FOO&#39;</code>.</p>
+
+<h1 id="BUGS-AND-LIMITATIONS">BUGS AND LIMITATIONS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-ppix-utilities@rt.cpan.org</code>, or through the web interface at <a href="http://rt.cpan.org">http://rt.cpan.org</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <code>&lt;wyant at cpan dot org&gt;</code></p>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright (c) 2009-2010 Thomas R. Wyant, III. All rights reserved.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the LICENSE file included with this module.</p>
+
+
+</body>
+
+</html>
+
+

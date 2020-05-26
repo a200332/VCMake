@@ -1,0 +1,145 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#INHERITANCE">INHERITANCE</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#The-a-aa-d-l-and-u-modifiers">The a, aa, d, l, and u modifiers</a></li>
+      <li><a href="#The-caret-modifier">The caret (^) modifier</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#asserts">asserts</a></li>
+      <li><a href="#match_semantics">match_semantics</a></li>
+      <li><a href="#modifiers">modifiers</a></li>
+      <li><a href="#negates">negates</a></li>
+    </ul>
+  </li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>PPIx::Regexp::Token::Modifier - Represent modifiers.</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code> <span class="keyword">use</span> <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">;</span>
+ <span class="variable">PPIx::Regexp::Dumper</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span> <span class="string">'qr{foo}smx'</span> <span class="operator">)</span>
+     <span class="operator">-&gt;</span><span class="variable">print</span><span class="operator">();</span>
+</code></pre>
+
+<p>The trailing <code>smx</code> will be represented by this class.</p>
+
+<p>This class also represents the whole of things like <code>(?ismx)</code>. But the modifiers in something like <code>(?i:foo)</code> are represented by a <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Modifier.html">PPIx::Regexp::Token::GroupType::Modifier</a>.</p>
+
+<h1 id="INHERITANCE">INHERITANCE</h1>
+
+<p><code>PPIx::Regexp::Token::Modifier</code> is a <a href="../../../../lib/PPIx/Regexp/Token.html">PPIx::Regexp::Token</a>.</p>
+
+<p><code>PPIx::Regexp::Token::Modifier</code> is the parent of <a href="../../../../lib/PPIx/Regexp/Token/GroupType/Modifier.html">PPIx::Regexp::Token::GroupType::Modifier</a>.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class represents modifier characters at the end of the regular expression. For example, in <code>qr{foo}smx</code> this class would represent the terminal <code>smx</code>.</p>
+
+<h2 id="The-a-aa-d-l-and-u-modifiers">The <code>a</code>, <code>aa</code>, <code>d</code>, <code>l</code>, and <code>u</code> modifiers</h2>
+
+<p>The <code>a</code>, <code>aa</code>, <code>d</code>, <code>l</code>, and <code>u</code> modifiers, introduced starting in Perl 5.13.6, are used to force either Unicode pattern semantics (<code>u</code>), locale semantics (<code>l</code>) default semantics (<code>d</code> the traditional Perl semantics, which can also mean &#39;dual&#39; since it means Unicode if the string&#39;s UTF-8 bit is on, and locale if the UTF-8 bit is off), or restricted default semantics (<code>a</code>). These are mutually exclusive, and only one can be asserted at a time. Asserting any of these overrides the inherited value of any of the others. The <code>asserted()</code> method reports as asserted the last one it sees, or none of them if it has seen none.</p>
+
+<p>For example, given <code>PPIx::Regexp::Token::Modifier</code> <code>$elem</code> representing the invalid regular expression fragment <code>(?dul)</code>, <code>$elem-&gt;asserted( &#39;l&#39; )</code> would return true, but <code>$elem-&gt;asserted( &#39;u&#39; )</code> would return false. Note that <code>$elem-&gt;negated( &#39;u&#39; )</code> would also return false, since <code>u</code> is not explicitly negated.</p>
+
+<p>If <code>$elem</code> represented regular expression fragment <code>(?i)</code>, <code>$elem-&gt;asserted( &#39;d&#39; )</code> would return false, since even though <code>d</code> represents the default behavior it is not explicitly asserted.</p>
+
+<h2 id="The-caret-modifier">The caret (<code>^</code>) modifier</h2>
+
+<p>Calling <code>^</code> a modifier is a bit of a misnomer. The <code>(?^...)</code> construction was introduced in Perl 5.13.6, to prevent the inheritance of modifiers. The documentation calls the caret a shorthand equivalent for <code>d-imsx</code>, and that it the way this class handles it.</p>
+
+<p>For example, given <code>PPIx::Regexp::Token::Modifier</code> <code>$elem</code> representing regular expression fragment <code>(?^i)</code>, <code>$elem-&gt;asserted( &#39;d&#39; )</code> would return true, since in the absence of an explicit <code>l</code> or <code>u</code> this class considers the <code>^</code> to explicitly assert <code>d</code>.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>This class provides the following public methods. Methods not documented here are private, and unsupported in the sense that the author reserves the right to change or remove them without notice.</p>
+
+<h2 id="asserts">asserts</h2>
+
+<pre><code> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">asserts</span><span class="operator">(</span> <span class="string">'i'</span> <span class="operator">)</span> <span class="keyword">and</span> <span class="keyword">print</span> <span class="string">"token asserts i"</span><span class="operator">;</span>
+ <span class="keyword">foreach</span> <span class="operator">(</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">asserts</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span> <span class="keyword">print</span> <span class="string">"token asserts </span><span class="variable">$_</span><span class="string">\n"</span> <span class="operator">}</span>
+</code></pre>
+
+<p>This method returns true if the token explicitly asserts the given modifier. The example would return true for the modifier in <code>(?i:foo)</code>, but false for <code>(?-i:foo)</code>.</p>
+
+<p>Starting with version 0.036_01, if the argument is a single-character modifier followed by an asterisk (intended as a wild card character), the return is the number of times that modifier appears. In this case an exception will be thrown if you specify a multi-character modifier (e.g. <code>&#39;ee*&#39;</code>), or if you specify one of the match semantics modifiers (e.g. <code>&#39;a*&#39;</code>).</p>
+
+<p>If called without an argument, or with an undef argument, all modifiers explicitly asserted by this token are returned.</p>
+
+<h2 id="match_semantics">match_semantics</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">$sem</span> <span class="operator">=</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">match_semantics</span><span class="operator">();</span>
+ <span class="keyword">defined</span> <span class="variable">$sem</span> <span class="keyword">or</span> <span class="variable">$sem</span> <span class="operator">=</span> <span class="string">'undefined'</span><span class="operator">;</span>
+ <span class="keyword">print</span> <span class="string">"This token has </span><span class="variable">$sem</span><span class="string"> match semantics\n"</span><span class="operator">;</span>
+</code></pre>
+
+<p>This method returns the match semantics asserted by the token, as one of the strings <code>&#39;a&#39;</code>, <code>&#39;aa&#39;</code>, <code>&#39;d&#39;</code>, <code>&#39;l&#39;</code>, or <code>&#39;u&#39;</code>. If no explicit match semantics are asserted, this method returns <code>undef</code>.</p>
+
+<h2 id="modifiers">modifiers</h2>
+
+<pre><code> <span class="keyword">my</span> <span class="variable">%mods</span> <span class="operator">=</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">modifiers</span><span class="operator">();</span>
+</code></pre>
+
+<p>Returns all modifiers asserted or negated by this token, and the values set (true for asserted, false for negated). If called in scalar context, returns a reference to a hash containing the values.</p>
+
+<h2 id="negates">negates</h2>
+
+<pre><code> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">negates</span><span class="operator">(</span> <span class="string">'i'</span> <span class="operator">)</span> <span class="keyword">and</span> <span class="keyword">print</span> <span class="string">"token negates i\n"</span><span class="operator">;</span>
+ <span class="keyword">foreach</span> <span class="operator">(</span> <span class="variable">$token</span><span class="operator">-&gt;</span><span class="variable">negates</span><span class="operator">()</span> <span class="operator">)</span> <span class="operator">{</span> <span class="keyword">print</span> <span class="string">"token negates </span><span class="variable">$_</span><span class="string">\n"</span> <span class="operator">}</span>
+</code></pre>
+
+<p>This method returns true if the token explicitly negates the given modifier. The example would return true for the modifier in <code>(?-i:foo)</code>, but false for <code>(?i:foo)</code>.</p>
+
+<p>If called without an argument, or with an undef argument, all modifiers explicitly negated by this token are returned.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Support is by the author. Please file bug reports at <a href="http://rt.cpan.org">http://rt.cpan.org</a>, or in electronic mail to the author.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Thomas R. Wyant, III <i>wyant at cpan dot org</i></p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>Copyright (C) 2009-2017 by Thomas R. Wyant, III</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the full text of the licenses in the directory LICENSES.</p>
+
+<p>This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.</p>
+
+
+</body>
+
+</html>
+
+

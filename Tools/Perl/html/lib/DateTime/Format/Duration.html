@@ -1,0 +1,505 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title></title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a></li>
+  <li><a href="#METHODS">METHODS</a></li>
+  <li><a href="#ACCESSORS">ACCESSORS</a></li>
+  <li><a href="#SETTERS">SETTERS</a></li>
+  <li><a href="#NOTES">NOTES</a>
+    <ul>
+      <li><a href="#Patterns">Patterns</a></li>
+      <li><a href="#Normalisation">Normalisation</a></li>
+      <li><a href="#Normalising-without-a-base">Normalising without a base</a></li>
+      <li><a href="#Deltas-vs-Duration-Objects">Deltas vs Duration Objects</a></li>
+    </ul>
+  </li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#CONTRIBUTOR">CONTRIBUTOR</a></li>
+  <li><a href="#COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DateTime::Format::Duration - Format and parse DateTime::Durations</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.04</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    <span class="keyword">use</span> <span class="variable">DateTime::Format::Duration</span><span class="operator">;</span>
+    
+    <span class="variable">$d</span> <span class="operator">=</span> <span class="variable">DateTime::Format::Duration</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+        <span class="string">pattern</span> <span class="operator">=&gt;</span> <span class="string">'%Y years, %m months, %e days, '</span><span class="operator">.</span>
+                <span class="string">'%H hours, %M minutes, %S seconds'</span>
+    <span class="operator">);</span>
+    
+    <span class="keyword">print</span> <span class="variable">$d</span><span class="operator">-&gt;</span><span class="variable">format_duration</span><span class="operator">(</span>
+        <span class="variable">DateTime::Duration</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+            <span class="string">years</span>   <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">,</span>
+            <span class="string">months</span>  <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">,</span>
+            <span class="string">days</span>    <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+            <span class="string">hours</span>   <span class="operator">=&gt;</span> <span class="number">6</span><span class="operator">,</span>
+            <span class="string">minutes</span> <span class="operator">=&gt;</span> <span class="number">15</span><span class="operator">,</span>
+            <span class="string">seconds</span> <span class="operator">=&gt;</span> <span class="number">45</span><span class="operator">,</span>
+            <span class="string">nanoseconds</span> <span class="operator">=&gt;</span> <span class="number">12000</span>
+        <span class="operator">)</span>
+    <span class="operator">);</span>
+    <span class="comment"># 3 years, 5 months, 1 days, 6 hours, 15 minutes, 45 seconds</span>
+    
+    
+    <span class="variable">$duration</span> <span class="operator">=</span> <span class="variable">$d</span><span class="operator">-&gt;</span><span class="variable">parse_duration</span><span class="operator">(</span>
+        <span class="string">'3 years, 5 months, 1 days, 6 hours, 15 minutes, 45 seconds'</span>
+    <span class="operator">);</span>
+    <span class="comment"># Returns DateTime::Duration object</span>
+    
+    
+    <span class="keyword">print</span> <span class="variable">$d</span><span class="operator">-&gt;</span><span class="variable">format_duration_from_deltas</span><span class="operator">(</span>
+        <span class="string">years</span>   <span class="operator">=&gt;</span> <span class="number">3</span><span class="operator">,</span>
+        <span class="string">months</span>  <span class="operator">=&gt;</span> <span class="number">5</span><span class="operator">,</span>
+        <span class="string">days</span>    <span class="operator">=&gt;</span> <span class="number">1</span><span class="operator">,</span>
+        <span class="string">hours</span>   <span class="operator">=&gt;</span> <span class="number">6</span><span class="operator">,</span>
+        <span class="string">minutes</span> <span class="operator">=&gt;</span> <span class="number">15</span><span class="operator">,</span>
+        <span class="string">seconds</span> <span class="operator">=&gt;</span> <span class="number">45</span><span class="operator">,</span>
+        <span class="string">nanoseconds</span> <span class="operator">=&gt;</span> <span class="number">12000</span>
+    <span class="operator">);</span>
+    <span class="comment"># 3 years, 5 months, 1 days, 6 hours, 15 minutes, 45 seconds</span>
+    
+    <span class="variable">%deltas</span> <span class="operator">=</span> <span class="variable">$d</span><span class="operator">-&gt;</span><span class="variable">parse_duration_as_deltas</span><span class="operator">(</span>
+          <span class="string">'3 years, 5 months, 1 days, 6 hours, 15 minutes, 45 seconds'</span>
+    <span class="operator">);</span>
+    <span class="comment"># Returns hash:</span>
+    <span class="comment"># (years=&gt;3, months=&gt;5, days=&gt;1, hours=&gt;6, minutes=&gt;15, seconds=&gt;45)</span>
+</code></pre>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<p>This module formats and parses <a href="../../../lib/DateTime/Duration.html">DateTime::Duration</a> objects as well as other durations representations.</p>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<p>This module contains a single constructor:</p>
+
+<ul>
+
+<li><p><code>new( ... )</code></p>
+
+<p>The <code>new</code> constructor takes the following attributes:</p>
+
+<ul>
+
+<li><p><code>pattern =&gt; $string</code></p>
+
+<p>This is a strf type pattern detailing the format of the duration. See the <a href="#Patterns">&quot;Patterns&quot;</a> sections below for more information.</p>
+
+</li>
+<li><p><code>normalise =&gt; $one_or_zero_or_ISO</code></p>
+
+</li>
+<li><p><code>normalize =&gt; $one_or_zero_or_ISO</code></p>
+
+<p>This determines whether durations are &#39;normalised&#39;. For example, does 120 seconds become 2 minutes?</p>
+
+<p>Setting this value to true without also setting a <code>base</code> means we will normalise without a base. See the <a href="#Normalising-without-a-base">&quot;Normalising without a base&quot;</a> section below.</p>
+
+</li>
+<li><p><code>base =&gt; $datetime_object</code></p>
+
+<p>If a base DateTime is given then that is the normalisation date. Setting this attribute overrides the above option and sets normalise to true.</p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p><a href="../../../lib/DateTime/Format/Duration.html">DateTime::Format::Duration</a> has the following methods:</p>
+
+<ul>
+
+<li><p><code>format_duration( $datetime_duration_object )</code></p>
+
+</li>
+<li><p><code>format_duration( duration =&gt; $dt_duration, pattern =&gt; $pattern )</code></p>
+
+<p>Returns a string representing a <a href="../../../lib/DateTime/Duration.html">DateTime::Duration</a> object in the format set by the pattern. If the first form is used, the pattern is taken from the object. If the object has no pattern then this method will croak.</p>
+
+</li>
+<li><p><code>format_duration_from_deltas( %deltas )</code></p>
+
+</li>
+<li><p><code>format_duration_from_deltas( %deltas, pattern =&gt; $pattern )</code></p>
+
+<p>As above, this method returns a string representing a duration in the format set by the pattern. However this method takes a hash of values. Permissible hash keys are <code>years, months, days, hours, minutes, seconds</code> and <code>nanoseconds</code> as well as <code>negative</code> which, if true, inverses the duration. (<code>years =&gt; -1</code> is the same as <code>years =&gt; 1, negative=&gt;1</code>)</p>
+
+</li>
+<li><p><code>parse_duration( $string )</code></p>
+
+<p>This method takes a string and returns a <a href="../../../lib/DateTime/Duration.html">DateTime::Duration</a> object that is the equivalent according to the pattern.</p>
+
+</li>
+<li><p><code>parse_duration_as_deltas( $string )</code></p>
+
+<p>Once again, this method is the same as above, however it returns a hash rather than an object.</p>
+
+</li>
+<li><p><code>normalise( $duration_object )</code></p>
+
+</li>
+<li><p><code>normalize( %deltas )</code></p>
+
+<p>Returns a hash of deltas after normalising the input. See the <a href="#NORMALISE">&quot;NORMALISE&quot;</a> section below for more information.</p>
+
+</li>
+</ul>
+
+<h1 id="ACCESSORS">ACCESSORS</h1>
+
+<ul>
+
+<li><p><code>pattern()</code></p>
+
+<p>Returns the current pattern.</p>
+
+</li>
+<li><p><code>base()</code></p>
+
+<p>Returns the current base.</p>
+
+</li>
+<li><p><code>normalising()</code></p>
+
+<p>Indicates whether or not the durations are being normalised.</p>
+
+</li>
+</ul>
+
+<h1 id="SETTERS">SETTERS</h1>
+
+<p>All setters return the object so that they can be strung together.</p>
+
+<ul>
+
+<li><p><code>set_pattern( $new_pattern )</code></p>
+
+<p>Sets the pattern and returns the object.</p>
+
+</li>
+<li><p><code>set_base( $new_DateTime )</code></p>
+
+<p>Sets the base <a href="../../../lib/DateTime.html">DateTime</a> and returns the object.</p>
+
+</li>
+<li><p><code>set_normalising( $true_or_false_or_ISO )</code></p>
+
+<p>Turns normalising on or off and returns the object.</p>
+
+</li>
+</ul>
+
+<h1 id="NOTES">NOTES</h1>
+
+<h2 id="Patterns">Patterns</h2>
+
+<p>This module uses a similar set of patterns to <a href="http://man.he.net/man3/strftime">strftime</a>. These patterns have been kept as close as possible to the original time-based patterns.</p>
+
+<ul>
+
+<li><p>%C</p>
+
+<p>The number of hundreds of years in the duration. 400 years would return 4. This is similar to centuries.</p>
+
+</li>
+<li><p>%d</p>
+
+<p>The number of days zero-padded to two digits. 2 days returns 02. 22 days returns 22 and 220 days returns 220.</p>
+
+</li>
+<li><p>%e</p>
+
+<p>The number of days.</p>
+
+</li>
+<li><p>%F</p>
+
+<p>Equivalent of %Y-%m-%d</p>
+
+</li>
+<li><p>%H</p>
+
+<p>The number of hours zero-padded to two digits.</p>
+
+</li>
+<li><p>%I</p>
+
+<p>Same as %H</p>
+
+</li>
+<li><p>%j</p>
+
+<p>The duration expressed in whole days. 36 hours returns 1</p>
+
+</li>
+<li><p>%k</p>
+
+<p>The hours without any padding</p>
+
+</li>
+<li><p>%l</p>
+
+<p>Same as %k</p>
+
+</li>
+<li><p>%m</p>
+
+<p>The months, zero-padded to two digits</p>
+
+</li>
+<li><p>%M</p>
+
+<p>The minutes, zero-padded to two digits</p>
+
+</li>
+<li><p>%n</p>
+
+<p>A linebreak when formatting and any whitespace when parsing</p>
+
+</li>
+<li><p>%N</p>
+
+<p>Nanoseconds - see note on precision at end</p>
+
+</li>
+<li><p>%p</p>
+
+<p>Either a &#39;+&#39; or a &#39;-&#39; indicating the positiveness of the duration</p>
+
+</li>
+<li><p>%P</p>
+
+<p>A &#39;-&#39; for negative durations and nothing for positive durations.</p>
+
+</li>
+<li><p>%r</p>
+
+<p>Equivalent of %H:%M:%S</p>
+
+</li>
+<li><p>%R</p>
+
+<p>Equivalent of %H:%M</p>
+
+</li>
+<li><p>%s</p>
+
+<p>Returns the value as seconds. 1 day, 5 seconds return 86405</p>
+
+</li>
+<li><p>%S</p>
+
+<p>Returns the seconds, zero-padded to two digits</p>
+
+</li>
+<li><p>%t</p>
+
+<p>A tab character when formatting or any whitespace when parsing</p>
+
+</li>
+<li><p>%T</p>
+
+<p>Equivalent of %P%H:%M:%S</p>
+
+</li>
+<li><p>%u</p>
+
+<p>Days after weeks are removed. 4 days returns 4, but 22 days returns 1 (22 days is three weeks, 1 day)</p>
+
+</li>
+<li><p>%V</p>
+
+<p>Duration expressed as weeks. 355 days returns 52.</p>
+
+</li>
+<li><p>%W</p>
+
+<p>Duration expressed as floating weeks. 10 days, 12 hours returns 1.5 weeks.</p>
+
+</li>
+<li><p>%y</p>
+
+<p>Years in the century. 145 years returns 45.</p>
+
+</li>
+<li><p>%Y</p>
+
+<p>Years, zero-padded to four digits</p>
+
+</li>
+<li><p>%%</p>
+
+<p>A &#39;%&#39; symbol</p>
+
+</li>
+</ul>
+
+<p><b>Precision</b> can be changed for any and all the above values. For all but nanoseconds (%N), the precision is the zero-padding. To change the precision insert a number between the &#39;%&#39; and the letter. For example: 1 year formatted with %6Y would return 000001 rather than the default 0001. Likewise, to remove padding %1Y would just return a 1.</p>
+
+<p>Nanosecond precision is the other way (nanoseconds are fractional and thus should be right padded). 123456789 nanoseconds formatted with %3N would return 123 and formatted as %12N would return 123456789000.</p>
+
+<h2 id="Normalisation">Normalisation</h2>
+
+<p>This module contains a complex method for normalising durations. The method ensures that the values for all components are as close to zero as possible. Rather than returning 68 minutes, it is normalised to 1 hour, 8 minutes.</p>
+
+<p>The complexity comes from three places:</p>
+
+<ul>
+
+<li><p>Mixed positive and negative components</p>
+
+<p>The duration of 1 day, minus 2 hours is easy to normalise in your head to 22 hours. However consider something more complex such as -2 years, +1 month, +22 days, +11 hours, -9 minutes.</p>
+
+<p>This module works from lowest to highest precision to calculate the duration. So, based on a <code>base</code> of 2004-03-28T00:00:00 the following transformations take place:</p>
+
+<pre><code>    2003-01-01T00:00:00 - 2 years   = 2001-01-01T00:00:00 === -2 years
+    2001-01-01T00:00:00 + 1 month   = 2001-02-01T00:00:00 === -1 year, 11 months
+    2001-02-01T00:00:00 + 22 days   = 2001-02-23T00:00:00 === -1yr, 10mths, 6days
+    2001-02-22T00:00:00 + 11 hours  = 2001-02-23T11:00:00 === -1y, 10m, 6d, 13h
+    2001-02-22T11:00:00 - 9 minutes = 2001-02-23T10:51:00 === -1y, 10m, 6d, 13h, 9m</code></pre>
+
+<img src="https://raw.githubusercontent.com/karenetheridge/DateTime-Format-Duration/master/docs/figure1.gif">
+
+<p>Figure 1 illustrates that, with the given base, -2 years, +1 month, +22 days, +11 hours, -9 minutes is normalised to -1 year, 10 months, 6 days, 13 hours and 9 minutes.</p>
+
+</li>
+<li><p>Months of unequal length.</p>
+
+<p>Unfortunately months can have 28, 29, 30 or 31 days and it can change from year to year. Thus if I wanted to normalise 2 months it could be any of 59 (Feb-Mar), 60 (Feb-Mar in a leap year), 61 (Mar-Apr, Apr-May, May-Jun, Jun-Jul, Aug-Sep, Sep-Oct, Oct-Nov or Nov-Dec) or 62 days (Dec-Jan or Jul-Aug). Because of this the module uses a base datetime for its calculations. If we use the base 2003-01-01T00:00:00 then two months would be 59 days (2003-03-01 - 2003-01-01)</p>
+
+</li>
+<li><p>The order of components</p>
+
+<p>Components will always be assessed from lowest to highest precision (years, months, days, hours, minutes, seconds, nanoseconds). This can really change things.</p>
+
+<p>Consider the duration of 1 day, 24 hours. Normally this will normalise to 2 days. However, consider changes to Daylight Savings. On the changes to and from DST days have 25 and 23 hours.</p>
+
+<p>If we take the base DateTime as midnight on the day DST ends (when there&#39;s 25 hours in the day), and add 1 day, 24 hours we end up at midnight 2 days later. So our duration normalises to two days.</p>
+
+<p>However, if we add 24 hours, 1 day we end up at 11pm on the next day! Why is this? Because midnight + 24 hours = 11pm (there&#39;s 25 hours on this day!), then we add 1 day and end up at 11pm on the following day.</p>
+
+<img src="https://raw.githubusercontent.com/karenetheridge/DateTime-Format-Duration/master/docs/figure2.gif">
+
+<p>Figure 2 illustrates the above problem on timelines.</p>
+
+</li>
+<li><p>Leap years and leap seconds</p>
+
+<p>Leap years and seconds further add to the confusion in normalisation. Leap seconds mean there are minutes that are 61 seconds long, thus 130 seconds can be 2 minutes, 10 seconds or 2 minutes 9 seconds, depending on the base DateTime. Similarly leap years mean a day can have 23, 24 or 25 hours.</p>
+
+<img src="https://raw.githubusercontent.com/karenetheridge/DateTime-Format-Duration/master/docs/figure3.gif">
+
+<p>Figure 3 shows how leaps are calculated on timelines.</p>
+
+</li>
+</ul>
+
+<h2 id="Normalising-without-a-base">Normalising without a base</h2>
+
+<p>This module includes two ways to normalise without a base.</p>
+
+<ul>
+
+<li><p>Standard Normalisation</p>
+
+<p>Using standard normalisation without a base, 45 days will stay as 45 days as there is no way to accurately convert to months. However the following assumptions will be made: There are 24 hours in a day and there are 60 seconds in a minute.</p>
+
+</li>
+<li><p>ISO Normalisation</p>
+
+<p>In ISO8601v2000, Section 5.5.3.2 says that &quot;The values used must not exceed the &#39;carry-over points&#39; of 12 months, 30 days, 24 hours, 60 minutes and 60 seconds&quot;. Thus if you set the normalise option of the constructor, or use set_normalising to &#39;ISO&#39;, months will be normalised to 30 days.</p>
+
+</li>
+</ul>
+
+<h2 id="Deltas-vs-Duration-Objects">Deltas vs Duration Objects</h2>
+
+<p>This module can bypass duration objects and just work with delta hashes. This used to be of greatest value with earlier versions of DateTime::Duration when DateTime::Duration assumed a duration with one negative component was a negative duration (that is, -2 hours, 34 minutes was assumed to be -2 hours, -34 minutes).</p>
+
+<p>These extra methods have been left in here firstly for backwards-compatibility but also as an added &#39;syntactic sugar&#39;. Consider these two equivalent expressions:</p>
+
+<pre><code>    <span class="variable">$one</span> <span class="operator">=</span> <span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">format_duration</span><span class="operator">(</span>
+        <span class="variable">DateTime::Duration</span><span class="operator">-&gt;</span><span class="variable">new</span><span class="operator">(</span>
+            <span class="string">years</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">2</span><span class="operator">,</span>
+            <span class="string">days</span>  <span class="operator">=&gt;</span> <span class="number">13</span><span class="operator">,</span>
+            <span class="string">hours</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">1</span>
+        <span class="operator">)</span>
+    <span class="operator">);</span>
+    
+    <span class="variable">$two</span> <span class="operator">=</span> <span class="variable">$o</span><span class="operator">-&gt;</span><span class="variable">format_duration_from_deltas</span><span class="operator">(</span>
+        <span class="string">years</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">2</span><span class="operator">,</span>
+        <span class="string">days</span>  <span class="operator">=&gt;</span> <span class="number">13</span><span class="operator">,</span>
+        <span class="string">hours</span> <span class="operator">=&gt;</span> <span class="operator">-</span><span class="number">1</span>
+    <span class="operator">);</span>
+</code></pre>
+
+<p>These both create the same string in $one and $two, but if you don&#39;t already have a DateTime::Duration object, the later looks cleaner.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>datetime@perl.org mailing list</p>
+
+<p>http://datetime.perl.org/</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>Bugs may be submitted through <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Duration">the RT bug tracker</a> (or <a href="mailto:bug-DateTime-Format-Duration@rt.cpan.org">bug-DateTime-Format-Duration@rt.cpan.org</a>).</p>
+
+<p>There is also a mailing list available for users of this distribution, at <a href="http://lists.perl.org/list/datetime.html">http://lists.perl.org/list/datetime.html</a>.</p>
+
+<p>I am also usually active on irc, as &#39;ether&#39; at <code>irc.perl.org</code>.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Rick Measham &lt;rickm@cpan.org&gt;</p>
+
+<h1 id="CONTRIBUTOR">CONTRIBUTOR</h1>
+
+<p>Karen Etheridge &lt;ether@cpan.org&gt;</p>
+
+<h1 id="COPYRIGHT-AND-LICENCE">COPYRIGHT AND LICENCE</h1>
+
+<p>This software is copyright (c) 2003 by Rick Measham.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+
+</body>
+
+</html>
+
+
