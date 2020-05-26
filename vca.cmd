@@ -22,6 +22,8 @@ rem call "%VCMakeRootPath%Script\dlgit" PDCurses                     https://git
 rem call "%VCMakeRootPath%Script\dlgit" doxygen                      https://github.com/doxygen/doxygen.git                              %Buildtype% doxygen.sln
 rem call "%VCMakeRootPath%Script\dlgit" CastXML                      https://github.com/CastXML/CastXML.git                              %Buildtype% CastXML.sln
 rem call "%VCMakeRootPath%Script\dlgit" qTox                         https://github.com/qTox/qTox.git                                    %Buildtype% qTox.sln
+rem call "%VCMakeRootPath%Script\dlgit" rocksdb                      https://github.com/facebook/rocksdb.git                             %Buildtype% rocksdb.sln
+rem call "%VCMakeRootPath%Script\dlgit" pytorch                      https://github.com/pytorch/pytorch.git                              %Buildtype% Caffe2.sln
 
 :: ±‡“Î≥…π¶
 rem call "%VCMakeRootPath%Script\dlzip" zlib-1.2.11                  https://www.zlib.net/zlib-1.2.11.tar.gz                             %Buildtype% zlib.sln
@@ -79,6 +81,5 @@ rem call "%VCMakeRootPath%Script\dlzip" libvorbis-1.3.6              http://down
 rem call "%VCMakeRootPath%Script\dlzip" libtheora-1.1.1              http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2   %Buildtype% libtheora.sln
 rem call "%VCMakeRootPath%Script\dlzip" flac-1.3.2                   http://downloads.xiph.org/releases/flac/flac-1.3.2.tar.xz           %Buildtype% flac.sln
 rem call "%VCMakeRootPath%Script\dlgit" tbb                          https://github.com/intel/tbb.git                                    %Buildtype% tbb.sln
-call "%VCMakeRootPath%Script\dlgit" opencv                       https://github.com/opencv/opencv.git                                %Buildtype%\opencv\static opencv.sln
-rem call "%VCMakeRootPath%Script\dlgit" rocksdb                      https://github.com/facebook/rocksdb.git                             %Buildtype% rocksdb.sln
-rem call "%VCMakeRootPath%Script\dlgit" pytorch                      https://github.com/pytorch/pytorch.git                              %Buildtype% Caffe2.sln
+rem call "%VCMakeRootPath%Script\dlgit" opencv                       https://github.com/opencv/opencv.git                                %Buildtype%\opencv\static opencv.sln
+call "%VCMakeRootPath%Script\dlgit" AMF                          https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git                 %Buildtype% AMF.sln
