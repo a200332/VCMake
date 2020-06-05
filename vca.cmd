@@ -24,6 +24,7 @@ rem call "%VCMakeRootPath%Script\dlgit" CastXML                      https://git
 rem call "%VCMakeRootPath%Script\dlgit" qTox                         https://github.com/qTox/qTox.git                                    %Buildtype% qTox.sln
 rem call "%VCMakeRootPath%Script\dlgit" rocksdb                      https://github.com/facebook/rocksdb.git                             %Buildtype% rocksdb.sln
 rem call "%VCMakeRootPath%Script\dlgit" pytorch                      https://github.com/pytorch/pytorch.git                              %Buildtype% Caffe2.sln
+rem call "%VCMakeRootPath%Script\dlgit" AMF                          https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git                 %Buildtype% AMF.sln
 
 :: ±‡“Î≥…π¶
 rem call "%VCMakeRootPath%Script\dlzip" zlib-1.2.11                  https://www.zlib.net/zlib-1.2.11.tar.gz                             %Buildtype% zlib.sln
@@ -82,4 +83,5 @@ rem call "%VCMakeRootPath%Script\dlzip" libtheora-1.1.1              http://down
 rem call "%VCMakeRootPath%Script\dlzip" flac-1.3.2                   http://downloads.xiph.org/releases/flac/flac-1.3.2.tar.xz           %Buildtype% flac.sln
 rem call "%VCMakeRootPath%Script\dlgit" tbb                          https://github.com/intel/tbb.git                                    %Buildtype% tbb.sln
 rem call "%VCMakeRootPath%Script\dlgit" opencv                       https://github.com/opencv/opencv.git                                %Buildtype%\opencv\static opencv.sln
-call "%VCMakeRootPath%Script\dlgit" AMF                          https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git                 %Buildtype% AMF.sln
+rem call "%VCMakeRootPath%Script\dlgit" libexpat                     https://github.com/libexpat/libexpat.git                            %Buildtype% libexpat.sln
+call "%VCMakeRootPath%Script\dlgit" lua                          https://github.com/LuaDist/lua.git                                  %Buildtype% lua.sln
