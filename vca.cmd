@@ -12,7 +12,6 @@ set "Buildtype=%VCMakeRootPath% %BuildLanguageX% %BuildPlatform1% %BuildPlatform
 :: 备注
 :: 1：Windows10下，OpenSSL 编译需要管理员权限，因为它需要向系统盘写入数据；
 :: 2：Clang 和 VTK，命令行编译会失败，用 GUI 编译成功后，再回到命令行编译；
-:: 3：AOM 只能编译 64 位版本
 
 :: 编译未成功，待验证
 rem call "%VCMakeRootPath%Script\dlgit" ImageMagick-windows          https://github.com/ImageMagick/ImageMagick-windows.git              %Buildtype% nghttp2.sln
@@ -25,7 +24,7 @@ rem call "%VCMakeRootPath%Script\dlgit" CastXML                      https://git
 rem call "%VCMakeRootPath%Script\dlgit" qTox                         https://github.com/qTox/qTox.git                                    %Buildtype% qTox.sln
 rem call "%VCMakeRootPath%Script\dlgit" rocksdb                      https://github.com/facebook/rocksdb.git                             %Buildtype% rocksdb.sln
 rem call "%VCMakeRootPath%Script\dlgit" pytorch                      https://github.com/pytorch/pytorch.git                              %Buildtype% Caffe2.sln
-rem call "%VCMakeRootPath%Script\dlgit" aom                          https://aomedia.googlesource.com/aom                                %Buildtype% aom.sln
+rem call "%VCMakeRootPath%Script\dlgit" AMF                          https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git                 %Buildtype% AMF.sln
 
 :: 编译成功
 rem call "%VCMakeRootPath%Script\dlzip" zlib-1.2.11                  https://www.zlib.net/zlib-1.2.11.tar.gz                             %Buildtype% zlib.sln
@@ -84,5 +83,5 @@ rem call "%VCMakeRootPath%Script\dlzip" libtheora-1.1.1              http://down
 rem call "%VCMakeRootPath%Script\dlzip" flac-1.3.2                   http://downloads.xiph.org/releases/flac/flac-1.3.2.tar.xz           %Buildtype% flac.sln
 rem call "%VCMakeRootPath%Script\dlgit" tbb                          https://github.com/intel/tbb.git                                    %Buildtype% tbb.sln
 rem call "%VCMakeRootPath%Script\dlgit" opencv                       https://github.com/opencv/opencv.git                                %Buildtype%\opencv\static opencv.sln
-rem call "%VCMakeRootPath%Script\dlgit" AMF                          https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git                 %Buildtype% AMF.sln
-call "%VCMakeRootPath%Script\dlgit" minizip                      https://github.com/nmoinvaz/minizip.git                             %Buildtype% minizip.sln
+rem call "%VCMakeRootPath%Script\dlgit" libexpat                     https://github.com/libexpat/libexpat.git                            %Buildtype% libexpat.sln
+call "%VCMakeRootPath%Script\dlgit" lua                          https://github.com/LuaDist/lua.git                                  %Buildtype% lua.sln
